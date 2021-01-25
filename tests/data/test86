@@ -67,17 +67,17 @@ HTTP, urlglob []-retrieval and -o #[num] usage
 <protocol>
 GET /860001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /860002 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /860003 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

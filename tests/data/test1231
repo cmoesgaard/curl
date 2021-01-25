@@ -47,12 +47,12 @@ http://%HOSTIP:%HTTPPORT/../../hej/but/who/../1231?stupid=me/../1231#soo/../1231
 <protocol>
 GET /hej/but/1231?stupid=me/../1231 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /hej/but/12310001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

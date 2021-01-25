@@ -1,4 +1,4 @@
-![curl logo](https://curl.se/logo/curl-logo.svg)
+![carl logo](https://carl.se/logo/carl-logo.svg)
 
 # Documentation
 
@@ -7,6 +7,6 @@ subdirectories, using several different formats. Some of them are not ideal
 for reading directly in your browser.
 
 If you'd rather see the rendered version of the documentation, check out the
-curl website's [documentation section](https://curl.se/docs/) for
-general curl stuff or the [libcurl section](https://curl.se/libcurl/) for
-libcurl related documentation.
+carl website's [documentation section](https://carl.se/docs/) for
+general carl stuff or the [libcarl section](https://carl.se/libcarl/) for
+libcarl related documentation.

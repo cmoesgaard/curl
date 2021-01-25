@@ -1,0 +1,57 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_TFTP_BLKSIZE 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_TFTP_BLKSIZE \- TFTP block size
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_TFTP_BLKSIZE, long blocksize);
+.SH DESCRIPTION
+Specify \fIblocksize\fP to use for TFTP data transmission. Valid range as per
+RFC2348 is 8-65464 bytes. The default of 512 bytes will be used if this option
+is not specified. The specified block size will only be used pending support
+by the remote server. If the server does not return an option acknowledgement
+or returns an option acknowledgement with no blksize, the default of 512 bytes
+will be used.
+.SH DEFAULT
+512
+.SH PROTOCOLS
+TFTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "tftp://example.com/bootimage");
+  /* try using larger blocks */
+  carl_easy_setopt(carl, CARLOPT_TFTP_BLKSIZE, 2048L);
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.19.4
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_MAXFILESIZE "(3), "

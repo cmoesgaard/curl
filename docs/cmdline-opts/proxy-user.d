@@ -6,11 +6,11 @@ Category: proxy auth
 ---
 Specify the user name and password to use for proxy authentication.
 
-If you use a Windows SSPI-enabled curl binary and do either Negotiate or NTLM
-authentication then you can tell curl to select the user name and password
+If you use a Windows SSPI-enabled carl binary and do either Negotiate or NTLM
+authentication then you can tell carl to select the user name and password
 from your environment by specifying a single colon with this option: "-U :".
 
-On systems where it works, curl will hide the given option argument from
+On systems where it works, carl will hide the given option argument from
 process listings. This is not enough to protect credentials from possibly
 getting seen by other users on the same system as they will still be visible
 for a brief moment before cleared. Such sensitive data should be retrieved

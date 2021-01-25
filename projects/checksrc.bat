@@ -10,7 +10,7 @@ rem * Copyright (C) 2014 - 2020, Steve Holme, <steve_holme@hotmail.com>.
 rem *
 rem * This software is licensed as described in the file COPYING, which
 rem * you should have received as part of this distribution. The terms
-rem * are also available at https://curl.se/docs/copyright.html.
+rem * are also available at https://carl.se/docs/copyright.html.
 rem *
 rem * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 rem * copies of the Software, and permit persons to whom the Software is
@@ -122,7 +122,7 @@ rem ***************************************************************************
     rem Check the lib directory
     if exist %SRC_DIR%\lib (
       for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\*.c.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib" "%%i"
-      for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\*.h.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib" -Wcurl_config.h.cmake -Wcurl_config.h.in -Wcurl_config.h "%%i"
+      for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\*.h.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib" -Wcarl_config.h.cmake -Wcarl_config.h.in -Wcarl_config.h "%%i"
     )
 
     rem Check the lib\vauth directory
@@ -186,12 +186,12 @@ rem ***************************************************************************
   echo.
   echo What to scan:
   echo.
-  echo lib       - Scan the libcurl source
+  echo lib       - Scan the libcarl source
   echo src       - Scan the command-line tool source
   echo tests     - Scan the library tests and unit tests
   echo examples  - Scan the examples
   echo.
-  echo directory - Specifies the curl source directory
+  echo directory - Specifies the carl source directory
   goto success
 
 :unknown

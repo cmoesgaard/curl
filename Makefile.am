@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -27,7 +27,7 @@ ACLOCAL_AMFLAGS = -I m4
 CMAKE_DIST =                                    \
  CMake/cmake_uninstall.cmake.in                 \
  CMake/CMakeConfigurableFile.in                 \
- CMake/curl-config.cmake.in                     \
+ CMake/carl-config.cmake.in                     \
  CMake/CurlSymbolHiding.cmake                   \
  CMake/CurlTests.c                              \
  CMake/FindBearSSL.cmake                        \
@@ -49,120 +49,120 @@ CMAKE_DIST =                                    \
  CMake/Utilities.cmake                          \
  CMakeLists.txt
 
-VC6_LIBTMPL = projects/Windows/VC6/lib/libcurl.tmpl
-VC6_LIBDSP = projects/Windows/VC6/lib/libcurl.dsp.dist
+VC6_LIBTMPL = projects/Windows/VC6/lib/libcarl.tmpl
+VC6_LIBDSP = projects/Windows/VC6/lib/libcarl.dsp.dist
 VC6_LIBDSP_DEPS = $(VC6_LIBTMPL) Makefile.am lib/Makefile.inc
-VC6_SRCTMPL = projects/Windows/VC6/src/curl.tmpl
-VC6_SRCDSP = projects/Windows/VC6/src/curl.dsp.dist
+VC6_SRCTMPL = projects/Windows/VC6/src/carl.tmpl
+VC6_SRCDSP = projects/Windows/VC6/src/carl.dsp.dist
 VC6_SRCDSP_DEPS = $(VC6_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC7_LIBTMPL = projects/Windows/VC7/lib/libcurl.tmpl
-VC7_LIBVCPROJ = projects/Windows/VC7/lib/libcurl.vcproj.dist
+VC7_LIBTMPL = projects/Windows/VC7/lib/libcarl.tmpl
+VC7_LIBVCPROJ = projects/Windows/VC7/lib/libcarl.vcproj.dist
 VC7_LIBVCPROJ_DEPS = $(VC7_LIBTMPL) Makefile.am lib/Makefile.inc
-VC7_SRCTMPL = projects/Windows/VC7/src/curl.tmpl
-VC7_SRCVCPROJ = projects/Windows/VC7/src/curl.vcproj.dist
+VC7_SRCTMPL = projects/Windows/VC7/src/carl.tmpl
+VC7_SRCVCPROJ = projects/Windows/VC7/src/carl.vcproj.dist
 VC7_SRCVCPROJ_DEPS = $(VC7_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC71_LIBTMPL = projects/Windows/VC7.1/lib/libcurl.tmpl
-VC71_LIBVCPROJ = projects/Windows/VC7.1/lib/libcurl.vcproj.dist
+VC71_LIBTMPL = projects/Windows/VC7.1/lib/libcarl.tmpl
+VC71_LIBVCPROJ = projects/Windows/VC7.1/lib/libcarl.vcproj.dist
 VC71_LIBVCPROJ_DEPS = $(VC71_LIBTMPL) Makefile.am lib/Makefile.inc
-VC71_SRCTMPL = projects/Windows/VC7.1/src/curl.tmpl
-VC71_SRCVCPROJ = projects/Windows/VC7.1/src/curl.vcproj.dist
+VC71_SRCTMPL = projects/Windows/VC7.1/src/carl.tmpl
+VC71_SRCVCPROJ = projects/Windows/VC7.1/src/carl.vcproj.dist
 VC71_SRCVCPROJ_DEPS = $(VC71_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC8_LIBTMPL = projects/Windows/VC8/lib/libcurl.tmpl
-VC8_LIBVCPROJ = projects/Windows/VC8/lib/libcurl.vcproj.dist
+VC8_LIBTMPL = projects/Windows/VC8/lib/libcarl.tmpl
+VC8_LIBVCPROJ = projects/Windows/VC8/lib/libcarl.vcproj.dist
 VC8_LIBVCPROJ_DEPS = $(VC8_LIBTMPL) Makefile.am lib/Makefile.inc
-VC8_SRCTMPL = projects/Windows/VC8/src/curl.tmpl
-VC8_SRCVCPROJ = projects/Windows/VC8/src/curl.vcproj.dist
+VC8_SRCTMPL = projects/Windows/VC8/src/carl.tmpl
+VC8_SRCVCPROJ = projects/Windows/VC8/src/carl.vcproj.dist
 VC8_SRCVCPROJ_DEPS = $(VC8_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC9_LIBTMPL = projects/Windows/VC9/lib/libcurl.tmpl
-VC9_LIBVCPROJ = projects/Windows/VC9/lib/libcurl.vcproj.dist
+VC9_LIBTMPL = projects/Windows/VC9/lib/libcarl.tmpl
+VC9_LIBVCPROJ = projects/Windows/VC9/lib/libcarl.vcproj.dist
 VC9_LIBVCPROJ_DEPS = $(VC9_LIBTMPL) Makefile.am lib/Makefile.inc
-VC9_SRCTMPL = projects/Windows/VC9/src/curl.tmpl
-VC9_SRCVCPROJ = projects/Windows/VC9/src/curl.vcproj.dist
+VC9_SRCTMPL = projects/Windows/VC9/src/carl.tmpl
+VC9_SRCVCPROJ = projects/Windows/VC9/src/carl.vcproj.dist
 VC9_SRCVCPROJ_DEPS = $(VC9_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC10_LIBTMPL = projects/Windows/VC10/lib/libcurl.tmpl
-VC10_LIBVCXPROJ = projects/Windows/VC10/lib/libcurl.vcxproj.dist
+VC10_LIBTMPL = projects/Windows/VC10/lib/libcarl.tmpl
+VC10_LIBVCXPROJ = projects/Windows/VC10/lib/libcarl.vcxproj.dist
 VC10_LIBVCXPROJ_DEPS = $(VC10_LIBTMPL) Makefile.am lib/Makefile.inc
-VC10_SRCTMPL = projects/Windows/VC10/src/curl.tmpl
-VC10_SRCVCXPROJ = projects/Windows/VC10/src/curl.vcxproj.dist
+VC10_SRCTMPL = projects/Windows/VC10/src/carl.tmpl
+VC10_SRCVCXPROJ = projects/Windows/VC10/src/carl.vcxproj.dist
 VC10_SRCVCXPROJ_DEPS = $(VC10_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC11_LIBTMPL = projects/Windows/VC11/lib/libcurl.tmpl
-VC11_LIBVCXPROJ = projects/Windows/VC11/lib/libcurl.vcxproj.dist
+VC11_LIBTMPL = projects/Windows/VC11/lib/libcarl.tmpl
+VC11_LIBVCXPROJ = projects/Windows/VC11/lib/libcarl.vcxproj.dist
 VC11_LIBVCXPROJ_DEPS = $(VC11_LIBTMPL) Makefile.am lib/Makefile.inc
-VC11_SRCTMPL = projects/Windows/VC11/src/curl.tmpl
-VC11_SRCVCXPROJ = projects/Windows/VC11/src/curl.vcxproj.dist
+VC11_SRCTMPL = projects/Windows/VC11/src/carl.tmpl
+VC11_SRCVCXPROJ = projects/Windows/VC11/src/carl.vcxproj.dist
 VC11_SRCVCXPROJ_DEPS = $(VC11_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC12_LIBTMPL = projects/Windows/VC12/lib/libcurl.tmpl
-VC12_LIBVCXPROJ = projects/Windows/VC12/lib/libcurl.vcxproj.dist
+VC12_LIBTMPL = projects/Windows/VC12/lib/libcarl.tmpl
+VC12_LIBVCXPROJ = projects/Windows/VC12/lib/libcarl.vcxproj.dist
 VC12_LIBVCXPROJ_DEPS = $(VC12_LIBTMPL) Makefile.am lib/Makefile.inc
-VC12_SRCTMPL = projects/Windows/VC12/src/curl.tmpl
-VC12_SRCVCXPROJ = projects/Windows/VC12/src/curl.vcxproj.dist
+VC12_SRCTMPL = projects/Windows/VC12/src/carl.tmpl
+VC12_SRCVCXPROJ = projects/Windows/VC12/src/carl.vcxproj.dist
 VC12_SRCVCXPROJ_DEPS = $(VC12_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC14_LIBTMPL = projects/Windows/VC14/lib/libcurl.tmpl
-VC14_LIBVCXPROJ = projects/Windows/VC14/lib/libcurl.vcxproj.dist
+VC14_LIBTMPL = projects/Windows/VC14/lib/libcarl.tmpl
+VC14_LIBVCXPROJ = projects/Windows/VC14/lib/libcarl.vcxproj.dist
 VC14_LIBVCXPROJ_DEPS = $(VC14_LIBTMPL) Makefile.am lib/Makefile.inc
-VC14_SRCTMPL = projects/Windows/VC14/src/curl.tmpl
-VC14_SRCVCXPROJ = projects/Windows/VC14/src/curl.vcxproj.dist
+VC14_SRCTMPL = projects/Windows/VC14/src/carl.tmpl
+VC14_SRCVCXPROJ = projects/Windows/VC14/src/carl.vcxproj.dist
 VC14_SRCVCXPROJ_DEPS = $(VC14_SRCTMPL) Makefile.am src/Makefile.inc
 
-VC15_LIBTMPL = projects/Windows/VC15/lib/libcurl.tmpl
-VC15_LIBVCXPROJ = projects/Windows/VC15/lib/libcurl.vcxproj.dist
+VC15_LIBTMPL = projects/Windows/VC15/lib/libcarl.tmpl
+VC15_LIBVCXPROJ = projects/Windows/VC15/lib/libcarl.vcxproj.dist
 VC15_LIBVCXPROJ_DEPS = $(VC15_LIBTMPL) Makefile.am lib/Makefile.inc
-VC15_SRCTMPL = projects/Windows/VC15/src/curl.tmpl
-VC15_SRCVCXPROJ = projects/Windows/VC15/src/curl.vcxproj.dist
+VC15_SRCTMPL = projects/Windows/VC15/src/carl.tmpl
+VC15_SRCVCXPROJ = projects/Windows/VC15/src/carl.vcxproj.dist
 VC15_SRCVCXPROJ_DEPS = $(VC15_SRCTMPL) Makefile.am src/Makefile.inc
 
 VC_DIST = projects/README                           \
  projects/build-openssl.bat                         \
  projects/build-wolfssl.bat                         \
  projects/checksrc.bat                              \
- projects/Windows/VC6/curl-all.dsw                  \
- projects/Windows/VC6/lib/libcurl.dsw               \
- projects/Windows/VC6/src/curl.dsw                  \
- projects/Windows/VC7/curl-all.sln                  \
- projects/Windows/VC7/lib/libcurl.sln               \
- projects/Windows/VC7/src/curl.sln                  \
- projects/Windows/VC7.1/curl-all.sln                \
- projects/Windows/VC7.1/lib/libcurl.sln             \
- projects/Windows/VC7.1/src/curl.sln                \
- projects/Windows/VC8/curl-all.sln                  \
- projects/Windows/VC8/lib/libcurl.sln               \
- projects/Windows/VC8/src/curl.sln                  \
- projects/Windows/VC9/curl-all.sln                  \
- projects/Windows/VC9/lib/libcurl.sln               \
- projects/Windows/VC9/src/curl.sln                  \
- projects/Windows/VC10/curl-all.sln                 \
- projects/Windows/VC10/lib/libcurl.sln              \
- projects/Windows/VC10/lib/libcurl.vcxproj.filters  \
- projects/Windows/VC10/src/curl.sln                 \
- projects/Windows/VC10/src/curl.vcxproj.filters     \
- projects/Windows/VC11/curl-all.sln                 \
- projects/Windows/VC11/lib/libcurl.sln              \
- projects/Windows/VC11/lib/libcurl.vcxproj.filters  \
- projects/Windows/VC11/src/curl.sln                 \
- projects/Windows/VC11/src/curl.vcxproj.filters     \
- projects/Windows/VC12/curl-all.sln                 \
- projects/Windows/VC12/lib/libcurl.sln              \
- projects/Windows/VC12/lib/libcurl.vcxproj.filters  \
- projects/Windows/VC12/src/curl.sln                 \
- projects/Windows/VC12/src/curl.vcxproj.filters     \
- projects/Windows/VC14/curl-all.sln                 \
- projects/Windows/VC14/lib/libcurl.sln              \
- projects/Windows/VC14/lib/libcurl.vcxproj.filters  \
- projects/Windows/VC14/src/curl.sln                 \
- projects/Windows/VC14/src/curl.vcxproj.filters     \
- projects/Windows/VC15/curl-all.sln                 \
- projects/Windows/VC15/lib/libcurl.sln              \
- projects/Windows/VC15/lib/libcurl.vcxproj.filters  \
- projects/Windows/VC15/src/curl.sln                 \
- projects/Windows/VC15/src/curl.vcxproj.filters     \
+ projects/Windows/VC6/carl-all.dsw                  \
+ projects/Windows/VC6/lib/libcarl.dsw               \
+ projects/Windows/VC6/src/carl.dsw                  \
+ projects/Windows/VC7/carl-all.sln                  \
+ projects/Windows/VC7/lib/libcarl.sln               \
+ projects/Windows/VC7/src/carl.sln                  \
+ projects/Windows/VC7.1/carl-all.sln                \
+ projects/Windows/VC7.1/lib/libcarl.sln             \
+ projects/Windows/VC7.1/src/carl.sln                \
+ projects/Windows/VC8/carl-all.sln                  \
+ projects/Windows/VC8/lib/libcarl.sln               \
+ projects/Windows/VC8/src/carl.sln                  \
+ projects/Windows/VC9/carl-all.sln                  \
+ projects/Windows/VC9/lib/libcarl.sln               \
+ projects/Windows/VC9/src/carl.sln                  \
+ projects/Windows/VC10/carl-all.sln                 \
+ projects/Windows/VC10/lib/libcarl.sln              \
+ projects/Windows/VC10/lib/libcarl.vcxproj.filters  \
+ projects/Windows/VC10/src/carl.sln                 \
+ projects/Windows/VC10/src/carl.vcxproj.filters     \
+ projects/Windows/VC11/carl-all.sln                 \
+ projects/Windows/VC11/lib/libcarl.sln              \
+ projects/Windows/VC11/lib/libcarl.vcxproj.filters  \
+ projects/Windows/VC11/src/carl.sln                 \
+ projects/Windows/VC11/src/carl.vcxproj.filters     \
+ projects/Windows/VC12/carl-all.sln                 \
+ projects/Windows/VC12/lib/libcarl.sln              \
+ projects/Windows/VC12/lib/libcarl.vcxproj.filters  \
+ projects/Windows/VC12/src/carl.sln                 \
+ projects/Windows/VC12/src/carl.vcxproj.filters     \
+ projects/Windows/VC14/carl-all.sln                 \
+ projects/Windows/VC14/lib/libcarl.sln              \
+ projects/Windows/VC14/lib/libcarl.vcxproj.filters  \
+ projects/Windows/VC14/src/carl.sln                 \
+ projects/Windows/VC14/src/carl.vcxproj.filters     \
+ projects/Windows/VC15/carl-all.sln                 \
+ projects/Windows/VC15/lib/libcarl.sln              \
+ projects/Windows/VC15/lib/libcarl.vcxproj.filters  \
+ projects/Windows/VC15/src/carl.sln                 \
+ projects/Windows/VC15/src/carl.vcxproj.filters     \
  projects/generate.bat                              \
  projects/wolfssl_options.h                         \
  projects/wolfssl_override.props
@@ -180,11 +180,11 @@ PLAN9_DIST = plan9/include/mkfile \
  plan9/src/mkfile.inc             \
  plan9/src/mkfile
 
-EXTRA_DIST = CHANGES COPYING maketgz Makefile.dist curl-config.in \
- RELEASE-NOTES buildconf libcurl.pc.in MacOSX-Framework \
+EXTRA_DIST = CHANGES COPYING maketgz Makefile.dist carl-config.in \
+ RELEASE-NOTES buildconf libcarl.pc.in MacOSX-Framework \
  scripts/updatemanpages.pl $(CMAKE_DIST) \
  $(VC_DIST) $(WINBUILD_DIST) $(PLAN9_DIST) \
- lib/libcurl.vers.in buildconf.bat scripts/coverage.sh scripts/completion.pl
+ lib/libcarl.vers.in buildconf.bat scripts/coverage.sh scripts/completion.pl
 
 CLEANFILES = $(VC6_LIBDSP) $(VC6_SRCDSP) $(VC7_LIBVCPROJ) $(VC7_SRCVCPROJ) \
  $(VC71_LIBVCPROJ) $(VC71_SRCVCPROJ) $(VC8_LIBVCPROJ) $(VC8_SRCVCPROJ) \
@@ -192,13 +192,13 @@ CLEANFILES = $(VC6_LIBDSP) $(VC6_SRCDSP) $(VC7_LIBVCPROJ) $(VC7_SRCVCPROJ) \
  $(VC11_LIBVCXPROJ) $(VC11_SRCVCXPROJ) $(VC12_LIBVCXPROJ) $(VC12_SRCVCXPROJ) \
  $(VC14_LIBVCXPROJ) $(VC14_SRCVCXPROJ) $(VC15_LIBVCXPROJ) $(VC15_SRCVCXPROJ)
 
-bin_SCRIPTS = curl-config
+bin_SCRIPTS = carl-config
 
 SUBDIRS = lib src
 DIST_SUBDIRS = $(SUBDIRS) tests packages scripts include docs
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libcurl.pc
+pkgconfig_DATA = libcarl.pc
 
 # List of files required to generate VC IDE .dsp, .vcproj and .vcxproj files
 include lib/Makefile.inc
@@ -254,7 +254,7 @@ examples:
 	@(cd docs/examples; $(MAKE) check)
 
 check-docs:
-	@(cd docs/libcurl; $(MAKE) check)
+	@(cd docs/libcarl; $(MAKE) check)
 
 # Build source and binary rpms. For rpm-3.0 and above, the ~/.rpmmacros
 # must contain the following line:
@@ -271,8 +271,8 @@ check-docs:
 #
 
 rpms:
-	$(MAKE) RPMDIST=curl rpm
-	$(MAKE) RPMDIST=curl-ssl rpm
+	$(MAKE) RPMDIST=carl rpm
+	$(MAKE) RPMDIST=carl-ssl rpm
 
 rpm:
 	RPM_TOPDIR=`rpm --showrc | $(PERL) -n -e 'print if(s/.*_topdir\s+(.*)/$$1/)'` ; \
@@ -287,7 +287,7 @@ rpm:
 # run 'make pkgadd' once you've done './configure' and 'make' to make a Solaris pkgadd format
 # file (which ends up back in this directory).
 # The pkgadd file is in 'pkgtrans' format, so to install on Solaris, do
-# pkgadd -d ./HAXXcurl-*
+# pkgadd -d ./HAXXcarl-*
 #
 
 # gak - libtool requires an absolute directory, hence the pwd below...
@@ -307,13 +307,13 @@ cygwinbin:
 install-data-hook:
 	(cd include && $(MAKE) install)
 	(cd docs && $(MAKE) install)
-	(cd docs/libcurl && $(MAKE) install)
+	(cd docs/libcarl && $(MAKE) install)
 
 # We extend the standard uninstall with a custom hook:
 uninstall-hook:
 	(cd include && $(MAKE) uninstall)
 	(cd docs && $(MAKE) uninstall)
-	(cd docs/libcurl && $(MAKE) uninstall)
+	(cd docs/libcarl && $(MAKE) uninstall)
 
 ca-bundle: lib/mk-ca-bundle.pl
 	@echo "generating a fresh ca-bundle.crt"
@@ -327,7 +327,7 @@ checksrc:
 	(cd lib && $(MAKE) checksrc)
 	(cd src && $(MAKE) checksrc)
 	(cd tests && $(MAKE) checksrc)
-	(cd include/curl && $(MAKE) checksrc)
+	(cd include/carl && $(MAKE) checksrc)
 	(cd docs/examples && $(MAKE) checksrc)
 	(cd packages && $(MAKE) checksrc)
 
@@ -351,11 +351,11 @@ vc-ide: $(VC6_LIBDSP_DEPS) $(VC6_SRCDSP_DEPS) $(VC7_LIBVCPROJ_DEPS) \
 	win32_lib_vssh_hdrs='$(LIB_VSSH_HFILES)'; \
 	win32_lib_vtls_srcs='$(LIB_VTLS_CFILES)'; \
 	win32_lib_vtls_hdrs='$(LIB_VTLS_HFILES)'; \
-	win32_src_srcs='$(CURL_CFILES)'; \
-	win32_src_hdrs='$(CURL_HFILES)'; \
-	win32_src_rc='$(CURL_RCFILES)'; \
-	win32_src_x_srcs='$(CURLX_CFILES)'; \
-	win32_src_x_hdrs='$(CURLX_HFILES) ../lib/config-win32.h'; \
+	win32_src_srcs='$(CARL_CFILES)'; \
+	win32_src_hdrs='$(CARL_HFILES)'; \
+	win32_src_rc='$(CARL_RCFILES)'; \
+	win32_src_x_srcs='$(CARLX_CFILES)'; \
+	win32_src_x_hdrs='$(CARLX_HFILES) ../lib/config-win32.h'; \
 	\
 	sorted_lib_srcs=`for file in $$win32_lib_srcs; do echo $$file; done | sort`; \
 	sorted_lib_hdrs=`for file in $$win32_lib_hdrs; do echo $$file; done | sort`; \
@@ -426,70 +426,70 @@ function gen_element(type, dir, file)\
 \
 {\
 \
-  if($$0 == "CURL_LIB_C_FILES") {\
+  if($$0 == "CARL_LIB_C_FILES") {\
     split(lib_srcs, arr);\
     for(val in arr) gen_element(proj_type, "lib", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_H_FILES") {\
+  else if($$0 == "CARL_LIB_H_FILES") {\
     split(lib_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "lib", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_RC_FILES") {\
+  else if($$0 == "CARL_LIB_RC_FILES") {\
     split(lib_rc, arr);\
     for(val in arr) gen_element(proj_type, "lib", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VAUTH_C_FILES") {\
+  else if($$0 == "CARL_LIB_VAUTH_C_FILES") {\
     split(lib_vauth_srcs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vauth", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VAUTH_H_FILES") {\
+  else if($$0 == "CARL_LIB_VAUTH_H_FILES") {\
     split(lib_vauth_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vauth", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VQUIC_C_FILES") {\
+  else if($$0 == "CARL_LIB_VQUIC_C_FILES") {\
     split(lib_vquic_srcs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vquic", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VQUIC_H_FILES") {\
+  else if($$0 == "CARL_LIB_VQUIC_H_FILES") {\
     split(lib_vquic_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vquic", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VSSH_C_FILES") {\
+  else if($$0 == "CARL_LIB_VSSH_C_FILES") {\
     split(lib_vssh_srcs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vssh", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VSSH_H_FILES") {\
+  else if($$0 == "CARL_LIB_VSSH_H_FILES") {\
     split(lib_vssh_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vssh", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VTLS_C_FILES") {\
+  else if($$0 == "CARL_LIB_VTLS_C_FILES") {\
     split(lib_vtls_srcs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vtls", arr[val]);\
   }\
-  else if($$0 == "CURL_LIB_VTLS_H_FILES") {\
+  else if($$0 == "CARL_LIB_VTLS_H_FILES") {\
     split(lib_vtls_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "lib\\vtls", arr[val]);\
   }\
-  else if($$0 == "CURL_SRC_C_FILES") {\
+  else if($$0 == "CARL_SRC_C_FILES") {\
     split(src_srcs, arr);\
     for(val in arr) gen_element(proj_type, "src", arr[val]);\
   }\
-  else if($$0 == "CURL_SRC_H_FILES") {\
+  else if($$0 == "CARL_SRC_H_FILES") {\
     split(src_hdrs, arr);\
     for(val in arr) gen_element(proj_type, "src", arr[val]);\
   }\
-  else if($$0 == "CURL_SRC_RC_FILES") {\
+  else if($$0 == "CARL_SRC_RC_FILES") {\
     split(src_rc, arr);\
     for(val in arr) gen_element(proj_type, "src", arr[val]);\
   }\
-  else if($$0 == "CURL_SRC_X_C_FILES") {\
+  else if($$0 == "CARL_SRC_X_C_FILES") {\
     split(src_x_srcs, arr);\
     for(val in arr) {\
       sub(/..\/lib\//, "", arr[val]);\
       gen_element(proj_type, "lib", arr[val]);\
     }\
   }\
-  else if($$0 == "CURL_SRC_X_H_FILES") {\
+  else if($$0 == "CARL_SRC_X_H_FILES") {\
     split(src_x_hdrs, arr);\
     for(val in arr) {\
       sub(/..\/lib\//, "", arr[val]);\

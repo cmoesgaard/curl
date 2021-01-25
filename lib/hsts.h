@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HSTS_H
-#define HEADER_CURL_HSTS_H
+#ifndef HEADER_CARL_HSTS_H
+#define HEADER_CARL_HSTS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,10 +21,10 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_HSTS)
-#include <curl/curl.h>
+#if !defined(CARL_DISABLE_HTTP) && defined(USE_HSTS)
+#include <carl/carl.h>
 #include "llist.h"
 
 #ifdef DEBUGBUILD
@@ -47,19 +47,19 @@ struct hsts {
 
 struct hsts *Curl_hsts_init(void);
 void Curl_hsts_cleanup(struct hsts **hp);
-CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
+CARLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
                          const char *sts);
 struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
                            bool subdomain);
-CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
+CARLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
                         const char *file);
-CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
+CARLcode Curl_hsts_loadfile(struct Curl_easy *data,
                             struct hsts *h, const char *file);
-CURLcode Curl_hsts_loadcb(struct Curl_easy *data,
+CARLcode Curl_hsts_loadcb(struct Curl_easy *data,
                           struct hsts *h);
 #else
 #define Curl_hsts_cleanup(x)
 #define Curl_hsts_loadcb(x,y)
 #define Curl_hsts_save(x,y,z)
-#endif /* CURL_DISABLE_HTTP || USE_HSTS */
-#endif /* HEADER_CURL_HSTS_H */
+#endif /* CARL_DISABLE_HTTP || USE_HSTS */
+#endif /* HEADER_CARL_HSTS_H */

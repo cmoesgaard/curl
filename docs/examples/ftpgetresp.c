@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 #include <stdio.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /* <DESC>
  * Similar to ftpget.c but also stores the received response-lines
@@ -40,8 +40,8 @@ write_response(void *ptr, size_t size, size_t nmemb, void *data)
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   FILE *ftpfile;
   FILE *respfile;
 
@@ -51,23 +51,23 @@ int main(void)
   /* local file name to store the FTP server's response lines in */
   respfile = fopen(FTPHEADERS, "wb"); /* b is binary, needed on win32 */
 
-  curl = curl_easy_init();
-  if(curl) {
+  carl = carl_easy_init();
+  if(carl) {
     /* Get a file listing from sunet */
-    curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.example.com/");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, ftpfile);
-    /* If you intend to use this on windows with a libcurl DLL, you must use
-       CURLOPT_WRITEFUNCTION as well */
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, write_response);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, respfile);
-    res = curl_easy_perform(curl);
+    carl_easy_setopt(carl, CARLOPT_URL, "ftp://ftp.example.com/");
+    carl_easy_setopt(carl, CARLOPT_WRITEDATA, ftpfile);
+    /* If you intend to use this on windows with a libcarl DLL, you must use
+       CARLOPT_WRITEFUNCTION as well */
+    carl_easy_setopt(carl, CARLOPT_HEADERFUNCTION, write_response);
+    carl_easy_setopt(carl, CARLOPT_HEADERDATA, respfile);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
   fclose(ftpfile); /* close the local file */

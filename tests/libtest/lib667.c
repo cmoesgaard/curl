@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,7 +24,7 @@
 #include "memdebug.h"
 
 static char data[]=
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
   /* ASCII representation with escape sequences for non-ASCII platforms */
   "\x64\x75\x6d\x6d\x79";
 #else
@@ -33,7 +33,7 @@ static char data[]=
 
 struct WriteThis {
   char *readptr;
-  curl_off_t sizeleft;
+  carl_off_t sizeleft;
 };
 
 static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
@@ -59,10 +59,10 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 
 int test(char *URL)
 {
-  CURL *easy = NULL;
-  curl_mime *mime = NULL;
-  curl_mimepart *part;
-  CURLcode result;
+  CARL *easy = NULL;
+  carl_mime *mime = NULL;
+  carl_mimepart *part;
+  CARLcode result;
   int res = TEST_ERR_FAILURE;
   struct WriteThis pooh;
 
@@ -71,47 +71,47 @@ int test(char *URL)
    * delivers data bytes one at a time. Use chunked encoding for accurate test.
    */
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  easy = curl_easy_init();
+  easy = carl_easy_init();
 
   /* First set the URL that is about to receive our POST. */
-  test_setopt(easy, CURLOPT_URL, URL);
+  test_setopt(easy, CARLOPT_URL, URL);
 
   /* get verbose debug output please */
-  test_setopt(easy, CURLOPT_VERBOSE, 1L);
+  test_setopt(easy, CARLOPT_VERBOSE, 1L);
 
   /* include headers in the output */
-  test_setopt(easy, CURLOPT_HEADER, 1L);
+  test_setopt(easy, CARLOPT_HEADER, 1L);
 
   /* Prepare the callback structure. */
   pooh.readptr = data;
-  pooh.sizeleft = (curl_off_t) strlen(data);
+  pooh.sizeleft = (carl_off_t) strlen(data);
 
   /* Build the mime tree. */
-  mime = curl_mime_init(easy);
-  part = curl_mime_addpart(mime);
-  curl_mime_name(part, "field");
-  curl_mime_encoder(part, "base64");
+  mime = carl_mime_init(easy);
+  part = carl_mime_addpart(mime);
+  carl_mime_name(part, "field");
+  carl_mime_encoder(part, "base64");
   /* Using an undefined length forces chunked transfer. */
-  curl_mime_data_cb(part, (curl_off_t) -1, read_callback, NULL, NULL, &pooh);
+  carl_mime_data_cb(part, (carl_off_t) -1, read_callback, NULL, NULL, &pooh);
 
   /* Bind mime data to its easy handle. */
-  test_setopt(easy, CURLOPT_MIMEPOST, mime);
+  test_setopt(easy, CARLOPT_MIMEPOST, mime);
 
   /* Send data. */
-  result = curl_easy_perform(easy);
+  result = carl_easy_perform(easy);
   if(result) {
-    fprintf(stderr, "curl_easy_perform() failed\n");
+    fprintf(stderr, "carl_easy_perform() failed\n");
     res = (int) result;
   }
 
 test_cleanup:
-  curl_easy_cleanup(easy);
-  curl_mime_free(mime);
-  curl_global_cleanup();
+  carl_easy_cleanup(easy);
+  carl_mime_free(mime);
+  carl_global_cleanup();
   return res;
 }

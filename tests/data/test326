@@ -56,7 +56,7 @@ http://%HOSTIP:%HTTPPORT/326 --raw
 <protocol>
 GET /326 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

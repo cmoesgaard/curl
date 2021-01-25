@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,11 +27,11 @@ static char buffer[17000]; /* more than 16K */
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
-  CURLFORMcode formrc;
-  struct curl_httppost *formpost = NULL;
-  struct curl_httppost *lastptr = NULL;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
+  CARLFORMcode formrc;
+  struct carl_httppost *formpost = NULL;
+  struct carl_httppost *lastptr = NULL;
 
   /* create a buffer with AAAA...BBBBB...CCCC...etc */
   int i;
@@ -42,53 +42,53 @@ int test(char *URL)
 
   buffer[ sizeof(buffer)-1] = 0; /* null-terminate */
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* Check proper name and data copying. */
-  formrc = curl_formadd(&formpost, &lastptr,
-                        CURLFORM_COPYNAME, "hello",
-                        CURLFORM_COPYCONTENTS, buffer,
-                        CURLFORM_END);
+  formrc = carl_formadd(&formpost, &lastptr,
+                        CARLFORM_COPYNAME, "hello",
+                        CARLFORM_COPYCONTENTS, buffer,
+                        CARLFORM_END);
 
   if(formrc)
-    printf("curl_formadd(1) = %d\n", (int) formrc);
+    printf("carl_formadd(1) = %d\n", (int) formrc);
 
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_formfree(formpost);
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_formfree(formpost);
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* First set the URL that is about to receive our POST. */
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
   /* send a multi-part formpost */
-  test_setopt(curl, CURLOPT_HTTPPOST, formpost);
+  test_setopt(carl, CARLOPT_HTTPPOST, formpost);
 
   /* get verbose debug output please */
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
   /* include headers in the output */
-  test_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
 
   /* Perform the request, res will get the return code */
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   /* now cleanup the formpost chain */
-  curl_formfree(formpost);
+  carl_formfree(formpost);
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return res;
 }

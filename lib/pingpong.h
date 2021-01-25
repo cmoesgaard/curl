@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_PINGPONG_H
-#define HEADER_CURL_PINGPONG_H
+#ifndef HEADER_CARL_PINGPONG_H
+#define HEADER_CARL_PINGPONG_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,10 +22,10 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_IMAP) || !defined(CURL_DISABLE_FTP) || \
-  !defined(CURL_DISABLE_POP3) || !defined(CURL_DISABLE_SMTP)
+#if !defined(CARL_DISABLE_IMAP) || !defined(CARL_DISABLE_FTP) || \
+  !defined(CARL_DISABLE_POP3) || !defined(CARL_DISABLE_SMTP)
 #define USE_PINGPONG
 #endif
 
@@ -37,7 +37,7 @@ typedef enum {
   FTPTRANSFER_INFO, /* do still go through to get info/headers */
   FTPTRANSFER_NONE, /* don't get anything and don't get info */
   FTPTRANSFER_LAST  /* end of list marker, never used */
-} curl_pp_transfer;
+} carl_pp_transfer;
 
 /*
  * 'pingpong' is the generic struct used for protocols doing server<->client
@@ -58,7 +58,7 @@ struct pingpong {
                      server */
   size_t sendleft; /* number of bytes left to send from the sendthis buffer */
   size_t sendsize; /* total size of the sendthis buffer */
-  struct curltime response; /* set to Curl_now() when a command has been sent
+  struct carltime response; /* set to Curl_now() when a command has been sent
                                off, used to time-out response reading */
   timediff_t response_time; /* When no timeout is given, this is the amount of
                                milliseconds we await for a server response. */
@@ -68,7 +68,7 @@ struct pingpong {
   /* Function pointers the protocols MUST implement and provide for the
      pingpong layer to function */
 
-  CURLcode (*statemachine)(struct Curl_easy *data, struct connectdata *conn);
+  CARLcode (*statemachine)(struct Curl_easy *data, struct connectdata *conn);
   bool (*endofresp)(struct Curl_easy *data, struct connectdata *conn,
                     char *ptr, size_t len, int *code);
 };
@@ -87,7 +87,7 @@ struct pingpong {
  * called repeatedly until done. Set 'wait' to make it wait a while on the
  * socket if there's no traffic.
  */
-CURLcode Curl_pp_statemach(struct Curl_easy *data, struct pingpong *pp,
+CARLcode Curl_pp_statemach(struct Curl_easy *data, struct pingpong *pp,
                            bool block, bool disconnecting);
 
 /* initialize stuff to prepare for reading a fresh new response */
@@ -112,7 +112,7 @@ timediff_t Curl_pp_state_timeout(struct Curl_easy *data,
  *
  * made to never block
  */
-CURLcode Curl_pp_sendf(struct Curl_easy *data,
+CARLcode Curl_pp_sendf(struct Curl_easy *data,
                        struct pingpong *pp,
                        const char *fmt, ...);
 
@@ -126,7 +126,7 @@ CURLcode Curl_pp_sendf(struct Curl_easy *data,
  *
  * made to never block
  */
-CURLcode Curl_pp_vsendf(struct Curl_easy *data,
+CARLcode Curl_pp_vsendf(struct Curl_easy *data,
                         struct pingpong *pp,
                         const char *fmt,
                         va_list args);
@@ -136,20 +136,20 @@ CURLcode Curl_pp_vsendf(struct Curl_easy *data,
  *
  * Reads a piece of a server response.
  */
-CURLcode Curl_pp_readresp(struct Curl_easy *data,
-                          curl_socket_t sockfd,
+CARLcode Curl_pp_readresp(struct Curl_easy *data,
+                          carl_socket_t sockfd,
                           struct pingpong *pp,
                           int *code, /* return the server code if done */
                           size_t *size); /* size of the response */
 
 
-CURLcode Curl_pp_flushsend(struct Curl_easy *data,
+CARLcode Curl_pp_flushsend(struct Curl_easy *data,
                            struct pingpong *pp);
 
 /* call this when a pingpong connection is disconnected */
-CURLcode Curl_pp_disconnect(struct pingpong *pp);
+CARLcode Curl_pp_disconnect(struct pingpong *pp);
 
-int Curl_pp_getsock(struct pingpong *pp, curl_socket_t *socks);
+int Curl_pp_getsock(struct pingpong *pp, carl_socket_t *socks);
 
 
 /***********************************************************************
@@ -161,4 +161,4 @@ int Curl_pp_getsock(struct pingpong *pp, curl_socket_t *socks);
  */
 bool Curl_pp_moredata(struct pingpong *pp);
 
-#endif /* HEADER_CURL_PINGPONG_H */
+#endif /* HEADER_CARL_PINGPONG_H */

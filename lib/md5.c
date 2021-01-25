@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,14 +20,14 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_CRYPTO_AUTH
+#ifndef CARL_DISABLE_CRYPTO_AUTH
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-#include "curl_md5.h"
-#include "curl_hmac.h"
+#include "carl_md5.h"
+#include "carl_hmac.h"
 #include "warnless.h"
 
 #ifdef USE_MBEDTLS
@@ -41,7 +41,7 @@
 #if defined(USE_GNUTLS_NETTLE)
 
 #include <nettle/md5.h>
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -67,7 +67,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 #elif defined(USE_GNUTLS)
 
 #include <gcrypt.h>
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -94,7 +94,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 #elif defined(USE_OPENSSL) && !defined(USE_AMISSL)
 /* When OpenSSL is available we use the MD5-function from OpenSSL */
 #include <openssl/md5.h>
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -102,7 +102,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 
 #include <mbedtls/md5.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -153,7 +153,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
    reliable than defining COMMON_DIGEST_FOR_OPENSSL on older cats. */
 #  include <CommonCrypto/CommonDigest.h>
 #  define MD5_CTX CC_MD5_CTX
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -177,7 +177,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 #elif defined(USE_WIN32_CRYPTO)
 
 #include <wincrypt.h>
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -258,7 +258,7 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 #include <string.h>
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* Any 32-bit or wider unsigned integer data type will do */
@@ -499,33 +499,33 @@ static void MD5_Final(unsigned char *result, MD5_CTX *ctx)
   memset(&ctx->buffer[used], 0, available - 8);
 
   ctx->lo <<= 3;
-  ctx->buffer[56] = curlx_ultouc((ctx->lo)&0xff);
-  ctx->buffer[57] = curlx_ultouc((ctx->lo >> 8)&0xff);
-  ctx->buffer[58] = curlx_ultouc((ctx->lo >> 16)&0xff);
-  ctx->buffer[59] = curlx_ultouc(ctx->lo >> 24);
-  ctx->buffer[60] = curlx_ultouc((ctx->hi)&0xff);
-  ctx->buffer[61] = curlx_ultouc((ctx->hi >> 8)&0xff);
-  ctx->buffer[62] = curlx_ultouc((ctx->hi >> 16)&0xff);
-  ctx->buffer[63] = curlx_ultouc(ctx->hi >> 24);
+  ctx->buffer[56] = carlx_ultouc((ctx->lo)&0xff);
+  ctx->buffer[57] = carlx_ultouc((ctx->lo >> 8)&0xff);
+  ctx->buffer[58] = carlx_ultouc((ctx->lo >> 16)&0xff);
+  ctx->buffer[59] = carlx_ultouc(ctx->lo >> 24);
+  ctx->buffer[60] = carlx_ultouc((ctx->hi)&0xff);
+  ctx->buffer[61] = carlx_ultouc((ctx->hi >> 8)&0xff);
+  ctx->buffer[62] = carlx_ultouc((ctx->hi >> 16)&0xff);
+  ctx->buffer[63] = carlx_ultouc(ctx->hi >> 24);
 
   body(ctx, ctx->buffer, 64);
 
-  result[0] = curlx_ultouc((ctx->a)&0xff);
-  result[1] = curlx_ultouc((ctx->a >> 8)&0xff);
-  result[2] = curlx_ultouc((ctx->a >> 16)&0xff);
-  result[3] = curlx_ultouc(ctx->a >> 24);
-  result[4] = curlx_ultouc((ctx->b)&0xff);
-  result[5] = curlx_ultouc((ctx->b >> 8)&0xff);
-  result[6] = curlx_ultouc((ctx->b >> 16)&0xff);
-  result[7] = curlx_ultouc(ctx->b >> 24);
-  result[8] = curlx_ultouc((ctx->c)&0xff);
-  result[9] = curlx_ultouc((ctx->c >> 8)&0xff);
-  result[10] = curlx_ultouc((ctx->c >> 16)&0xff);
-  result[11] = curlx_ultouc(ctx->c >> 24);
-  result[12] = curlx_ultouc((ctx->d)&0xff);
-  result[13] = curlx_ultouc((ctx->d >> 8)&0xff);
-  result[14] = curlx_ultouc((ctx->d >> 16)&0xff);
-  result[15] = curlx_ultouc(ctx->d >> 24);
+  result[0] = carlx_ultouc((ctx->a)&0xff);
+  result[1] = carlx_ultouc((ctx->a >> 8)&0xff);
+  result[2] = carlx_ultouc((ctx->a >> 16)&0xff);
+  result[3] = carlx_ultouc(ctx->a >> 24);
+  result[4] = carlx_ultouc((ctx->b)&0xff);
+  result[5] = carlx_ultouc((ctx->b >> 8)&0xff);
+  result[6] = carlx_ultouc((ctx->b >> 16)&0xff);
+  result[7] = carlx_ultouc(ctx->b >> 24);
+  result[8] = carlx_ultouc((ctx->c)&0xff);
+  result[9] = carlx_ultouc((ctx->c >> 8)&0xff);
+  result[10] = carlx_ultouc((ctx->c >> 16)&0xff);
+  result[11] = carlx_ultouc(ctx->c >> 24);
+  result[12] = carlx_ultouc((ctx->d)&0xff);
+  result[13] = carlx_ultouc((ctx->d >> 8)&0xff);
+  result[14] = carlx_ultouc((ctx->d >> 16)&0xff);
+  result[15] = carlx_ultouc(ctx->d >> 24);
 
   memset(ctx, 0, sizeof(*ctx));
 }
@@ -535,11 +535,11 @@ static void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 const struct HMAC_params Curl_HMAC_MD5[] = {
   {
     /* Hash initialization function. */
-    CURLX_FUNCTION_CAST(HMAC_hinit_func, MD5_Init),
+    CARLX_FUNCTION_CAST(HMAC_hinit_func, MD5_Init),
     /* Hash update function. */
-    CURLX_FUNCTION_CAST(HMAC_hupdate_func, MD5_Update),
+    CARLX_FUNCTION_CAST(HMAC_hupdate_func, MD5_Update),
     /* Hash computation end function. */
-    CURLX_FUNCTION_CAST(HMAC_hfinal_func, MD5_Final),
+    CARLX_FUNCTION_CAST(HMAC_hfinal_func, MD5_Final),
     /* Size of hash context structure. */
     sizeof(MD5_CTX),
     /* Maximum key length. */
@@ -552,11 +552,11 @@ const struct HMAC_params Curl_HMAC_MD5[] = {
 const struct MD5_params Curl_DIGEST_MD5[] = {
   {
     /* Digest initialization function */
-    CURLX_FUNCTION_CAST(Curl_MD5_init_func, MD5_Init),
+    CARLX_FUNCTION_CAST(Curl_MD5_init_func, MD5_Init),
     /* Digest update function */
-    CURLX_FUNCTION_CAST(Curl_MD5_update_func, MD5_Update),
+    CARLX_FUNCTION_CAST(Curl_MD5_update_func, MD5_Update),
     /* Digest computation end function */
-    CURLX_FUNCTION_CAST(Curl_MD5_final_func, MD5_Final),
+    CARLX_FUNCTION_CAST(Curl_MD5_final_func, MD5_Final),
     /* Size of digest context struct */
     sizeof(MD5_CTX),
     /* Result size */
@@ -573,7 +573,7 @@ void Curl_md5it(unsigned char *outbuffer, const unsigned char *input,
   MD5_CTX ctx;
 
   MD5_Init(&ctx);
-  MD5_Update(&ctx, input, curlx_uztoui(len));
+  MD5_Update(&ctx, input, carlx_uztoui(len));
   MD5_Final(outbuffer, &ctx);
 }
 
@@ -601,23 +601,23 @@ struct MD5_context *Curl_MD5_init(const struct MD5_params *md5params)
   return ctxt;
 }
 
-CURLcode Curl_MD5_update(struct MD5_context *context,
+CARLcode Curl_MD5_update(struct MD5_context *context,
                          const unsigned char *data,
                          unsigned int len)
 {
   (*context->md5_hash->md5_update_func)(context->md5_hashctx, data, len);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-CURLcode Curl_MD5_final(struct MD5_context *context, unsigned char *result)
+CARLcode Curl_MD5_final(struct MD5_context *context, unsigned char *result)
 {
   (*context->md5_hash->md5_final_func)(result, context->md5_hashctx);
 
   free(context->md5_hashctx);
   free(context);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-#endif /* CURL_DISABLE_CRYPTO_AUTH */
+#endif /* CARL_DISABLE_CRYPTO_AUTH */

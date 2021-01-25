@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef NETWARE /* Novell NetWare */
 
@@ -32,7 +32,7 @@
 #include <nks/thread.h>
 #include <nks/synch.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 

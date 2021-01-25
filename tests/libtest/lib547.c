@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,7 +28,7 @@
 
 #include "memdebug.h"
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
    /* ASCII representation with escape sequences for non-ASCII platforms */
 #  define UPLOADTHIS "\x74\x68\x69\x73\x20\x69\x73\x20\x74\x68\x65\x20\x62" \
                      "\x6c\x75\x72\x62\x20\x77\x65\x20\x77\x61\x6e\x74\x20" \
@@ -60,17 +60,17 @@ static size_t readcallback(char  *ptr,
   fprintf(stderr, "READ NOT FINE!\n");
   return 0;
 }
-static curlioerr ioctlcallback(CURL *handle,
+static carlioerr ioctlcallback(CARL *handle,
                                int cmd,
                                void *clientp)
 {
   int *counter = (int *)clientp;
   (void)handle; /* unused */
-  if(cmd == CURLIOCMD_RESTARTREAD) {
+  if(cmd == CARLIOCMD_RESTARTREAD) {
     fprintf(stderr, "REWIND!\n");
     *counter = 0; /* clear counter to make the read callback restart */
   }
-  return CURLIOE_OK;
+  return CARLIOE_OK;
 }
 
 
@@ -79,52 +79,52 @@ static curlioerr ioctlcallback(CURL *handle,
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
 #ifndef LIB548
   int counter = 0;
 #endif
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
 #ifdef LIB548
   /* set the data to POST with a mere pointer to a null-terminated string */
-  test_setopt(curl, CURLOPT_POSTFIELDS, UPLOADTHIS);
+  test_setopt(carl, CARLOPT_POSTFIELDS, UPLOADTHIS);
 #else
   /* 547 style, which means reading the POST data from a callback */
-  test_setopt(curl, CURLOPT_IOCTLFUNCTION, ioctlcallback);
-  test_setopt(curl, CURLOPT_IOCTLDATA, &counter);
-  test_setopt(curl, CURLOPT_READFUNCTION, readcallback);
-  test_setopt(curl, CURLOPT_READDATA, &counter);
+  test_setopt(carl, CARLOPT_IOCTLFUNCTION, ioctlcallback);
+  test_setopt(carl, CARLOPT_IOCTLDATA, &counter);
+  test_setopt(carl, CARLOPT_READFUNCTION, readcallback);
+  test_setopt(carl, CARLOPT_READDATA, &counter);
   /* We CANNOT do the POST fine without setting the size (or choose
      chunked)! */
-  test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(UPLOADTHIS));
+  test_setopt(carl, CARLOPT_POSTFIELDSIZE, (long)strlen(UPLOADTHIS));
 #endif
-  test_setopt(curl, CURLOPT_POST, 1L);
-  test_setopt(curl, CURLOPT_PROXY, libtest_arg2);
-  test_setopt(curl, CURLOPT_PROXYUSERPWD, libtest_arg3);
-  test_setopt(curl, CURLOPT_PROXYAUTH,
-                   (long) (CURLAUTH_NTLM | CURLAUTH_DIGEST | CURLAUTH_BASIC) );
+  test_setopt(carl, CARLOPT_POST, 1L);
+  test_setopt(carl, CARLOPT_PROXY, libtest_arg2);
+  test_setopt(carl, CARLOPT_PROXYUSERPWD, libtest_arg3);
+  test_setopt(carl, CARLOPT_PROXYAUTH,
+                   (long) (CARLAUTH_NTLM | CARLAUTH_DIGEST | CARLAUTH_BASIC) );
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

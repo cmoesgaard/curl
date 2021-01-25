@@ -2,7 +2,7 @@
 <info>
 <keywords>
 unittest
-curlx_tvdiff
+carlx_tvdiff
 </keywords>
 </info>
 
@@ -21,7 +21,7 @@ none
 unittest
 </features>
 <name>
-curlx_tvdiff
+carlx_tvdiff
 </name>
 </client>
 

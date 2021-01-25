@@ -1,0 +1,63 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SSH_KEYDATA 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SSH_KEYDATA \- pointer to pass to the SSH key callback
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SSH_KEYDATA, void *pointer);
+.SH DESCRIPTION
+Pass a void * as parameter. This \fIpointer\fP will be passed along verbatim
+to the callback set with \fICARLOPT_SSH_KEYFUNCTION(3)\fP.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+SFTP and SCP
+.SH EXAMPLE
+.nf
+static int keycb(CARL *easy,
+                 const struct carl_khkey *knownkey,
+                 const struct carl_khkey *foundkey,
+                 enum carl_khmatch,
+                 void *clientp)
+{
+  /* 'clientp' points to the callback_data struct */
+  /* investigate the situation and return the correct value */
+  return CARLKHSTAT_FINE_ADD_TO_FILE;
+}
+{
+  carl_easy_setopt(carl, CARLOPT_URL, "sftp://example.com/thisfile.txt");
+  carl_easy_setopt(carl, CARLOPT_SSH_KEYFUNCTION, keycb);
+  carl_easy_setopt(carl, CARLOPT_SSH_KEYDATA, &callback_data);
+  carl_easy_setopt(carl, CARLOPT_SSH_KNOWNHOSTS, "/home/user/known_hosts");
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.19.6
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SSH_KEYDATA "(3), " CARLOPT_SSH_KNOWNHOSTS "(3), "

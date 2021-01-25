@@ -38,7 +38,7 @@ http://%HOSTIP:%HTTPPORT/we/want/our/1271 -w @log/blank1271
 <protocol>
 GET /we/want/our/1271 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

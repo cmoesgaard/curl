@@ -37,7 +37,7 @@ http://%HOSTIP:%HTTPPORT/want/274 -L --max-redirs 0
 <protocol>
 GET /want/274 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

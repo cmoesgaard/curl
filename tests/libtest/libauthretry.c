@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,121 +27,121 @@
 #include "test.h"
 #include "memdebug.h"
 
-static CURLcode send_request(CURL *curl, const char *url, int seq,
+static CARLcode send_request(CARL *carl, const char *url, int seq,
                              long auth_scheme, const char *userpwd)
 {
-  CURLcode res;
+  CARLcode res;
   size_t len = strlen(url) + 4 + 1;
   char *full_url = malloc(len);
   if(!full_url) {
     fprintf(stderr, "Not enough memory for full url\n");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   msnprintf(full_url, len, "%s%04d", url, seq);
   fprintf(stderr, "Sending new request %d to %s with credential %s "
           "(auth %ld)\n", seq, full_url, userpwd, auth_scheme);
-  test_setopt(curl, CURLOPT_URL, full_url);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_HEADER, 1L);
-  test_setopt(curl, CURLOPT_HTTPGET, 1L);
-  test_setopt(curl, CURLOPT_USERPWD, userpwd);
-  test_setopt(curl, CURLOPT_HTTPAUTH, auth_scheme);
+  test_setopt(carl, CARLOPT_URL, full_url);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_HTTPGET, 1L);
+  test_setopt(carl, CARLOPT_USERPWD, userpwd);
+  test_setopt(carl, CARLOPT_HTTPAUTH, auth_scheme);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
   free(full_url);
   return res;
 }
 
-static CURLcode send_wrong_password(CURL *curl, const char *url, int seq,
+static CARLcode send_wrong_password(CARL *carl, const char *url, int seq,
                                     long auth_scheme)
 {
-    return send_request(curl, url, seq, auth_scheme, "testuser:wrongpass");
+    return send_request(carl, url, seq, auth_scheme, "testuser:wrongpass");
 }
 
-static CURLcode send_right_password(CURL *curl, const char *url, int seq,
+static CARLcode send_right_password(CARL *carl, const char *url, int seq,
                                     long auth_scheme)
 {
-    return send_request(curl, url, seq, auth_scheme, "testuser:testpass");
+    return send_request(carl, url, seq, auth_scheme, "testuser:testpass");
 }
 
 static long parse_auth_name(const char *arg)
 {
   if(!arg)
-    return CURLAUTH_NONE;
-  if(curl_strequal(arg, "basic"))
-    return CURLAUTH_BASIC;
-  if(curl_strequal(arg, "digest"))
-    return CURLAUTH_DIGEST;
-  if(curl_strequal(arg, "ntlm"))
-    return CURLAUTH_NTLM;
-  return CURLAUTH_NONE;
+    return CARLAUTH_NONE;
+  if(carl_strequal(arg, "basic"))
+    return CARLAUTH_BASIC;
+  if(carl_strequal(arg, "digest"))
+    return CARLAUTH_DIGEST;
+  if(carl_strequal(arg, "ntlm"))
+    return CARLAUTH_NTLM;
+  return CARLAUTH_NONE;
 }
 
 int test(char *url)
 {
-  CURLcode res;
-  CURL *curl = NULL;
+  CARLcode res;
+  CARL *carl = NULL;
 
   long main_auth_scheme = parse_auth_name(libtest_arg2);
   long fallback_auth_scheme = parse_auth_name(libtest_arg3);
 
-  if(main_auth_scheme == CURLAUTH_NONE ||
-      fallback_auth_scheme == CURLAUTH_NONE) {
+  if(main_auth_scheme == CARLAUTH_NONE ||
+      fallback_auth_scheme == CARLAUTH_NONE) {
     fprintf(stderr, "auth schemes not found on commandline\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* Send wrong password, then right password */
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  res = send_wrong_password(curl, url, 100, main_auth_scheme);
-  if(res != CURLE_OK)
+  res = send_wrong_password(carl, url, 100, main_auth_scheme);
+  if(res != CARLE_OK)
     goto test_cleanup;
 
-  res = send_right_password(curl, url, 200, fallback_auth_scheme);
-  if(res != CURLE_OK)
+  res = send_right_password(carl, url, 200, fallback_auth_scheme);
+  if(res != CARLE_OK)
     goto test_cleanup;
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   /* Send wrong password twice, then right password */
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  res = send_wrong_password(curl, url, 300, main_auth_scheme);
-  if(res != CURLE_OK)
+  res = send_wrong_password(carl, url, 300, main_auth_scheme);
+  if(res != CARLE_OK)
     goto test_cleanup;
 
-  res = send_wrong_password(curl, url, 400, fallback_auth_scheme);
-  if(res != CURLE_OK)
+  res = send_wrong_password(carl, url, 400, fallback_auth_scheme);
+  if(res != CARLE_OK)
     goto test_cleanup;
 
-  res = send_right_password(curl, url, 500, fallback_auth_scheme);
-  if(res != CURLE_OK)
+  res = send_right_password(carl, url, 500, fallback_auth_scheme);
+  if(res != CARLE_OK)
     goto test_cleanup;
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

@@ -60,7 +60,7 @@ proxy
 HTTP POST multipart with Expect: header using proxy anyauth (Digest)
  </name>
  <command>
--x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/259 -F name=daniel -F tool=curl -F file=@log/test259.txt -U uuuser:pppassword --proxy-anyauth -H "Expect: 100-continue"
+-x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/259 -F name=daniel -F tool=carl -F file=@log/test259.txt -U uuuser:pppassword --proxy-anyauth -H "Expect: 100-continue"
 </command>
 # We create this file before the command is invoked!
 <file name="log/test259.txt">
@@ -78,7 +78,7 @@ bar
 <protocol>
 POST http://remotehost:54321/we/want/259 HTTP/1.1
 Host: remotehost:54321
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Expect: 100-continue
@@ -92,7 +92,7 @@ daniel
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="file"; filename="test259.txt"
 Content-Type: text/plain
@@ -105,7 +105,7 @@ bar
 POST http://remotehost:54321/we/want/259 HTTP/1.1
 Host: remotehost:54321
 Proxy-Authorization: Digest username="uuuser", realm="many secrets", nonce="911", uri="/we/want/259", response="b479994d13e60f3aa192a67c5892ddc5"
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Expect: 100-continue
@@ -119,7 +119,7 @@ daniel
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="file"; filename="test259.txt"
 Content-Type: text/plain

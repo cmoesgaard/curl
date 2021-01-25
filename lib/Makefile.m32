@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 ###########################################################################
 #
-## Makefile for building libcurl.a with MingW (GCC-3.2 or later or LLVM/Clang)
+## Makefile for building libcarl.a with MingW (GCC-3.2 or later or LLVM/Clang)
 ## and optionally OpenSSL (1.0.2a), libssh2 (1.5), zlib (1.2.8), librtmp (2.4),
 ## brotli (1.0.1), zstd (1.4.5)
 ##
@@ -93,23 +93,23 @@ ifndef LIBCARES_PATH
 LIBCARES_PATH = $(PROOT)/ares
 endif
 
-ifeq ($(CURL_CC),)
-CURL_CC := $(CROSSPREFIX)gcc
+ifeq ($(CARL_CC),)
+CARL_CC := $(CROSSPREFIX)gcc
 endif
-ifeq ($(CURL_AR),)
-CURL_AR := $(CROSSPREFIX)ar
+ifeq ($(CARL_AR),)
+CARL_AR := $(CROSSPREFIX)ar
 endif
-ifeq ($(CURL_RANLIB),)
-CURL_RANLIB := $(CROSSPREFIX)ranlib
+ifeq ($(CARL_RANLIB),)
+CARL_RANLIB := $(CROSSPREFIX)ranlib
 endif
 
-CC = $(CURL_CC)
-CFLAGS = $(CURL_CFLAG_EXTRAS) -g -O2 -Wall -W
+CC = $(CARL_CC)
+CFLAGS = $(CARL_CFLAG_EXTRAS) -g -O2 -Wall -W
 CFLAGS += -fno-strict-aliasing
 # comment LDFLAGS below to keep debug info
-LDFLAGS = $(CURL_LDFLAG_EXTRAS) $(CURL_LDFLAG_EXTRAS_DLL) -s
-AR = $(CURL_AR)
-RANLIB = $(CURL_RANLIB)
+LDFLAGS = $(CARL_LDFLAG_EXTRAS) $(CARL_LDFLAG_EXTRAS_DLL) -s
+AR = $(CARL_AR)
+RANLIB = $(CARL_RANLIB)
 RC = $(CROSSPREFIX)windres
 RCFLAGS = --include-dir=$(PROOT)/include -DDEBUGBUILD=0 -O coff
 STRIP   = $(CROSSPREFIX)strip -g
@@ -231,10 +231,10 @@ UNICODE = 1
 endif
 
 INCLUDES = -I. -I../include
-CFLAGS += -DBUILDING_LIBCURL
+CFLAGS += -DBUILDING_LIBCARL
 ifdef SSL
   ifdef WINSSL
-    CFLAGS += -DCURL_WITH_MULTI_SSL
+    CFLAGS += -DCARL_WITH_MULTI_SSL
   endif
 endif
 ifdef UNICODE
@@ -248,7 +248,7 @@ else
     INCLUDES += -I"$(LIBCARES_PATH)"
     CFLAGS += -DUSE_ARES -DCARES_STATICLIB
     DLL_LIBS += -L"$(LIBCARES_PATH)" -lcares
-    libcurl_dll_DEPENDENCIES = $(LIBCARES_PATH)/libcares.a
+    libcarl_dll_DEPENDENCIES = $(LIBCARES_PATH)/libcares.a
   endif
 endif
 ifdef RTMP
@@ -371,12 +371,12 @@ ifdef LDAPS
 endif
 ifdef USE_LDAP_NOVELL
   INCLUDES += -I"$(LDAP_SDK)/inc"
-  CFLAGS += -DCURL_HAS_NOVELL_LDAPSDK
+  CFLAGS += -DCARL_HAS_NOVELL_LDAPSDK
   DLL_LIBS += -L"$(LDAP_SDK)/lib/mscvc" -lldapsdk -lldapssl -lldapx
 endif
 ifdef USE_LDAP_OPENLDAP
   INCLUDES += -I"$(LDAP_SDK)/include"
-  CFLAGS += -DCURL_HAS_OPENLDAP_LDAPSDK
+  CFLAGS += -DCARL_HAS_OPENLDAP_LDAPSDK
   DLL_LIBS += -L"$(LDAP_SDK)/lib" -lldap -llber
 endif
 ifndef USE_LDAP_NOVELL
@@ -389,35 +389,35 @@ DLL_LIBS += -lws2_32
 # Makefile.inc provides the CSOURCES and HHEADERS defines
 include Makefile.inc
 
-ifeq ($(CURL_DLL_A_SUFFIX),)
-CURL_DLL_A_SUFFIX := dll
+ifeq ($(CARL_DLL_A_SUFFIX),)
+CARL_DLL_A_SUFFIX := dll
 endif
 
-libcurl_dll_LIBRARY = libcurl$(CURL_DLL_SUFFIX).dll
-libcurl_dll_a_LIBRARY = libcurl$(CURL_DLL_A_SUFFIX).a
-libcurl_a_LIBRARY = libcurl.a
+libcarl_dll_LIBRARY = libcarl$(CARL_DLL_SUFFIX).dll
+libcarl_dll_a_LIBRARY = libcarl$(CARL_DLL_A_SUFFIX).a
+libcarl_a_LIBRARY = libcarl.a
 
-libcurl_a_OBJECTS := $(patsubst %.c,%.o,$(strip $(CSOURCES)))
-libcurl_a_DEPENDENCIES := $(strip $(CSOURCES) $(HHEADERS))
+libcarl_a_OBJECTS := $(patsubst %.c,%.o,$(strip $(CSOURCES)))
+libcarl_a_DEPENDENCIES := $(strip $(CSOURCES) $(HHEADERS))
 
-RESOURCE = libcurl.res
+RESOURCE = libcarl.res
 
 
-all: $(libcurl_a_LIBRARY) $(libcurl_dll_LIBRARY)
+all: $(libcarl_a_LIBRARY) $(libcarl_dll_LIBRARY)
 
-$(libcurl_a_LIBRARY): $(libcurl_a_OBJECTS) $(libcurl_a_DEPENDENCIES)
+$(libcarl_a_LIBRARY): $(libcarl_a_OBJECTS) $(libcarl_a_DEPENDENCIES)
 	@$(call DEL, $@)
-	$(AR) cru $@ $(libcurl_a_OBJECTS)
+	$(AR) cru $@ $(libcarl_a_OBJECTS)
 	$(RANLIB) $@
 	$(STRIP) $@
 
 # remove the last line above to keep debug info
 
-$(libcurl_dll_LIBRARY): $(libcurl_a_OBJECTS) $(RESOURCE) $(libcurl_dll_DEPENDENCIES)
+$(libcarl_dll_LIBRARY): $(libcarl_a_OBJECTS) $(RESOURCE) $(libcarl_dll_DEPENDENCIES)
 	@$(call DEL, $@)
 	$(CC) $(LDFLAGS) -shared -o $@ \
-	  -Wl,--output-def,$(@:.dll=.def),--out-implib,$(libcurl_dll_a_LIBRARY) \
-	  $(libcurl_a_OBJECTS) $(RESOURCE) $(DLL_LIBS)
+	  -Wl,--output-def,$(@:.dll=.def),--out-implib,$(libcarl_dll_a_LIBRARY) \
+	  $(libcarl_a_OBJECTS) $(RESOURCE) $(DLL_LIBS)
 
 %.o: %.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
@@ -426,10 +426,10 @@ $(libcurl_dll_LIBRARY): $(libcurl_a_OBJECTS) $(RESOURCE) $(libcurl_dll_DEPENDENC
 	$(RC) $(RCFLAGS) -i $< -o $@
 
 clean:
-	@$(call DEL, $(libcurl_a_OBJECTS) $(RESOURCE))
+	@$(call DEL, $(libcarl_a_OBJECTS) $(RESOURCE))
 
 distclean vclean: clean
-	@$(call DEL, $(libcurl_a_LIBRARY) $(libcurl_dll_LIBRARY) $(libcurl_dll_LIBRARY:.dll=.def) $(libcurl_dll_a_LIBRARY))
+	@$(call DEL, $(libcarl_a_LIBRARY) $(libcarl_dll_LIBRARY) $(libcarl_dll_LIBRARY:.dll=.def) $(libcarl_dll_a_LIBRARY))
 
 $(LIBCARES_PATH)/libcares.a:
 	$(MAKE) -C $(LIBCARES_PATH) -f Makefile.m32

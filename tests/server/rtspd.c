@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,9 +22,9 @@
 #include "server_setup.h"
 
 /*
- * curl's test suite Real Time Streaming Protocol (RTSP) server.
+ * carl's test suite Real Time Streaming Protocol (RTSP) server.
  *
- * This source file was started based on curl's HTTP test suite server.
+ * This source file was started based on carl's HTTP test suite server.
  */
 
 #ifdef HAVE_SIGNAL_H
@@ -46,10 +46,10 @@
 #include <netinet/tcp.h> /* for TCP_NODELAY */
 #endif
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "util.h"
 #include "server_sockaddr.h"
@@ -132,7 +132,7 @@ static void storerequest(char *reqbuf, size_t totalsize);
 
 const char *serverlogfile = DEFAULT_LOGFILE;
 
-#define RTSPDVERSION "curl test suite RTSP server/0.1"
+#define RTSPDVERSION "carl test suite RTSP server/0.1"
 
 #define REQUEST_DUMP  "log/server.input"
 #define RESPONSE_DUMP "log/server.response"
@@ -645,7 +645,7 @@ storerequest_cleanup:
 }
 
 /* return 0 on success, non-zero on failure */
-static int get_request(curl_socket_t sock, struct httprequest *req)
+static int get_request(carl_socket_t sock, struct httprequest *req)
 {
   int error;
   int fail = 0;
@@ -687,7 +687,7 @@ static int get_request(curl_socket_t sock, struct httprequest *req)
   while(!done_processing && (req->offset < REQBUFSIZ-1)) {
     if(pipereq_length && pipereq) {
       memmove(reqbuf, pipereq, pipereq_length);
-      got = curlx_uztosz(pipereq_length);
+      got = carlx_uztosz(pipereq_length);
       pipereq_length = 0;
     }
     else {
@@ -756,7 +756,7 @@ static int get_request(curl_socket_t sock, struct httprequest *req)
 }
 
 /* returns -1 on failure */
-static int send_doc(curl_socket_t sock, struct httprequest *req)
+static int send_doc(carl_socket_t sock, struct httprequest *req)
 {
   ssize_t written;
   size_t count;
@@ -1043,8 +1043,8 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
 int main(int argc, char *argv[])
 {
   srvr_sockaddr_union_t me;
-  curl_socket_t sock = CURL_SOCKET_BAD;
-  curl_socket_t msgsock = CURL_SOCKET_BAD;
+  carl_socket_t sock = CARL_SOCKET_BAD;
+  carl_socket_t msgsock = CARL_SOCKET_BAD;
   int wrotepidfile = 0;
   int flag;
   unsigned short port = DEFAULT_PORT;
@@ -1105,7 +1105,7 @@ int main(int argc, char *argv[])
       if(argc>arg) {
         char *endptr;
         unsigned long ulnum = strtoul(argv[arg], &endptr, 10);
-        port = curlx_ultous(ulnum);
+        port = carlx_ultous(ulnum);
         arg++;
       }
     }
@@ -1148,7 +1148,7 @@ int main(int argc, char *argv[])
     sock = socket(AF_INET6, SOCK_STREAM, 0);
 #endif
 
-  if(CURL_SOCKET_BAD == sock) {
+  if(CARL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
            error, strerror(error));
@@ -1192,7 +1192,7 @@ int main(int argc, char *argv[])
   if(!port) {
     /* The system was supposed to choose a port number, figure out which
        port we actually got and update the listener port value with it. */
-    curl_socklen_t la_size;
+    carl_socklen_t la_size;
     srvr_sockaddr_union_t localaddr;
 #ifdef ENABLE_IPV6
     if(!use_ipv6)
@@ -1263,7 +1263,7 @@ int main(int argc, char *argv[])
 
     if(got_exit_signal)
       break;
-    if(CURL_SOCKET_BAD == msgsock) {
+    if(CARL_SOCKET_BAD == msgsock) {
       error = SOCKERRNO;
       logmsg("MAJOR ERROR: accept() failed with error: (%d) %s",
              error, strerror(error));
@@ -1344,7 +1344,7 @@ int main(int argc, char *argv[])
 
     logmsg("====> Client disconnect");
     sclose(msgsock);
-    msgsock = CURL_SOCKET_BAD;
+    msgsock = CARL_SOCKET_BAD;
 
     if(serverlogslocked) {
       serverlogslocked = 0;
@@ -1357,10 +1357,10 @@ int main(int argc, char *argv[])
 
 server_cleanup:
 
-  if((msgsock != sock) && (msgsock != CURL_SOCKET_BAD))
+  if((msgsock != sock) && (msgsock != CARL_SOCKET_BAD))
     sclose(msgsock);
 
-  if(sock != CURL_SOCKET_BAD)
+  if(sock != CARL_SOCKET_BAD)
     sclose(sock);
 
   if(got_exit_signal)

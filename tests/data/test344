@@ -44,7 +44,7 @@ http://%HOSTIP:%HTTPPORT/344 --etag-compare log/etag344 --etag-save log/etag344
 <protocol>
 GET /344 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 If-None-Match: ""
 

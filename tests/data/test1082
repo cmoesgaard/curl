@@ -45,7 +45,7 @@ perl -e "print 'Test requires default test client host address' if ( '%CLIENTIP'
 <protocol>
 GET /1082 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

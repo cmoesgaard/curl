@@ -45,12 +45,12 @@ HTTP with -d, -G and {}
 <protocol>
 GET /199?foo=moo&moo=poo HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /199?foo=moo&moo=poo HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

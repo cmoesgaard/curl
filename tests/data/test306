@@ -55,7 +55,7 @@ HTTPS GET, receive no headers only data!
 <protocol>
 GET /306 HTTP/1.1
 Host: %HOSTIP:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

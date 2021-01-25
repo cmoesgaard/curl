@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -25,32 +25,32 @@
 #  Adapted for djgpp2 / Watt-32 / DOS
 #
 
-DEPEND_PREREQ = curl_config.h
+DEPEND_PREREQ = carl_config.h
 VPATH  = vtls vauth
 TOPDIR = ..
 
 include ../packages/DOS/common.dj
 include Makefile.inc
 
-CFLAGS += -DBUILDING_LIBCURL
+CFLAGS += -DBUILDING_LIBCARL
 
 SOURCES = $(sort $(CSOURCES))
 OBJECTS = $(addprefix $(OBJ_DIR)/, $(notdir $(SOURCES:.c=.o)))
 
-CURL_LIB = libcurl.a
+CARL_LIB = libcarl.a
 
-all: $(OBJ_DIR) curl_config.h $(CURL_LIB)
+all: $(OBJ_DIR) carl_config.h $(CARL_LIB)
 
-$(CURL_LIB): $(OBJECTS)
+$(CARL_LIB): $(OBJECTS)
 	ar rs $@ $?
 
-curl_config.h: config-dos.h
+carl_config.h: config-dos.h
 	$(COPY) $^ $@
 
 # clean generated files
 #
 genclean:
-	- $(DELETE) curl_config.h
+	- $(DELETE) carl_config.h
 
 # clean object files and subdir
 #
@@ -66,6 +66,6 @@ clean: objclean
 # clean everything
 #
 realclean vclean: clean
-	- $(DELETE) $(CURL_LIB)
+	- $(DELETE) $(CARL_LIB)
 
 -include depend.dj

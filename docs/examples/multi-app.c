@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,8 +32,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-/* curl stuff */
-#include <curl/curl.h>
+/* carl stuff */
+#include <carl/carl.h>
 
 /*
  * Download a HTTP file and upload an FTP file simultaneously.
@@ -45,46 +45,46 @@
 
 int main(void)
 {
-  CURL *handles[HANDLECOUNT];
-  CURLM *multi_handle;
+  CARL *handles[HANDLECOUNT];
+  CARLM *multi_handle;
 
   int still_running = 0; /* keep number of running handles */
   int i;
 
-  CURLMsg *msg; /* for picking up messages with the transfer status */
+  CARLMsg *msg; /* for picking up messages with the transfer status */
   int msgs_left; /* how many messages are left */
 
-  /* Allocate one CURL handle per transfer */
+  /* Allocate one CARL handle per transfer */
   for(i = 0; i<HANDLECOUNT; i++)
-    handles[i] = curl_easy_init();
+    handles[i] = carl_easy_init();
 
   /* set the options (I left out a few, you'll get the point anyway) */
-  curl_easy_setopt(handles[HTTP_HANDLE], CURLOPT_URL, "https://example.com");
+  carl_easy_setopt(handles[HTTP_HANDLE], CARLOPT_URL, "https://example.com");
 
-  curl_easy_setopt(handles[FTP_HANDLE], CURLOPT_URL, "ftp://example.com");
-  curl_easy_setopt(handles[FTP_HANDLE], CURLOPT_UPLOAD, 1L);
+  carl_easy_setopt(handles[FTP_HANDLE], CARLOPT_URL, "ftp://example.com");
+  carl_easy_setopt(handles[FTP_HANDLE], CARLOPT_UPLOAD, 1L);
 
   /* init a multi stack */
-  multi_handle = curl_multi_init();
+  multi_handle = carl_multi_init();
 
   /* add the individual transfers */
   for(i = 0; i<HANDLECOUNT; i++)
-    curl_multi_add_handle(multi_handle, handles[i]);
+    carl_multi_add_handle(multi_handle, handles[i]);
 
   /* we start some action by calling perform right away */
-  curl_multi_perform(multi_handle, &still_running);
+  carl_multi_perform(multi_handle, &still_running);
 
   while(still_running) {
     struct timeval timeout;
     int rc; /* select() return code */
-    CURLMcode mc; /* curl_multi_fdset() return code */
+    CARLMcode mc; /* carl_multi_fdset() return code */
 
     fd_set fdread;
     fd_set fdwrite;
     fd_set fdexcep;
     int maxfd = -1;
 
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     FD_ZERO(&fdread);
     FD_ZERO(&fdwrite);
@@ -94,20 +94,20 @@ int main(void)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(multi_handle, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(multi_handle, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -115,7 +115,7 @@ int main(void)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #ifdef _WIN32
@@ -139,14 +139,14 @@ int main(void)
       break;
     case 0: /* timeout */
     default: /* action */
-      curl_multi_perform(multi_handle, &still_running);
+      carl_multi_perform(multi_handle, &still_running);
       break;
     }
   }
 
   /* See how the transfers went */
-  while((msg = curl_multi_info_read(multi_handle, &msgs_left))) {
-    if(msg->msg == CURLMSG_DONE) {
+  while((msg = carl_multi_info_read(multi_handle, &msgs_left))) {
+    if(msg->msg == CARLMSG_DONE) {
       int idx;
 
       /* Find out which handle this message is about */
@@ -167,11 +167,11 @@ int main(void)
     }
   }
 
-  curl_multi_cleanup(multi_handle);
+  carl_multi_cleanup(multi_handle);
 
-  /* Free the CURL handles */
+  /* Free the CARL handles */
   for(i = 0; i<HANDLECOUNT; i++)
-    curl_easy_cleanup(handles[i]);
+    carl_easy_cleanup(handles[i]);
 
   return 0;
 }

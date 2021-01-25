@@ -1,0 +1,129 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_URL 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_URL \- provide the URL to use in the request
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_URL, char *URL);
+.SH DESCRIPTION
+Pass in a pointer to the \fIURL\fP to work with. The parameter should be a
+char * to a null-terminated string which must be URL-encoded in the following
+format:
+
+scheme://host:port/path
+
+For a greater explanation of the format please see RFC3986.
+
+libcarl doesn't validate the syntax or use this variable until the transfer is
+issued. Even if you set a crazy value here, \fIcarl_easy_setopt(3)\fP will
+still return \fICARLE_OK\fP.
+
+If the given URL is missing a scheme name (such as "http://" or "ftp://" etc)
+then libcarl will make a guess based on the host. If the outermost sub-domain
+name matches DICT, FTP, IMAP, LDAP, POP3 or SMTP then that protocol will be
+used, otherwise HTTP will be used. Since 7.45.0 guessing can be disabled by
+setting a default protocol, see \fICARLOPT_DEFAULT_PROTOCOL(3)\fP for details.
+
+Should the protocol, either that specified by the scheme or deduced by libcarl
+from the host name, not be supported by libcarl then
+\fICARLE_UNSUPPORTED_PROTOCOL\fP will be returned from either the
+\fIcarl_easy_perform(3)\fP or \fIcarl_multi_perform(3)\fP functions when you
+call them. Use \fIcarl_version_info(3)\fP for detailed information of which
+protocols are supported by the build of libcarl you are using.
+
+\fICARLOPT_PROTOCOLS(3)\fP can be used to limit what protocols libcarl will
+use for this transfer, independent of what libcarl has been compiled to
+support. That may be useful if you accept the URL from an external source and
+want to limit the accessibility.
+
+The \fICARLOPT_URL(3)\fP string will be ignored if \fICARLOPT_CARLU(3)\fP is
+set.
+
+\fICARLOPT_URL(3)\fP or \fICARLOPT_CARLU(3)\fP \fBmust\fP be set before a
+transfer is started.
+
+The application does not have to keep the string around after setting this
+option.
+.SH ENCODING
+The string pointed to in the \fICARLOPT_URL(3)\fP argument is generally
+expected to be a sequence of characters using an ASCII compatible encoding.
+
+If libcarl is built with IDN support, the server name part of the URL can use
+an "international name" by using the current encoding (according to locale) or
+UTF-8 (when winidn is used).
+
+If libcarl is built without IDN support, the server name is used exactly as
+specified when passed to the name resolver functions.
+.SH DEFAULT
+There is no default URL. If this option isn't set, no transfer can be
+performed.
+.SH SECURITY CONCERNS
+Applications may at times find it convenient to allow users to specify URLs
+for various purposes and that string would then end up fed to this option.
+
+Getting a URL from an external untrusted party will bring reasons for several
+security concerns:
+
+If you have an application that runs as or in a server application, getting an
+unfiltered URL can easily trick your application to access a local resource
+instead of a remote. Protecting yourself against localhost accesses is very
+hard when accepting user provided URLs.
+
+Such custom URLs can also access other ports than you planned as port numbers
+are part of the regular URL format. The combination of a local host and a
+custom port number can allow external users to play tricks with your local
+services.
+
+Accepting external URLs may also use other protocols than http:// or other
+common ones. Restrict what accept with \fICARLOPT_PROTOCOLS(3)\fP.
+
+User provided URLs can also be made to point to sites that redirect further on
+(possibly to other protocols too). Consider your
+\fICARLOPT_FOLLOWLOCATION(3)\fP and \fICARLOPT_REDIR_PROTOCOLS(3)\fP settings.
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+POP3 and SMTP were added in 7.31.0
+.SH RETURN VALUE
+Returns CARLE_OK on success or CARLE_OUT_OF_MEMORY if there was insufficient
+heap space.
+
+Note that \fIcarl_easy_setopt(3)\fP won't actually parse the given string so
+given a bad URL, it will not be detected until \fIcarl_easy_perform(3)\fP or
+similar is called.
+.SH "SEE ALSO"
+.BR CARLOPT_VERBOSE "(3), " CARLOPT_PROTOCOLS "(3), "
+.BR CARLOPT_FORBID_REUSE "(3), " CARLOPT_FRESH_CONNECT "(3), "
+.BR carl_easy_perform "(3), "
+.BR CARLINFO_REDIRECT_URL "(3), " CARLOPT_PATH_AS_IS "(3), " CARLOPT_CARLU "(3), "

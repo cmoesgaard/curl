@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
  * but vtls.c should ever call or use these functions.
  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_NSS
 
@@ -39,7 +39,7 @@
 #include "vtls.h"
 #include "llist.h"
 #include "multiif.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 #include "nssg.h"
 #include <nspr.h>
 #include <nss.h>
@@ -71,7 +71,7 @@
 #include "x509asn1.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define SSL_DIR "/etc/pki/nssdb"
@@ -275,7 +275,7 @@ static char *nss_sslver_to_name(PRUint16 nssver)
     return strdup("TLSv1.3");
 #endif
   default:
-    return curl_maprintf("0x%04x", nssver);
+    return carl_maprintf("0x%04x", nssver);
   }
 }
 
@@ -430,21 +430,21 @@ static PK11SlotInfo* nss_find_slot_by_name(const char *slot_name)
 }
 
 /* wrap 'ptr' as list node and tail-insert into 'list' */
-static CURLcode insert_wrapped_ptr(struct Curl_llist *list, void *ptr)
+static CARLcode insert_wrapped_ptr(struct Curl_llist *list, void *ptr)
 {
   struct ptr_list_wrap *wrap = malloc(sizeof(*wrap));
   if(!wrap)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   wrap->ptr = ptr;
   Curl_llist_insert_next(list, list->tail, wrap, &wrap->node);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /* Call PK11_CreateGenericObject() with the given obj_class and filename.  If
  * the call succeeds, append the object handle to the list of objects so that
  * the object can be destroyed in nss_close(). */
-static CURLcode nss_create_object(struct ssl_connect_data *connssl,
+static CARLcode nss_create_object(struct ssl_connect_data *connssl,
                                   CK_OBJECT_CLASS obj_class,
                                   const char *filename, bool cacert)
 {
@@ -454,15 +454,15 @@ static CURLcode nss_create_object(struct ssl_connect_data *connssl,
   CK_BBOOL ckfalse = CK_FALSE;
   CK_ATTRIBUTE attrs[/* max count of attributes */ 4];
   int attr_cnt = 0;
-  CURLcode result = (cacert)
-    ? CURLE_SSL_CACERT_BADFILE
-    : CURLE_SSL_CERTPROBLEM;
+  CARLcode result = (cacert)
+    ? CARLE_SSL_CACERT_BADFILE
+    : CARLE_SSL_CERTPROBLEM;
 
   const int slot_id = (cacert) ? 0 : 1;
   char *slot_name = aprintf("PEM Token #%d", slot_id);
   struct ssl_backend_data *backend = connssl->backend;
   if(!slot_name)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   slot = nss_find_slot_by_name(slot_name);
   free(slot_name);
@@ -494,16 +494,16 @@ static CURLcode nss_create_object(struct ssl_connect_data *connssl,
   if(!obj)
     return result;
 
-  if(insert_wrapped_ptr(&backend->obj_list, obj) != CURLE_OK) {
+  if(insert_wrapped_ptr(&backend->obj_list, obj) != CARLE_OK) {
     PK11_DestroyGenericObject(obj);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   if(!cacert && CKO_CERTIFICATE == obj_class)
     /* store reference to a client certificate */
     backend->obj_clicert = obj;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /* Destroy the NSS object whose handle is given by ptr.  This function is
@@ -528,12 +528,12 @@ static void nss_destroy_crl_item(void *user, void *ptr)
   free(wrap);
 }
 
-static CURLcode nss_load_cert(struct ssl_connect_data *ssl,
+static CARLcode nss_load_cert(struct ssl_connect_data *ssl,
                               const char *filename, PRBool cacert)
 {
-  CURLcode result = (cacert)
-    ? CURLE_SSL_CACERT_BADFILE
-    : CURLE_SSL_CERTPROBLEM;
+  CARLcode result = (cacert)
+    ? CARLE_SSL_CACERT_BADFILE
+    : CARLE_SSL_CERTPROBLEM;
 
   /* libnsspem.so leaks memory if the requested file does not exist.  For more
    * details, go to <https://bugzilla.redhat.com/734760>. */
@@ -566,7 +566,7 @@ static CURLcode nss_load_cert(struct ssl_connect_data *ssl,
 }
 
 /* add given CRL to cache if it is not already there */
-static CURLcode nss_cache_crl(SECItem *crl_der)
+static CARLcode nss_cache_crl(SECItem *crl_der)
 {
   CERTCertDBHandle *db = CERT_GetDefaultCertDB();
   CERTSignedCrl *crl = SEC_FindCrlByDERCert(db, crl_der, 0);
@@ -574,7 +574,7 @@ static CURLcode nss_cache_crl(SECItem *crl_der)
     /* CRL already cached */
     SEC_DestroyCrl(crl);
     SECITEM_FreeItem(crl_der, PR_TRUE);
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   /* acquire lock before call of CERT_CacheCRL() and accessing nss_crl_list */
@@ -584,24 +584,24 @@ static CURLcode nss_cache_crl(SECItem *crl_der)
     /* unable to cache CRL */
     SECITEM_FreeItem(crl_der, PR_TRUE);
     PR_Unlock(nss_crllock);
-    return CURLE_SSL_CRL_BADFILE;
+    return CARLE_SSL_CRL_BADFILE;
   }
 
   /* store the CRL item so that we can free it in nss_cleanup() */
-  if(insert_wrapped_ptr(&nss_crl_list, crl_der) != CURLE_OK) {
+  if(insert_wrapped_ptr(&nss_crl_list, crl_der) != CARLE_OK) {
     if(SECSuccess == CERT_UncacheCRL(db, crl_der))
       SECITEM_FreeItem(crl_der, PR_TRUE);
     PR_Unlock(nss_crllock);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* we need to clear session cache, so that the CRL could take effect */
   SSL_ClearSessionCache();
   PR_Unlock(nss_crllock);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_load_crl(const char *crlfilename)
+static CARLcode nss_load_crl(const char *crlfilename)
 {
   PRFileDesc *infile;
   PRFileInfo  info;
@@ -611,7 +611,7 @@ static CURLcode nss_load_crl(const char *crlfilename)
 
   infile = PR_Open(crlfilename, PR_RDONLY, 0);
   if(!infile)
-    return CURLE_SSL_CRL_BADFILE;
+    return CARLE_SSL_CRL_BADFILE;
 
   if(PR_SUCCESS != PR_GetOpenFileInfo(infile, &info))
     goto fail;
@@ -662,15 +662,15 @@ fail:
   PR_Close(infile);
   SECITEM_FreeItem(crl_der, PR_TRUE);
   SECITEM_FreeItem(&filedata, PR_FALSE);
-  return CURLE_SSL_CRL_BADFILE;
+  return CARLE_SSL_CRL_BADFILE;
 }
 
-static CURLcode nss_load_key(struct Curl_easy *data, struct connectdata *conn,
+static CARLcode nss_load_key(struct Curl_easy *data, struct connectdata *conn,
                              int sockindex, char *key_file)
 {
   PK11SlotInfo *slot, *tmp;
   SECStatus status;
-  CURLcode result;
+  CARLcode result;
   struct ssl_connect_data *ssl = conn->ssl;
 
   (void)sockindex; /* unused */
@@ -683,7 +683,7 @@ static CURLcode nss_load_key(struct Curl_easy *data, struct connectdata *conn,
 
   slot = nss_find_slot_by_name("PEM Token #1");
   if(!slot)
-    return CURLE_SSL_CERTPROBLEM;
+    return CARLE_SSL_CERTPROBLEM;
 
   /* This will force the token to be seen as re-inserted */
   tmp = SECMOD_WaitForAnyTokenEvent(pem_module, 0, 0);
@@ -691,13 +691,13 @@ static CURLcode nss_load_key(struct Curl_easy *data, struct connectdata *conn,
     PK11_FreeSlot(tmp);
   if(!PK11_IsPresent(slot)) {
     PK11_FreeSlot(slot);
-    return CURLE_SSL_CERTPROBLEM;
+    return CARLE_SSL_CERTPROBLEM;
   }
 
   status = PK11_Authenticate(slot, PR_TRUE, SSL_SET_OPTION(key_passwd));
   PK11_FreeSlot(slot);
 
-  return (SECSuccess == status) ? CURLE_OK : CURLE_SSL_CERTPROBLEM;
+  return (SECSuccess == status) ? CARLE_OK : CARLE_SSL_CERTPROBLEM;
 }
 
 static int display_error(struct Curl_easy *data, PRInt32 err,
@@ -716,10 +716,10 @@ static int display_error(struct Curl_easy *data, PRInt32 err,
   return 0; /* The caller will print a generic error */
 }
 
-static CURLcode cert_stuff(struct Curl_easy *data, struct connectdata *conn,
+static CARLcode cert_stuff(struct Curl_easy *data, struct connectdata *conn,
                            int sockindex, char *cert_file, char *key_file)
 {
-  CURLcode result;
+  CARLcode result;
 
   if(cert_file) {
     result = nss_load_cert(&conn->ssl[sockindex], cert_file, PR_FALSE);
@@ -751,7 +751,7 @@ static CURLcode cert_stuff(struct Curl_easy *data, struct connectdata *conn,
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static char *nss_get_password(PK11SlotInfo *slot, PRBool retry, void *arg)
@@ -848,15 +848,15 @@ static void HandshakeCallback(PRFileDesc *sock, void *arg)
 #ifdef USE_NGHTTP2
     if(buflen == NGHTTP2_PROTO_VERSION_ID_LEN &&
        !memcmp(NGHTTP2_PROTO_VERSION_ID, buf, NGHTTP2_PROTO_VERSION_ID_LEN)) {
-      conn->negnpn = CURL_HTTP_VERSION_2;
+      conn->negnpn = CARL_HTTP_VERSION_2;
     }
     else
 #endif
     if(buflen == ALPN_HTTP_1_1_LENGTH &&
        !memcmp(ALPN_HTTP_1_1, buf, ALPN_HTTP_1_1_LENGTH)) {
-      conn->negnpn = CURL_HTTP_VERSION_1_1;
+      conn->negnpn = CARL_HTTP_VERSION_1_1;
     }
-    Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
+    Curl_multiuse_state(data, conn->negnpn == CARL_HTTP_VERSION_2 ?
                         BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
   }
 }
@@ -948,9 +948,9 @@ static void display_cert_info(struct Curl_easy *data,
   PR_Free(common_name);
 }
 
-static CURLcode display_conn_info(struct Curl_easy *data, PRFileDesc *sock)
+static CARLcode display_conn_info(struct Curl_easy *data, PRFileDesc *sock)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   SSLChannelInfo channel;
   SSLCipherSuiteInfo suite;
   CERTCertificate *cert;
@@ -1075,17 +1075,17 @@ static SECStatus check_issuer_cert(PRFileDesc *sock,
   return res;
 }
 
-static CURLcode cmp_peer_pubkey(struct ssl_connect_data *connssl,
+static CARLcode cmp_peer_pubkey(struct ssl_connect_data *connssl,
                                 const char *pinnedpubkey)
 {
-  CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+  CARLcode result = CARLE_SSL_PINNEDPUBKEYNOTMATCH;
   struct ssl_backend_data *backend = connssl->backend;
   struct Curl_easy *data = backend->data;
   CERTCertificate *cert;
 
   if(!pinnedpubkey)
     /* no pinned public key specified */
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* get peer certificate */
   cert = SSL_PeerCertificate(backend->handle);
@@ -1108,10 +1108,10 @@ static CURLcode cmp_peer_pubkey(struct ssl_connect_data *connssl,
 
   /* report the resulting status */
   switch(result) {
-  case CURLE_OK:
+  case CARLE_OK:
     infof(data, "pinned public key verified successfully!\n");
     break;
-  case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
+  case CARLE_SSL_PINNEDPUBKEYNOTMATCH:
     failf(data, "failed to verify pinned public key");
     break;
   default:
@@ -1271,18 +1271,18 @@ static PRStatus nspr_io_close(PRFileDesc *fd)
 }
 
 /* load a PKCS #11 module */
-static CURLcode nss_load_module(SECMODModule **pmod, const char *library,
+static CARLcode nss_load_module(SECMODModule **pmod, const char *library,
                                 const char *name)
 {
   char *config_string;
   SECMODModule *module = *pmod;
   if(module)
     /* already loaded */
-    return CURLE_OK;
+    return CARLE_OK;
 
   config_string = aprintf("library=%s name=%s", library, name);
   if(!config_string)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   module = SECMOD_LoadUserModule(config_string, NULL, PR_FALSE);
   free(config_string);
@@ -1290,12 +1290,12 @@ static CURLcode nss_load_module(SECMODModule **pmod, const char *library,
   if(module && module->loaded) {
     /* loaded successfully */
     *pmod = module;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   if(module)
     SECMOD_DestroyModule(module);
-  return CURLE_FAILED_INIT;
+  return CARLE_FAILED_INIT;
 }
 
 /* unload a PKCS #11 module */
@@ -1315,14 +1315,14 @@ static void nss_unload_module(SECMODModule **pmod)
 }
 
 /* data might be NULL */
-static CURLcode nss_init_core(struct Curl_easy *data, const char *cert_dir)
+static CARLcode nss_init_core(struct Curl_easy *data, const char *cert_dir)
 {
   NSSInitParameters initparams;
   PRErrorCode err;
   const char *err_name;
 
   if(nss_context != NULL)
-    return CURLE_OK;
+    return CARLE_OK;
 
   memset((void *) &initparams, '\0', sizeof(initparams));
   initparams.length = sizeof(initparams);
@@ -1330,7 +1330,7 @@ static CURLcode nss_init_core(struct Curl_easy *data, const char *cert_dir)
   if(cert_dir) {
     char *certpath = aprintf("sql:%s", cert_dir);
     if(!certpath)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     infof(data, "Initializing NSS with certpath: %s\n", certpath);
     nss_context = NSS_InitContext(certpath, "", "", "", &initparams,
@@ -1338,7 +1338,7 @@ static CURLcode nss_init_core(struct Curl_easy *data, const char *cert_dir)
     free(certpath);
 
     if(nss_context != NULL)
-      return CURLE_OK;
+      return CARLE_OK;
 
     err = PR_GetError();
     err_name = nss_error_to_name(err);
@@ -1350,23 +1350,23 @@ static CURLcode nss_init_core(struct Curl_easy *data, const char *cert_dir)
          | NSS_INIT_NOCERTDB   | NSS_INIT_NOMODDB       | NSS_INIT_FORCEOPEN
          | NSS_INIT_NOROOTINIT | NSS_INIT_OPTIMIZESPACE | NSS_INIT_PK11RELOAD);
   if(nss_context != NULL)
-    return CURLE_OK;
+    return CARLE_OK;
 
   err = PR_GetError();
   err_name = nss_error_to_name(err);
   failf(data, "Unable to initialize NSS: %d (%s)", err, err_name);
-  return CURLE_SSL_CACERT_BADFILE;
+  return CARLE_SSL_CACERT_BADFILE;
 }
 
 /* data might be NULL */
-static CURLcode nss_setup(struct Curl_easy *data)
+static CARLcode nss_setup(struct Curl_easy *data)
 {
   char *cert_dir;
   struct_stat st;
-  CURLcode result;
+  CARLcode result;
 
   if(initialized)
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* list of all CRL items we need to destroy in nss_cleanup() */
   Curl_llist_init(&nss_crl_list, nss_destroy_crl_item);
@@ -1390,9 +1390,9 @@ static CURLcode nss_setup(struct Curl_easy *data)
 
   if(nspr_io_identity == PR_INVALID_IO_LAYER) {
     /* allocate an identity for our own NSPR I/O layer */
-    nspr_io_identity = PR_GetUniqueIdentity("libcurl");
+    nspr_io_identity = PR_GetUniqueIdentity("libcarl");
     if(nspr_io_identity == PR_INVALID_IO_LAYER)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     /* the default methods just call down to the lower I/O layer */
     memcpy(&nspr_io_methods, PR_GetDefaultIOMethods(),
@@ -1413,7 +1413,7 @@ static CURLcode nss_setup(struct Curl_easy *data)
 
   initialized = 1;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /**
@@ -1424,7 +1424,7 @@ static CURLcode nss_setup(struct Curl_easy *data)
  */
 static int nss_init(void)
 {
-  /* curl_global_init() is not thread-safe so this test is ok */
+  /* carl_global_init() is not thread-safe so this test is ok */
   if(nss_initlock == NULL) {
     PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
     nss_initlock = PR_NewLock();
@@ -1439,14 +1439,14 @@ static int nss_init(void)
 }
 
 /* data might be NULL */
-CURLcode Curl_nss_force_init(struct Curl_easy *data)
+CARLcode Curl_nss_force_init(struct Curl_easy *data)
 {
-  CURLcode result;
+  CARLcode result;
   if(!nss_initlock) {
     if(data)
-      failf(data, "unable to initialize NSS, curl_global_init() should have "
-                  "been called with CURL_GLOBAL_SSL or CURL_GLOBAL_ALL");
-    return CURLE_FAILED_INIT;
+      failf(data, "unable to initialize NSS, carl_global_init() should have "
+                  "been called with CARL_GLOBAL_SSL or CARL_GLOBAL_ALL");
+    return CARLE_FAILED_INIT;
   }
 
   PR_Lock(nss_initlock);
@@ -1550,24 +1550,24 @@ static void nss_close(struct Curl_easy *data, struct connectdata *conn,
                       int sockindex)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   struct ssl_connect_data *connssl_proxy = &conn->proxy_ssl[sockindex];
 #endif
   struct ssl_backend_data *backend = connssl->backend;
 
   (void)data;
   if(backend->handle
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
     || connssl_proxy->backend->handle
 #endif
     ) {
     /* NSS closes the socket we previously handed to it, so we must mark it
        as closed to avoid double close */
     fake_sclose(conn->sock[sockindex]);
-    conn->sock[sockindex] = CURL_SOCKET_BAD;
+    conn->sock[sockindex] = CARL_SOCKET_BAD;
   }
 
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   if(backend->handle)
     /* nss_close(connssl) will transitively close also
        connssl_proxy->backend->handle if both are used. Clear it to avoid
@@ -1581,13 +1581,13 @@ static void nss_close(struct Curl_easy *data, struct connectdata *conn,
 
 /* return true if NSS can provide error code (and possibly msg) for the
    error */
-static bool is_nss_error(CURLcode err)
+static bool is_nss_error(CARLcode err)
 {
   switch(err) {
-  case CURLE_PEER_FAILED_VERIFICATION:
-  case CURLE_SSL_CERTPROBLEM:
-  case CURLE_SSL_CONNECT_ERROR:
-  case CURLE_SSL_ISSUER_ERROR:
+  case CARLE_PEER_FAILED_VERIFICATION:
+  case CARLE_SSL_CERTPROBLEM:
+  case CARLE_SSL_CONNECT_ERROR:
+  case CARLE_SSL_ISSUER_ERROR:
     return true;
 
   default:
@@ -1612,14 +1612,14 @@ static bool is_cc_error(PRInt32 err)
 static Curl_recv nss_recv;
 static Curl_send nss_send;
 
-static CURLcode nss_load_ca_certificates(struct Curl_easy *data,
+static CARLcode nss_load_ca_certificates(struct Curl_easy *data,
                                          struct connectdata *conn,
                                          int sockindex)
 {
   const char *cafile = SSL_CONN_CONFIG(CAfile);
   const char *capath = SSL_CONN_CONFIG(CApath);
   bool use_trust_module;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   /* treat empty string as unset */
   if(cafile && !cafile[0])
@@ -1639,10 +1639,10 @@ static CURLcode nss_load_ca_certificates(struct Curl_easy *data,
     result = nss_load_module(&trust_module, trust_library, "trust");
     infof(data, "%s %s\n", (result) ? "failed to load" : "loaded",
           trust_library);
-    if(result == CURLE_FAILED_INIT)
+    if(result == CARLE_FAILED_INIT)
       /* If libnssckbi.so is not available (or fails to load), one can still
          use CA certificates stored in NSS database.  Ignore the failure. */
-      result = CURLE_OK;
+      result = CARLE_OK;
   }
   else if(!use_trust_module && trust_module) {
     /* libnssckbi.so not needed but already loaded --> unload it! */
@@ -1660,26 +1660,26 @@ static CURLcode nss_load_ca_certificates(struct Curl_easy *data,
   if(capath) {
     struct_stat st;
     if(stat(capath, &st) == -1)
-      return CURLE_SSL_CACERT_BADFILE;
+      return CARLE_SSL_CACERT_BADFILE;
 
     if(S_ISDIR(st.st_mode)) {
       PRDirEntry *entry;
       PRDir *dir = PR_OpenDir(capath);
       if(!dir)
-        return CURLE_SSL_CACERT_BADFILE;
+        return CARLE_SSL_CACERT_BADFILE;
 
       while((entry =
              PR_ReadDir(dir, (PRDirFlags)(PR_SKIP_BOTH | PR_SKIP_HIDDEN)))) {
         char *fullpath = aprintf("%s/%s", capath, entry->name);
         if(!fullpath) {
           PR_CloseDir(dir);
-          return CURLE_OUT_OF_MEMORY;
+          return CARLE_OUT_OF_MEMORY;
         }
 
-        if(CURLE_OK != nss_load_cert(&conn->ssl[sockindex], fullpath, PR_TRUE))
+        if(CARLE_OK != nss_load_cert(&conn->ssl[sockindex], fullpath, PR_TRUE))
           /* This is purposefully tolerant of errors so non-PEM files can
            * be in the same directory */
-          infof(data, "failed to load '%s' from CURLOPT_CAPATH\n", fullpath);
+          infof(data, "failed to load '%s' from CARLOPT_CAPATH\n", fullpath);
 
         free(fullpath);
       }
@@ -1687,109 +1687,109 @@ static CURLcode nss_load_ca_certificates(struct Curl_easy *data,
       PR_CloseDir(dir);
     }
     else
-      infof(data, "warning: CURLOPT_CAPATH not a directory (%s)\n", capath);
+      infof(data, "warning: CARLOPT_CAPATH not a directory (%s)\n", capath);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_sslver_from_curl(PRUint16 *nssver, long version)
+static CARLcode nss_sslver_from_carl(PRUint16 *nssver, long version)
 {
   switch(version) {
-  case CURL_SSLVERSION_SSLv2:
+  case CARL_SSLVERSION_SSLv2:
     *nssver = SSL_LIBRARY_VERSION_2;
-    return CURLE_OK;
+    return CARLE_OK;
 
-  case CURL_SSLVERSION_SSLv3:
+  case CARL_SSLVERSION_SSLv3:
     *nssver = SSL_LIBRARY_VERSION_3_0;
-    return CURLE_OK;
+    return CARLE_OK;
 
-  case CURL_SSLVERSION_TLSv1_0:
+  case CARL_SSLVERSION_TLSv1_0:
     *nssver = SSL_LIBRARY_VERSION_TLS_1_0;
-    return CURLE_OK;
+    return CARLE_OK;
 
-  case CURL_SSLVERSION_TLSv1_1:
+  case CARL_SSLVERSION_TLSv1_1:
 #ifdef SSL_LIBRARY_VERSION_TLS_1_1
     *nssver = SSL_LIBRARY_VERSION_TLS_1_1;
-    return CURLE_OK;
+    return CARLE_OK;
 #else
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
 #endif
 
-  case CURL_SSLVERSION_TLSv1_2:
+  case CARL_SSLVERSION_TLSv1_2:
 #ifdef SSL_LIBRARY_VERSION_TLS_1_2
     *nssver = SSL_LIBRARY_VERSION_TLS_1_2;
-    return CURLE_OK;
+    return CARLE_OK;
 #else
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
 #endif
 
-  case CURL_SSLVERSION_TLSv1_3:
+  case CARL_SSLVERSION_TLSv1_3:
 #ifdef SSL_LIBRARY_VERSION_TLS_1_3
     *nssver = SSL_LIBRARY_VERSION_TLS_1_3;
-    return CURLE_OK;
+    return CARLE_OK;
 #else
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
 #endif
 
   default:
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 }
 
-static CURLcode nss_init_sslver(SSLVersionRange *sslver,
+static CARLcode nss_init_sslver(SSLVersionRange *sslver,
                                 struct Curl_easy *data,
                                 struct connectdata *conn)
 {
-  CURLcode result;
+  CARLcode result;
   const long min = SSL_CONN_CONFIG(version);
   const long max = SSL_CONN_CONFIG(version_max);
   SSLVersionRange vrange;
 
   switch(min) {
-  case CURL_SSLVERSION_TLSv1:
-  case CURL_SSLVERSION_DEFAULT:
+  case CARL_SSLVERSION_TLSv1:
+  case CARL_SSLVERSION_DEFAULT:
     /* Bump our minimum TLS version if NSS has stricter requirements. */
     if(SSL_VersionRangeGetDefault(ssl_variant_stream, &vrange) != SECSuccess)
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     if(sslver->min < vrange.min)
       sslver->min = vrange.min;
     break;
   default:
-    result = nss_sslver_from_curl(&sslver->min, min);
+    result = nss_sslver_from_carl(&sslver->min, min);
     if(result) {
-      failf(data, "unsupported min version passed via CURLOPT_SSLVERSION");
+      failf(data, "unsupported min version passed via CARLOPT_SSLVERSION");
       return result;
     }
   }
 
   switch(max) {
-  case CURL_SSLVERSION_MAX_NONE:
-  case CURL_SSLVERSION_MAX_DEFAULT:
+  case CARL_SSLVERSION_MAX_NONE:
+  case CARL_SSLVERSION_MAX_DEFAULT:
     break;
   default:
-    result = nss_sslver_from_curl(&sslver->max, max >> 16);
+    result = nss_sslver_from_carl(&sslver->max, max >> 16);
     if(result) {
-      failf(data, "unsupported max version passed via CURLOPT_SSLVERSION");
+      failf(data, "unsupported max version passed via CARLOPT_SSLVERSION");
       return result;
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_fail_connect(struct ssl_connect_data *connssl,
+static CARLcode nss_fail_connect(struct ssl_connect_data *connssl,
                                  struct Curl_easy *data,
-                                 CURLcode curlerr)
+                                 CARLcode carlerr)
 {
   PRErrorCode err = 0;
   struct ssl_backend_data *backend = connssl->backend;
 
-  if(is_nss_error(curlerr)) {
+  if(is_nss_error(carlerr)) {
     /* read NSPR error code */
     err = PR_GetError();
     if(is_cc_error(err))
-      curlerr = CURLE_SSL_CERTPROBLEM;
+      carlerr = CARLE_SSL_CERTPROBLEM;
 
     /* print the error number and error string */
     infof(data, "NSS error %d (%s)\n", err, nss_error_to_name(err));
@@ -1801,11 +1801,11 @@ static CURLcode nss_fail_connect(struct ssl_connect_data *connssl,
   /* cleanup on connection failure */
   Curl_llist_destroy(&backend->obj_list, NULL);
 
-  return curlerr;
+  return carlerr;
 }
 
 /* Switch the SSL socket into blocking or non-blocking mode. */
-static CURLcode nss_set_blocking(struct ssl_connect_data *connssl,
+static CARLcode nss_set_blocking(struct ssl_connect_data *connssl,
                                  struct Curl_easy *data,
                                  bool blocking)
 {
@@ -1815,12 +1815,12 @@ static CURLcode nss_set_blocking(struct ssl_connect_data *connssl,
   sock_opt.value.non_blocking = !blocking;
 
   if(PR_SetSocketOption(backend->handle, &sock_opt) != PR_SUCCESS)
-    return nss_fail_connect(connssl, data, CURLE_SSL_CONNECT_ERROR);
+    return nss_fail_connect(connssl, data, CARLE_SSL_CONNECT_ERROR);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_setup_connect(struct Curl_easy *data,
+static CARLcode nss_setup_connect(struct Curl_easy *data,
                                   struct connectdata *conn, int sockindex)
 {
   PRFileDesc *model = NULL;
@@ -1828,10 +1828,10 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   PRFileDesc *nspr_io_stub = NULL;
   PRBool ssl_no_cache;
   PRBool ssl_cbc_random_iv;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
-  CURLcode result;
+  CARLcode result;
   bool second_layer = FALSE;
   SSLVersionRange sslver_supported;
 
@@ -1864,13 +1864,13 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
 
   result = nss_load_module(&pem_module, pem_library, "PEM");
   PR_Unlock(nss_initlock);
-  if(result == CURLE_FAILED_INIT)
+  if(result == CARLE_FAILED_INIT)
     infof(data, "WARNING: failed to load NSS PEM library %s. Using "
                 "OpenSSL PEM certificates will not work.\n", pem_library);
   else if(result)
     goto error;
 
-  result = CURLE_SSL_CONNECT_ERROR;
+  result = CARLE_SSL_CONNECT_ERROR;
 
   model = PR_NewTCPSocket();
   if(!model)
@@ -1891,7 +1891,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
     goto error;
 
   /* enable/disable the requested SSL version(s) */
-  if(nss_init_sslver(&sslver, data, conn) != CURLE_OK)
+  if(nss_init_sslver(&sslver, data, conn) != CARLE_OK)
     goto error;
   if(SSL_VersionRangeGetSupported(ssl_variant_stream,
                                   &sslver_supported) != SECSuccess)
@@ -1924,7 +1924,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
 
   if(SSL_CONN_CONFIG(cipher_list)) {
     if(set_ciphers(data, model, SSL_CONN_CONFIG(cipher_list)) != SECSuccess) {
-      result = CURLE_SSL_CIPHER;
+      result = CARLE_SSL_CIPHER;
       goto error;
     }
   }
@@ -1947,8 +1947,8 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
     goto error;
 
   {
-    const CURLcode rv = nss_load_ca_certificates(data, conn, sockindex);
-    if((rv == CURLE_SSL_CACERT_BADFILE) && !SSL_CONN_CONFIG(verifypeer))
+    const CARLcode rv = nss_load_ca_certificates(data, conn, sockindex);
+    if((rv == CARLE_SSL_CACERT_BADFILE) && !SSL_CONN_CONFIG(verifypeer))
       /* not a fatal error because we are not going to verify the peer */
       infof(data, "warning: CA certificates failed to load\n");
     else if(rv) {
@@ -1958,7 +1958,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   }
 
   if(SSL_SET_OPTION(CRLfile)) {
-    const CURLcode rv = nss_load_crl(SSL_SET_OPTION(CRLfile));
+    const CARLcode rv = nss_load_crl(SSL_SET_OPTION(CRLfile));
     if(rv) {
       result = rv;
       goto error;
@@ -1973,7 +1973,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
       backend->obj_clicert = NULL;
     }
     else {
-      CURLcode rv = cert_stuff(data, conn, sockindex,
+      CARLcode rv = cert_stuff(data, conn, sockindex,
                                SSL_SET_OPTION(primary.clientcert),
                                SSL_SET_OPTION(key));
       if(rv) {
@@ -1991,11 +1991,11 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
 
   if(SSL_GetClientAuthDataHook(model, SelectClientCert,
                                (void *)connssl) != SECSuccess) {
-    result = CURLE_SSL_CERTPROBLEM;
+    result = CARLE_SSL_CERTPROBLEM;
     goto error;
   }
 
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   if(conn->proxy_ssl[sockindex].use) {
     DEBUGASSERT(ssl_connection_complete == conn->proxy_ssl[sockindex].state);
     DEBUGASSERT(conn->proxy_ssl[sockindex].backend->handle != NULL);
@@ -2083,8 +2083,8 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
     unsigned char protocols[128];
 
 #ifdef USE_NGHTTP2
-    if(data->set.httpversion >= CURL_HTTP_VERSION_2
-#ifndef CURL_DISABLE_PROXY
+    if(data->set.httpversion >= CARL_HTTP_VERSION_2
+#ifndef CARL_DISABLE_PROXY
       && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
 #endif
       ) {
@@ -2117,7 +2117,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   if(SSL_SetSockPeerID(backend->handle, SSL_HOST_NAME()) != SECSuccess)
     goto error;
 
-  return CURLE_OK;
+  return CARLE_OK;
 
 error:
   if(model)
@@ -2126,19 +2126,19 @@ error:
   return nss_fail_connect(connssl, data, result);
 }
 
-static CURLcode nss_do_connect(struct Curl_easy *data,
+static CARLcode nss_do_connect(struct Curl_easy *data,
                                struct connectdata *conn, int sockindex)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
-  CURLcode result = CURLE_SSL_CONNECT_ERROR;
+  CARLcode result = CARLE_SSL_CONNECT_ERROR;
   PRUint32 timeout;
 
   /* check timeout situation */
   const timediff_t time_left = Curl_timeleft(data, NULL, TRUE);
   if(time_left < 0) {
     failf(data, "timed out before SSL handshake");
-    result = CURLE_OPERATION_TIMEDOUT;
+    result = CARLE_OPERATION_TIMEDOUT;
     goto error;
   }
 
@@ -2147,11 +2147,11 @@ static CURLcode nss_do_connect(struct Curl_easy *data,
   if(SSL_ForceHandshakeWithTimeout(backend->handle, timeout) != SECSuccess) {
     if(PR_GetError() == PR_WOULD_BLOCK_ERROR)
       /* blocking direction is updated by nss_update_connecting_state() */
-      return CURLE_AGAIN;
+      return CARLE_AGAIN;
     else if(SSL_SET_OPTION(certverifyresult) == SSL_ERROR_BAD_CERT_DOMAIN)
-      result = CURLE_PEER_FAILED_VERIFICATION;
+      result = CARLE_PEER_FAILED_VERIFICATION;
     else if(SSL_SET_OPTION(certverifyresult) != 0)
-      result = CURLE_PEER_FAILED_VERIFICATION;
+      result = CARLE_PEER_FAILED_VERIFICATION;
     goto error;
   }
 
@@ -2170,7 +2170,7 @@ static CURLcode nss_do_connect(struct Curl_easy *data,
 
     if(SECFailure == ret) {
       infof(data, "SSL certificate issuer check failed\n");
-      result = CURLE_SSL_ISSUER_ERROR;
+      result = CARLE_SSL_ISSUER_ERROR;
       goto error;
     }
     else {
@@ -2183,30 +2183,30 @@ static CURLcode nss_do_connect(struct Curl_easy *data,
     /* status already printed */
     goto error;
 
-  return CURLE_OK;
+  return CARLE_OK;
 
 error:
   return nss_fail_connect(connssl, data, result);
 }
 
-static CURLcode nss_connect_common(struct Curl_easy *data,
+static CARLcode nss_connect_common(struct Curl_easy *data,
                                    struct connectdata *conn, int sockindex,
                                    bool *done)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   const bool blocking = (done == NULL);
-  CURLcode result;
+  CARLcode result;
 
   if(connssl->state == ssl_connection_complete) {
     if(!blocking)
       *done = TRUE;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   if(connssl->connecting_state == ssl_connect_1) {
     result = nss_setup_connect(data, conn, sockindex);
     if(result)
-      /* we do not expect CURLE_AGAIN from nss_setup_connect() */
+      /* we do not expect CARLE_AGAIN from nss_setup_connect() */
       return result;
 
     connssl->connecting_state = ssl_connect_2;
@@ -2219,12 +2219,12 @@ static CURLcode nss_connect_common(struct Curl_easy *data,
 
   result = nss_do_connect(data, conn, sockindex);
   switch(result) {
-  case CURLE_OK:
+  case CARLE_OK:
     break;
-  case CURLE_AGAIN:
+  case CARLE_AGAIN:
     if(!blocking)
-      /* CURLE_AGAIN in non-blocking mode is not an error */
-      return CURLE_OK;
+      /* CARLE_AGAIN in non-blocking mode is not an error */
+      return CARLE_OK;
     /* FALLTHROUGH */
   default:
     return result;
@@ -2247,16 +2247,16 @@ static CURLcode nss_connect_common(struct Curl_easy *data,
   /* ssl_connect_done is never used outside, go back to the initial state */
   connssl->connecting_state = ssl_connect_1;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_connect(struct Curl_easy *data, struct connectdata *conn,
+static CARLcode nss_connect(struct Curl_easy *data, struct connectdata *conn,
                             int sockindex)
 {
   return nss_connect_common(data, conn, sockindex, /* blocking */ NULL);
 }
 
-static CURLcode nss_connect_nonblocking(struct Curl_easy *data,
+static CARLcode nss_connect_nonblocking(struct Curl_easy *data,
                                         struct connectdata *conn,
                                         int sockindex, bool *done)
 {
@@ -2267,7 +2267,7 @@ static ssize_t nss_send(struct Curl_easy *data,    /* transfer */
                         int sockindex,             /* socketindex */
                         const void *mem,           /* send this data */
                         size_t len,                /* amount to write */
-                        CURLcode *curlcode)
+                        CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
@@ -2282,7 +2282,7 @@ static ssize_t nss_send(struct Curl_easy *data,    /* transfer */
   if(rc < 0) {
     PRInt32 err = PR_GetError();
     if(err == PR_WOULD_BLOCK_ERROR)
-      *curlcode = CURLE_AGAIN;
+      *carlcode = CARLE_AGAIN;
     else {
       /* print the error number and error string */
       const char *err_name = nss_error_to_name(err);
@@ -2291,9 +2291,9 @@ static ssize_t nss_send(struct Curl_easy *data,    /* transfer */
       /* print a human-readable message describing the error if available */
       nss_print_error_message(data, err);
 
-      *curlcode = (is_cc_error(err))
-        ? CURLE_SSL_CERTPROBLEM
-        : CURLE_SEND_ERROR;
+      *carlcode = (is_cc_error(err))
+        ? CARLE_SSL_CERTPROBLEM
+        : CARLE_SEND_ERROR;
     }
 
     return -1;
@@ -2306,7 +2306,7 @@ static ssize_t nss_recv(struct Curl_easy *data,    /* transfer */
                         int sockindex,             /* socketindex */
                         char *buf,             /* store read data here */
                         size_t buffersize,     /* max amount to read */
-                        CURLcode *curlcode)
+                        CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
@@ -2324,7 +2324,7 @@ static ssize_t nss_recv(struct Curl_easy *data,    /* transfer */
     PRInt32 err = PR_GetError();
 
     if(err == PR_WOULD_BLOCK_ERROR)
-      *curlcode = CURLE_AGAIN;
+      *carlcode = CARLE_AGAIN;
     else {
       /* print the error number and error string */
       const char *err_name = nss_error_to_name(err);
@@ -2333,9 +2333,9 @@ static ssize_t nss_recv(struct Curl_easy *data,    /* transfer */
       /* print a human-readable message describing the error if available */
       nss_print_error_message(data, err);
 
-      *curlcode = (is_cc_error(err))
-        ? CURLE_SSL_CERTPROBLEM
-        : CURLE_RECV_ERROR;
+      *carlcode = (is_cc_error(err))
+        ? CARLE_SSL_CERTPROBLEM
+        : CARLE_RECV_ERROR;
     }
 
     return -1;
@@ -2357,20 +2357,20 @@ static int Curl_nss_seed(struct Curl_easy *data)
 }
 
 /* data might be NULL */
-static CURLcode nss_random(struct Curl_easy *data,
+static CARLcode nss_random(struct Curl_easy *data,
                            unsigned char *entropy,
                            size_t length)
 {
   Curl_nss_seed(data);  /* Initiate the seed if not already done */
 
-  if(SECSuccess != PK11_GenerateRandom(entropy, curlx_uztosi(length)))
+  if(SECSuccess != PK11_GenerateRandom(entropy, carlx_uztosi(length)))
     /* signal a failure */
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_md5sum(unsigned char *tmp, /* input */
+static CARLcode nss_md5sum(unsigned char *tmp, /* input */
                            size_t tmplen,
                            unsigned char *md5sum, /* output */
                            size_t md5len)
@@ -2379,16 +2379,16 @@ static CURLcode nss_md5sum(unsigned char *tmp, /* input */
   unsigned int MD5out;
 
   if(!MD5pw)
-    return CURLE_NOT_BUILT_IN;
+    return CARLE_NOT_BUILT_IN;
 
-  PK11_DigestOp(MD5pw, tmp, curlx_uztoui(tmplen));
-  PK11_DigestFinal(MD5pw, md5sum, &MD5out, curlx_uztoui(md5len));
+  PK11_DigestOp(MD5pw, tmp, carlx_uztoui(tmplen));
+  PK11_DigestFinal(MD5pw, md5sum, &MD5out, carlx_uztoui(md5len));
   PK11_DestroyContext(MD5pw, PR_TRUE);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode nss_sha256sum(const unsigned char *tmp, /* input */
+static CARLcode nss_sha256sum(const unsigned char *tmp, /* input */
                               size_t tmplen,
                               unsigned char *sha256sum, /* output */
                               size_t sha256len)
@@ -2397,13 +2397,13 @@ static CURLcode nss_sha256sum(const unsigned char *tmp, /* input */
   unsigned int SHA256out;
 
   if(!SHA256pw)
-    return CURLE_NOT_BUILT_IN;
+    return CARLE_NOT_BUILT_IN;
 
-  PK11_DigestOp(SHA256pw, tmp, curlx_uztoui(tmplen));
-  PK11_DigestFinal(SHA256pw, sha256sum, &SHA256out, curlx_uztoui(sha256len));
+  PK11_DigestOp(SHA256pw, tmp, carlx_uztoui(tmplen));
+  PK11_DigestFinal(SHA256pw, sha256sum, &SHA256out, carlx_uztoui(sha256len));
   PK11_DestroyContext(SHA256pw, PR_TRUE);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static bool nss_cert_status_request(void)
@@ -2425,7 +2425,7 @@ static bool nss_false_start(void)
 }
 
 static void *nss_get_internals(struct ssl_connect_data *connssl,
-                                    CURLINFO info UNUSED_PARAM)
+                                    CARLINFO info UNUSED_PARAM)
 {
   struct ssl_backend_data *backend = connssl->backend;
   (void)info;
@@ -2433,7 +2433,7 @@ static void *nss_get_internals(struct ssl_connect_data *connssl,
 }
 
 const struct Curl_ssl Curl_ssl_nss = {
-  { CURLSSLBACKEND_NSS, "nss" }, /* info */
+  { CARLSSLBACKEND_NSS, "nss" }, /* info */
 
   SSLSUPP_CA_PATH |
   SSLSUPP_CERTINFO |

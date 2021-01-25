@@ -1,14 +1,14 @@
-curl security process
+carl security process
 =====================
 
 This document describes how security vulnerabilities should be handled in the
-curl project.
+carl project.
 
 Publishing Information
 ----------------------
 
-All known and public curl or libcurl related vulnerabilities are listed on
-[the curl website security page](https://curl.se/docs/security.html).
+All known and public carl or libcarl related vulnerabilities are listed on
+[the carl website security page](https://carl.se/docs/security.html).
 
 Security vulnerabilities **should not** be entered in the project's public bug
 tracker.
@@ -27,11 +27,11 @@ reference to the security nature of the commit if done prior to the public
 announcement.
 
 - The person discovering the issue, the reporter, reports the vulnerability on
-  [https://hackerone.com/curl](https://hackerone.com/curl). Issues filed there
+  [https://hackerone.com/carl](https://hackerone.com/carl). Issues filed there
   reach a handful of selected and trusted people.
 
 - Messages that do not relate to the reporting or managing of an undisclosed
-  security vulnerability in curl or libcurl are ignored and no further action
+  security vulnerability in carl or libcarl are ignored and no further action
   is required.
 
 - A person in the security team responds to the original report to acknowledge
@@ -86,21 +86,21 @@ announcement.
 
 - The project team announces the release and the vulnerability to the world in
   the same manner we always announce releases. It gets sent to the
-  curl-announce, curl-library and curl-users mailing lists.
+  carl-announce, carl-library and carl-users mailing lists.
 
 - The security web page on the website should get the new vulnerability
   mentioned.
 
-curl-security (at haxx dot se)
+carl-security (at haxx dot se)
 ------------------------------
 
-This is a private mailing list for discussions on and about curl security
+This is a private mailing list for discussions on and about carl security
 issues.
 
 Who is on this list? There are a couple of criteria you must meet, and then we
 might ask you to join the list or you can ask to join it. It really isn't very
 formal. We basically only require that you have a long-term presence in the
-curl project and you have shown an understanding for the project and its way
+carl project and you have shown an understanding for the project and its way
 of working. You must've been around for a good while and you should have no
 plans in vanishing in the near future.
 
@@ -115,14 +115,14 @@ Publishing Security Advisories
 
 2. Name the advisory file after the allocated CVE id.
 
-3. Add a line on the top of the array in `curl-www/docs/vuln.pm'.
+3. Add a line on the top of the array in `carl-www/docs/vuln.pm'.
 
-4. Put the new advisory markdown file in the curl-www/docs/ directory. Add it
+4. Put the new advisory markdown file in the carl-www/docs/ directory. Add it
    to the git repo.
 
 5. Run `make` in your local web checkout and verify that things look fine.
 
-6. On security advisory release day, push the changes on the curl-www
+6. On security advisory release day, push the changes on the carl-www
    repository's remote master branch.
 
 Hackerone
@@ -136,5 +136,5 @@ has been published.
 Bug Bounty
 ----------
 
-See [BUG-BOUNTY](https://curl.se/docs/bugbounty.html) for details on the
+See [BUG-BOUNTY](https://carl.se/docs/bugbounty.html) for details on the
 bug bounty program.

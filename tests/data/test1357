@@ -25,7 +25,7 @@ MOOOO
 # Client-side
 <client>
 # this relies on the debug feature to allow us to set directory to store the
-# -O output in, using the CURL_TESTDIR variable
+# -O output in, using the CARL_TESTDIR variable
 <features>
 debug
 </features>
@@ -36,7 +36,7 @@ ftp
 FTP download, file with C-D inside, using -O -D file
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
 ftp://%HOSTIP:%FTPPORT/path/file1357 -O -D log/heads1357

@@ -28,7 +28,7 @@ ftp://%HOSTIP:%FTPPORT/196 --retry 1
 
 # Verify data after the test has been "shot"
 <verify>
-# 67 is CURLE_LOGIN_DENIED
+# 67 is CARLE_LOGIN_DENIED
 <errorcode>
 67
 </errorcode>

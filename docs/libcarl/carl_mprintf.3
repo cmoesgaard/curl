@@ -1,0 +1,103 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_printf 3 "30 April 2004" "libcarl 7.12" "libcarl Manual"
+.SH NAME
+carl_maprintf, carl_mfprintf, carl_mprintf, carl_msnprintf, carl_msprintf
+carl_mvaprintf, carl_mvfprintf, carl_mvprintf, carl_mvsnprintf,
+carl_mvsprintf - formatted output conversion
+.SH SYNOPSIS
+.B #include <carl/mprintf.h>
+.sp
+.BI "int carl_mprintf(const char *" format ", ...);"
+.br
+.BI "int carl_mfprintf(FILE *" fd ", const char *" format ", ...);"
+.br
+.BI "int carl_msprintf(char *" buffer ", const char *" format ", ...);"
+.br
+.BI "int carl_msnprintf(char *" buffer ", size_t " maxlength ", const char *" format ", ...);"
+.br
+.BI "int carl_mvprintf(const char *" format ", va_list " args ");"
+.br
+.BI "int carl_mvfprintf(FILE *" fd ", const char *" format ", va_list " args ");"
+.br
+.BI "int carl_mvsprintf(char *" buffer ", const char *" format ", va_list " args ");"
+.br
+.BI "int carl_mvsnprintf(char *" buffer ", size_t " maxlength ", const char *" format ", va_list " args ");"
+.br
+.BI "char *carl_maprintf(const char *" format ", ...);"
+.br
+.BI "char *carl_mvaprintf(const char *" format ", va_list " args ");"
+.SH DESCRIPTION
+These are all functions that produce output according to a format string and
+given arguments. These are mostly clones of the well-known C-style functions
+and there will be no detailed explanation of all available formatting rules
+and usage here.
+
+See this table for notable exceptions.
+.RS
+.TP
+.B carl_mprintf()
+Normal printf() clone.
+.TP
+.B carl_mfprintf()
+Normal fprintf() clone.
+.TP
+.B carl_msprintf()
+Normal sprintf() clone.
+.TP
+.B carl_msnprintf()
+snprintf() clone. Many systems don't have this. It is just like \fBsprintf\fP
+but with an extra argument after the buffer that specifies the length of the
+target buffer.
+.TP
+.B carl_mvprintf()
+Normal vprintf() clone.
+.TP
+.B carl_mvfprintf()
+Normal vfprintf() clone.
+.TP
+.B carl_mvsprintf()
+Normal vsprintf() clone.
+.TP
+.B carl_mvsnprintf()
+vsnprintf() clone.  Many systems don't have this. It is just like
+\fBvsprintf\fP but with an extra argument after the buffer that specifies the
+length of the target buffer.
+.TP
+.B carl_maprintf()
+Like printf() but returns the output string as a malloc()ed string. The
+returned string must be free()ed by the receiver.
+.TP
+.B carl_mvaprintf()
+Like carl_maprintf() but takes a va_list pointer argument instead of a
+variable amount of arguments.
+.RE
+.SH AVAILABILITY
+These functions will be removed from the public libcarl API in the future. Do
+not use them in any new programs or projects.
+.SH RETURN VALUE
+The \fBcarl_maprintf\fP and \fBcarl_mvaprintf\fP functions return a pointer to
+a newly allocated string, or NULL if it failed.
+
+All other functions return the number of characters they actually outputted.
+.SH "SEE ALSO"
+.BR printf "(3), " sprintf "(3), " fprintf "(3), " vprintf "(3) "

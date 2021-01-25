@@ -32,7 +32,7 @@ moo
 
 # Verify data after the test has been "shot"
 <verify>
-# CURLE_URL_MALFORMAT is error code 3
+# CARLE_URL_MALFORMAT is error code 3
 <errorcode>
 3
 </errorcode>

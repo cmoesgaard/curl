@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,8 +22,8 @@
 #include "test.h"
 #include "memdebug.h"
 
-static void my_lock(CURL *handle, curl_lock_data data,
-                    curl_lock_access laccess, void *useptr)
+static void my_lock(CARL *handle, carl_lock_data data,
+                    carl_lock_access laccess, void *useptr)
 {
   (void)handle;
   (void)data;
@@ -32,7 +32,7 @@ static void my_lock(CURL *handle, curl_lock_data data,
   printf("-> Mutex lock\n");
 }
 
-static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
+static void my_unlock(CARL *handle, carl_lock_data data, void *useptr)
 {
   (void)handle;
   (void)data;
@@ -43,48 +43,48 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
 /* test function */
 int test(char *URL)
 {
-  CURLcode res = CURLE_OK;
-  CURLSH *share;
+  CARLcode res = CARLE_OK;
+  CARLSH *share;
   int i;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  share = curl_share_init();
+  share = carl_share_init();
   if(!share) {
-    fprintf(stderr, "curl_share_init() failed\n");
-    curl_global_cleanup();
+    fprintf(stderr, "carl_share_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
-  curl_share_setopt(share, CURLSHOPT_LOCKFUNC, my_lock);
-  curl_share_setopt(share, CURLSHOPT_UNLOCKFUNC, my_unlock);
+  carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_CONNECT);
+  carl_share_setopt(share, CARLSHOPT_LOCKFUNC, my_lock);
+  carl_share_setopt(share, CARLSHOPT_UNLOCKFUNC, my_unlock);
 
   /* Loop the transfer and cleanup the handle properly every lap. This will
      still reuse connections since the pool is in the shared object! */
 
   for(i = 0; i < 3; i++) {
-    CURL *curl = curl_easy_init();
-    if(curl) {
-      curl_easy_setopt(curl, CURLOPT_URL, URL);
+    CARL *carl = carl_easy_init();
+    if(carl) {
+      carl_easy_setopt(carl, CARLOPT_URL, URL);
 
       /* use the share object */
-      curl_easy_setopt(curl, CURLOPT_SHARE, share);
+      carl_easy_setopt(carl, CARLOPT_SHARE, share);
 
       /* Perform the request, res will get the return code */
-      res = curl_easy_perform(curl);
+      res = carl_easy_perform(carl);
       /* Check for errors */
-      if(res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                curl_easy_strerror(res));
+      if(res != CARLE_OK)
+        fprintf(stderr, "carl_easy_perform() failed: %s\n",
+                carl_easy_strerror(res));
 
       /* always cleanup */
-      curl_easy_cleanup(curl);
+      carl_easy_cleanup(carl);
     }
   }
 
-  curl_share_cleanup(share);
-  curl_global_cleanup();
+  carl_share_cleanup(share);
+  carl_global_cleanup();
 
   return 0;
 }

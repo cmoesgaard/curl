@@ -63,7 +63,7 @@ body
 <proxy>
 CONNECT smtp.1320:%SMTPPORT HTTP/1.1
 Host: smtp.1320:%SMTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>

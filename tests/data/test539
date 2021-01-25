@@ -35,13 +35,13 @@ dr-xr-xr-x   5 0        1            512 Oct  1  1997 usr
 <server>
 ftp
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib539
 </tool>
 
  <name>
-Two FTP fetches using different CURLOPT_FTP_FILEMETHOD
+Two FTP fetches using different CARLOPT_FTP_FILEMETHOD
  </name>
  <command>
 ftp://%HOSTIP:%FTPPORT/path/to/the/file/539

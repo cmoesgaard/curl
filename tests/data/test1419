@@ -54,12 +54,12 @@ http://%HOSTIP:%HTTPPORT/1419 --anyauth http://%HOSTIP:%HTTPPORT/14190003
 <protocol>
 GET /1419 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /14190003 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 [DISCONNECT]

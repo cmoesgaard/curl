@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-set(EXE_NAME curl)
+set(EXE_NAME carl)
 
 if(USE_MANUAL)
   # Use the C locale to ensure that only ASCII characters appear in the
@@ -29,16 +29,16 @@ if(USE_MANUAL)
     COMMAND ${CMAKE_COMMAND} -E echo "#include \"tool_setup.h\"" > tool_hugehelp.c
     COMMAND ${CMAKE_COMMAND} -E echo "#ifndef HAVE_LIBZ" >> tool_hugehelp.c
     COMMAND env LC_ALL=C "${NROFF}" ${NROFF_MANOPT}
-            "${CURL_BINARY_DIR}/docs/curl.1" |
+            "${CARL_BINARY_DIR}/docs/carl.1" |
             "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl" >> tool_hugehelp.c
     COMMAND ${CMAKE_COMMAND} -E echo "#else" >> tool_hugehelp.c
     COMMAND env LC_ALL=C "${NROFF}" ${NROFF_MANOPT}
-            "${CURL_BINARY_DIR}/docs/curl.1" |
+            "${CARL_BINARY_DIR}/docs/carl.1" |
             "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl" -c >> tool_hugehelp.c
     COMMAND ${CMAKE_COMMAND} -E echo "#endif /* HAVE_LIBZ */" >> tool_hugehelp.c
     DEPENDS
-      generate-curl.1
-      "${CURL_BINARY_DIR}/docs/curl.1"
+      generate-carl.1
+      "${CARL_BINARY_DIR}/docs/carl.1"
       "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl"
       "${CMAKE_CURRENT_SOURCE_DIR}/tool_hugehelp.h"
     VERBATIM)
@@ -58,13 +58,13 @@ transform_makefile_inc("Makefile.inc" "${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.
 include(${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake)
 
 if(MSVC)
-  list(APPEND CURL_FILES curl.rc)
+  list(APPEND CARL_FILES carl.rc)
 endif()
 
-# CURL_FILES comes from Makefile.inc
+# CARL_FILES comes from Makefile.inc
 add_executable(
   ${EXE_NAME}
-  ${CURL_FILES}
+  ${CARL_FILES}
   )
 
 add_executable(
@@ -72,7 +72,7 @@ add_executable(
   ALIAS ${EXE_NAME}
   )
 
-if(CURL_HAS_LTO)
+if(CARL_HAS_LTO)
   set_target_properties(${EXE_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
     INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE)
@@ -84,20 +84,20 @@ if(ENABLE_UNICODE AND MINGW)
   set_source_files_properties(tool_main.c PROPERTIES COMPILE_FLAGS "-Wno-missing-prototypes -Wno-missing-declarations")
 endif()
 
-source_group("curlX source files" FILES ${CURLX_CFILES})
-source_group("curl source files" FILES ${CURL_CFILES})
-source_group("curl header files" FILES ${CURL_HFILES})
+source_group("carlX source files" FILES ${CARLX_CFILES})
+source_group("carl source files" FILES ${CARL_CFILES})
+source_group("carl header files" FILES ${CARL_HFILES})
 
 include_directories(
-  ${CURL_SOURCE_DIR}/lib        # To be able to reach "curl_setup_once.h"
-  ${CURL_BINARY_DIR}/lib        # To be able to reach "curl_config.h"
-  ${CURL_BINARY_DIR}/include    # To be able to reach "curl/curl.h"
+  ${CARL_SOURCE_DIR}/lib        # To be able to reach "carl_setup_once.h"
+  ${CARL_BINARY_DIR}/lib        # To be able to reach "carl_config.h"
+  ${CARL_BINARY_DIR}/include    # To be able to reach "carl/carl.h"
   # This is needed as tool_hugehelp.c is generated in the binary dir
-  ${CURL_SOURCE_DIR}/src        # To be able to reach "tool_hugehelp.h"
+  ${CARL_SOURCE_DIR}/src        # To be able to reach "tool_hugehelp.h"
   )
 
-#Build curl executable
-target_link_libraries(${EXE_NAME} libcurl ${CURL_LIBS})
+#Build carl executable
+target_link_libraries(${EXE_NAME} libcarl ${CARL_LIBS})
 
 ################################################################################
 
@@ -109,6 +109,6 @@ target_link_libraries(${EXE_NAME} libcurl ${CURL_LIBS})
 
 install(TARGETS ${EXE_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
 export(TARGETS ${EXE_NAME}
-       APPEND FILE ${PROJECT_BINARY_DIR}/curl-target.cmake
+       APPEND FILE ${PROJECT_BINARY_DIR}/carl-target.cmake
        NAMESPACE ${PROJECT_NAME}::
 )

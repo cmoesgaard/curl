@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SETUP_OS400_H
-#define HEADER_CURL_SETUP_OS400_H
+#ifndef HEADER_CARL_SETUP_OS400_H
+#define HEADER_CARL_SETUP_OS400_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -49,9 +49,9 @@ extern int Curl_getaddrinfo_a(const char *nodename,
 
 
 extern int Curl_getnameinfo_a(const struct sockaddr *sa,
-                              curl_socklen_t salen,
-                              char *nodename, curl_socklen_t nodenamelen,
-                              char *servname, curl_socklen_t servnamelen,
+                              carl_socklen_t salen,
+                              char *nodename, carl_socklen_t nodenamelen,
+                              char *servname, carl_socklen_t servnamelen,
                               int flags);
 #define getnameinfo             Curl_getnameinfo_a
 
@@ -224,4 +224,4 @@ extern int Curl_os400_getsockname(int sd, struct sockaddr *addr, int *addrlen);
 #define inflateEnd              Curl_os400_inflateEnd
 #endif
 
-#endif /* HEADER_CURL_SETUP_OS400_H */
+#endif /* HEADER_CARL_SETUP_OS400_H */

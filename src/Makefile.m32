@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 ###########################################################################
 #
-## Makefile for building curl.exe with MingW (GCC-3.2 or later or LLVM/Clang)
+## Makefile for building carl.exe with MingW (GCC-3.2 or later or LLVM/Clang)
 ## and optionally OpenSSL (1.0.2a), libssh2 (1.5), zlib (1.2.8), librtmp (2.4),
 ## brotli (1.0.1), zstd (1.4.5)
 ##
@@ -105,21 +105,21 @@ ifndef LIBCARES_PATH
 LIBCARES_PATH = $(PROOT)/ares
 endif
 
-ifeq ($(CURL_CC),)
-CURL_CC := $(CROSSPREFIX)gcc
+ifeq ($(CARL_CC),)
+CARL_CC := $(CROSSPREFIX)gcc
 endif
-ifeq ($(CURL_AR),)
-CURL_AR := $(CROSSPREFIX)ar
+ifeq ($(CARL_AR),)
+CARL_AR := $(CROSSPREFIX)ar
 endif
 
-CC = $(CURL_CC)
-CFLAGS = $(CURL_CFLAG_EXTRAS) -g -O2 -Wall -W
+CC = $(CARL_CC)
+CFLAGS = $(CARL_CFLAG_EXTRAS) -g -O2 -Wall -W
 CFLAGS += -fno-strict-aliasing
 # comment LDFLAGS below to keep debug info
-LDFLAGS = $(CURL_LDFLAG_EXTRAS) $(CURL_LDFLAG_EXTRAS_EXE) -s
-AR = $(CURL_AR)
+LDFLAGS = $(CARL_LDFLAG_EXTRAS) $(CARL_LDFLAG_EXTRAS_EXE) -s
+AR = $(CARL_AR)
 RC = $(CROSSPREFIX)windres
-RCFLAGS = --include-dir=$(PROOT)/include -O coff -DCURL_EMBED_MANIFEST
+RCFLAGS = --include-dir=$(PROOT)/include -O coff -DCARL_EMBED_MANIFEST
 STRIP   = $(CROSSPREFIX)strip -g
 
 # We may need these someday
@@ -245,7 +245,7 @@ endif
 INCLUDES = -I. -I../include -I../lib
 ifdef SSL
   ifdef WINSSL
-    CFLAGS += -DCURL_WITH_MULTI_SSL
+    CFLAGS += -DCARL_WITH_MULTI_SSL
   endif
 endif
 ifdef UNICODE
@@ -254,12 +254,12 @@ ifdef UNICODE
 endif
 
 ifdef DYN
-  curl_DEPENDENCIES = $(PROOT)/lib/libcurldll.a $(PROOT)/lib/libcurl.dll
-  curl_LDADD = -L$(PROOT)/lib -lcurldll
+  carl_DEPENDENCIES = $(PROOT)/lib/libcarldll.a $(PROOT)/lib/libcarl.dll
+  carl_LDADD = -L$(PROOT)/lib -lcarldll
 else
-  curl_DEPENDENCIES = $(PROOT)/lib/libcurl.a
-  curl_LDADD = -L$(PROOT)/lib -lcurl
-  CFLAGS += -DCURL_STATICLIB
+  carl_DEPENDENCIES = $(PROOT)/lib/libcarl.a
+  carl_LDADD = -L$(PROOT)/lib -lcarl
+  CFLAGS += -DCARL_STATICLIB
   LDFLAGS += -static
 endif
 ifdef SYNC
@@ -267,36 +267,36 @@ ifdef SYNC
 else
   ifdef ARES
     ifndef DYN
-      curl_DEPENDENCIES += $(LIBCARES_PATH)/libcares.a
+      carl_DEPENDENCIES += $(LIBCARES_PATH)/libcares.a
     endif
     CFLAGS += -DUSE_ARES -DCARES_STATICLIB
-    curl_LDADD += -L"$(LIBCARES_PATH)" -lcares
+    carl_LDADD += -L"$(LIBCARES_PATH)" -lcares
   endif
 endif
 ifdef RTMP
   CFLAGS += -DUSE_LIBRTMP
-  curl_LDADD += -L"$(LIBRTMP_PATH)/librtmp" -lrtmp -lwinmm
+  carl_LDADD += -L"$(LIBRTMP_PATH)/librtmp" -lrtmp -lwinmm
 endif
 ifdef NGHTTP2
   CFLAGS += -DUSE_NGHTTP2
-  curl_LDADD += -L"$(NGHTTP2_PATH)/lib" -lnghttp2
+  carl_LDADD += -L"$(NGHTTP2_PATH)/lib" -lnghttp2
 endif
 ifdef SSH2
   CFLAGS += -DUSE_LIBSSH2 -DHAVE_LIBSSH2_H
-  curl_LDADD += -L"$(LIBSSH2_PATH)/win32" -lssh2
+  carl_LDADD += -L"$(LIBSSH2_PATH)/win32" -lssh2
   ifdef WINSSL
     ifndef DYN
-      curl_LDADD += -lbcrypt -lcrypt32
+      carl_LDADD += -lbcrypt -lcrypt32
     endif
   endif
 endif
 ifdef SSL
   ifdef NGHTTP3
     CFLAGS += -DUSE_NGHTTP3
-    curl_LDADD += -L"$(NGHTTP3_PATH)/lib" -lnghttp3
+    carl_LDADD += -L"$(NGHTTP3_PATH)/lib" -lnghttp3
     ifdef NGTCP2
       CFLAGS += -DUSE_NGTCP2
-      curl_LDADD += -L"$(NGTCP2_PATH)/lib" -lngtcp2 -lngtcp2_crypto_openssl
+      carl_LDADD += -L"$(NGTCP2_PATH)/lib" -lngtcp2 -lngtcp2_crypto_openssl
     endif
   endif
 
@@ -328,55 +328,55 @@ ifdef SSL
   endif
   INCLUDES += -I"$(OPENSSL_INCLUDE)"
   CFLAGS += -DUSE_OPENSSL
-  curl_LDADD += -L"$(OPENSSL_LIBPATH)" $(OPENSSL_LIBS)
+  carl_LDADD += -L"$(OPENSSL_LIBPATH)" $(OPENSSL_LIBS)
 endif
 ifdef WINSSL
   CFLAGS += -DUSE_SCHANNEL
-  curl_LDADD += -lcrypt32
+  carl_LDADD += -lcrypt32
 endif
 ifdef ZLIB
   INCLUDES += -I"$(ZLIB_PATH)"
   CFLAGS += -DHAVE_LIBZ -DHAVE_ZLIB_H
-  curl_LDADD += -L"$(ZLIB_PATH)" -lz
+  carl_LDADD += -L"$(ZLIB_PATH)" -lz
 endif
 ifdef ZSTD
   INCLUDES += -I"$(ZSTD_PATH)/include"
   CFLAGS += -DHAVE_ZSTD
-  curl_LDADD += -L"$(ZSTD_PATH)/lib"
+  carl_LDADD += -L"$(ZSTD_PATH)/lib"
   ifdef ZSTD_LIBS
-    curl_LDADD += $(ZSTD_LIBS)
+    carl_LDADD += $(ZSTD_LIBS)
   else
-    curl_LDADD += -lzstd
+    carl_LDADD += -lzstd
   endif
 endif
 ifdef BROTLI
   INCLUDES += -I"$(BROTLI_PATH)/include"
   CFLAGS += -DHAVE_BROTLI
-  curl_LDADD += -L"$(BROTLI_PATH)/lib"
+  carl_LDADD += -L"$(BROTLI_PATH)/lib"
   ifdef BROTLI_LIBS
-    curl_LDADD += $(BROTLI_LIBS)
+    carl_LDADD += $(BROTLI_LIBS)
   else
-    curl_LDADD += -lbrotlidec
+    carl_LDADD += -lbrotlidec
   endif
 endif
 ifdef IDN2
   CFLAGS += -DUSE_LIBIDN2
-  curl_LDADD += -L"$(LIBIDN2_PATH)/lib" -lidn2
+  carl_LDADD += -L"$(LIBIDN2_PATH)/lib" -lidn2
 else
 ifdef WINIDN
   CFLAGS += -DUSE_WIN32_IDN
-  curl_LDADD += -L"$(WINIDN_PATH)" -lnormaliz
+  carl_LDADD += -L"$(WINIDN_PATH)" -lnormaliz
 endif
 endif
 ifdef METALINK
   INCLUDES += -I"$(LIBMETALINK_PATH)/include"
   CFLAGS += -DUSE_METALINK
-  curl_LDADD += -L"$(LIBMETALINK_PATH)/lib" -lmetalink
+  carl_LDADD += -L"$(LIBMETALINK_PATH)/lib" -lmetalink
   ifndef DYN
     ifeq ($(findstring libexpat_metalink_parser.o,$(shell $(AR) t "$(LIBMETALINK_PATH)/lib/libmetalink.a")),libexpat_metalink_parser.o)
-      curl_LDADD += -L"$(LIBEXPAT_PATH)/lib" -lexpat
+      carl_LDADD += -L"$(LIBEXPAT_PATH)/lib" -lexpat
     else
-      curl_LDADD += -L"$(LIBXML2_PATH)/lib" -lxml2
+      carl_LDADD += -L"$(LIBXML2_PATH)/lib" -lxml2
     endif
   endif
 endif
@@ -390,42 +390,42 @@ ifdef LDAPS
   CFLAGS += -DHAVE_LDAP_SSL
 endif
 ifdef USE_LDAP_NOVELL
-  CFLAGS += -DCURL_HAS_NOVELL_LDAPSDK
-  curl_LDADD += -L"$(LDAP_SDK)/lib/mscvc" -lldapsdk -lldapssl -lldapx
+  CFLAGS += -DCARL_HAS_NOVELL_LDAPSDK
+  carl_LDADD += -L"$(LDAP_SDK)/lib/mscvc" -lldapsdk -lldapssl -lldapx
 endif
 ifdef USE_LDAP_OPENLDAP
-  CFLAGS += -DCURL_HAS_OPENLDAP_LDAPSDK
-  curl_LDADD += -L"$(LDAP_SDK)/lib" -lldap -llber
+  CFLAGS += -DCARL_HAS_OPENLDAP_LDAPSDK
+  carl_LDADD += -L"$(LDAP_SDK)/lib" -lldap -llber
 endif
 ifndef USE_LDAP_NOVELL
 ifndef USE_LDAP_OPENLDAP
-curl_LDADD += -lwldap32
+carl_LDADD += -lwldap32
 endif
 endif
-curl_LDADD += -lws2_32
+carl_LDADD += -lws2_32
 
 # Makefile.inc provides the CSOURCES and HHEADERS defines
 include Makefile.inc
 
-curl_PROGRAMS = curl.exe
-curl_OBJECTS := $(patsubst %.c,%.o,$(strip $(CURL_CFILES)))
-curlx_OBJECTS := $(patsubst %.c,%.o,$(notdir $(strip $(CURLX_CFILES))))
-curl_OBJECTS += $(curlx_OBJECTS)
+carl_PROGRAMS = carl.exe
+carl_OBJECTS := $(patsubst %.c,%.o,$(strip $(CARL_CFILES)))
+carlx_OBJECTS := $(patsubst %.c,%.o,$(notdir $(strip $(CARLX_CFILES))))
+carl_OBJECTS += $(carlx_OBJECTS)
 vpath %.c $(PROOT)/lib
 
-RESOURCE = curl.res
+RESOURCE = carl.res
 
 
-all: $(curl_PROGRAMS)
+all: $(carl_PROGRAMS)
 
-curl.exe: $(RESOURCE) $(curl_OBJECTS) $(curl_DEPENDENCIES)
+carl.exe: $(RESOURCE) $(carl_OBJECTS) $(carl_DEPENDENCIES)
 	$(call DEL, $@)
-	$(CC) $(LDFLAGS) -o $@ $< $(curl_OBJECTS) $(curl_LDADD)
+	$(CC) $(LDFLAGS) -o $@ $< $(carl_OBJECTS) $(carl_LDADD)
 
 # We don't have nroff normally under win32
-# tool_hugehelp.c: $(PROOT)/docs/MANUAL $(PROOT)/docs/curl.1 mkhelp.pl
+# tool_hugehelp.c: $(PROOT)/docs/MANUAL $(PROOT)/docs/carl.1 mkhelp.pl
 #	@$(call DEL, tool_hugehelp.c)
-# 	$(NROFF) -man $(PROOT)/docs/curl.1 | $(PERL) mkhelp.pl $(PROOT)/docs/MANUAL > tool_hugehelp.c
+# 	$(NROFF) -man $(PROOT)/docs/carl.1 | $(PERL) mkhelp.pl $(PROOT)/docs/MANUAL > tool_hugehelp.c
 
 tool_hugehelp.c:
 	@echo Creating $@
@@ -441,7 +441,7 @@ clean:
 ifeq "$(wildcard tool_hugehelp.c.cvs)" "tool_hugehelp.c.cvs"
 	@$(call DEL, tool_hugehelp.c)
 endif
-	@$(call DEL, $(curl_OBJECTS) $(curlx_OBJECTS) $(RESOURCE))
+	@$(call DEL, $(carl_OBJECTS) $(carlx_OBJECTS) $(RESOURCE))
 
 distclean vclean: clean
-	@$(call DEL, $(curl_PROGRAMS))
+	@$(call DEL, $(carl_PROGRAMS))

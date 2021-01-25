@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,76 +23,76 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_libinfo.h"
 
 #include "memdebug.h" /* keep this as LAST include */
 
-/* global variable definitions, for libcurl run-time info */
+/* global variable definitions, for libcarl run-time info */
 
-curl_version_info_data *curlinfo = NULL;
+carl_version_info_data *carlinfo = NULL;
 long built_in_protos = 0;
 
 /*
- * libcurl_info_init: retrieves run-time information about libcurl,
- * setting a global pointer 'curlinfo' to libcurl's run-time info
+ * libcarl_info_init: retrieves run-time information about libcarl,
+ * setting a global pointer 'carlinfo' to libcarl's run-time info
  * struct, and a global bit pattern 'built_in_protos' composed of
- * CURLPROTO_* bits indicating which protocols are actually built
+ * CARLPROTO_* bits indicating which protocols are actually built
  * into library being used.
  */
 
-CURLcode get_libcurl_info(void)
+CARLcode get_libcarl_info(void)
 {
   static struct proto_name_pattern {
     const char *proto_name;
     long        proto_pattern;
   } const possibly_built_in[] = {
-    { "dict",   CURLPROTO_DICT   },
-    { "file",   CURLPROTO_FILE   },
-    { "ftp",    CURLPROTO_FTP    },
-    { "ftps",   CURLPROTO_FTPS   },
-    { "gopher", CURLPROTO_GOPHER },
-    { "gophers",CURLPROTO_GOPHERS},
-    { "http",   CURLPROTO_HTTP   },
-    { "https",  CURLPROTO_HTTPS  },
-    { "imap",   CURLPROTO_IMAP   },
-    { "imaps",  CURLPROTO_IMAPS  },
-    { "ldap",   CURLPROTO_LDAP   },
-    { "ldaps",  CURLPROTO_LDAPS  },
-    { "mqtt",   CURLPROTO_MQTT   },
-    { "pop3",   CURLPROTO_POP3   },
-    { "pop3s",  CURLPROTO_POP3S  },
-    { "rtmp",   CURLPROTO_RTMP   },
-    { "rtmps",  CURLPROTO_RTMPS  },
-    { "rtsp",   CURLPROTO_RTSP   },
-    { "scp",    CURLPROTO_SCP    },
-    { "sftp",   CURLPROTO_SFTP   },
-    { "smb",    CURLPROTO_SMB    },
-    { "smbs",   CURLPROTO_SMBS   },
-    { "smtp",   CURLPROTO_SMTP   },
-    { "smtps",  CURLPROTO_SMTPS  },
-    { "telnet", CURLPROTO_TELNET },
-    { "tftp",   CURLPROTO_TFTP   },
+    { "dict",   CARLPROTO_DICT   },
+    { "file",   CARLPROTO_FILE   },
+    { "ftp",    CARLPROTO_FTP    },
+    { "ftps",   CARLPROTO_FTPS   },
+    { "gopher", CARLPROTO_GOPHER },
+    { "gophers",CARLPROTO_GOPHERS},
+    { "http",   CARLPROTO_HTTP   },
+    { "https",  CARLPROTO_HTTPS  },
+    { "imap",   CARLPROTO_IMAP   },
+    { "imaps",  CARLPROTO_IMAPS  },
+    { "ldap",   CARLPROTO_LDAP   },
+    { "ldaps",  CARLPROTO_LDAPS  },
+    { "mqtt",   CARLPROTO_MQTT   },
+    { "pop3",   CARLPROTO_POP3   },
+    { "pop3s",  CARLPROTO_POP3S  },
+    { "rtmp",   CARLPROTO_RTMP   },
+    { "rtmps",  CARLPROTO_RTMPS  },
+    { "rtsp",   CARLPROTO_RTSP   },
+    { "scp",    CARLPROTO_SCP    },
+    { "sftp",   CARLPROTO_SFTP   },
+    { "smb",    CARLPROTO_SMB    },
+    { "smbs",   CARLPROTO_SMBS   },
+    { "smtp",   CARLPROTO_SMTP   },
+    { "smtps",  CARLPROTO_SMTPS  },
+    { "telnet", CARLPROTO_TELNET },
+    { "tftp",   CARLPROTO_TFTP   },
     {  NULL,    0                }
   };
 
   const char *const *proto;
 
-  /* Pointer to libcurl's run-time version information */
-  curlinfo = curl_version_info(CURLVERSION_NOW);
-  if(!curlinfo)
-    return CURLE_FAILED_INIT;
+  /* Pointer to libcarl's run-time version information */
+  carlinfo = carl_version_info(CARLVERSION_NOW);
+  if(!carlinfo)
+    return CARLE_FAILED_INIT;
 
-  /* Build CURLPROTO_* bit pattern with libcurl's built-in protocols */
+  /* Build CARLPROTO_* bit pattern with libcarl's built-in protocols */
   built_in_protos = 0;
-  if(curlinfo->protocols) {
-    for(proto = curlinfo->protocols; *proto; proto++) {
+  if(carlinfo->protocols) {
+    for(proto = carlinfo->protocols; *proto; proto++) {
       struct proto_name_pattern const *p;
       for(p = possibly_built_in; p->proto_name; p++) {
-        if(curl_strequal(*proto, p->proto_name)) {
+        if(carl_strequal(*proto, p->proto_name)) {
           built_in_protos |= p->proto_pattern;
           break;
         }
@@ -100,5 +100,5 @@ CURLcode get_libcurl_info(void)
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }

@@ -1,0 +1,93 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_HTTP_VERSION 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_HTTP_VERSION \- specify HTTP protocol version to use
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_HTTP_VERSION, long version);
+.SH DESCRIPTION
+Pass \fIversion\fP a long, set to one of the values described below. They ask
+libcarl to use the specific HTTP versions.
+
+Note that the HTTP version is just a request. libcarl will still prioritize to
+re-use an existing connection so it might then re-use a connection using a
+HTTP version you haven't asked for.
+
+.IP CARL_HTTP_VERSION_NONE
+We don't care about what version the library uses. libcarl will use whatever
+it thinks fit.
+.IP CARL_HTTP_VERSION_1_0
+Enforce HTTP 1.0 requests.
+.IP CARL_HTTP_VERSION_1_1
+Enforce HTTP 1.1 requests.
+.IP CARL_HTTP_VERSION_2_0
+Attempt HTTP 2 requests. libcarl will fall back to HTTP 1.1 if HTTP 2 can't be
+negotiated with the server. (Added in 7.33.0)
+
+The alias \fICARL_HTTP_VERSION_2\fP was added in 7.43.0 to better reflect the
+actual protocol name.
+.IP CARL_HTTP_VERSION_2TLS
+Attempt HTTP 2 over TLS (HTTPS) only. libcarl will fall back to HTTP 1.1 if
+HTTP 2 can't be negotiated with the HTTPS server. For clear text HTTP servers,
+libcarl will use 1.1. (Added in 7.47.0)
+.IP CARL_HTTP_VERSION_2_PRIOR_KNOWLEDGE
+Issue non-TLS HTTP requests using HTTP/2 without HTTP/1.1 Upgrade. It requires
+prior knowledge that the server supports HTTP/2 straight away. HTTPS requests
+will still do HTTP/2 the standard way with negotiated protocol version in the
+TLS handshake. (Added in 7.49.0)
+.IP CARL_HTTP_VERSION_3
+(Added in 7.66.0) Setting this value will make libcarl attempt to use HTTP/3
+directly to server given in the URL. Note that this cannot gracefully
+downgrade to earlier HTTP version if the server doesn't support HTTP/3.
+
+For more reliably upgrading to HTTP/3, set the preferred version to something
+lower and let the server announce its HTTP/3 support via Alt-Svc:. See
+\fICARLOPT_ALTSVC(3)\fP.
+.SH DEFAULT
+Since carl 7.62.0: CARL_HTTP_VERSION_2TLS
+
+Before that: CARL_HTTP_VERSION_1_1
+.SH PROTOCOLS
+HTTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_HTTP_VERSION, CARL_HTTP_VERSION_2TLS);
+  ret = carl_easy_perform(carl);
+  if(ret == CARLE_HTTP_RETURNED_ERROR) {
+    /* an HTTP response error problem */
+  }
+}
+.fi
+.SH AVAILABILITY
+Along with HTTP
+.SH RETURN VALUE
+Returns CARLE_OK if HTTP is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SSLVERSION "(3), " CARLOPT_HTTP200ALIASES "(3), "
+.BR CARLOPT_HTTP09_ALLOWED "(3), " CARLOPT_ALTSVC "(3) "

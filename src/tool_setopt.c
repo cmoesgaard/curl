@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,11 +21,11 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#ifndef CURL_DISABLE_LIBCURL_OPTION
+#ifndef CARL_DISABLE_LIBCARL_OPTION
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_easysrc.h"
@@ -44,144 +44,144 @@
 #define NV1(e, v) {#e, (v)}
 #define NVEND {NULL, 0}         /* sentinel to mark end of list */
 
-const struct NameValue setopt_nv_CURLPROXY[] = {
-  NV(CURLPROXY_HTTP),
-  NV(CURLPROXY_HTTP_1_0),
-  NV(CURLPROXY_HTTPS),
-  NV(CURLPROXY_SOCKS4),
-  NV(CURLPROXY_SOCKS5),
-  NV(CURLPROXY_SOCKS4A),
-  NV(CURLPROXY_SOCKS5_HOSTNAME),
+const struct NameValue setopt_nv_CARLPROXY[] = {
+  NV(CARLPROXY_HTTP),
+  NV(CARLPROXY_HTTP_1_0),
+  NV(CARLPROXY_HTTPS),
+  NV(CARLPROXY_SOCKS4),
+  NV(CARLPROXY_SOCKS5),
+  NV(CARLPROXY_SOCKS4A),
+  NV(CARLPROXY_SOCKS5_HOSTNAME),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURL_SOCKS_PROXY[] = {
-  NV(CURLPROXY_SOCKS4),
-  NV(CURLPROXY_SOCKS5),
-  NV(CURLPROXY_SOCKS4A),
-  NV(CURLPROXY_SOCKS5_HOSTNAME),
+const struct NameValue setopt_nv_CARL_SOCKS_PROXY[] = {
+  NV(CARLPROXY_SOCKS4),
+  NV(CARLPROXY_SOCKS5),
+  NV(CARLPROXY_SOCKS4A),
+  NV(CARLPROXY_SOCKS5_HOSTNAME),
   NVEND,
 };
 
-const struct NameValueUnsigned setopt_nv_CURLHSTS[] = {
-  NV(CURLHSTS_ENABLE),
+const struct NameValueUnsigned setopt_nv_CARLHSTS[] = {
+  NV(CARLHSTS_ENABLE),
   NVEND,
 };
 
-const struct NameValueUnsigned setopt_nv_CURLAUTH[] = {
-  NV(CURLAUTH_ANY),             /* combination */
-  NV(CURLAUTH_ANYSAFE),         /* combination */
-  NV(CURLAUTH_BASIC),
-  NV(CURLAUTH_DIGEST),
-  NV(CURLAUTH_GSSNEGOTIATE),
-  NV(CURLAUTH_NTLM),
-  NV(CURLAUTH_DIGEST_IE),
-  NV(CURLAUTH_NTLM_WB),
-  NV(CURLAUTH_ONLY),
-  NV(CURLAUTH_NONE),
+const struct NameValueUnsigned setopt_nv_CARLAUTH[] = {
+  NV(CARLAUTH_ANY),             /* combination */
+  NV(CARLAUTH_ANYSAFE),         /* combination */
+  NV(CARLAUTH_BASIC),
+  NV(CARLAUTH_DIGEST),
+  NV(CARLAUTH_GSSNEGOTIATE),
+  NV(CARLAUTH_NTLM),
+  NV(CARLAUTH_DIGEST_IE),
+  NV(CARLAUTH_NTLM_WB),
+  NV(CARLAUTH_ONLY),
+  NV(CARLAUTH_NONE),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURL_HTTP_VERSION[] = {
-  NV(CURL_HTTP_VERSION_NONE),
-  NV(CURL_HTTP_VERSION_1_0),
-  NV(CURL_HTTP_VERSION_1_1),
-  NV(CURL_HTTP_VERSION_2_0),
-  NV(CURL_HTTP_VERSION_2TLS),
-  NV(CURL_HTTP_VERSION_3),
+const struct NameValue setopt_nv_CARL_HTTP_VERSION[] = {
+  NV(CARL_HTTP_VERSION_NONE),
+  NV(CARL_HTTP_VERSION_1_0),
+  NV(CARL_HTTP_VERSION_1_1),
+  NV(CARL_HTTP_VERSION_2_0),
+  NV(CARL_HTTP_VERSION_2TLS),
+  NV(CARL_HTTP_VERSION_3),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURL_SSLVERSION[] = {
-  NV(CURL_SSLVERSION_DEFAULT),
-  NV(CURL_SSLVERSION_TLSv1),
-  NV(CURL_SSLVERSION_SSLv2),
-  NV(CURL_SSLVERSION_SSLv3),
-  NV(CURL_SSLVERSION_TLSv1_0),
-  NV(CURL_SSLVERSION_TLSv1_1),
-  NV(CURL_SSLVERSION_TLSv1_2),
-  NV(CURL_SSLVERSION_TLSv1_3),
+const struct NameValue setopt_nv_CARL_SSLVERSION[] = {
+  NV(CARL_SSLVERSION_DEFAULT),
+  NV(CARL_SSLVERSION_TLSv1),
+  NV(CARL_SSLVERSION_SSLv2),
+  NV(CARL_SSLVERSION_SSLv3),
+  NV(CARL_SSLVERSION_TLSv1_0),
+  NV(CARL_SSLVERSION_TLSv1_1),
+  NV(CARL_SSLVERSION_TLSv1_2),
+  NV(CARL_SSLVERSION_TLSv1_3),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURL_TIMECOND[] = {
-  NV(CURL_TIMECOND_IFMODSINCE),
-  NV(CURL_TIMECOND_IFUNMODSINCE),
-  NV(CURL_TIMECOND_LASTMOD),
-  NV(CURL_TIMECOND_NONE),
+const struct NameValue setopt_nv_CARL_TIMECOND[] = {
+  NV(CARL_TIMECOND_IFMODSINCE),
+  NV(CARL_TIMECOND_IFUNMODSINCE),
+  NV(CARL_TIMECOND_LASTMOD),
+  NV(CARL_TIMECOND_NONE),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURLFTPSSL_CCC[] = {
-  NV(CURLFTPSSL_CCC_NONE),
-  NV(CURLFTPSSL_CCC_PASSIVE),
-  NV(CURLFTPSSL_CCC_ACTIVE),
+const struct NameValue setopt_nv_CARLFTPSSL_CCC[] = {
+  NV(CARLFTPSSL_CCC_NONE),
+  NV(CARLFTPSSL_CCC_PASSIVE),
+  NV(CARLFTPSSL_CCC_ACTIVE),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURLUSESSL[] = {
-  NV(CURLUSESSL_NONE),
-  NV(CURLUSESSL_TRY),
-  NV(CURLUSESSL_CONTROL),
-  NV(CURLUSESSL_ALL),
+const struct NameValue setopt_nv_CARLUSESSL[] = {
+  NV(CARLUSESSL_NONE),
+  NV(CARLUSESSL_TRY),
+  NV(CARLUSESSL_CONTROL),
+  NV(CARLUSESSL_ALL),
   NVEND,
 };
 
-const struct NameValueUnsigned setopt_nv_CURLSSLOPT[] = {
-  NV(CURLSSLOPT_ALLOW_BEAST),
-  NV(CURLSSLOPT_NO_REVOKE),
-  NV(CURLSSLOPT_NO_PARTIALCHAIN),
-  NV(CURLSSLOPT_REVOKE_BEST_EFFORT),
-  NV(CURLSSLOPT_NATIVE_CA),
+const struct NameValueUnsigned setopt_nv_CARLSSLOPT[] = {
+  NV(CARLSSLOPT_ALLOW_BEAST),
+  NV(CARLSSLOPT_NO_REVOKE),
+  NV(CARLSSLOPT_NO_PARTIALCHAIN),
+  NV(CARLSSLOPT_REVOKE_BEST_EFFORT),
+  NV(CARLSSLOPT_NATIVE_CA),
   NVEND,
 };
 
-const struct NameValue setopt_nv_CURL_NETRC[] = {
-  NV(CURL_NETRC_IGNORED),
-  NV(CURL_NETRC_OPTIONAL),
-  NV(CURL_NETRC_REQUIRED),
+const struct NameValue setopt_nv_CARL_NETRC[] = {
+  NV(CARL_NETRC_IGNORED),
+  NV(CARL_NETRC_OPTIONAL),
+  NV(CARL_NETRC_REQUIRED),
   NVEND,
 };
 
 /* These mappings essentially triplicated - see
  * tool_libinfo.c and tool_paramhlp.c */
-const struct NameValue setopt_nv_CURLPROTO[] = {
-  NV(CURLPROTO_ALL),            /* combination */
-  NV(CURLPROTO_DICT),
-  NV(CURLPROTO_FILE),
-  NV(CURLPROTO_FTP),
-  NV(CURLPROTO_FTPS),
-  NV(CURLPROTO_GOPHER),
-  NV(CURLPROTO_HTTP),
-  NV(CURLPROTO_HTTPS),
-  NV(CURLPROTO_IMAP),
-  NV(CURLPROTO_IMAPS),
-  NV(CURLPROTO_LDAP),
-  NV(CURLPROTO_LDAPS),
-  NV(CURLPROTO_POP3),
-  NV(CURLPROTO_POP3S),
-  NV(CURLPROTO_RTSP),
-  NV(CURLPROTO_SCP),
-  NV(CURLPROTO_SFTP),
-  NV(CURLPROTO_SMB),
-  NV(CURLPROTO_SMBS),
-  NV(CURLPROTO_SMTP),
-  NV(CURLPROTO_SMTPS),
-  NV(CURLPROTO_TELNET),
-  NV(CURLPROTO_TFTP),
+const struct NameValue setopt_nv_CARLPROTO[] = {
+  NV(CARLPROTO_ALL),            /* combination */
+  NV(CARLPROTO_DICT),
+  NV(CARLPROTO_FILE),
+  NV(CARLPROTO_FTP),
+  NV(CARLPROTO_FTPS),
+  NV(CARLPROTO_GOPHER),
+  NV(CARLPROTO_HTTP),
+  NV(CARLPROTO_HTTPS),
+  NV(CARLPROTO_IMAP),
+  NV(CARLPROTO_IMAPS),
+  NV(CARLPROTO_LDAP),
+  NV(CARLPROTO_LDAPS),
+  NV(CARLPROTO_POP3),
+  NV(CARLPROTO_POP3S),
+  NV(CARLPROTO_RTSP),
+  NV(CARLPROTO_SCP),
+  NV(CARLPROTO_SFTP),
+  NV(CARLPROTO_SMB),
+  NV(CARLPROTO_SMBS),
+  NV(CARLPROTO_SMTP),
+  NV(CARLPROTO_SMTPS),
+  NV(CARLPROTO_TELNET),
+  NV(CARLPROTO_TFTP),
   NVEND,
 };
 
 /* These options have non-zero default values. */
-static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
-  NV1(CURLOPT_SSL_VERIFYPEER, 1),
-  NV1(CURLOPT_SSL_VERIFYHOST, 1),
-  NV1(CURLOPT_SSL_ENABLE_NPN, 1),
-  NV1(CURLOPT_SSL_ENABLE_ALPN, 1),
-  NV1(CURLOPT_TCP_NODELAY, 1),
-  NV1(CURLOPT_PROXY_SSL_VERIFYPEER, 1),
-  NV1(CURLOPT_PROXY_SSL_VERIFYHOST, 1),
-  NV1(CURLOPT_SOCKS5_AUTH, 1),
+static const struct NameValue setopt_nv_CARLNONZERODEFAULTS[] = {
+  NV1(CARLOPT_SSL_VERIFYPEER, 1),
+  NV1(CARLOPT_SSL_VERIFYHOST, 1),
+  NV1(CARLOPT_SSL_ENABLE_NPN, 1),
+  NV1(CARLOPT_SSL_ENABLE_ALPN, 1),
+  NV1(CARLOPT_TCP_NODELAY, 1),
+  NV1(CARLOPT_PROXY_SSL_VERIFYPEER, 1),
+  NV1(CARLOPT_PROXY_SSL_VERIFYHOST, 1),
+  NV1(CARLOPT_SOCKS5_AUTH, 1),
   NVEND
 };
 
@@ -198,7 +198,7 @@ static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
 } while(0)
 #define NULL_CHECK(p) do { \
   if(!p) { \
-    ret = CURLE_OUT_OF_MEMORY; \
+    ret = CARLE_OUT_OF_MEMORY; \
     goto nomem; \
   } \
 } while(0)
@@ -229,7 +229,7 @@ static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
 #define MAX_STRING_LENGTH_OUTPUT 2000
 #define ZERO_TERMINATED -1
 
-static char *c_escape(const char *str, curl_off_t len)
+static char *c_escape(const char *str, carl_off_t len)
 {
   const char *s;
   unsigned char c;
@@ -287,19 +287,19 @@ static char *c_escape(const char *str, curl_off_t len)
 }
 
 /* setopt wrapper for enum types */
-CURLcode tool_setopt_enum(CURL *curl, struct GlobalConfig *config,
-                          const char *name, CURLoption tag,
+CARLcode tool_setopt_enum(CARL *carl, struct GlobalConfig *config,
+                          const char *name, CARLoption tag,
                           const struct NameValue *nvlist, long lval)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   bool skip = FALSE;
 
-  ret = curl_easy_setopt(curl, tag, lval);
+  ret = carl_easy_setopt(carl, tag, lval);
   if(!lval)
     skip = TRUE;
 
-  if(config->libcurl && !skip && !ret) {
-    /* we only use this for real if --libcurl was used */
+  if(config->libcarl && !skip && !ret) {
+    /* we only use this for real if --libcarl was used */
     const struct NameValue *nv = NULL;
     for(nv = nvlist; nv->name; nv++) {
       if(nv->value == lval)
@@ -309,10 +309,10 @@ CURLcode tool_setopt_enum(CURL *curl, struct GlobalConfig *config,
       /* If no definition was found, output an explicit value.
        * This could happen if new values are defined and used
        * but the NameValue list is not updated. */
-      CODE2("curl_easy_setopt(hnd, %s, %ldL);", name, lval);
+      CODE2("carl_easy_setopt(hnd, %s, %ldL);", name, lval);
     }
     else {
-      CODE2("curl_easy_setopt(hnd, %s, (long)%s);", name, nv->name);
+      CODE2("carl_easy_setopt(hnd, %s, (long)%s);", name, nv->name);
     }
   }
 
@@ -325,24 +325,24 @@ CURLcode tool_setopt_enum(CURL *curl, struct GlobalConfig *config,
 }
 
 /* setopt wrapper for flags */
-CURLcode tool_setopt_flags(CURL *curl, struct GlobalConfig *config,
-                           const char *name, CURLoption tag,
+CARLcode tool_setopt_flags(CARL *carl, struct GlobalConfig *config,
+                           const char *name, CARLoption tag,
                            const struct NameValue *nvlist, long lval)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   bool skip = FALSE;
 
-  ret = curl_easy_setopt(curl, tag, lval);
+  ret = carl_easy_setopt(carl, tag, lval);
   if(!lval)
     skip = TRUE;
 
-  if(config->libcurl && !skip && !ret) {
-    /* we only use this for real if --libcurl was used */
+  if(config->libcarl && !skip && !ret) {
+    /* we only use this for real if --libcarl was used */
     char preamble[80];          /* should accommodate any symbol name */
     long rest = lval;           /* bits not handled yet */
     const struct NameValue *nv = NULL;
     msnprintf(preamble, sizeof(preamble),
-              "curl_easy_setopt(hnd, %s, ", name);
+              "carl_easy_setopt(hnd, %s, ", name);
     for(nv = nvlist; nv->name; nv++) {
       if((nv->value & ~ rest) == 0) {
         /* all value flags contained in rest */
@@ -367,25 +367,25 @@ CURLcode tool_setopt_flags(CURL *curl, struct GlobalConfig *config,
 }
 
 /* setopt wrapper for bitmasks */
-CURLcode tool_setopt_bitmask(CURL *curl, struct GlobalConfig *config,
-                             const char *name, CURLoption tag,
+CARLcode tool_setopt_bitmask(CARL *carl, struct GlobalConfig *config,
+                             const char *name, CARLoption tag,
                              const struct NameValueUnsigned *nvlist,
                              long lval)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   bool skip = FALSE;
 
-  ret = curl_easy_setopt(curl, tag, lval);
+  ret = carl_easy_setopt(carl, tag, lval);
   if(!lval)
     skip = TRUE;
 
-  if(config->libcurl && !skip && !ret) {
-    /* we only use this for real if --libcurl was used */
+  if(config->libcarl && !skip && !ret) {
+    /* we only use this for real if --libcarl was used */
     char preamble[80];
     unsigned long rest = (unsigned long)lval;
     const struct NameValueUnsigned *nv = NULL;
     msnprintf(preamble, sizeof(preamble),
-              "curl_easy_setopt(hnd, %s, ", name);
+              "carl_easy_setopt(hnd, %s, ", name);
     for(nv = nvlist; nv->name; nv++) {
       if((nv->value & ~ rest) == 0) {
         /* all value flags contained in rest */
@@ -409,25 +409,25 @@ CURLcode tool_setopt_bitmask(CURL *curl, struct GlobalConfig *config,
   return ret;
 }
 
-/* Generate code for a struct curl_slist. */
-static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
+/* Generate code for a struct carl_slist. */
+static CARLcode libcarl_generate_slist(struct carl_slist *slist, int *slistno)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   char *escaped = NULL;
 
   /* May need several slist variables, so invent name */
   *slistno = ++easysrc_slist_count;
 
-  DECL1("struct curl_slist *slist%d;", *slistno);
+  DECL1("struct carl_slist *slist%d;", *slistno);
   DATA1("slist%d = NULL;", *slistno);
-  CLEAN1("curl_slist_free_all(slist%d);", *slistno);
+  CLEAN1("carl_slist_free_all(slist%d);", *slistno);
   CLEAN1("slist%d = NULL;", *slistno);
   for(; slist; slist = slist->next) {
     Curl_safefree(escaped);
     escaped = c_escape(slist->data, ZERO_TERMINATED);
     if(!escaped)
-      return CURLE_OUT_OF_MEMORY;
-    DATA3("slist%d = curl_slist_append(slist%d, \"%s\");",
+      return CARLE_OUT_OF_MEMORY;
+    DATA3("slist%d = carl_slist_append(slist%d, \"%s\");",
                                        *slistno, *slistno, escaped);
   }
 
@@ -436,18 +436,18 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
   return ret;
 }
 
-static CURLcode libcurl_generate_mime(CURL *curl,
+static CARLcode libcarl_generate_mime(CARL *carl,
                                       struct GlobalConfig *config,
                                       struct tool_mime *toolmime,
                                       int *mimeno);     /* Forward. */
 
 /* Wrapper to generate source code for a mime part. */
-static CURLcode libcurl_generate_mime_part(CURL *curl,
+static CARLcode libcarl_generate_mime_part(CARL *carl,
                                            struct GlobalConfig *config,
                                            struct tool_mime *part,
                                            int mimeno)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   int submimeno = 0;
   char *escaped = NULL;
   const char *data = NULL;
@@ -455,25 +455,25 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
 
   /* Parts are linked in reverse order. */
   if(part->prev) {
-    ret = libcurl_generate_mime_part(curl, config, part->prev, mimeno);
+    ret = libcarl_generate_mime_part(carl, config, part->prev, mimeno);
     if(ret)
       return ret;
   }
 
   /* Create the part. */
-  CODE2("part%d = curl_mime_addpart(mime%d);", mimeno, mimeno);
+  CODE2("part%d = carl_mime_addpart(mime%d);", mimeno, mimeno);
 
   switch(part->kind) {
   case TOOLMIME_PARTS:
-    ret = libcurl_generate_mime(curl, config, part, &submimeno);
+    ret = libcarl_generate_mime(carl, config, part, &submimeno);
     if(!ret) {
-      CODE2("curl_mime_subparts(part%d, mime%d);", mimeno, submimeno);
+      CODE2("carl_mime_subparts(part%d, mime%d);", mimeno, submimeno);
       CODE1("mime%d = NULL;", submimeno);   /* Avoid freeing in CLEAN. */
     }
     break;
 
   case TOOLMIME_DATA:
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
     /* Data will be set in ASCII, thus issue a comment with clear text. */
     escaped = c_escape(part->data, ZERO_TERMINATED);
     NULL_CHECK(escaped);
@@ -496,7 +496,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
       Curl_safefree(escaped);
       escaped = c_escape(data, ZERO_TERMINATED);
       NULL_CHECK(escaped);
-      CODE2("curl_mime_data(part%d, \"%s\", CURL_ZERO_TERMINATED);",
+      CODE2("carl_mime_data(part%d, \"%s\", CARL_ZERO_TERMINATED);",
                             mimeno, escaped);
     }
     break;
@@ -505,9 +505,9 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
   case TOOLMIME_FILEDATA:
     escaped = c_escape(part->data, ZERO_TERMINATED);
     NULL_CHECK(escaped);
-    CODE2("curl_mime_filedata(part%d, \"%s\");", mimeno, escaped);
+    CODE2("carl_mime_filedata(part%d, \"%s\");", mimeno, escaped);
     if(part->kind == TOOLMIME_FILEDATA && !filename) {
-      CODE1("curl_mime_filename(part%d, NULL);", mimeno);
+      CODE1("carl_mime_filename(part%d, NULL);", mimeno);
     }
     break;
 
@@ -517,9 +517,9 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
     /* FALLTHROUGH */
   case TOOLMIME_STDINDATA:
     /* Can only be reading stdin in the current context. */
-    CODE1("curl_mime_data_cb(part%d, -1, (curl_read_callback) fread, \\",
+    CODE1("carl_mime_data_cb(part%d, -1, (carl_read_callback) fread, \\",
           mimeno);
-    CODE0("                  (curl_seek_callback) fseek, NULL, stdin);");
+    CODE0("                  (carl_seek_callback) fseek, NULL, stdin);");
     break;
   default:
     /* Other cases not possible in this context. */
@@ -530,42 +530,42 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
     Curl_safefree(escaped);
     escaped = c_escape(part->encoder, ZERO_TERMINATED);
     NULL_CHECK(escaped);
-    CODE2("curl_mime_encoder(part%d, \"%s\");", mimeno, escaped);
+    CODE2("carl_mime_encoder(part%d, \"%s\");", mimeno, escaped);
   }
 
   if(!ret && filename) {
     Curl_safefree(escaped);
     escaped = c_escape(filename, ZERO_TERMINATED);
     NULL_CHECK(escaped);
-    CODE2("curl_mime_filename(part%d, \"%s\");", mimeno, escaped);
+    CODE2("carl_mime_filename(part%d, \"%s\");", mimeno, escaped);
   }
 
   if(!ret && part->name) {
     Curl_safefree(escaped);
     escaped = c_escape(part->name, ZERO_TERMINATED);
     NULL_CHECK(escaped);
-    CODE2("curl_mime_name(part%d, \"%s\");", mimeno, escaped);
+    CODE2("carl_mime_name(part%d, \"%s\");", mimeno, escaped);
   }
 
   if(!ret && part->type) {
     Curl_safefree(escaped);
     escaped = c_escape(part->type, ZERO_TERMINATED);
     NULL_CHECK(escaped);
-    CODE2("curl_mime_type(part%d, \"%s\");", mimeno, escaped);
+    CODE2("carl_mime_type(part%d, \"%s\");", mimeno, escaped);
   }
 
   if(!ret && part->headers) {
     int slistno;
 
-    ret = libcurl_generate_slist(part->headers, &slistno);
+    ret = libcarl_generate_slist(part->headers, &slistno);
     if(!ret) {
-      CODE2("curl_mime_headers(part%d, slist%d, 1);", mimeno, slistno);
+      CODE2("carl_mime_headers(part%d, slist%d, 1);", mimeno, slistno);
       CODE1("slist%d = NULL;", slistno); /* Prevent CLEANing. */
     }
   }
 
 nomem:
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
   if(data)
     free((char *) data);
 #endif
@@ -575,24 +575,24 @@ nomem:
 }
 
 /* Wrapper to generate source code for a mime structure. */
-static CURLcode libcurl_generate_mime(CURL *curl,
+static CARLcode libcarl_generate_mime(CARL *carl,
                                       struct GlobalConfig *config,
                                       struct tool_mime *toolmime,
                                       int *mimeno)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
 
   /* May need several mime variables, so invent name. */
   *mimeno = ++easysrc_mime_count;
-  DECL1("curl_mime *mime%d;", *mimeno);
+  DECL1("carl_mime *mime%d;", *mimeno);
   DATA1("mime%d = NULL;", *mimeno);
-  CODE1("mime%d = curl_mime_init(hnd);", *mimeno);
-  CLEAN1("curl_mime_free(mime%d);", *mimeno);
+  CODE1("mime%d = carl_mime_init(hnd);", *mimeno);
+  CLEAN1("carl_mime_free(mime%d);", *mimeno);
   CLEAN1("mime%d = NULL;", *mimeno);
 
   if(toolmime->subparts) {
-    DECL1("curl_mimepart *part%d;", *mimeno);
-    ret = libcurl_generate_mime_part(curl, config,
+    DECL1("carl_mimepart *part%d;", *mimeno);
+    ret = libcarl_generate_mime_part(carl, config,
                                      toolmime->subparts, *mimeno);
   }
 
@@ -600,41 +600,41 @@ nomem:
   return ret;
 }
 
-/* setopt wrapper for CURLOPT_MIMEPOST */
-CURLcode tool_setopt_mimepost(CURL *curl, struct GlobalConfig *config,
-                              const char *name, CURLoption tag,
-                              curl_mime *mimepost)
+/* setopt wrapper for CARLOPT_MIMEPOST */
+CARLcode tool_setopt_mimepost(CARL *carl, struct GlobalConfig *config,
+                              const char *name, CARLoption tag,
+                              carl_mime *mimepost)
 {
-  CURLcode ret = curl_easy_setopt(curl, tag, mimepost);
+  CARLcode ret = carl_easy_setopt(carl, tag, mimepost);
   int mimeno = 0;
 
-  if(!ret && config->libcurl) {
-    ret = libcurl_generate_mime(curl, config,
+  if(!ret && config->libcarl) {
+    ret = libcarl_generate_mime(carl, config,
                                 config->current->mimeroot, &mimeno);
 
     if(!ret)
-      CODE2("curl_easy_setopt(hnd, %s, mime%d);", name, mimeno);
+      CODE2("carl_easy_setopt(hnd, %s, mime%d);", name, mimeno);
   }
 
 nomem:
   return ret;
 }
 
-/* setopt wrapper for curl_slist options */
-CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
-                           const char *name, CURLoption tag,
-                           struct curl_slist *list)
+/* setopt wrapper for carl_slist options */
+CARLcode tool_setopt_slist(CARL *carl, struct GlobalConfig *config,
+                           const char *name, CARLoption tag,
+                           struct carl_slist *list)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
 
-  ret = curl_easy_setopt(curl, tag, list);
+  ret = carl_easy_setopt(carl, tag, list);
 
-  if(config->libcurl && list && !ret) {
+  if(config->libcarl && list && !ret) {
     int i;
 
-    ret = libcurl_generate_slist(list, &i);
+    ret = libcarl_generate_slist(list, &i);
     if(!ret)
-      CODE2("curl_easy_setopt(hnd, %s, slist%d);", name, i);
+      CODE2("carl_easy_setopt(hnd, %s, slist%d);", name, i);
   }
 
  nomem:
@@ -643,9 +643,9 @@ CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
 
 /* generic setopt wrapper for all other options.
  * Some type information is encoded in the tag value. */
-CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
+CARLcode tool_setopt(CARL *carl, bool str, struct GlobalConfig *global,
                      struct OperationConfig *config,
-                     const char *name, CURLoption tag, ...)
+                     const char *name, CARLoption tag, ...)
 {
   va_list arg;
   char buf[256];
@@ -654,16 +654,16 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
   bool skip = FALSE;
   bool escape = FALSE;
   char *escaped = NULL;
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
 
   va_start(arg, tag);
 
-  if(tag < CURLOPTTYPE_OBJECTPOINT) {
+  if(tag < CARLOPTTYPE_OBJECTPOINT) {
     /* Value is expected to be a long */
     long lval = va_arg(arg, long);
     long defval = 0L;
     const struct NameValue *nv = NULL;
-    for(nv = setopt_nv_CURLNONZERODEFAULTS; nv->name; nv++) {
+    for(nv = setopt_nv_CARLNONZERODEFAULTS; nv->name; nv++) {
       if(!strcmp(name, nv->name)) {
         defval = nv->value;
         break; /* found it */
@@ -672,16 +672,16 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
 
     msnprintf(buf, sizeof(buf), "%ldL", lval);
     value = buf;
-    ret = curl_easy_setopt(curl, tag, lval);
+    ret = carl_easy_setopt(carl, tag, lval);
     if(lval == defval)
       skip = TRUE;
   }
-  else if(tag < CURLOPTTYPE_OFF_T) {
+  else if(tag < CARLOPTTYPE_OFF_T) {
     /* Value is some sort of object pointer */
     void *pval = va_arg(arg, void *);
 
     /* function pointers are never printable */
-    if(tag >= CURLOPTTYPE_FUNCTIONPOINT) {
+    if(tag >= CARLOPTTYPE_FUNCTIONPOINT) {
       if(pval) {
         value = "functionpointer";
         remark = TRUE;
@@ -701,16 +701,16 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
     else
       skip = TRUE;
 
-    ret = curl_easy_setopt(curl, tag, pval);
+    ret = carl_easy_setopt(carl, tag, pval);
 
   }
-  else if(tag < CURLOPTTYPE_BLOB) {
-    /* Value is expected to be curl_off_t */
-    curl_off_t oval = va_arg(arg, curl_off_t);
+  else if(tag < CARLOPTTYPE_BLOB) {
+    /* Value is expected to be carl_off_t */
+    carl_off_t oval = va_arg(arg, carl_off_t);
     msnprintf(buf, sizeof(buf),
-              "(curl_off_t)%" CURL_FORMAT_CURL_OFF_T, oval);
+              "(carl_off_t)%" CARL_FORMAT_CARL_OFF_T, oval);
     value = buf;
-    ret = curl_easy_setopt(curl, tag, oval);
+    ret = carl_easy_setopt(carl, tag, oval);
 
     if(!oval)
       skip = TRUE;
@@ -727,27 +727,27 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
     else
       skip = TRUE;
 
-    ret = curl_easy_setopt(curl, tag, pblob);
+    ret = carl_easy_setopt(carl, tag, pblob);
   }
 
   va_end(arg);
 
-  if(global->libcurl && !skip && !ret) {
-    /* we only use this for real if --libcurl was used */
+  if(global->libcarl && !skip && !ret) {
+    /* we only use this for real if --libcarl was used */
 
     if(remark)
       REM2("%s set to a %s", name, value);
     else {
       if(escape) {
-        curl_off_t len = ZERO_TERMINATED;
-        if(tag == CURLOPT_POSTFIELDS)
+        carl_off_t len = ZERO_TERMINATED;
+        if(tag == CARLOPT_POSTFIELDS)
           len = config->postfieldsize;
         escaped = c_escape(value, len);
         NULL_CHECK(escaped);
-        CODE2("curl_easy_setopt(hnd, %s, \"%s\");", name, escaped);
+        CODE2("carl_easy_setopt(hnd, %s, \"%s\");", name, escaped);
       }
       else
-        CODE2("curl_easy_setopt(hnd, %s, %s);", name, value);
+        CODE2("carl_easy_setopt(hnd, %s, %s);", name, value);
     }
   }
 
@@ -756,121 +756,121 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
   return ret;
 }
 
-#else /* CURL_DISABLE_LIBCURL_OPTION */
+#else /* CARL_DISABLE_LIBCARL_OPTION */
 
 #include "tool_cfgable.h"
 #include "tool_setopt.h"
 
-#endif /* CURL_DISABLE_LIBCURL_OPTION */
+#endif /* CARL_DISABLE_LIBCARL_OPTION */
 
 /*
- * tool_setopt_skip() allows the curl tool code to avoid setopt options that
+ * tool_setopt_skip() allows the carl tool code to avoid setopt options that
  * are explicitly disabled in the build.
  */
-bool tool_setopt_skip(CURLoption tag)
+bool tool_setopt_skip(CARLoption tag)
 {
-#ifdef CURL_DISABLE_PROXY
+#ifdef CARL_DISABLE_PROXY
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_HAPROXYPROTOCOL:
-  case CURLOPT_HTTPPROXYTUNNEL:
-  case CURLOPT_NOPROXY:
-  case CURLOPT_PRE_PROXY:
-  case CURLOPT_PROXY:
-  case CURLOPT_PROXYAUTH:
-  case CURLOPT_PROXY_CAINFO:
-  case CURLOPT_PROXY_CAPATH:
-  case CURLOPT_PROXY_CRLFILE:
-  case CURLOPT_PROXYHEADER:
-  case CURLOPT_PROXY_KEYPASSWD:
-  case CURLOPT_PROXYPASSWORD:
-  case CURLOPT_PROXY_PINNEDPUBLICKEY:
-  case CURLOPT_PROXYPORT:
-  case CURLOPT_PROXY_SERVICE_NAME:
-  case CURLOPT_PROXY_SSLCERT:
-  case CURLOPT_PROXY_SSLCERTTYPE:
-  case CURLOPT_PROXY_SSL_CIPHER_LIST:
-  case CURLOPT_PROXY_SSLKEY:
-  case CURLOPT_PROXY_SSLKEYTYPE:
-  case CURLOPT_PROXY_SSL_OPTIONS:
-  case CURLOPT_PROXY_SSL_VERIFYHOST:
-  case CURLOPT_PROXY_SSL_VERIFYPEER:
-  case CURLOPT_PROXY_SSLVERSION:
-  case CURLOPT_PROXY_TLS13_CIPHERS:
-  case CURLOPT_PROXY_TLSAUTH_PASSWORD:
-  case CURLOPT_PROXY_TLSAUTH_TYPE:
-  case CURLOPT_PROXY_TLSAUTH_USERNAME:
-  case CURLOPT_PROXY_TRANSFER_MODE:
-  case CURLOPT_PROXYTYPE:
-  case CURLOPT_PROXYUSERNAME:
-  case CURLOPT_PROXYUSERPWD:
+  case CARLOPT_HAPROXYPROTOCOL:
+  case CARLOPT_HTTPPROXYTUNNEL:
+  case CARLOPT_NOPROXY:
+  case CARLOPT_PRE_PROXY:
+  case CARLOPT_PROXY:
+  case CARLOPT_PROXYAUTH:
+  case CARLOPT_PROXY_CAINFO:
+  case CARLOPT_PROXY_CAPATH:
+  case CARLOPT_PROXY_CRLFILE:
+  case CARLOPT_PROXYHEADER:
+  case CARLOPT_PROXY_KEYPASSWD:
+  case CARLOPT_PROXYPASSWORD:
+  case CARLOPT_PROXY_PINNEDPUBLICKEY:
+  case CARLOPT_PROXYPORT:
+  case CARLOPT_PROXY_SERVICE_NAME:
+  case CARLOPT_PROXY_SSLCERT:
+  case CARLOPT_PROXY_SSLCERTTYPE:
+  case CARLOPT_PROXY_SSL_CIPHER_LIST:
+  case CARLOPT_PROXY_SSLKEY:
+  case CARLOPT_PROXY_SSLKEYTYPE:
+  case CARLOPT_PROXY_SSL_OPTIONS:
+  case CARLOPT_PROXY_SSL_VERIFYHOST:
+  case CARLOPT_PROXY_SSL_VERIFYPEER:
+  case CARLOPT_PROXY_SSLVERSION:
+  case CARLOPT_PROXY_TLS13_CIPHERS:
+  case CARLOPT_PROXY_TLSAUTH_PASSWORD:
+  case CARLOPT_PROXY_TLSAUTH_TYPE:
+  case CARLOPT_PROXY_TLSAUTH_USERNAME:
+  case CARLOPT_PROXY_TRANSFER_MODE:
+  case CARLOPT_PROXYTYPE:
+  case CARLOPT_PROXYUSERNAME:
+  case CARLOPT_PROXYUSERPWD:
     return TRUE;
   default:
     break;
   }
 #endif
-#ifdef CURL_DISABLE_FTP
+#ifdef CARL_DISABLE_FTP
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_FTPPORT:
-  case CURLOPT_FTP_ACCOUNT:
-  case CURLOPT_FTP_ALTERNATIVE_TO_USER:
-  case CURLOPT_FTP_FILEMETHOD:
-  case CURLOPT_FTP_SKIP_PASV_IP:
-  case CURLOPT_FTP_USE_EPRT:
-  case CURLOPT_FTP_USE_EPSV:
-  case CURLOPT_FTP_USE_PRET:
-  case CURLOPT_KRBLEVEL:
+  case CARLOPT_FTPPORT:
+  case CARLOPT_FTP_ACCOUNT:
+  case CARLOPT_FTP_ALTERNATIVE_TO_USER:
+  case CARLOPT_FTP_FILEMETHOD:
+  case CARLOPT_FTP_SKIP_PASV_IP:
+  case CARLOPT_FTP_USE_EPRT:
+  case CARLOPT_FTP_USE_EPSV:
+  case CARLOPT_FTP_USE_PRET:
+  case CARLOPT_KRBLEVEL:
     return TRUE;
   default:
     break;
   }
 #endif
-#ifdef CURL_DISABLE_RTSP
+#ifdef CARL_DISABLE_RTSP
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_INTERLEAVEDATA:
+  case CARLOPT_INTERLEAVEDATA:
     return TRUE;
   default:
     break;
   }
 #endif
-#if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
+#if defined(CARL_DISABLE_HTTP) || defined(CARL_DISABLE_COOKIES)
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_COOKIE:
-  case CURLOPT_COOKIEFILE:
-  case CURLOPT_COOKIEJAR:
-  case CURLOPT_COOKIESESSION:
+  case CARLOPT_COOKIE:
+  case CARLOPT_COOKIEFILE:
+  case CARLOPT_COOKIEJAR:
+  case CARLOPT_COOKIESESSION:
     return TRUE;
   default:
     break;
   }
 #endif
-#if defined(CURL_DISABLE_TELNET)
+#if defined(CARL_DISABLE_TELNET)
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_TELNETOPTIONS:
+  case CARLOPT_TELNETOPTIONS:
     return TRUE;
   default:
     break;
   }
 #endif
-#ifdef CURL_DISABLE_TFTP
+#ifdef CARL_DISABLE_TFTP
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_TFTP_BLKSIZE:
-  case CURLOPT_TFTP_NO_OPTIONS:
+  case CARLOPT_TFTP_BLKSIZE:
+  case CARLOPT_TFTP_NO_OPTIONS:
     return TRUE;
   default:
     break;
   }
 #endif
-#ifdef CURL_DISABLE_NETRC
+#ifdef CARL_DISABLE_NETRC
 #define USED_TAG
   switch(tag) {
-  case CURLOPT_NETRC:
-  case CURLOPT_NETRC_FILE:
+  case CARLOPT_NETRC:
+  case CARLOPT_NETRC_FILE:
     return TRUE;
   default:
     break;

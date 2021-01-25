@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SMTP_H
-#define HEADER_CURL_SMTP_H
+#ifndef HEADER_CARL_SMTP_H
+#define HEADER_CARL_SMTP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 #include "pingpong.h"
-#include "curl_sasl.h"
+#include "carl_sasl.h"
 
 /****************************************************************************
  * SMTP unique setup
@@ -52,9 +52,9 @@ typedef enum {
    perhaps the Curl_easy is changed between the times the connection is
    used. */
 struct SMTP {
-  curl_pp_transfer transfer;
+  carl_pp_transfer transfer;
   char *custom;            /* Custom Request */
-  struct curl_slist *rcpt; /* Recipient list */
+  struct carl_slist *rcpt; /* Recipient list */
   bool rcpt_had_ok;        /* Whether any of RCPT TO commands (depends on
                               total number of recipients) succeeded so far */
   bool trailing_crlf;      /* Specifies if the trailing CRLF is present */
@@ -91,6 +91,6 @@ extern const struct Curl_handler Curl_handler_smtps;
 #define SMTP_EOB_REPL "\x0d\x0a\x2e\x2e"
 #define SMTP_EOB_REPL_LEN 4
 
-CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread);
+CARLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread);
 
-#endif /* HEADER_CURL_SMTP_H */
+#endif /* HEADER_CARL_SMTP_H */

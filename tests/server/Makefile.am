@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,9 +26,9 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_srcdir)/include is for libcurl's external include files
-# $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
-# $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "borrowed" files
+# $(top_srcdir)/include is for libcarl's external include files
+# $(top_builddir)/lib is for libcarl's generated lib/carl_config.h file
+# $(top_srcdir)/lib for libcarl's lib/carl_setup.h and other "borrowed" files
 # $(top_builddir)/ares is for in-tree c-ares's generated ares_build.h file
 # $(top_srcdir)/ares is for in-tree c-ares's external include files
 
@@ -48,7 +48,7 @@ endif
 LIBS = $(BLANK_AT_MAKETIME)
 
 if DOING_NATIVE_WINDOWS
-AM_CPPFLAGS += -DCURL_STATICLIB
+AM_CPPFLAGS += -DCARL_STATICLIB
 endif
 
 # Makefile.inc provides neat definitions
@@ -64,7 +64,7 @@ CS_ = $(CS_0)
 checksrc:
 	$(CHECKSRC)@PERL@ $(top_srcdir)/lib/checksrc.pl $(srcdir)/*.[ch]
 
-if CURLDEBUG
+if CARLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif

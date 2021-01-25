@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,48 +32,48 @@ static off_t const testDataSize = sizeof(testData) - 1;
 
 int test(char *URL)
 {
-  CURL *easy;
-  CURLM *multi_handle;
+  CARL *easy;
+  CARLM *multi_handle;
   int still_running; /* keep number of running handles */
-  CURLMsg *msg; /* for picking up messages with the transfer status */
+  CARLMsg *msg; /* for picking up messages with the transfer status */
   int msgs_left; /* how many messages are left */
-  int res = CURLE_OK;
+  int res = CARLE_OK;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  /* Allocate one CURL handle per transfer */
-  easy = curl_easy_init();
+  /* Allocate one CARL handle per transfer */
+  easy = carl_easy_init();
 
   /* init a multi stack */
-  multi_handle = curl_multi_init();
+  multi_handle = carl_multi_init();
 
   /* add the individual transfer */
-  curl_multi_add_handle(multi_handle, easy);
+  carl_multi_add_handle(multi_handle, easy);
 
   /* set the options (I left out a few, you'll get the point anyway) */
-  curl_easy_setopt(easy, CURLOPT_URL, URL);
-  curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE,
-                   (curl_off_t)testDataSize);
-  curl_easy_setopt(easy, CURLOPT_POSTFIELDS, testData);
+  carl_easy_setopt(easy, CARLOPT_URL, URL);
+  carl_easy_setopt(easy, CARLOPT_POSTFIELDSIZE_LARGE,
+                   (carl_off_t)testDataSize);
+  carl_easy_setopt(easy, CARLOPT_POSTFIELDS, testData);
 
   /* we start some action by calling perform right away */
-  curl_multi_perform(multi_handle, &still_running);
+  carl_multi_perform(multi_handle, &still_running);
 
   abort_on_test_timeout();
 
   do {
     struct timeval timeout;
     int rc; /* select() return code */
-    CURLMcode mc; /* curl_multi_fdset() return code */
+    CARLMcode mc; /* carl_multi_fdset() return code */
 
     fd_set fdread;
     fd_set fdwrite;
     fd_set fdexcep;
     int maxfd = -1;
 
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     FD_ZERO(&fdread);
     FD_ZERO(&fdwrite);
@@ -83,20 +83,20 @@ int test(char *URL)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(multi_handle, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(multi_handle, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -104,7 +104,7 @@ int test(char *URL)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #if defined(WIN32) || defined(_WIN32)
@@ -128,7 +128,7 @@ int test(char *URL)
       break;
     case 0: /* timeout */
     default: /* action */
-      curl_multi_perform(multi_handle, &still_running);
+      carl_multi_perform(multi_handle, &still_running);
       break;
     }
 
@@ -137,8 +137,8 @@ int test(char *URL)
 
   /* See how the transfers went */
   do {
-    msg = curl_multi_info_read(multi_handle, &msgs_left);
-    if(msg && msg->msg == CURLMSG_DONE) {
+    msg = carl_multi_info_read(multi_handle, &msgs_left);
+    if(msg && msg->msg == CARLMSG_DONE) {
       printf("HTTP transfer completed with status %d\n", msg->data.result);
       break;
     }
@@ -147,11 +147,11 @@ int test(char *URL)
   } while(msg);
 
 test_cleanup:
-  curl_multi_cleanup(multi_handle);
+  carl_multi_cleanup(multi_handle);
 
-  /* Free the CURL handles */
-  curl_easy_cleanup(easy);
-  curl_global_cleanup();
+  /* Free the CARL handles */
+  carl_easy_cleanup(easy);
+  carl_global_cleanup();
 
   return res;
 }

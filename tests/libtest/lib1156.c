@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,8 +25,8 @@
   Check range/resume returned error codes and data presence.
 
   The input parameters are:
-  - CURLOPT_RANGE/CURLOPT_RESUME_FROM
-  - CURLOPT_FAILONERROR
+  - CARLOPT_RANGE/CARLOPT_RESUME_FROM
+  - CARLOPT_FAILONERROR
   - Returned http code (2xx/416)
   - Content-Range header present in reply.
 
@@ -42,32 +42,32 @@
 
 struct testparams {
   unsigned int flags; /* ORed flags as above. */
-  CURLcode result; /* Code that should be returned by curl_easy_perform(). */
+  CARLcode result; /* Code that should be returned by carl_easy_perform(). */
 };
 
 static const struct testparams params[] = {
-  { 0,                                                             CURLE_OK },
-  {                                 F_CONTENTRANGE,                CURLE_OK },
-  {                        F_FAIL,                                 CURLE_OK },
-  {                        F_FAIL | F_CONTENTRANGE,                CURLE_OK },
-  {            F_HTTP416,                                          CURLE_OK },
-  {            F_HTTP416 |          F_CONTENTRANGE,                CURLE_OK },
+  { 0,                                                             CARLE_OK },
+  {                                 F_CONTENTRANGE,                CARLE_OK },
+  {                        F_FAIL,                                 CARLE_OK },
+  {                        F_FAIL | F_CONTENTRANGE,                CARLE_OK },
+  {            F_HTTP416,                                          CARLE_OK },
+  {            F_HTTP416 |          F_CONTENTRANGE,                CARLE_OK },
   {            F_HTTP416 | F_FAIL |                  F_IGNOREBODY,
-                                                  CURLE_HTTP_RETURNED_ERROR },
+                                                  CARLE_HTTP_RETURNED_ERROR },
   {            F_HTTP416 | F_FAIL | F_CONTENTRANGE | F_IGNOREBODY,
-                                                  CURLE_HTTP_RETURNED_ERROR },
+                                                  CARLE_HTTP_RETURNED_ERROR },
   { F_RESUME |                                       F_IGNOREBODY,
-                                                          CURLE_RANGE_ERROR },
-  { F_RESUME |                      F_CONTENTRANGE,                CURLE_OK },
+                                                          CARLE_RANGE_ERROR },
+  { F_RESUME |                      F_CONTENTRANGE,                CARLE_OK },
   { F_RESUME |             F_FAIL |                  F_IGNOREBODY,
-                                                          CURLE_RANGE_ERROR },
-  { F_RESUME |             F_FAIL | F_CONTENTRANGE,                CURLE_OK },
-  { F_RESUME | F_HTTP416 |                           F_IGNOREBODY, CURLE_OK },
-  { F_RESUME | F_HTTP416 |          F_CONTENTRANGE | F_IGNOREBODY, CURLE_OK },
+                                                          CARLE_RANGE_ERROR },
+  { F_RESUME |             F_FAIL | F_CONTENTRANGE,                CARLE_OK },
+  { F_RESUME | F_HTTP416 |                           F_IGNOREBODY, CARLE_OK },
+  { F_RESUME | F_HTTP416 |          F_CONTENTRANGE | F_IGNOREBODY, CARLE_OK },
   { F_RESUME | F_HTTP416 | F_FAIL |                  F_IGNOREBODY,
-                                                  CURLE_HTTP_RETURNED_ERROR },
+                                                  CARLE_HTTP_RETURNED_ERROR },
   { F_RESUME | F_HTTP416 | F_FAIL | F_CONTENTRANGE | F_IGNOREBODY,
-                                                  CURLE_HTTP_RETURNED_ERROR }
+                                                  CARLE_HTTP_RETURNED_ERROR }
 };
 
 static int      hasbody;
@@ -82,9 +82,9 @@ static size_t writedata(char *data, size_t size, size_t nmemb, void *userdata)
   return size * nmemb;
 }
 
-static int onetest(CURL *curl, const char *url, const struct testparams *p)
+static int onetest(CARL *carl, const char *url, const struct testparams *p)
 {
-  CURLcode res;
+  CARLcode res;
   unsigned int replyselector;
   char urlbuf[256];
 
@@ -92,13 +92,13 @@ static int onetest(CURL *curl, const char *url, const struct testparams *p)
   if(p->flags & F_HTTP416)
     replyselector += 2;
   msnprintf(urlbuf, sizeof(urlbuf), "%s%04u", url, replyselector);
-  test_setopt(curl, CURLOPT_URL, urlbuf);
-  test_setopt(curl, CURLOPT_RESUME_FROM, (p->flags & F_RESUME)? 3: 0);
-  test_setopt(curl, CURLOPT_RANGE, !(p->flags & F_RESUME)?
+  test_setopt(carl, CARLOPT_URL, urlbuf);
+  test_setopt(carl, CARLOPT_RESUME_FROM, (p->flags & F_RESUME)? 3: 0);
+  test_setopt(carl, CARLOPT_RANGE, !(p->flags & F_RESUME)?
                                    "3-1000000": (char *) NULL);
-  test_setopt(curl, CURLOPT_FAILONERROR, (p->flags & F_FAIL)? 1: 0);
+  test_setopt(carl, CARLOPT_FAILONERROR, (p->flags & F_FAIL)? 1: 0);
   hasbody = 0;
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res != p->result) {
     fprintf(stderr, "bad error code (%d): resume=%s, fail=%s, http416=%s, "
                     "content-range=%s, expected=%d\n", res,
@@ -127,36 +127,36 @@ static int onetest(CURL *curl, const char *url, const struct testparams *p)
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
   size_t i;
   int status = 0;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_WRITEFUNCTION, writedata);
+  test_setopt(carl, CARLOPT_WRITEFUNCTION, writedata);
 
   for(i = 0; i < sizeof(params) / sizeof(params[0]); i++)
-    status |= onetest(curl, URL, params + i);
+    status |= onetest(carl, URL, params + i);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
   return status;
 
   test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

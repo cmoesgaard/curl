@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -33,13 +33,13 @@ if test "$start" = "-h"; then
   exit
 fi
 if test -z "$start"; then
-  start=`git tag --sort=taggerdate | grep "^curl-" | tail -1`;
+  start=`git tag --sort=taggerdate | grep "^carl-" | tail -1`;
 fi
 
 
-# We also include curl-www if possible. Override by setting CURLWWW
-if [ -z "$CURLWWW" ] ; then
-    CURLWWW=../curl-www
+# We also include carl-www if possible. Override by setting CARLWWW
+if [ -z "$CARLWWW" ] ; then
+    CARLWWW=../carl-www
 fi
 
 cat ./docs/THANKS
@@ -47,9 +47,9 @@ cat ./docs/THANKS
 (
  (
   git log --use-mailmap $start..HEAD
-  if [ -d "$CURLWWW" ]
+  if [ -d "$CARLWWW" ]
   then
-   git -C ../curl-www log --use-mailmap $start..HEAD
+   git -C ../carl-www log --use-mailmap $start..HEAD
   fi
  ) | \
 

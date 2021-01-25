@@ -38,7 +38,7 @@ smtp://%HOSTIP:%SMTPPORT/957 --mail-rcpt Användaren
 #
 # Verify data after the test has been "shot"
 <verify>
-# 56 - CURLE_RECV_ERROR
+# 56 - CARLE_RECV_ERROR
 <errorcode>
 56
 </errorcode>

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,21 +20,21 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
-#ifndef CURL_DISABLE_NETRC
+#include "carl_setup.h"
+#ifndef CARL_DISABLE_NETRC
 
 #ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "netrc.h"
 #include "strtok.h"
 #include "strcase.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* Get user and password from .netrc when given a machine name */
@@ -219,7 +219,7 @@ int Curl_parsenetrc(const char *host,
 
   if(!netrcfile) {
     char *home = NULL;
-    char *homea = curl_getenv("HOME"); /* portable environment reader */
+    char *homea = carl_getenv("HOME"); /* portable environment reader */
     if(homea) {
       home = homea;
 #if defined(HAVE_GETPWUID_R) && defined(HAVE_GETEUID)
@@ -246,7 +246,7 @@ int Curl_parsenetrc(const char *host,
       return retcode; /* no home directory found (or possibly out of
                          memory) */
 
-    filealloc = curl_maprintf("%s%s.netrc", home, DIR_CHAR);
+    filealloc = carl_maprintf("%s%s.netrc", home, DIR_CHAR);
     if(!filealloc) {
       free(homea);
       return -1;
@@ -257,7 +257,7 @@ int Curl_parsenetrc(const char *host,
 #ifdef WIN32
     if(retcode == NETRC_FILE_MISSING) {
       /* fallback to the old-style "_netrc" file */
-      filealloc = curl_maprintf("%s%s_netrc", home, DIR_CHAR);
+      filealloc = carl_maprintf("%s%s_netrc", home, DIR_CHAR);
       if(!filealloc) {
         free(homea);
         return -1;

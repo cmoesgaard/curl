@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,7 +37,7 @@
 #include "tool_bname.h"
 #include "tool_doswin.h"
 
-#include "curlx.h"
+#include "carlx.h"
 #include "memdebug.h" /* keep this as LAST include */
 
 #ifdef WIN32
@@ -505,12 +505,12 @@ SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
      */
   for(p = fname; p; p = (p == fname && fname != base ? base : NULL)) {
     size_t p_len;
-    int x = (curl_strnequal(p, "CON", 3) ||
-             curl_strnequal(p, "PRN", 3) ||
-             curl_strnequal(p, "AUX", 3) ||
-             curl_strnequal(p, "NUL", 3)) ? 3 :
-            (curl_strnequal(p, "CLOCK$", 6)) ? 6 :
-            (curl_strnequal(p, "COM", 3) || curl_strnequal(p, "LPT", 3)) ?
+    int x = (carl_strnequal(p, "CON", 3) ||
+             carl_strnequal(p, "PRN", 3) ||
+             carl_strnequal(p, "AUX", 3) ||
+             carl_strnequal(p, "NUL", 3)) ? 3 :
+            (carl_strnequal(p, "CLOCK$", 6)) ? 6 :
+            (carl_strnequal(p, "COM", 3) || carl_strnequal(p, "LPT", 3)) ?
               (('1' <= p[3] && p[3] <= '9') ? 4 : 3) : 0;
 
     if(!x)
@@ -612,20 +612,20 @@ char **__crt0_glob_function(char *arg)
  * HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\SafeProcessSearchMode
  */
 
-CURLcode FindWin32CACert(struct OperationConfig *config,
-                         curl_sslbackend backend,
+CARLcode FindWin32CACert(struct OperationConfig *config,
+                         carl_sslbackend backend,
                          const TCHAR *bundle_file)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
-  /* Search and set cert file only if libcurl supports SSL.
+  /* Search and set cert file only if libcarl supports SSL.
    *
    * If Schannel is the selected SSL backend then these locations are
    * ignored. We allow setting CA location for schannel only when explicitly
-   * specified by the user via CURLOPT_CAINFO / --cacert.
+   * specified by the user via CARLOPT_CAINFO / --cacert.
    */
-  if((curlinfo->features & CURL_VERSION_SSL) &&
-     backend != CURLSSLBACKEND_SCHANNEL) {
+  if((carlinfo->features & CARL_VERSION_SSL) &&
+     backend != CARLSSLBACKEND_SCHANNEL) {
 
     DWORD res_len;
     TCHAR buf[PATH_MAX];
@@ -637,12 +637,12 @@ CURLcode FindWin32CACert(struct OperationConfig *config,
     if(res_len > 0) {
       Curl_safefree(config->cacert);
 #ifdef UNICODE
-      config->cacert = curlx_convert_wchar_to_UTF8(buf);
+      config->cacert = carlx_convert_wchar_to_UTF8(buf);
 #else
       config->cacert = strdup(buf);
 #endif
       if(!config->cacert)
-        result = CURLE_OUT_OF_MEMORY;
+        result = CARLE_OUT_OF_MEMORY;
     }
   }
 
@@ -653,11 +653,11 @@ CURLcode FindWin32CACert(struct OperationConfig *config,
 /* Get a list of all loaded modules with full paths.
  * Returns slist on success or NULL on error.
  */
-struct curl_slist *GetLoadedModulePaths(void)
+struct carl_slist *GetLoadedModulePaths(void)
 {
   HANDLE hnd = INVALID_HANDLE_VALUE;
   MODULEENTRY32 mod = {0};
-  struct curl_slist *slist = NULL;
+  struct carl_slist *slist = NULL;
 
   mod.dwSize = sizeof(MODULEENTRY32);
 
@@ -673,7 +673,7 @@ struct curl_slist *GetLoadedModulePaths(void)
 
   do {
     char *path; /* points to stack allocated buffer */
-    struct curl_slist *temp;
+    struct carl_slist *temp;
 
 #ifdef UNICODE
     /* sizeof(mod.szExePath) is the max total bytes of wchars. the max total
@@ -686,7 +686,7 @@ struct curl_slist *GetLoadedModulePaths(void)
 #else
     path = mod.szExePath;
 #endif
-    temp = curl_slist_append(slist, path);
+    temp = carl_slist_append(slist, path);
     if(!temp)
       goto error;
     slist = temp;
@@ -695,7 +695,7 @@ struct curl_slist *GetLoadedModulePaths(void)
   goto cleanup;
 
 error:
-  curl_slist_free_all(slist);
+  carl_slist_free_all(slist);
   slist = NULL;
 cleanup:
   if(hnd != INVALID_HANDLE_VALUE)
@@ -764,9 +764,9 @@ static void init_terminal(void)
 LARGE_INTEGER tool_freq;
 bool tool_isVistaOrGreater;
 
-CURLcode win32_init(void)
+CARLcode win32_init(void)
 {
-  if(curlx_verify_windows_version(6, 0, PLATFORM_WINNT,
+  if(carlx_verify_windows_version(6, 0, PLATFORM_WINNT,
                                   VERSION_GREATER_THAN_EQUAL))
     tool_isVistaOrGreater = true;
   else
@@ -776,7 +776,7 @@ CURLcode win32_init(void)
 
   init_terminal();
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 #endif /* WIN32 */

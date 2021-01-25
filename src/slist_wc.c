@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 #include "tool_setup.h"
 
-#ifndef CURL_DISABLE_LIBCURL_OPTION
+#ifndef CARL_DISABLE_LIBCARL_OPTION
 
 #include "slist_wc.h"
 
@@ -36,7 +36,7 @@
 struct slist_wc *slist_wc_append(struct slist_wc *list,
                                  const char *data)
 {
-  struct curl_slist *new_item = curl_slist_append(NULL, data);
+  struct carl_slist *new_item = carl_slist_append(NULL, data);
 
   if(!new_item)
     return NULL;
@@ -45,7 +45,7 @@ struct slist_wc *slist_wc_append(struct slist_wc *list,
     list = malloc(sizeof(struct slist_wc));
 
     if(!list) {
-      curl_slist_free_all(new_item);
+      carl_slist_free_all(new_item);
       return NULL;
     }
 
@@ -65,8 +65,8 @@ void slist_wc_free_all(struct slist_wc *list)
   if(!list)
     return;
 
-  curl_slist_free_all(list->first);
+  carl_slist_free_all(list->first);
   free(list);
 }
 
-#endif /* CURL_DISABLE_LIBCURL_OPTION */
+#endif /* CARL_DISABLE_LIBCARL_OPTION */

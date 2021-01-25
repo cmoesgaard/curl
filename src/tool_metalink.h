@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_METALINK_H
-#define HEADER_CURL_TOOL_METALINK_H
+#ifndef HEADER_CARL_TOOL_METALINK_H
+#define HEADER_CARL_TOOL_METALINK_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -79,15 +79,15 @@ struct metalinkfile {
 #ifdef USE_METALINK
 
 /*
- * curl requires libmetalink 0.1.0 or newer
+ * carl requires libmetalink 0.1.0 or newer
  */
-#define CURL_REQ_LIBMETALINK_MAJOR  0
-#define CURL_REQ_LIBMETALINK_MINOR  1
-#define CURL_REQ_LIBMETALINK_PATCH  0
+#define CARL_REQ_LIBMETALINK_MAJOR  0
+#define CARL_REQ_LIBMETALINK_MINOR  1
+#define CARL_REQ_LIBMETALINK_PATCH  0
 
-#define CURL_REQ_LIBMETALINK_VERS  ((CURL_REQ_LIBMETALINK_MAJOR * 10000) + \
-                                    (CURL_REQ_LIBMETALINK_MINOR * 100) + \
-                                     CURL_REQ_LIBMETALINK_PATCH)
+#define CARL_REQ_LIBMETALINK_VERS  ((CARL_REQ_LIBMETALINK_MAJOR * 10000) + \
+                                    (CARL_REQ_LIBMETALINK_MINOR * 100) + \
+                                     CARL_REQ_LIBMETALINK_PATCH)
 
 extern const struct digest_params MD5_DIGEST_PARAMS[1];
 extern const struct digest_params SHA1_DIGEST_PARAMS[1];
@@ -117,7 +117,7 @@ int parse_metalink(struct OperationConfig *config, struct OutStruct *outs,
                    const char *metalink_url);
 
 /*
- * Callback function for CURLOPT_WRITEFUNCTION
+ * Callback function for CARLOPT_WRITEFUNCTION
  */
 size_t metalink_write_cb(void *buffer, size_t sz, size_t nmemb,
                          void *userdata);
@@ -162,4 +162,4 @@ void metalink_cleanup(void);
 
 #endif /* USE_METALINK */
 
-#endif /* HEADER_CURL_TOOL_METALINK_H */
+#endif /* HEADER_CARL_TOOL_METALINK_H */

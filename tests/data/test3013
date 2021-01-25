@@ -49,12 +49,12 @@ http://%HOSTIP:%HTTPPORT/this/is/the/3013 -O --output-dir %PWD/log http://%HOSTI
 <protocol>
 GET /this/is/the/3013 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /another/3013 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -1,4 +1,4 @@
-# The curl Test Suite
+# The carl Test Suite
 
 # Running
 
@@ -120,7 +120,7 @@
 ### Memory test
 
   The test script will check that all allocated memory is freed properly IF
-  curl has been built with the `CURLDEBUG` define set. The script will
+  carl has been built with the `CARLDEBUG` define set. The script will
   automatically detect if that is the case, and it will use the
   'memanalyze.pl' script to analyze the memory debugging output.
 
@@ -132,8 +132,8 @@
   test many times and makes each different memory allocation fail on each
   successive run.  This tests the out of memory error handling code to ensure
   that memory leaks do not occur even in those situations. It can help to
-  compile curl with `CPPFLAGS=-DMEMDEBUG_LOG_SYNC` when using this option, to
-  ensure that the memory log file is properly written even if curl crashes.
+  compile carl with `CPPFLAGS=-DMEMDEBUG_LOG_SYNC` when using this option, to
+  ensure that the memory log file is properly written even if carl crashes.
 
 ### Debug
 
@@ -159,7 +159,7 @@
 ### Code coverage
 
   gcc provides a tool that can determine the code coverage figures for the
-  test suite.  To use it, configure curl with `CFLAGS='-fprofile-arcs
+  test suite.  To use it, configure carl with `CFLAGS='-fprofile-arcs
   -ftest-coverage -g -O0`.  Make sure you run the normal and torture tests to
   get more full coverage, i.e. do:
 
@@ -176,9 +176,9 @@
 
 ### Remote testing
 
-  The runtests.pl script provides some hooks to allow curl to be tested on a
+  The runtests.pl script provides some hooks to allow carl to be tested on a
   machine where perl can not be run.  The test framework in this case runs on
-  a workstation where perl is available, while curl itself is run on a remote
+  a workstation where perl is available, while carl itself is run on a remote
   system using ssh or some other remote execution method.  See the comments at
   the beginning of runtests.pl for details.
 
@@ -193,8 +193,8 @@
 ## Write tests
 
   Here's a quick description on writing test cases. We basically have three
-  kinds of tests: the ones that test the curl tool, the ones that build small
-  applications and test libcurl directly and the unit tests that test
+  kinds of tests: the ones that test the carl tool, the ones that build small
+  applications and test libcarl directly and the unit tests that test
   individual (possibly internal) functions.
 
 ### test data
@@ -207,18 +207,18 @@
   identifier described above, and the XML-like file format of them is
   described in the separate [FILEFORMAT.md](FILEFORMAT.md) document.
 
-### curl tests
+### carl tests
 
-  A test case that runs the curl tool and verifies that it gets the correct
+  A test case that runs the carl tool and verifies that it gets the correct
   data, it sends the correct data, it uses the correct protocol primitives
   etc.
 
-### libcurl tests
+### libcarl tests
 
-  The libcurl tests are identical to the curl ones, except that they use a
-  specific and dedicated custom-built program to run instead of "curl". This
+  The libcarl tests are identical to the carl ones, except that they use a
+  specific and dedicated custom-built program to run instead of "carl". This
   tool is built from source code placed in `tests/libtest` and if you want to
-  make a new libcurl test that is where you add your code.
+  make a new libcarl test that is where you add your code.
 
 ### unit tests
 
@@ -226,4 +226,4 @@
   describing the specific set of checks and macros that may be used when
   writing tests that verify behaviors of specific individual functions.
 
-  The unit tests depend on curl being built with debug enabled.
+  The unit tests depend on carl being built with debug enabled.

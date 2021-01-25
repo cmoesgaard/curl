@@ -10,16 +10,16 @@ specify any number of extra headers. This is the equivalent option to --header
 but is for proxy communication only like in CONNECT requests when you want a
 separate header sent to the proxy to what is sent to the actual remote host.
 
-curl will make sure that each header you add/replace is sent with the proper
+carl will make sure that each header you add/replace is sent with the proper
 end-of-line marker, you should thus \fBnot\fP add that as a part of the header
 content: do not add newlines or carriage returns, they will only mess things
 up for you.
 
-Headers specified with this option will not be included in requests that curl
+Headers specified with this option will not be included in requests that carl
 knows will not be sent to a proxy.
 
 Starting in 7.55.0, this option can take an argument in @filename style, which
-then adds a header for each line in the input file. Using @- will make curl
+then adds a header for each line in the input file. Using @- will make carl
 read the header file from stdin.
 
 This option can be used multiple times to add/replace/remove multiple headers.

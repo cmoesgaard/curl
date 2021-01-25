@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,28 +19,28 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-set(LIB_NAME libcurl)
+set(LIB_NAME libcarl)
 
 if(BUILD_SHARED_LIBS)
-  set(CURL_STATICLIB NO)
+  set(CARL_STATICLIB NO)
 else()
-  set(CURL_STATICLIB YES)
+  set(CARL_STATICLIB YES)
 endif()
 
 # Use:
-# * CURL_STATICLIB
-configure_file(curl_config.h.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h)
+# * CARL_STATICLIB
+configure_file(carl_config.h.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/carl_config.h)
 
 transform_makefile_inc("Makefile.inc" "${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake")
 include(${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake)
 
 list(APPEND HHEADERS
-  ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h
+  ${CMAKE_CURRENT_BINARY_DIR}/carl_config.h
   )
 
 if(WIN32)
-  list(APPEND CSOURCES libcurl.rc)
+  list(APPEND CSOURCES libcarl.rc)
 endif()
 
 # SET(CSOURCES
@@ -50,13 +50,13 @@ endif()
 # # strtoofft.c - specify later
 # )
 
-# #OPTION(CURL_MALLOC_DEBUG "Debug mallocs in Curl" OFF)
-# MARK_AS_ADVANCED(CURL_MALLOC_DEBUG)
-# IF(CURL_MALLOC_DEBUG)
+# #OPTION(CARL_MALLOC_DEBUG "Debug mallocs in Curl" OFF)
+# MARK_AS_ADVANCED(CARL_MALLOC_DEBUG)
+# IF(CARL_MALLOC_DEBUG)
 # SET(CSOURCES ${CSOURCES}
 # memdebug.c
 # )
-# ENDIF(CURL_MALLOC_DEBUG)
+# ENDIF(CARL_MALLOC_DEBUG)
 
 # # only build compat strtoofft if we need to
 # IF(NOT HAVE_STRTOLL AND NOT HAVE__STRTOI64)
@@ -89,27 +89,27 @@ add_library(
   )
 
 if(NOT BUILD_SHARED_LIBS)
-    set_target_properties(${LIB_NAME} PROPERTIES INTERFACE_COMPILE_DEFINITIONS CURL_STATICLIB)
+    set_target_properties(${LIB_NAME} PROPERTIES INTERFACE_COMPILE_DEFINITIONS CARL_STATICLIB)
 endif()
 
-target_link_libraries(${LIB_NAME} ${CURL_LIBS})
+target_link_libraries(${LIB_NAME} ${CARL_LIBS})
 
 if(WIN32)
   add_definitions(-D_USRDLL)
 endif()
 
-set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCURL)
+set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCARL)
 
-if(HIDES_CURL_PRIVATE_SYMBOLS)
-  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_DEFINITIONS "CURL_HIDDEN_SYMBOLS")
-  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_FLAGS ${CURL_CFLAG_SYMBOLS_HIDE})
+if(HIDES_CARL_PRIVATE_SYMBOLS)
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_DEFINITIONS "CARL_HIDDEN_SYMBOLS")
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_FLAGS ${CARL_CFLAG_SYMBOLS_HIDE})
 endif()
 
-# Remove the "lib" prefix since the library is already named "libcurl".
+# Remove the "lib" prefix since the library is already named "libcarl".
 set_target_properties(${LIB_NAME} PROPERTIES PREFIX "")
 set_target_properties(${LIB_NAME} PROPERTIES IMPORT_PREFIX "")
 
-if(CURL_HAS_LTO)
+if(CARL_HAS_LTO)
   set_target_properties(${LIB_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
     INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE)
@@ -117,14 +117,14 @@ endif()
 
 if(WIN32)
   if(BUILD_SHARED_LIBS)
-    # Add "_imp" as a suffix before the extension to avoid conflicting with the statically linked "libcurl.lib"
+    # Add "_imp" as a suffix before the extension to avoid conflicting with the statically linked "libcarl.lib"
     set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_imp.lib")
   endif()
 endif()
 
 target_include_directories(${LIB_NAME} INTERFACE
   $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${CURL_SOURCE_DIR}/include>)
+  $<BUILD_INTERFACE:${CARL_SOURCE_DIR}/include>)
 
 install(TARGETS ${LIB_NAME}
   EXPORT ${TARGETS_EXPORT_NAME}
@@ -134,6 +134,6 @@ install(TARGETS ${LIB_NAME}
 )
 
 export(TARGETS ${LIB_NAME}
-       APPEND FILE ${PROJECT_BINARY_DIR}/libcurl-target.cmake
+       APPEND FILE ${PROJECT_BINARY_DIR}/libcarl-target.cmake
        NAMESPACE ${PROJECT_NAME}::
 )

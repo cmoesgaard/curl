@@ -43,7 +43,7 @@ four is the number of lines
 <protocol>
 PUT /156 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 85
 Expect: 100-continue

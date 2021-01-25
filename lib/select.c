@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include <limits.h>
 
@@ -47,7 +47,7 @@
 #include <strings.h>  /* bzero() in FD_SET */
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "urldata.h"
 #include "connect.h"
@@ -141,7 +141,7 @@ int Curl_wait_ms(timediff_t timeout_ms)
  *    0 = timeout
  *    N = number of signalled file descriptors
  */
-int Curl_select(curl_socket_t maxfd,   /* highest socket number */
+int Curl_select(carl_socket_t maxfd,   /* highest socket number */
                 fd_set *fds_read,      /* sockets ready for reading */
                 fd_set *fds_write,     /* sockets ready for writing */
                 fd_set *fds_err,       /* sockets with errors */
@@ -235,22 +235,22 @@ int Curl_select(curl_socket_t maxfd,   /* highest socket number */
  *    0 = timeout
  *    [bitmask] = action as described below
  *
- * CURL_CSELECT_IN - first socket is readable
- * CURL_CSELECT_IN2 - second socket is readable
- * CURL_CSELECT_OUT - write socket is writable
- * CURL_CSELECT_ERR - an error condition occurred
+ * CARL_CSELECT_IN - first socket is readable
+ * CARL_CSELECT_IN2 - second socket is readable
+ * CARL_CSELECT_OUT - write socket is writable
+ * CARL_CSELECT_ERR - an error condition occurred
  */
-int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
-                      curl_socket_t readfd1,
-                      curl_socket_t writefd, /* socket to write to */
+int Curl_socket_check(carl_socket_t readfd0, /* two sockets to read from */
+                      carl_socket_t readfd1,
+                      carl_socket_t writefd, /* socket to write to */
                       timediff_t timeout_ms) /* milliseconds to wait */
 {
   struct pollfd pfd[3];
   int num;
   int r;
 
-  if((readfd0 == CURL_SOCKET_BAD) && (readfd1 == CURL_SOCKET_BAD) &&
-     (writefd == CURL_SOCKET_BAD)) {
+  if((readfd0 == CARL_SOCKET_BAD) && (readfd1 == CARL_SOCKET_BAD) &&
+     (writefd == CARL_SOCKET_BAD)) {
     /* no sockets, just wait */
     return Curl_wait_ms(timeout_ms);
   }
@@ -261,19 +261,19 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
      value indicating a blocking call should be performed. */
 
   num = 0;
-  if(readfd0 != CURL_SOCKET_BAD) {
+  if(readfd0 != CARL_SOCKET_BAD) {
     pfd[num].fd = readfd0;
     pfd[num].events = POLLRDNORM|POLLIN|POLLRDBAND|POLLPRI;
     pfd[num].revents = 0;
     num++;
   }
-  if(readfd1 != CURL_SOCKET_BAD) {
+  if(readfd1 != CARL_SOCKET_BAD) {
     pfd[num].fd = readfd1;
     pfd[num].events = POLLRDNORM|POLLIN|POLLRDBAND|POLLPRI;
     pfd[num].revents = 0;
     num++;
   }
-  if(writefd != CURL_SOCKET_BAD) {
+  if(writefd != CARL_SOCKET_BAD) {
     pfd[num].fd = writefd;
     pfd[num].events = POLLWRNORM|POLLOUT|POLLPRI;
     pfd[num].revents = 0;
@@ -286,25 +286,25 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
 
   r = 0;
   num = 0;
-  if(readfd0 != CURL_SOCKET_BAD) {
+  if(readfd0 != CARL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
-      r |= CURL_CSELECT_IN;
+      r |= CARL_CSELECT_IN;
     if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
-      r |= CURL_CSELECT_ERR;
+      r |= CARL_CSELECT_ERR;
     num++;
   }
-  if(readfd1 != CURL_SOCKET_BAD) {
+  if(readfd1 != CARL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
-      r |= CURL_CSELECT_IN2;
+      r |= CARL_CSELECT_IN2;
     if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
-      r |= CURL_CSELECT_ERR;
+      r |= CARL_CSELECT_ERR;
     num++;
   }
-  if(writefd != CURL_SOCKET_BAD) {
+  if(writefd != CARL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLWRNORM|POLLOUT))
-      r |= CURL_CSELECT_OUT;
+      r |= CARL_CSELECT_OUT;
     if(pfd[num].revents & (POLLERR|POLLHUP|POLLPRI|POLLNVAL))
-      r |= CURL_CSELECT_ERR;
+      r |= CARL_CSELECT_ERR;
   }
 
   return r;
@@ -331,7 +331,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
   fd_set fds_read;
   fd_set fds_write;
   fd_set fds_err;
-  curl_socket_t maxfd;
+  carl_socket_t maxfd;
 #endif
   bool fds_none = TRUE;
   unsigned int i;
@@ -339,7 +339,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
 
   if(ufds) {
     for(i = 0; i < nfds; i++) {
-      if(ufds[i].fd != CURL_SOCKET_BAD) {
+      if(ufds[i].fd != CARL_SOCKET_BAD) {
         fds_none = FALSE;
         break;
       }
@@ -373,7 +373,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
     return r;
 
   for(i = 0; i < nfds; i++) {
-    if(ufds[i].fd == CURL_SOCKET_BAD)
+    if(ufds[i].fd == CARL_SOCKET_BAD)
       continue;
     if(ufds[i].revents & POLLHUP)
       ufds[i].revents |= POLLIN;
@@ -386,11 +386,11 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
   FD_ZERO(&fds_read);
   FD_ZERO(&fds_write);
   FD_ZERO(&fds_err);
-  maxfd = (curl_socket_t)-1;
+  maxfd = (carl_socket_t)-1;
 
   for(i = 0; i < nfds; i++) {
     ufds[i].revents = 0;
-    if(ufds[i].fd == CURL_SOCKET_BAD)
+    if(ufds[i].fd == CARL_SOCKET_BAD)
       continue;
     VERIFY_SOCK(ufds[i].fd);
     if(ufds[i].events & (POLLIN|POLLOUT|POLLPRI|
@@ -409,7 +409,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
   /*
      Note also that WinSock ignores the first argument, so we don't worry
      about the fact that maxfd is computed incorrectly with WinSock (since
-     curl_socket_t is unsigned in such cases and thus -1 is the largest
+     carl_socket_t is unsigned in such cases and thus -1 is the largest
      value).
   */
   r = Curl_select(maxfd, &fds_read, &fds_write, &fds_err, timeout_ms);
@@ -419,7 +419,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
   r = 0;
   for(i = 0; i < nfds; i++) {
     ufds[i].revents = 0;
-    if(ufds[i].fd == CURL_SOCKET_BAD)
+    if(ufds[i].fd == CARL_SOCKET_BAD)
       continue;
     if(FD_ISSET(ufds[i].fd, &fds_read)) {
       if(ufds[i].events & POLLRDNORM)
@@ -451,13 +451,13 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
 #ifdef TPF
 /*
  * This is a replacement for select() on the TPF platform.
- * It is used whenever libcurl calls select().
+ * It is used whenever libcarl calls select().
  * The call below to tpf_process_signals() is required because
  * TPF's select calls are not signal interruptible.
  *
  * Return values are the same as select's.
  */
-int tpf_select_libcurl(int maxfds, fd_set *reads, fd_set *writes,
+int tpf_select_libcarl(int maxfds, fd_set *reads, fd_set *writes,
                        fd_set *excepts, struct timeval *tv)
 {
    int rc;

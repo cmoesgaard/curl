@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -36,17 +36,17 @@
 
 #ifdef USE_XATTR
 
-/* mapping table of curl metadata to extended attribute names */
+/* mapping table of carl metadata to extended attribute names */
 static const struct xattr_mapping {
   const char *attr; /* name of the xattr */
-  CURLINFO info;
+  CARLINFO info;
 } mappings[] = {
   /* mappings proposed by
    * https://freedesktop.org/wiki/CommonExtendedAttributes/
    */
-  { "user.xdg.origin.url", CURLINFO_EFFECTIVE_URL },
-  { "user.mime_type",      CURLINFO_CONTENT_TYPE },
-  { NULL,                  CURLINFO_NONE } /* last element, abort loop here */
+  { "user.xdg.origin.url", CARLINFO_EFFECTIVE_URL },
+  { "user.mime_type",      CARLINFO_CONTENT_TYPE },
+  { NULL,                  CARLINFO_NONE } /* last element, abort loop here */
 };
 
 /* returns TRUE if a new URL is returned, that then needs to be freed */
@@ -58,52 +58,52 @@ static
 #endif
 bool stripcredentials(char **url)
 {
-  CURLU *u;
-  CURLUcode uc;
+  CARLU *u;
+  CARLUcode uc;
   char *nurl;
-  u = curl_url();
+  u = carl_url();
   if(u) {
-    uc = curl_url_set(u, CURLUPART_URL, *url, 0);
+    uc = carl_url_set(u, CARLUPART_URL, *url, 0);
     if(uc)
       goto error;
 
-    uc = curl_url_set(u, CURLUPART_USER, NULL, 0);
+    uc = carl_url_set(u, CARLUPART_USER, NULL, 0);
     if(uc)
       goto error;
 
-    uc = curl_url_set(u, CURLUPART_PASSWORD, NULL, 0);
+    uc = carl_url_set(u, CARLUPART_PASSWORD, NULL, 0);
     if(uc)
       goto error;
 
-    uc = curl_url_get(u, CURLUPART_URL, &nurl, 0);
+    uc = carl_url_get(u, CARLUPART_URL, &nurl, 0);
     if(uc)
       goto error;
 
-    curl_url_cleanup(u);
+    carl_url_cleanup(u);
 
     *url = nurl;
     return TRUE;
   }
   error:
-  curl_url_cleanup(u);
+  carl_url_cleanup(u);
   return FALSE;
 }
 
-/* store metadata from the curl request alongside the downloaded
+/* store metadata from the carl request alongside the downloaded
  * file using extended attributes
  */
-int fwrite_xattr(CURL *curl, int fd)
+int fwrite_xattr(CARL *carl, int fd)
 {
   int i = 0;
   int err = 0;
 
-  /* loop through all xattr-curlinfo pairs and abort on a set error */
+  /* loop through all xattr-carlinfo pairs and abort on a set error */
   while(err == 0 && mappings[i].attr != NULL) {
     char *value = NULL;
-    CURLcode result = curl_easy_getinfo(curl, mappings[i].info, &value);
+    CARLcode result = carl_easy_getinfo(carl, mappings[i].info, &value);
     if(!result && value) {
       bool freeptr = FALSE;
-      if(CURLINFO_EFFECTIVE_URL == mappings[i].info)
+      if(CARLINFO_EFFECTIVE_URL == mappings[i].info)
         freeptr = stripcredentials(&value);
       if(value) {
 #ifdef HAVE_FSETXATTR_6
@@ -120,7 +120,7 @@ int fwrite_xattr(CURL *curl, int fd)
         }
 #endif
         if(freeptr)
-          curl_free(value);
+          carl_free(value);
       }
     }
     i++;
@@ -129,9 +129,9 @@ int fwrite_xattr(CURL *curl, int fd)
   return err;
 }
 #else
-int fwrite_xattr(CURL *curl, int fd)
+int fwrite_xattr(CARL *carl, int fd)
 {
-  (void)curl;
+  (void)carl;
   (void)fd;
 
   return 0;

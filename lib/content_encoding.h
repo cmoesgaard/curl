@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONTENT_ENCODING_H
-#define HEADER_CURL_CONTENT_ENCODING_H
+#ifndef HEADER_CARL_CONTENT_ENCODING_H
+#define HEADER_CARL_CONTENT_ENCODING_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 struct contenc_writer {
   const struct content_encoding *handler;  /* Encoding handler. */
@@ -33,9 +33,9 @@ struct contenc_writer {
 struct content_encoding {
   const char *name;        /* Encoding name. */
   const char *alias;       /* Encoding name alias. */
-  CURLcode (*init_writer)(struct Curl_easy *data,
+  CARLcode (*init_writer)(struct Curl_easy *data,
                           struct contenc_writer *writer);
-  CURLcode (*unencode_write)(struct Curl_easy *data,
+  CARLcode (*unencode_write)(struct Curl_easy *data,
                              struct contenc_writer *writer,
                              const char *buf, size_t nbytes);
   void (*close_writer)(struct Curl_easy *data,
@@ -44,12 +44,12 @@ struct content_encoding {
 };
 
 
-CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
+CARLcode Curl_build_unencoding_stack(struct Curl_easy *data,
                                      const char *enclist, int maybechunked);
-CURLcode Curl_unencode_write(struct Curl_easy *data,
+CARLcode Curl_unencode_write(struct Curl_easy *data,
                              struct contenc_writer *writer,
                              const char *buf, size_t nbytes);
 void Curl_unencode_cleanup(struct Curl_easy *data);
 char *Curl_all_content_encodings(void);
 
-#endif /* HEADER_CURL_CONTENT_ENCODING_H */
+#endif /* HEADER_CARL_CONTENT_ENCODING_H */

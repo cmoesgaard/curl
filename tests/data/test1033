@@ -50,7 +50,7 @@ http://%HOSTIP:%HTTPPORT/1033
 <protocol>
 GET /1033 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

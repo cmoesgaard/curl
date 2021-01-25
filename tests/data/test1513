@@ -38,7 +38,7 @@ http://%HOSTIP:%HTTPPORT/1513
 <verify>
 <protocol>
 </protocol>
-# 42 == CURLE_ABORTED_BY_CALLBACK
+# 42 == CARLE_ABORTED_BY_CALLBACK
 <errorcode>
 42
 </errorcode>

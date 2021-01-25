@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_ESCAPE_H
-#define HEADER_CURL_ESCAPE_H
+#ifndef HEADER_CARL_ESCAPE_H
+#define HEADER_CARL_ESCAPE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,9 +32,9 @@ enum urlreject {
   REJECT_ZERO
 };
 
-CURLcode Curl_urldecode(struct Curl_easy *data,
+CARLcode Curl_urldecode(struct Curl_easy *data,
                         const char *string, size_t length,
                         char **ostring, size_t *olen,
                         enum urlreject ctrl);
 
-#endif /* HEADER_CURL_ESCAPE_H */
+#endif /* HEADER_CARL_ESCAPE_H */

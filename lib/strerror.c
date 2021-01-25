@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef HAVE_STRERROR_R
 #  if (!defined(HAVE_POSIX_STRERROR_R) && \
@@ -33,20 +33,20 @@
 #  endif
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #ifdef USE_LIBIDN2
 #include <idn2.h>
 #endif
 
 #ifdef USE_WINDOWS_SSPI
-#include "curl_sspi.h"
+#include "carl_sspi.h"
 #endif
 
 #include "strerror.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #if defined(WIN32) || defined(_WIN32_WCE)
@@ -54,287 +54,287 @@
 #endif
 
 const char *
-curl_easy_strerror(CURLcode error)
+carl_easy_strerror(CARLcode error)
 {
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   switch(error) {
-  case CURLE_OK:
+  case CARLE_OK:
     return "No error";
 
-  case CURLE_UNSUPPORTED_PROTOCOL:
+  case CARLE_UNSUPPORTED_PROTOCOL:
     return "Unsupported protocol";
 
-  case CURLE_FAILED_INIT:
+  case CARLE_FAILED_INIT:
     return "Failed initialization";
 
-  case CURLE_URL_MALFORMAT:
+  case CARLE_URL_MALFORMAT:
     return "URL using bad/illegal format or missing URL";
 
-  case CURLE_NOT_BUILT_IN:
+  case CARLE_NOT_BUILT_IN:
     return "A requested feature, protocol or option was not found built-in in"
-      " this libcurl due to a build-time decision.";
+      " this libcarl due to a build-time decision.";
 
-  case CURLE_COULDNT_RESOLVE_PROXY:
+  case CARLE_COULDNT_RESOLVE_PROXY:
     return "Couldn't resolve proxy name";
 
-  case CURLE_COULDNT_RESOLVE_HOST:
+  case CARLE_COULDNT_RESOLVE_HOST:
     return "Couldn't resolve host name";
 
-  case CURLE_COULDNT_CONNECT:
+  case CARLE_COULDNT_CONNECT:
     return "Couldn't connect to server";
 
-  case CURLE_WEIRD_SERVER_REPLY:
+  case CARLE_WEIRD_SERVER_REPLY:
     return "Weird server reply";
 
-  case CURLE_REMOTE_ACCESS_DENIED:
+  case CARLE_REMOTE_ACCESS_DENIED:
     return "Access denied to remote resource";
 
-  case CURLE_FTP_ACCEPT_FAILED:
+  case CARLE_FTP_ACCEPT_FAILED:
     return "FTP: The server failed to connect to data port";
 
-  case CURLE_FTP_ACCEPT_TIMEOUT:
+  case CARLE_FTP_ACCEPT_TIMEOUT:
     return "FTP: Accepting server connect has timed out";
 
-  case CURLE_FTP_PRET_FAILED:
+  case CARLE_FTP_PRET_FAILED:
     return "FTP: The server did not accept the PRET command.";
 
-  case CURLE_FTP_WEIRD_PASS_REPLY:
+  case CARLE_FTP_WEIRD_PASS_REPLY:
     return "FTP: unknown PASS reply";
 
-  case CURLE_FTP_WEIRD_PASV_REPLY:
+  case CARLE_FTP_WEIRD_PASV_REPLY:
     return "FTP: unknown PASV reply";
 
-  case CURLE_FTP_WEIRD_227_FORMAT:
+  case CARLE_FTP_WEIRD_227_FORMAT:
     return "FTP: unknown 227 response format";
 
-  case CURLE_FTP_CANT_GET_HOST:
+  case CARLE_FTP_CANT_GET_HOST:
     return "FTP: can't figure out the host in the PASV response";
 
-  case CURLE_HTTP2:
+  case CARLE_HTTP2:
     return "Error in the HTTP2 framing layer";
 
-  case CURLE_FTP_COULDNT_SET_TYPE:
+  case CARLE_FTP_COULDNT_SET_TYPE:
     return "FTP: couldn't set file type";
 
-  case CURLE_PARTIAL_FILE:
+  case CARLE_PARTIAL_FILE:
     return "Transferred a partial file";
 
-  case CURLE_FTP_COULDNT_RETR_FILE:
+  case CARLE_FTP_COULDNT_RETR_FILE:
     return "FTP: couldn't retrieve (RETR failed) the specified file";
 
-  case CURLE_QUOTE_ERROR:
+  case CARLE_QUOTE_ERROR:
     return "Quote command returned error";
 
-  case CURLE_HTTP_RETURNED_ERROR:
+  case CARLE_HTTP_RETURNED_ERROR:
     return "HTTP response code said error";
 
-  case CURLE_WRITE_ERROR:
+  case CARLE_WRITE_ERROR:
     return "Failed writing received data to disk/application";
 
-  case CURLE_UPLOAD_FAILED:
+  case CARLE_UPLOAD_FAILED:
     return "Upload failed (at start/before it took off)";
 
-  case CURLE_READ_ERROR:
+  case CARLE_READ_ERROR:
     return "Failed to open/read local data from file/application";
 
-  case CURLE_OUT_OF_MEMORY:
+  case CARLE_OUT_OF_MEMORY:
     return "Out of memory";
 
-  case CURLE_OPERATION_TIMEDOUT:
+  case CARLE_OPERATION_TIMEDOUT:
     return "Timeout was reached";
 
-  case CURLE_FTP_PORT_FAILED:
+  case CARLE_FTP_PORT_FAILED:
     return "FTP: command PORT failed";
 
-  case CURLE_FTP_COULDNT_USE_REST:
+  case CARLE_FTP_COULDNT_USE_REST:
     return "FTP: command REST failed";
 
-  case CURLE_RANGE_ERROR:
+  case CARLE_RANGE_ERROR:
     return "Requested range was not delivered by the server";
 
-  case CURLE_HTTP_POST_ERROR:
+  case CARLE_HTTP_POST_ERROR:
     return "Internal problem setting up the POST";
 
-  case CURLE_SSL_CONNECT_ERROR:
+  case CARLE_SSL_CONNECT_ERROR:
     return "SSL connect error";
 
-  case CURLE_BAD_DOWNLOAD_RESUME:
+  case CARLE_BAD_DOWNLOAD_RESUME:
     return "Couldn't resume download";
 
-  case CURLE_FILE_COULDNT_READ_FILE:
+  case CARLE_FILE_COULDNT_READ_FILE:
     return "Couldn't read a file:// file";
 
-  case CURLE_LDAP_CANNOT_BIND:
+  case CARLE_LDAP_CANNOT_BIND:
     return "LDAP: cannot bind";
 
-  case CURLE_LDAP_SEARCH_FAILED:
+  case CARLE_LDAP_SEARCH_FAILED:
     return "LDAP: search failed";
 
-  case CURLE_FUNCTION_NOT_FOUND:
+  case CARLE_FUNCTION_NOT_FOUND:
     return "A required function in the library was not found";
 
-  case CURLE_ABORTED_BY_CALLBACK:
+  case CARLE_ABORTED_BY_CALLBACK:
     return "Operation was aborted by an application callback";
 
-  case CURLE_BAD_FUNCTION_ARGUMENT:
-    return "A libcurl function was given a bad argument";
+  case CARLE_BAD_FUNCTION_ARGUMENT:
+    return "A libcarl function was given a bad argument";
 
-  case CURLE_INTERFACE_FAILED:
+  case CARLE_INTERFACE_FAILED:
     return "Failed binding local connection end";
 
-  case CURLE_TOO_MANY_REDIRECTS :
+  case CARLE_TOO_MANY_REDIRECTS :
     return "Number of redirects hit maximum amount";
 
-  case CURLE_UNKNOWN_OPTION:
-    return "An unknown option was passed in to libcurl";
+  case CARLE_UNKNOWN_OPTION:
+    return "An unknown option was passed in to libcarl";
 
-  case CURLE_TELNET_OPTION_SYNTAX :
+  case CARLE_TELNET_OPTION_SYNTAX :
     return "Malformed telnet option";
 
-  case CURLE_GOT_NOTHING:
+  case CARLE_GOT_NOTHING:
     return "Server returned nothing (no headers, no data)";
 
-  case CURLE_SSL_ENGINE_NOTFOUND:
+  case CARLE_SSL_ENGINE_NOTFOUND:
     return "SSL crypto engine not found";
 
-  case CURLE_SSL_ENGINE_SETFAILED:
+  case CARLE_SSL_ENGINE_SETFAILED:
     return "Can not set SSL crypto engine as default";
 
-  case CURLE_SSL_ENGINE_INITFAILED:
+  case CARLE_SSL_ENGINE_INITFAILED:
     return "Failed to initialise SSL crypto engine";
 
-  case CURLE_SEND_ERROR:
+  case CARLE_SEND_ERROR:
     return "Failed sending data to the peer";
 
-  case CURLE_RECV_ERROR:
+  case CARLE_RECV_ERROR:
     return "Failure when receiving data from the peer";
 
-  case CURLE_SSL_CERTPROBLEM:
+  case CARLE_SSL_CERTPROBLEM:
     return "Problem with the local SSL certificate";
 
-  case CURLE_SSL_CIPHER:
+  case CARLE_SSL_CIPHER:
     return "Couldn't use specified SSL cipher";
 
-  case CURLE_PEER_FAILED_VERIFICATION:
+  case CARLE_PEER_FAILED_VERIFICATION:
     return "SSL peer certificate or SSH remote key was not OK";
 
-  case CURLE_SSL_CACERT_BADFILE:
+  case CARLE_SSL_CACERT_BADFILE:
     return "Problem with the SSL CA cert (path? access rights?)";
 
-  case CURLE_BAD_CONTENT_ENCODING:
+  case CARLE_BAD_CONTENT_ENCODING:
     return "Unrecognized or bad HTTP Content or Transfer-Encoding";
 
-  case CURLE_LDAP_INVALID_URL:
+  case CARLE_LDAP_INVALID_URL:
     return "Invalid LDAP URL";
 
-  case CURLE_FILESIZE_EXCEEDED:
+  case CARLE_FILESIZE_EXCEEDED:
     return "Maximum file size exceeded";
 
-  case CURLE_USE_SSL_FAILED:
+  case CARLE_USE_SSL_FAILED:
     return "Requested SSL level failed";
 
-  case CURLE_SSL_SHUTDOWN_FAILED:
+  case CARLE_SSL_SHUTDOWN_FAILED:
     return "Failed to shut down the SSL connection";
 
-  case CURLE_SSL_CRL_BADFILE:
+  case CARLE_SSL_CRL_BADFILE:
     return "Failed to load CRL file (path? access rights?, format?)";
 
-  case CURLE_SSL_ISSUER_ERROR:
+  case CARLE_SSL_ISSUER_ERROR:
     return "Issuer check against peer certificate failed";
 
-  case CURLE_SEND_FAIL_REWIND:
+  case CARLE_SEND_FAIL_REWIND:
     return "Send failed since rewinding of the data stream failed";
 
-  case CURLE_LOGIN_DENIED:
+  case CARLE_LOGIN_DENIED:
     return "Login denied";
 
-  case CURLE_TFTP_NOTFOUND:
+  case CARLE_TFTP_NOTFOUND:
     return "TFTP: File Not Found";
 
-  case CURLE_TFTP_PERM:
+  case CARLE_TFTP_PERM:
     return "TFTP: Access Violation";
 
-  case CURLE_REMOTE_DISK_FULL:
+  case CARLE_REMOTE_DISK_FULL:
     return "Disk full or allocation exceeded";
 
-  case CURLE_TFTP_ILLEGAL:
+  case CARLE_TFTP_ILLEGAL:
     return "TFTP: Illegal operation";
 
-  case CURLE_TFTP_UNKNOWNID:
+  case CARLE_TFTP_UNKNOWNID:
     return "TFTP: Unknown transfer ID";
 
-  case CURLE_REMOTE_FILE_EXISTS:
+  case CARLE_REMOTE_FILE_EXISTS:
     return "Remote file already exists";
 
-  case CURLE_TFTP_NOSUCHUSER:
+  case CARLE_TFTP_NOSUCHUSER:
     return "TFTP: No such user";
 
-  case CURLE_CONV_FAILED:
+  case CARLE_CONV_FAILED:
     return "Conversion failed";
 
-  case CURLE_CONV_REQD:
-    return "Caller must register CURLOPT_CONV_ callback options";
+  case CARLE_CONV_REQD:
+    return "Caller must register CARLOPT_CONV_ callback options";
 
-  case CURLE_REMOTE_FILE_NOT_FOUND:
+  case CARLE_REMOTE_FILE_NOT_FOUND:
     return "Remote file not found";
 
-  case CURLE_SSH:
+  case CARLE_SSH:
     return "Error in the SSH layer";
 
-  case CURLE_AGAIN:
+  case CARLE_AGAIN:
     return "Socket not ready for send/recv";
 
-  case CURLE_RTSP_CSEQ_ERROR:
+  case CARLE_RTSP_CSEQ_ERROR:
     return "RTSP CSeq mismatch or invalid CSeq";
 
-  case CURLE_RTSP_SESSION_ERROR:
+  case CARLE_RTSP_SESSION_ERROR:
     return "RTSP session error";
 
-  case CURLE_FTP_BAD_FILE_LIST:
+  case CARLE_FTP_BAD_FILE_LIST:
     return "Unable to parse FTP file list";
 
-  case CURLE_CHUNK_FAILED:
+  case CARLE_CHUNK_FAILED:
     return "Chunk callback failed";
 
-  case CURLE_NO_CONNECTION_AVAILABLE:
+  case CARLE_NO_CONNECTION_AVAILABLE:
     return "The max connection limit is reached";
 
-  case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
+  case CARLE_SSL_PINNEDPUBKEYNOTMATCH:
     return "SSL public key does not match pinned public key";
 
-  case CURLE_SSL_INVALIDCERTSTATUS:
+  case CARLE_SSL_INVALIDCERTSTATUS:
     return "SSL server certificate status verification FAILED";
 
-  case CURLE_HTTP2_STREAM:
+  case CARLE_HTTP2_STREAM:
     return "Stream error in the HTTP/2 framing layer";
 
-  case CURLE_RECURSIVE_API_CALL:
+  case CARLE_RECURSIVE_API_CALL:
     return "API function called from within callback";
 
-  case CURLE_AUTH_ERROR:
+  case CARLE_AUTH_ERROR:
     return "An authentication function returned an error";
 
-  case CURLE_HTTP3:
+  case CARLE_HTTP3:
     return "HTTP/3 error";
 
-  case CURLE_QUIC_CONNECT_ERROR:
+  case CARLE_QUIC_CONNECT_ERROR:
     return "QUIC connection error";
 
- case CURLE_PROXY:
+ case CARLE_PROXY:
     return "proxy handshake error";
 
-    /* error codes not used by current libcurl */
-  case CURLE_OBSOLETE20:
-  case CURLE_OBSOLETE24:
-  case CURLE_OBSOLETE29:
-  case CURLE_OBSOLETE32:
-  case CURLE_OBSOLETE40:
-  case CURLE_OBSOLETE44:
-  case CURLE_OBSOLETE46:
-  case CURLE_OBSOLETE50:
-  case CURLE_OBSOLETE51:
-  case CURLE_OBSOLETE57:
-  case CURL_LAST:
+    /* error codes not used by current libcarl */
+  case CARLE_OBSOLETE20:
+  case CARLE_OBSOLETE24:
+  case CARLE_OBSOLETE29:
+  case CARLE_OBSOLETE32:
+  case CARLE_OBSOLETE40:
+  case CARLE_OBSOLETE44:
+  case CARLE_OBSOLETE46:
+  case CARLE_OBSOLETE50:
+  case CARLE_OBSOLETE51:
+  case CARLE_OBSOLETE57:
+  case CARL_LAST:
     break;
   }
   /*
@@ -361,53 +361,53 @@ curl_easy_strerror(CURLcode error)
 }
 
 const char *
-curl_multi_strerror(CURLMcode error)
+carl_multi_strerror(CARLMcode error)
 {
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   switch(error) {
-  case CURLM_CALL_MULTI_PERFORM:
-    return "Please call curl_multi_perform() soon";
+  case CARLM_CALL_MULTI_PERFORM:
+    return "Please call carl_multi_perform() soon";
 
-  case CURLM_OK:
+  case CARLM_OK:
     return "No error";
 
-  case CURLM_BAD_HANDLE:
+  case CARLM_BAD_HANDLE:
     return "Invalid multi handle";
 
-  case CURLM_BAD_EASY_HANDLE:
+  case CARLM_BAD_EASY_HANDLE:
     return "Invalid easy handle";
 
-  case CURLM_OUT_OF_MEMORY:
+  case CARLM_OUT_OF_MEMORY:
     return "Out of memory";
 
-  case CURLM_INTERNAL_ERROR:
+  case CARLM_INTERNAL_ERROR:
     return "Internal error";
 
-  case CURLM_BAD_SOCKET:
+  case CARLM_BAD_SOCKET:
     return "Invalid socket argument";
 
-  case CURLM_UNKNOWN_OPTION:
+  case CARLM_UNKNOWN_OPTION:
     return "Unknown option";
 
-  case CURLM_ADDED_ALREADY:
+  case CARLM_ADDED_ALREADY:
     return "The easy handle is already added to a multi handle";
 
-  case CURLM_RECURSIVE_API_CALL:
+  case CARLM_RECURSIVE_API_CALL:
     return "API function called from within callback";
 
-  case CURLM_WAKEUP_FAILURE:
+  case CARLM_WAKEUP_FAILURE:
     return "Wakeup is unavailable or failed";
 
-  case CURLM_BAD_FUNCTION_ARGUMENT:
-    return "A libcurl function was given a bad argument";
+  case CARLM_BAD_FUNCTION_ARGUMENT:
+    return "A libcarl function was given a bad argument";
 
-  case CURLM_LAST:
+  case CARLM_LAST:
     break;
   }
 
   return "Unknown error";
 #else
-  if(error == CURLM_OK)
+  if(error == CARLM_OK)
     return "No error";
   else
     return "Error";
@@ -415,35 +415,35 @@ curl_multi_strerror(CURLMcode error)
 }
 
 const char *
-curl_share_strerror(CURLSHcode error)
+carl_share_strerror(CARLSHcode error)
 {
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   switch(error) {
-  case CURLSHE_OK:
+  case CARLSHE_OK:
     return "No error";
 
-  case CURLSHE_BAD_OPTION:
+  case CARLSHE_BAD_OPTION:
     return "Unknown share option";
 
-  case CURLSHE_IN_USE:
+  case CARLSHE_IN_USE:
     return "Share currently in use";
 
-  case CURLSHE_INVALID:
+  case CARLSHE_INVALID:
     return "Invalid share handle";
 
-  case CURLSHE_NOMEM:
+  case CARLSHE_NOMEM:
     return "Out of memory";
 
-  case CURLSHE_NOT_BUILT_IN:
+  case CARLSHE_NOT_BUILT_IN:
     return "Feature not enabled in this library";
 
-  case CURLSHE_LAST:
+  case CARLSHE_LAST:
     break;
   }
 
-  return "CURLSHcode unknown";
+  return "CARLSHcode unknown";
 #else
-  if(error == CURLSHE_OK)
+  if(error == CARLSHE_OK)
     return "No error";
   else
     return "Error";
@@ -458,7 +458,7 @@ curl_share_strerror(CURLSHcode error)
 static const char *
 get_winsock_error (int err, char *buf, size_t len)
 {
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   const char *p;
 #endif
 
@@ -467,7 +467,7 @@ get_winsock_error (int err, char *buf, size_t len)
 
   *buf = '\0';
 
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
+#ifdef CARL_DISABLE_VERBOSE_STRINGS
   (void)err;
   return NULL;
 #else
@@ -831,7 +831,7 @@ const char *Curl_winapi_strerror(DWORD err, char *buf, size_t buflen)
 
   *buf = '\0';
 
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   if(!get_winapi_error(err, buf, buflen)) {
     msnprintf(buf, buflen, "Unknown error %u (0x%08X)", err, err);
   }
@@ -873,7 +873,7 @@ const char *Curl_sspi_strerror(int err, char *buf, size_t buflen)
 
   *buf = '\0';
 
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
 
   switch(err) {
     case SEC_E_OK:

@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -30,7 +30,7 @@ import os
 import sys
 import tempfile
 
-# Import our curl test data helper
+# Import our carl test data helper
 from util import ClosingFileHandler, TestData
 
 if sys.version_info.major >= 3:

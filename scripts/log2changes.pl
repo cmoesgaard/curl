@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -53,7 +53,7 @@ while(<STDIN>) {
     if($l =~/^commit ([[:xdigit:]]*) ?(.*)/) {
         $co = $1;
         my $ref = $2;
-        if ($ref =~ /refs\/tags\/curl-([0-9_]*)/) {
+        if ($ref =~ /refs\/tags\/carl-([0-9_]*)/) {
             $tag = $1;
             $tag =~ tr/_/./;
         }

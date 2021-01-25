@@ -1,0 +1,57 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_MAX_PIPELINE_LENGTH 3 "4 Nov 2014" "libcarl 7.39.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_MAX_PIPELINE_LENGTH \- maximum number of requests in a pipeline
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_MAX_PIPELINE_LENGTH, long max);
+.SH DESCRIPTION
+No function since pipelining was removed in 7.62.0.
+
+Pass a long. The set \fBmax\fP number will be used as the maximum amount of
+outstanding requests in an HTTP/1.1 pipelined connection. This option is only
+used for HTTP/1.1 pipelining, not for HTTP/2 multiplexing.
+
+When this limit is reached, libcarl will use another connection to the same
+host (see \fICARLMOPT_MAX_HOST_CONNECTIONS(3)\fP), or queue the request until
+one of the pipelines to the host is ready to accept a request.  Thus, the
+total number of requests in-flight is \fICARLMOPT_MAX_HOST_CONNECTIONS(3)\fP *
+\fICARLMOPT_MAX_PIPELINE_LENGTH(3)\fP.
+.SH DEFAULT
+5
+.SH PROTOCOLS
+HTTP(S)
+.SH EXAMPLE
+.nf
+CARLM *m = carl_multi_init();
+/* set a more conservative pipe length */
+carl_multi_setopt(m, CARLMOPT_MAX_PIPELINE_LENGTH, 3L);
+.fi
+.SH AVAILABILITY
+Added in 7.30.0
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLMOPT_PIPELINING "(3), " CARLMOPT_MAX_HOST_CONNECTIONS "(3), "

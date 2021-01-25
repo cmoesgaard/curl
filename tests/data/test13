@@ -34,7 +34,7 @@ http://%HOSTIP:%HTTPPORT/want/13 -X DELETE
 <protocol>
 DELETE /want/13 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

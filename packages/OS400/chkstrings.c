@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,16 +22,16 @@
 
 #include <stdlib.h>
 #pragma enum(int)
-#include "curl_setup.h"
+#include "carl_setup.h"
 #include "urldata.h"
 
 /* The following defines indicate the expected dupstring enum values in
- * curl_easy_setopt_ccsid() in packages/OS400/ccsidcurl.c. If a mismatch is
- * flagged during the build, it indicates that curl_easy_setopt_ccsid() may
+ * carl_easy_setopt_ccsid() in packages/OS400/ccsidcarl.c. If a mismatch is
+ * flagged during the build, it indicates that carl_easy_setopt_ccsid() may
  * need updating to perform data EBCDIC to ASCII data conversion on the
  * string.
  *
- * Once any applicable changes to curl_easy_setopt_ccsid() have been
+ * Once any applicable changes to carl_easy_setopt_ccsid() have been
  * made, the EXPECTED_STRING_LASTZEROTERMINATED/EXPECTED_STRING_LAST
  * values can be updated to match the latest enum values in urldata.h.
  */
@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
     rc += 2;
   }
   if(rc) {
-    fprintf(stderr, "curl_easy_setopt_ccsid() in packages/OS400/ccsidcurl.c"
+    fprintf(stderr, "carl_easy_setopt_ccsid() in packages/OS400/ccsidcarl.c"
             " may need updating if new strings are provided as"
-            " input via the curl API.\n");
+            " input via the carl API.\n");
   }
   return rc;
 }

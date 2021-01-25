@@ -43,7 +43,7 @@ data inside the file
 <protocol>
 POST /we/want/166 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 223
 Content-Type: multipart/form-data; boundary=----------------------------b0b3d6d23991

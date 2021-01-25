@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 ###########################################################################
 #
-# Makefile for building libcurl with MSVC
+# Makefile for building libcarl with MSVC
 #
 # Usage: see README.md
 #
@@ -46,11 +46,11 @@ CC = cl.exe
 !IF "$(VC)"=="6"
 CC_NODEBUG  = $(CC) /O2 /DNDEBUG
 CC_DEBUG    = $(CC) /Od /Gm /Zi /D_DEBUG /GZ
-CFLAGS      = /I. /I../lib /I../include /nologo /W4 /GX /DWIN32 /YX /FD /c /DBUILDING_LIBCURL
+CFLAGS      = /I. /I../lib /I../include /nologo /W4 /GX /DWIN32 /YX /FD /c /DBUILDING_LIBCARL
 !ELSE
 CC_NODEBUG  = $(CC) /O2 /DNDEBUG
 CC_DEBUG    = $(CC) /Od /D_DEBUG /RTC1 /Z7 /LDd
-CFLAGS      = /I. /I ../lib /I../include /nologo /W4 /EHsc /DWIN32 /FD /c /DBUILDING_LIBCURL
+CFLAGS      = /I. /I ../lib /I../include /nologo /W4 /EHsc /DWIN32 /FD /c /DBUILDING_LIBCARL
 !ENDIF
 
 LFLAGS     = /nologo /machine:$(MACHINE)
@@ -65,11 +65,11 @@ LNKLIB     = lib.exe
 CFLAGS_PDB = /Zi
 LFLAGS_PDB = /incremental:no /opt:ref,icf /DEBUG
 
-CFLAGS_LIBCURL_STATIC  = /DCURL_STATICLIB
+CFLAGS_LIBCARL_STATIC  = /DCARL_STATICLIB
 
 WIN_LIBS    = ws2_32.lib wldap32.lib advapi32.lib crypt32.lib
 
-BASE_NAME              = libcurl
+BASE_NAME              = libcarl
 BASE_NAME_DEBUG        = $(BASE_NAME)_debug
 BASE_NAME_STATIC       = $(BASE_NAME)_a
 BASE_NAME_STATIC_DEBUG = $(BASE_NAME_STATIC)_debug
@@ -86,16 +86,16 @@ PDB_NAME_STATIC_DEBUG  = $(BASE_NAME_STATIC_DEBUG).pdb
 PDB_NAME_DLL           = $(BASE_NAME).pdb
 PDB_NAME_DLL_DEBUG     = $(BASE_NAME_DEBUG).pdb
 
-# CURL Command section
-PROGRAM_NAME  = curl.exe
-CURL_CFLAGS   = /I../lib /I../include /nologo /W4 /EHsc /DWIN32 /FD /c
-CURL_LFLAGS   = /out:$(DIRDIST)\bin\$(PROGRAM_NAME) /subsystem:console $(LFLAGS)
-CURL_RESFLAGS = /i../include
+# CARL Command section
+PROGRAM_NAME  = carl.exe
+CARL_CFLAGS   = /I../lib /I../include /nologo /W4 /EHsc /DWIN32 /FD /c
+CARL_LFLAGS   = /out:$(DIRDIST)\bin\$(PROGRAM_NAME) /subsystem:console $(LFLAGS)
+CARL_RESFLAGS = /i../include
 
 #############################################################
 ## Nothing more to do below this line!
-LIBCURL_SRC_DIR = ..\lib
-CURL_SRC_DIR = ..\src
+LIBCARL_SRC_DIR = ..\lib
+CARL_SRC_DIR = ..\src
 
 !IFNDEF WITH_DEVEL
 WITH_DEVEL   = ../../deps
@@ -138,7 +138,7 @@ SSL_CFLAGS   = /DUSE_OPENSSL /I"$(SSL_INC_DIR)"
 SSL_CFLAGS   = $(SSL_CFLAGS) /DHAVE_BORINGSSL
 !ENDIF
 !IF "$(ENABLE_OPENSSL_AUTO_LOAD_CONFIG)"=="false"
-SSL_CFLAGS   = $(SSL_CFLAGS) /DCURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG
+SSL_CFLAGS   = $(SSL_CFLAGS) /DCARL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG
 !ENDIF
 !ENDIF
 
@@ -346,7 +346,7 @@ GEN_PDB = true
 !IFDEF EMBED_MANIFEST
 MANIFESTTOOL = $(MT) -manifest $(DIRDIST)\bin\$(PROGRAM_NAME).manifest -outputresource:$(DIRDIST)\bin\$(PROGRAM_NAME);1
 !ELSE
-CURL_RC_FLAGS = $(CURL_RC_FLAGS) /dCURL_EMBED_MANIFEST
+CARL_RC_FLAGS = $(CARL_RC_FLAGS) /dCARL_EMBED_MANIFEST
 !ENDIF
 
 # Runtime library configuration
@@ -360,12 +360,12 @@ RTLIB_DEBUG  = /MDd
 
 !IF "$(MODE)"=="static"
 TARGET = $(LIB_NAME_STATIC)
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_STATIC)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_STATIC)
 AS_DLL = false
 CFGSET = true
 !ELSEIF "$(MODE)"=="dll"
 TARGET = $(LIB_NAME_DLL)
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_IMP)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_IMP)
 AS_DLL = true
 CFGSET = true
 !ENDIF
@@ -376,16 +376,16 @@ CFGSET = true
 
 
 
-# CURL_XX macros are for the curl.exe command
+# CARL_XX macros are for the carl.exe command
 
 !IF "$(DEBUG)"=="yes"
-RC_FLAGS = /dDEBUGBUILD=1 /Fo $@ $(LIBCURL_SRC_DIR)\libcurl.rc
-CURL_CC       = $(CC_DEBUG) $(RTLIB_DEBUG)
-CURL_RC_FLAGS = $(CURL_RC_FLAGS) /i../include /dDEBUGBUILD=1 /Fo $@ $(CURL_SRC_DIR)\curl.rc
+RC_FLAGS = /dDEBUGBUILD=1 /Fo $@ $(LIBCARL_SRC_DIR)\libcarl.rc
+CARL_CC       = $(CC_DEBUG) $(RTLIB_DEBUG)
+CARL_RC_FLAGS = $(CARL_RC_FLAGS) /i../include /dDEBUGBUILD=1 /Fo $@ $(CARL_SRC_DIR)\carl.rc
 !ELSE
-RC_FLAGS = /dDEBUGBUILD=0 /Fo $@ $(LIBCURL_SRC_DIR)\libcurl.rc
-CURL_CC       = $(CC_NODEBUG) $(RTLIB)
-CURL_RC_FLAGS = $(CURL_RC_FLAGS) /i../include /dDEBUGBUILD=0 /Fo $@ $(CURL_SRC_DIR)\curl.rc
+RC_FLAGS = /dDEBUGBUILD=0 /Fo $@ $(LIBCARL_SRC_DIR)\libcarl.rc
+CARL_CC       = $(CC_NODEBUG) $(RTLIB)
+CARL_RC_FLAGS = $(CARL_RC_FLAGS) /i../include /dDEBUGBUILD=0 /Fo $@ $(CARL_SRC_DIR)\carl.rc
 !ENDIF
 
 !IF "$(AS_DLL)" == "true"
@@ -395,14 +395,14 @@ LNK       = $(LNKDLL) $(LFLAGS) $(WIN_LIBS) /out:$(LIB_DIROBJ)\$(TARGET)
 TARGET    = $(LIB_NAME_DLL_DEBUG)
 LNK       = $(LNK) /DEBUG /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP_DEBUG)
 PDB       = $(PDB_NAME_DLL_DEBUG)
-CURL_LIBS = /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP_DEBUG)
+CARL_LIBS = /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP_DEBUG)
 !ELSE
 TARGET    = $(LIB_NAME_DLL)
 LNK       = $(LNK)  /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP)
 PDB       = $(PDB_NAME_DLL)
-CURL_LIBS = /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP)
+CARL_LIBS = /IMPLIB:$(LIB_DIROBJ)\$(LIB_NAME_IMP)
 !ENDIF
-RESOURCE  = $(LIB_DIROBJ)\libcurl.res
+RESOURCE  = $(LIB_DIROBJ)\libcarl.res
 
 # AS_DLL
 !ELSE
@@ -415,7 +415,7 @@ TARGET   = $(LIB_NAME_STATIC)
 PDB      = $(PDB_NAME_STATIC)
 !ENDIF
 LNK      = $(LNKLIB) /out:$(LIB_DIROBJ)\$(TARGET)
-CURL_CC  = $(CURL_CC) $(CFLAGS_LIBCURL_STATIC)
+CARL_CC  = $(CARL_CC) $(CFLAGS_LIBCARL_STATIC)
 
 # AS_DLL
 !ENDIF
@@ -470,7 +470,7 @@ LFLAGS = $(LFLAGS) $(LFLAGS_PDB)
 !IF ( "$(USE_SSL)"=="true" && "$(USE_SCHANNEL)"=="true" ) \
  || ( "$(USE_SSL)"=="true" && "$(USE_MBEDTLS)"=="true" ) \
  || ( "$(USE_MBEDTLS)"=="true" && "$(USE_SCHANNEL)"=="true" )
-CFLAGS = $(CFLAGS) /DCURL_WITH_MULTI_SSL
+CFLAGS = $(CFLAGS) /DCARL_WITH_MULTI_SSL
 !ENDIF
 
 !IF "$(USE_UNICODE)"=="true"
@@ -478,7 +478,7 @@ CFLAGS = $(CFLAGS) /DUNICODE /D_UNICODE
 !ENDIF
 
 LIB_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-lib
-CURL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-curl
+CARL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-carl
 
 !IFDEF WITH_PREFIX
 DIRDIST = $(WITH_PREFIX)
@@ -487,23 +487,23 @@ DIRDIST = ..\builds\$(CONFIG_NAME_LIB)\
 !ENDIF
 
 #
-# curl.exe
+# carl.exe
 #
-CURL_LINK = link.exe /incremental:no /libpath:"$(DIRDIST)\lib"
+CARL_LINK = link.exe /incremental:no /libpath:"$(DIRDIST)\lib"
 
 !IF "$(CFGSET)" != "FALSE"
 # A mode was provided, so the library can be built.
 #
-!include CURL_OBJS.inc
-!include LIBCURL_OBJS.inc
+!include CARL_OBJS.inc
+!include LIBCARL_OBJS.inc
 
 !IF "$(AS_DLL)" == "true"
-LIB_OBJS = $(LIBCURL_OBJS) $(RESOURCE)
+LIB_OBJS = $(LIBCARL_OBJS) $(RESOURCE)
 !ELSE
-LIB_OBJS = $(LIBCURL_OBJS)
+LIB_OBJS = $(LIBCARL_OBJS)
 !ENDIF
 
-EXE_OBJS = $(CURL_OBJS) $(CURL_DIROBJ)\curl.res
+EXE_OBJS = $(CARL_OBJS) $(CARL_DIROBJ)\carl.res
 
 all : $(TARGET) $(PROGRAM_NAME)
 
@@ -537,14 +537,14 @@ $(TARGET): $(LIB_OBJS) $(LIB_DIROBJ) $(DIRDIST)
 	@if exist $(LIB_DIROBJ)\$(LIB_NAME_IMP_DEBUG) copy $(LIB_DIROBJ)\$(LIB_NAME_IMP_DEBUG) $(DIRDIST)\lib >nul 2<&1
 	@-copy $(LIB_DIROBJ)\*.exp                 $(DIRDIST)\lib /y >nul 2<&1
 	@-copy $(LIB_DIROBJ)\*.pdb                 $(DIRDIST)\lib /y >nul 2<&1
-	@-copy ..\include\curl\*.h   $(DIRDIST)\include\curl\ /y  >nul 2<&1
+	@-copy ..\include\carl\*.h   $(DIRDIST)\include\carl\ /y  >nul 2<&1
 
 $(LIB_OBJS): $(LIB_DIROBJ) $(DIRDIST)
 
 $(DIRDIST):
 	@if not exist "$(DIRDIST)\bin" mkdir $(DIRDIST)\bin
 	@if not exist "$(DIRDIST)\include" mkdir $(DIRDIST)\include
-	@if not exist "$(DIRDIST)\include\curl" mkdir $(DIRDIST)\include\curl
+	@if not exist "$(DIRDIST)\include\carl" mkdir $(DIRDIST)\include\carl
 	@if not exist "$(DIRDIST)\lib" mkdir $(DIRDIST)\lib
 
 $(LIB_DIROBJ):
@@ -554,85 +554,85 @@ $(LIB_DIROBJ):
 	@if not exist "$(LIB_DIROBJ)\vssh" mkdir $(LIB_DIROBJ)\vssh
 	@if not exist "$(LIB_DIROBJ)\vquic" mkdir $(LIB_DIROBJ)\vquic
 
-$(CURL_DIROBJ):
-	@if not exist "$(CURL_DIROBJ)" mkdir $(CURL_DIROBJ)
-# we need a lib dir for the portability functions from libcurl
+$(CARL_DIROBJ):
+	@if not exist "$(CARL_DIROBJ)" mkdir $(CARL_DIROBJ)
+# we need a lib dir for the portability functions from libcarl
 # we use the .c directly here
-	@if not exist "$(CURL_DIROBJ)" mkdir $(CURL_DIROBJ)\lib
+	@if not exist "$(CARL_DIROBJ)" mkdir $(CARL_DIROBJ)\lib
 
 .SUFFIXES: .c .obj .res
 
-{$(LIBCURL_SRC_DIR)\}.c{$(LIB_DIROBJ)\}.obj:
-	$(CURL_CC) $(CFLAGS) /Fo"$@"  $<
+{$(LIBCARL_SRC_DIR)\}.c{$(LIB_DIROBJ)\}.obj:
+	$(CARL_CC) $(CFLAGS) /Fo"$@"  $<
 
-{$(LIBCURL_SRC_DIR)\vauth\}.c{$(LIB_DIROBJ)\vauth\}.obj:
-	$(CURL_CC) $(CFLAGS) /Fo"$@"  $<
+{$(LIBCARL_SRC_DIR)\vauth\}.c{$(LIB_DIROBJ)\vauth\}.obj:
+	$(CARL_CC) $(CFLAGS) /Fo"$@"  $<
 
-{$(LIBCURL_SRC_DIR)\vtls\}.c{$(LIB_DIROBJ)\vtls\}.obj:
-	$(CURL_CC) $(CFLAGS) /Fo"$@"  $<
+{$(LIBCARL_SRC_DIR)\vtls\}.c{$(LIB_DIROBJ)\vtls\}.obj:
+	$(CARL_CC) $(CFLAGS) /Fo"$@"  $<
 
-{$(LIBCURL_SRC_DIR)\vssh\}.c{$(LIB_DIROBJ)\vssh\}.obj:
-	$(CURL_CC) $(CFLAGS) /Fo"$@"  $<
+{$(LIBCARL_SRC_DIR)\vssh\}.c{$(LIB_DIROBJ)\vssh\}.obj:
+	$(CARL_CC) $(CFLAGS) /Fo"$@"  $<
 
-{$(LIBCURL_SRC_DIR)\vquic\}.c{$(LIB_DIROBJ)\vquic\}.obj:
-	$(CURL_CC) $(CFLAGS) /Fo"$@"  $<
+{$(LIBCARL_SRC_DIR)\vquic\}.c{$(LIB_DIROBJ)\vquic\}.obj:
+	$(CARL_CC) $(CFLAGS) /Fo"$@"  $<
 
-$(LIB_DIROBJ)\libcurl.res: $(LIBCURL_SRC_DIR)\libcurl.rc
+$(LIB_DIROBJ)\libcarl.res: $(LIBCARL_SRC_DIR)\libcarl.rc
 	$(RC) $(RC_FLAGS)
 
 #
-# curl.exe
+# carl.exe
 #
 
 
 !IF "$(MODE)"=="static"
 !IF "$(DEBUG)"=="yes"
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_STATIC_DEBUG)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_STATIC_DEBUG)
 !ELSE
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_STATIC)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_STATIC)
 !ENDIF
 !ELSEIF "$(MODE)"=="dll"
 !IF "$(DEBUG)"=="yes"
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_IMP_DEBUG)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_IMP_DEBUG)
 !ELSE
-CURL_LIBCURL_LIBNAME=$(LIB_NAME_IMP)
+CARL_LIBCARL_LIBNAME=$(LIB_NAME_IMP)
 !ENDIF
 !ENDIF
 
-CURL_FROM_LIBCURL=$(CURL_DIROBJ)\tool_hugehelp.obj \
- $(CURL_DIROBJ)\nonblock.obj \
- $(CURL_DIROBJ)\strtoofft.obj \
- $(CURL_DIROBJ)\warnless.obj \
- $(CURL_DIROBJ)\curl_ctype.obj \
- $(CURL_DIROBJ)\curl_multibyte.obj \
- $(CURL_DIROBJ)\version_win32.obj \
- $(CURL_DIROBJ)\dynbuf.obj
+CARL_FROM_LIBCARL=$(CARL_DIROBJ)\tool_hugehelp.obj \
+ $(CARL_DIROBJ)\nonblock.obj \
+ $(CARL_DIROBJ)\strtoofft.obj \
+ $(CARL_DIROBJ)\warnless.obj \
+ $(CARL_DIROBJ)\carl_ctype.obj \
+ $(CARL_DIROBJ)\carl_multibyte.obj \
+ $(CARL_DIROBJ)\version_win32.obj \
+ $(CARL_DIROBJ)\dynbuf.obj
 
-$(PROGRAM_NAME): $(CURL_DIROBJ) $(CURL_FROM_LIBCURL) $(EXE_OBJS)
-	$(CURL_LINK) $(CURL_LFLAGS) $(CURL_LIBCURL_LIBNAME) $(WIN_LIBS) $(CURL_FROM_LIBCURL) $(EXE_OBJS)
+$(PROGRAM_NAME): $(CARL_DIROBJ) $(CARL_FROM_LIBCARL) $(EXE_OBJS)
+	$(CARL_LINK) $(CARL_LFLAGS) $(CARL_LIBCARL_LIBNAME) $(WIN_LIBS) $(CARL_FROM_LIBCARL) $(EXE_OBJS)
 	$(MANIFESTTOOL)
 
-{$(CURL_SRC_DIR)\}.c{$(CURL_DIROBJ)\}.obj:
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@"  $<
+{$(CARL_SRC_DIR)\}.c{$(CARL_DIROBJ)\}.obj:
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@"  $<
 
-$(CURL_DIROBJ)\tool_hugehelp.obj: $(CURL_SRC_DIR)\tool_hugehelp.c
-	$(CURL_CC) $(CURL_CFLAGS) /Zm200 /Fo"$@" $(CURL_SRC_DIR)\tool_hugehelp.c
-$(CURL_DIROBJ)\nonblock.obj: ../lib/nonblock.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/nonblock.c
-$(CURL_DIROBJ)\strtoofft.obj: ../lib/strtoofft.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/strtoofft.c
-$(CURL_DIROBJ)\warnless.obj: ../lib/warnless.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/warnless.c
-$(CURL_DIROBJ)\curl_ctype.obj: ../lib/curl_ctype.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/curl_ctype.c
-$(CURL_DIROBJ)\curl_multibyte.obj: ../lib/curl_multibyte.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/curl_multibyte.c
-$(CURL_DIROBJ)\version_win32.obj: ../lib/version_win32.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/version_win32.c
-$(CURL_DIROBJ)\dynbuf.obj: ../lib/dynbuf.c
-	$(CURL_CC) $(CURL_CFLAGS) /Fo"$@" ../lib/dynbuf.c
-$(CURL_DIROBJ)\curl.res: $(CURL_SRC_DIR)\curl.rc
-	rc $(CURL_RC_FLAGS)
+$(CARL_DIROBJ)\tool_hugehelp.obj: $(CARL_SRC_DIR)\tool_hugehelp.c
+	$(CARL_CC) $(CARL_CFLAGS) /Zm200 /Fo"$@" $(CARL_SRC_DIR)\tool_hugehelp.c
+$(CARL_DIROBJ)\nonblock.obj: ../lib/nonblock.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/nonblock.c
+$(CARL_DIROBJ)\strtoofft.obj: ../lib/strtoofft.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/strtoofft.c
+$(CARL_DIROBJ)\warnless.obj: ../lib/warnless.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/warnless.c
+$(CARL_DIROBJ)\carl_ctype.obj: ../lib/carl_ctype.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/carl_ctype.c
+$(CARL_DIROBJ)\carl_multibyte.obj: ../lib/carl_multibyte.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/carl_multibyte.c
+$(CARL_DIROBJ)\version_win32.obj: ../lib/version_win32.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/version_win32.c
+$(CARL_DIROBJ)\dynbuf.obj: ../lib/dynbuf.c
+	$(CARL_CC) $(CARL_CFLAGS) /Fo"$@" ../lib/dynbuf.c
+$(CARL_DIROBJ)\carl.res: $(CARL_SRC_DIR)\carl.rc
+	rc $(CARL_RC_FLAGS)
 
 !ENDIF  # End of case where a config was provided.
 
@@ -646,5 +646,5 @@ clean:
 	@-erase /s *.pdb 2> NUL
 	@-erase /s *.res 2> NUL
 	@if exist $(LIB_DIROBJ) rd /s/q $(LIB_DIROBJ)
-	@if exist $(CURL_DIROBJ)rd /s/q $(CURL_DIROBJ)
+	@if exist $(CARL_DIROBJ)rd /s/q $(CARL_DIROBJ)
 	@if exist $(DIRDIST) rd /s/q $(DIRDIST)

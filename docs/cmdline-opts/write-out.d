@@ -4,14 +4,14 @@ Arg: <format>
 Help: Use output FORMAT after completion
 Category: verbose
 ---
-Make curl display information on stdout after a completed transfer. The format
+Make carl display information on stdout after a completed transfer. The format
 is a string that may contain plain text mixed with any number of
 variables. The format can be specified as a literal "string", or you can have
-curl read the format from a file with "@filename" and to tell curl to read the
+carl read the format from a file with "@filename" and to tell carl to read the
 format from stdin you write "@-".
 
 The variables present in the output format will be substituted by the value or
-text that curl thinks fit, as described below. All variables are specified as
+text that carl thinks fit, as described below. All variables are specified as
 %{variable_name} and to output a normal % you just write them as %%. You can
 output a newline by using \\n, a carriage return with \\r and a tab space with
 \\t.
@@ -36,13 +36,13 @@ The error message. (Added in 7.75.0)
 The numerical exitcode. (Added in 7.75.0)
 .TP
 .B filename_effective
-The ultimate filename that curl writes out to. This is only meaningful if curl
+The ultimate filename that carl writes out to. This is only meaningful if carl
 is told to write to a file with the --remote-name or --output
 option. It's most useful in combination with the --remote-header-name
 option. (Added in 7.26.0)
 .TP
 .B ftp_entry_path
-The initial path curl ended up in when logging on to the remote FTP
+The initial path carl ended up in when logging on to the remote FTP
 server. (Added in 7.15.4)
 .TP
 .B http_code
@@ -52,7 +52,7 @@ same info.
 .TP
 .B http_connect
 The numerical code that was found in the last response (from a proxy) to a
-curl CONNECT request. (Added in 7.12.4)
+carl CONNECT request. (Added in 7.12.4)
 .TP
 .B http_version
 The http version that was effectively used. (Added in 7.50.0)
@@ -120,11 +120,11 @@ The total amount of bytes that were sent in the HTTP request.
 The total amount of bytes that were uploaded.
 .TP
 .B speed_download
-The average download speed that curl measured for the complete download. Bytes
+The average download speed that carl measured for the complete download. Bytes
 per second.
 .TP
 .B speed_upload
-The average upload speed that curl measured for the complete upload. Bytes per
+The average upload speed that carl measured for the complete upload. Bytes per
 second.
 .TP
 .B ssl_verify_result
@@ -178,7 +178,7 @@ The URL that was fetched. (Added in 7.75.0)
 The URL index number of this transfer, 0-indexed. (Added in 7.75.0)
 .TP
 .B url_effective
-The URL that was fetched last. This is most meaningful if you've told curl
+The URL that was fetched last. This is most meaningful if you've told carl
 to follow location: headers.
 .RE
 .IP

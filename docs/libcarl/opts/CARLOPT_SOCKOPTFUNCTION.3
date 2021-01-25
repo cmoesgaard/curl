@@ -1,0 +1,124 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SOCKOPTFUNCTION 3 "16 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SOCKOPTFUNCTION \- set callback for setting socket options
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+typedef enum  {
+  CARLSOCKTYPE_IPCXN,  /* socket created for a specific IP connection */
+  CARLSOCKTYPE_ACCEPT, /* socket created by accept() call */
+  CARLSOCKTYPE_LAST    /* never use */
+} carlsocktype;
+
+#define CARL_SOCKOPT_OK 0
+#define CARL_SOCKOPT_ERROR 1 /* causes libcarl to abort and return
+                                CARLE_ABORTED_BY_CALLBACK */
+#define CARL_SOCKOPT_ALREADY_CONNECTED 2
+
+int sockopt_callback(void *clientp,
+                     carl_socket_t carlfd,
+                     carlsocktype purpose);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SOCKOPTFUNCTION, sockopt_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+When set, this callback function gets called by libcarl when the socket has
+been created, but before the connect call to allow applications to change
+specific socket options. The callback's \fIpurpose\fP argument identifies the
+exact purpose for this particular socket:
+
+\fICARLSOCKTYPE_IPCXN\fP for actively created connections or since 7.28.0
+\fICARLSOCKTYPE_ACCEPT\fP for FTP when the connection was setup with PORT/EPSV
+(in earlier versions these sockets weren't passed to this callback).
+
+Future versions of libcarl may support more purposes. libcarl passes the newly
+created socket descriptor to the callback in the \fIcarlfd\fP parameter so
+additional setsockopt() calls can be done at the user's discretion.
+
+The \fIclientp\fP pointer contains whatever user-defined value set using the
+\fICARLOPT_SOCKOPTDATA(3)\fP function.
+
+Return \fICARL_SOCKOPT_OK\fP from the callback on success. Return
+\fICARL_SOCKOPT_ERROR\fP from the callback function to signal an unrecoverable
+error to the library and it will close the socket and return
+\fICARLE_COULDNT_CONNECT\fP.
+Alternatively, the callback function can return
+\fICARL_SOCKOPT_ALREADY_CONNECTED\fP, to tell libcarl that the socket is
+already connected and then libcarl will not attempt to connect it. This allows
+an application to pass in an already connected socket with
+\fICARLOPT_OPENSOCKETFUNCTION(3)\fP and then have this function make libcarl
+not attempt to connect (again).
+.SH DEFAULT
+By default, this callback is NULL and unused.
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+/* make libcarl use the already established socket 'sockfd' */
+
+static carl_socket_t opensocket(void *clientp,
+                                carlsocktype purpose,
+                                struct carl_sockaddr *address)
+{
+  carl_socket_t sockfd;
+  sockfd = *(carl_socket_t *)clientp;
+  /* the actual externally set socket is passed in via the OPENSOCKETDATA
+     option */
+  return sockfd;
+}
+
+static int sockopt_callback(void *clientp, carl_socket_t carlfd,
+                            carlsocktype purpose)
+{
+  /* This return code was added in libcarl 7.21.5 */
+  return CARL_SOCKOPT_ALREADY_CONNECTED;
+}
+
+carl = carl_easy_init();
+if(carl) {
+  /* libcarl will internally think that you connect to the host
+   * and port that you specify in the URL option. */
+  carl_easy_setopt(carl, CARLOPT_URL, "http://99.99.99.99:9999");
+  /* call this function to get a socket */
+  carl_easy_setopt(carl, CARLOPT_OPENSOCKETFUNCTION, opensocket);
+  carl_easy_setopt(carl, CARLOPT_OPENSOCKETDATA, &sockfd);
+
+  /* call this function to set options for the socket */
+  carl_easy_setopt(carl, CARLOPT_SOCKOPTFUNCTION, sockopt_callback);
+
+  res = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+.fi
+.SH AVAILABILITY
+Added in 7.16.0. The \fICARL_SOCKOPT_ALREADY_CONNECTED\fP return code was
+added in 7.21.5.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SOCKOPTDATA "(3), " CARLOPT_OPENSOCKETFUNCTION "(3), "

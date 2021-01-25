@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_RTSP_H
-#define HEADER_CURL_RTSP_H
+#ifndef HEADER_CARL_RTSP_H
+#define HEADER_CARL_RTSP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,20 +22,20 @@
  *
  ***************************************************************************/
 #ifdef USE_HYPER
-#define CURL_DISABLE_RTSP
+#define CARL_DISABLE_RTSP
 #endif
 
-#ifndef CURL_DISABLE_RTSP
+#ifndef CARL_DISABLE_RTSP
 
 extern const struct Curl_handler Curl_handler_rtsp;
 
-CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header);
+CARLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header);
 
 #else
 /* disabled */
-#define Curl_rtsp_parseheader(x,y) CURLE_NOT_BUILT_IN
+#define Curl_rtsp_parseheader(x,y) CARLE_NOT_BUILT_IN
 
-#endif /* CURL_DISABLE_RTSP */
+#endif /* CARL_DISABLE_RTSP */
 
 /*
  * RTSP Connection data
@@ -67,4 +67,4 @@ struct RTSP {
 };
 
 
-#endif /* HEADER_CURL_RTSP_H */
+#endif /* HEADER_CARL_RTSP_H */

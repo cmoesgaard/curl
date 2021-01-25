@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLOPT_CURLU
+CARLOPT_CARLU
 </keywords>
 </info>
 <reply>
@@ -30,7 +30,7 @@ http
 lib658
 </tool>
 <name>
-Pass URL to libcurl with CURLOPT_CURLU
+Pass URL to libcarl with CARLOPT_CARLU
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT/658

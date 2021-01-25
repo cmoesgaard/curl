@@ -60,12 +60,12 @@ http://%HOSTIP:%HTTP2PORT/1700 --http2 http://%HOSTIP:%HTTP2PORT/17000001
 <protocol>
 GET /1700 HTTP/1.1
 Host: %HOSTIP:%HTTP2PORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /17000001 HTTP/1.1
 Host: %HOSTIP:%HTTP2PORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

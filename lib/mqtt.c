@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,12 +21,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_MQTT
+#ifndef CARL_DISABLE_MQTT
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "transfer.h"
 #include "sendf.h"
 #include "progress.h"
@@ -36,8 +36,8 @@
 #include "url.h"
 #include "escape.h"
 #include "warnless.h"
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "multiif.h"
 #include "rand.h"
 
@@ -53,17 +53,17 @@
 
 #define MQTT_CONNACK_LEN 2
 #define MQTT_SUBACK_LEN 3
-#define MQTT_CLIENTID_LEN 12 /* "curl0123abcd" */
+#define MQTT_CLIENTID_LEN 12 /* "carl0123abcd" */
 
 /*
  * Forward declarations.
  */
 
-static CURLcode mqtt_do(struct Curl_easy *data, bool *done);
-static CURLcode mqtt_doing(struct Curl_easy *data, bool *done);
+static CARLcode mqtt_do(struct Curl_easy *data, bool *done);
+static CARLcode mqtt_doing(struct Curl_easy *data, bool *done);
 static int mqtt_getsock(struct Curl_easy *data, struct connectdata *conn,
-                        curl_socket_t *sock);
-static CURLcode mqtt_setup_conn(struct Curl_easy *data,
+                        carl_socket_t *sock);
+static CARLcode mqtt_setup_conn(struct Curl_easy *data,
                                 struct connectdata *conn);
 
 /*
@@ -87,12 +87,12 @@ const struct Curl_handler Curl_handler_mqtt = {
   ZERO_NULL,                          /* readwrite */
   ZERO_NULL,                          /* connection_check */
   PORT_MQTT,                          /* defport */
-  CURLPROTO_MQTT,                     /* protocol */
-  CURLPROTO_MQTT,                     /* family */
+  CARLPROTO_MQTT,                     /* protocol */
+  CARLPROTO_MQTT,                     /* family */
   PROTOPT_NONE                        /* flags */
 };
 
-static CURLcode mqtt_setup_conn(struct Curl_easy *data,
+static CARLcode mqtt_setup_conn(struct Curl_easy *data,
                                 struct connectdata *conn)
 {
   /* allocate the HTTP-specific struct for the Curl_easy, only to survive
@@ -103,27 +103,27 @@ static CURLcode mqtt_setup_conn(struct Curl_easy *data,
 
   mq = calloc(1, sizeof(struct MQTT));
   if(!mq)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   data->req.p.mqtt = mq;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode mqtt_send(struct Curl_easy *data,
+static CARLcode mqtt_send(struct Curl_easy *data,
                           char *buf, size_t len)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   struct MQTT *mq = data->req.p.mqtt;
   ssize_t n;
   result = Curl_write(data, sockfd, buf, len, &n);
   if(!result)
-    Curl_debug(data, CURLINFO_HEADER_OUT, buf, (size_t)n);
+    Curl_debug(data, CARLINFO_HEADER_OUT, buf, (size_t)n);
   if(len != (size_t)n) {
     size_t nsend = len - n;
     char *sendleftovers = Curl_memdup(&buf[n], nsend);
     if(!sendleftovers)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     mq->sendleftovers = sendleftovers;
     mq->nsend = nsend;
   }
@@ -135,20 +135,20 @@ static CURLcode mqtt_send(struct Curl_easy *data,
    states */
 static int mqtt_getsock(struct Curl_easy *data,
                         struct connectdata *conn,
-                        curl_socket_t *sock)
+                        carl_socket_t *sock)
 {
   (void)data;
   sock[0] = conn->sock[FIRSTSOCKET];
   return GETSOCK_READSOCK(FIRSTSOCKET);
 }
 
-static CURLcode mqtt_connect(struct Curl_easy *data)
+static CARLcode mqtt_connect(struct Curl_easy *data)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   const size_t client_id_offset = 14;
   const size_t packetlen = client_id_offset + MQTT_CLIENTID_LEN;
-  char client_id[MQTT_CLIENTID_LEN + 1] = "curl";
-  const size_t clen = strlen("curl");
+  char client_id[MQTT_CLIENTID_LEN + 1] = "carl";
+  const size_t clen = strlen("carl");
   char packet[32] = {
     MQTT_MSG_CONNECT,  /* packet type */
     0x00,              /* remaining length */
@@ -171,18 +171,18 @@ static CURLcode mqtt_connect(struct Curl_easy *data)
   return result;
 }
 
-static CURLcode mqtt_disconnect(struct Curl_easy *data)
+static CARLcode mqtt_disconnect(struct Curl_easy *data)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   result = mqtt_send(data, (char *)"\xe0\x00", 2);
   return result;
 }
 
-static CURLcode mqtt_verify_connack(struct Curl_easy *data)
+static CARLcode mqtt_verify_connack(struct Curl_easy *data)
 {
-  CURLcode result;
+  CARLcode result;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   unsigned char readbuf[MQTT_CONNACK_LEN];
   ssize_t nread;
 
@@ -190,11 +190,11 @@ static CURLcode mqtt_verify_connack(struct Curl_easy *data)
   if(result)
     goto fail;
 
-  Curl_debug(data, CURLINFO_HEADER_IN, (char *)readbuf, (size_t)nread);
+  Curl_debug(data, CARLINFO_HEADER_IN, (char *)readbuf, (size_t)nread);
 
   /* fixme */
   if(nread < MQTT_CONNACK_LEN) {
-    result = CURLE_WEIRD_SERVER_REPLY;
+    result = CARLE_WEIRD_SERVER_REPLY;
     goto fail;
   }
 
@@ -202,17 +202,17 @@ static CURLcode mqtt_verify_connack(struct Curl_easy *data)
   if(readbuf[0] != 0x00 || readbuf[1] != 0x00) {
     failf(data, "Expected %02x%02x but got %02x%02x",
           0x00, 0x00, readbuf[0], readbuf[1]);
-    result = CURLE_WEIRD_SERVER_REPLY;
+    result = CARLE_WEIRD_SERVER_REPLY;
   }
 
 fail:
   return result;
 }
 
-static CURLcode mqtt_get_topic(struct Curl_easy *data,
+static CARLcode mqtt_get_topic(struct Curl_easy *data,
                                char **topic, size_t *topiclen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *path = data->state.up.path;
 
   if(strlen(path) > 1) {
@@ -221,7 +221,7 @@ static CURLcode mqtt_get_topic(struct Curl_easy *data,
   }
   else {
     failf(data, "Error: No topic specified.");
-    result = CURLE_URL_MALFORMAT;
+    result = CARLE_URL_MALFORMAT;
   }
   return result;
 }
@@ -243,9 +243,9 @@ static int mqtt_encode_len(char *buf, size_t len)
   return i;
 }
 
-static CURLcode mqtt_subscribe(struct Curl_easy *data)
+static CARLcode mqtt_subscribe(struct Curl_easy *data)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *topic = NULL;
   size_t topiclen;
   unsigned char *packet = NULL;
@@ -267,7 +267,7 @@ static CURLcode mqtt_subscribe(struct Curl_easy *data)
 
   packet = malloc(packetlen);
   if(!packet) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
 
@@ -291,11 +291,11 @@ fail:
 /*
  * Called when the first byte was already read.
  */
-static CURLcode mqtt_verify_suback(struct Curl_easy *data)
+static CARLcode mqtt_verify_suback(struct Curl_easy *data)
 {
-  CURLcode result;
+  CARLcode result;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   unsigned char readbuf[MQTT_SUBACK_LEN];
   ssize_t nread;
   struct mqtt_conn *mqtt = &conn->proto.mqtt;
@@ -304,11 +304,11 @@ static CURLcode mqtt_verify_suback(struct Curl_easy *data)
   if(result)
     goto fail;
 
-  Curl_debug(data, CURLINFO_HEADER_IN, (char *)readbuf, (size_t)nread);
+  Curl_debug(data, CARLINFO_HEADER_IN, (char *)readbuf, (size_t)nread);
 
   /* fixme */
   if(nread < MQTT_SUBACK_LEN) {
-    result = CURLE_WEIRD_SERVER_REPLY;
+    result = CARLE_WEIRD_SERVER_REPLY;
     goto fail;
   }
 
@@ -316,15 +316,15 @@ static CURLcode mqtt_verify_suback(struct Curl_easy *data)
   if(readbuf[0] != ((mqtt->packetid >> 8) & 0xff) ||
      readbuf[1] != (mqtt->packetid & 0xff) ||
      readbuf[2] != 0x00)
-    result = CURLE_WEIRD_SERVER_REPLY;
+    result = CARLE_WEIRD_SERVER_REPLY;
 
 fail:
   return result;
 }
 
-static CURLcode mqtt_publish(struct Curl_easy *data)
+static CARLcode mqtt_publish(struct Curl_easy *data)
 {
-  CURLcode result;
+  CARLcode result;
   char *payload = data->set.postfields;
   size_t payloadlen;
   char *topic = NULL;
@@ -334,10 +334,10 @@ static CURLcode mqtt_publish(struct Curl_easy *data)
   size_t remaininglength;
   size_t encodelen;
   char encodedbytes[4];
-  curl_off_t postfieldsize = data->set.postfieldsize;
+  carl_off_t postfieldsize = data->set.postfieldsize;
 
   if(!payload)
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   if(postfieldsize < 0)
     payloadlen = strlen(payload);
   else
@@ -353,7 +353,7 @@ static CURLcode mqtt_publish(struct Curl_easy *data)
   /* add the control byte and the encoded remaining length */
   pkt = malloc(remaininglength + 1 + encodelen);
   if(!pkt) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
 
@@ -395,7 +395,7 @@ static size_t mqtt_decode_len(unsigned char *buf,
   return len;
 }
 
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
 static const char *statenames[]={
   "MQTT_FIRST",
   "MQTT_REMAINING_LENGTH",
@@ -416,7 +416,7 @@ static void mqstate(struct Curl_easy *data,
 {
   struct connectdata *conn = data->conn;
   struct mqtt_conn *mqtt = &conn->proto.mqtt;
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
   infof(data, "%s (from %s) (next is %s)\n",
         statenames[state],
         statenames[mqtt->state],
@@ -431,11 +431,11 @@ static void mqstate(struct Curl_easy *data,
 /* for the publish packet */
 #define MQTT_HEADER_LEN 5    /* max 5 bytes */
 
-static CURLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
+static CARLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   ssize_t nread;
   unsigned char *pkt = (unsigned char *)data->state.buffer;
   size_t remlen;
@@ -469,7 +469,7 @@ static CURLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
       goto end;
     }
     else {
-      result = CURLE_WEIRD_SERVER_REPLY;
+      result = CARLE_WEIRD_SERVER_REPLY;
       goto end;
     }
 
@@ -489,17 +489,17 @@ static CURLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
       rest = (size_t)data->set.buffer_size;
     result = Curl_read(data, sockfd, (char *)pkt, rest, &nread);
     if(result) {
-      if(CURLE_AGAIN == result) {
+      if(CARLE_AGAIN == result) {
         infof(data, "EEEE AAAAGAIN\n");
       }
       goto end;
     }
     if(!nread) {
       infof(data, "server disconnected\n");
-      result = CURLE_PARTIAL_FILE;
+      result = CARLE_PARTIAL_FILE;
       goto end;
     }
-    Curl_debug(data, CURLINFO_DATA_IN, (char *)pkt, (size_t)nread);
+    Curl_debug(data, CARLINFO_DATA_IN, (char *)pkt, (size_t)nread);
 
     mq->npacket -= nread;
     k->bytecount += nread;
@@ -518,16 +518,16 @@ static CURLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
   }
   default:
     DEBUGASSERT(NULL); /* illegal state */
-    result = CURLE_WEIRD_SERVER_REPLY;
+    result = CARLE_WEIRD_SERVER_REPLY;
     goto end;
   }
   end:
   return result;
 }
 
-static CURLcode mqtt_do(struct Curl_easy *data, bool *done)
+static CARLcode mqtt_do(struct Curl_easy *data, bool *done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   *done = FALSE; /* unconditionally */
 
   result = mqtt_connect(data);
@@ -536,17 +536,17 @@ static CURLcode mqtt_do(struct Curl_easy *data, bool *done)
     return result;
   }
   mqstate(data, MQTT_FIRST, MQTT_CONNACK);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode mqtt_doing(struct Curl_easy *data, bool *done)
+static CARLcode mqtt_doing(struct Curl_easy *data, bool *done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
   struct mqtt_conn *mqtt = &conn->proto.mqtt;
   struct MQTT *mq = data->req.p.mqtt;
   ssize_t nread;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   unsigned char *pkt = (unsigned char *)data->state.buffer;
   unsigned char byte;
 
@@ -568,7 +568,7 @@ static CURLcode mqtt_doing(struct Curl_easy *data, bool *done)
     result = Curl_read(data, sockfd, (char *)&mq->firstbyte, 1, &nread);
     if(!nread)
       break;
-    Curl_debug(data, CURLINFO_HEADER_IN, (char *)&mq->firstbyte, 1);
+    Curl_debug(data, CARLINFO_HEADER_IN, (char *)&mq->firstbyte, 1);
     /* remember the first byte */
     mq->npacket = 0;
     mqstate(data, MQTT_REMAINING_LENGTH, MQTT_NOSTATE);
@@ -578,7 +578,7 @@ static CURLcode mqtt_doing(struct Curl_easy *data, bool *done)
       result = Curl_read(data, sockfd, (char *)&byte, 1, &nread);
       if(!nread)
         break;
-      Curl_debug(data, CURLINFO_HEADER_IN, (char *)&byte, 1);
+      Curl_debug(data, CARLINFO_HEADER_IN, (char *)&byte, 1);
       pkt[mq->npacket++] = byte;
     } while((byte & 0x80) && (mq->npacket < 4));
     if(result)
@@ -629,9 +629,9 @@ static CURLcode mqtt_doing(struct Curl_easy *data, bool *done)
     break;
   }
 
-  if(result == CURLE_AGAIN)
-    result = CURLE_OK;
+  if(result == CARLE_AGAIN)
+    result = CARLE_OK;
   return result;
 }
 
-#endif /* CURL_DISABLE_MQTT */
+#endif /* CARL_DISABLE_MQTT */

@@ -10,7 +10,7 @@
 # *
 # * This software is licensed as described in the file COPYING, which
 # * you should have received as part of this distribution. The terms
-# * are also available at https://curl.se/docs/copyright.html.
+# * are also available at https://carl.se/docs/copyright.html.
 # *
 # * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 # * KIND, either express or implied.
 # *
 # ***************************************************************************
-# This Perl script creates a fresh ca-bundle.crt file for use with libcurl.
+# This Perl script creates a fresh ca-bundle.crt file for use with libcarl.
 # It downloads certdata.txt from Mozilla's source tree (see URL below),
 # then parses certdata.txt and extracts CA Root Certificates into PEM format.
 # These are then processed with the OpenSSL commandline tool to produce the
@@ -129,7 +129,7 @@ else {
   $url = $opt_d;
 }
 
-my $curl = `curl -V`;
+my $carl = `carl -V`;
 
 if ($opt_i) {
   print ("=" x 78 . "\n");
@@ -303,31 +303,31 @@ report "SHA256 of old file: $oldhash";
 if(!$opt_n) {
   report "Downloading $txt ...";
 
-  # If we have an HTTPS URL then use curl
+  # If we have an HTTPS URL then use carl
   if($url =~ /^https:\/\//i) {
-    if($curl) {
-      if($curl =~ /^Protocols:.* https( |$)/m) {
-        report "Get certdata with curl!";
+    if($carl) {
+      if($carl =~ /^Protocols:.* https( |$)/m) {
+        report "Get certdata with carl!";
         my $proto = !$opt_k ? "--proto =https" : "";
         my $quiet = $opt_q ? "-s" : "";
-        my @out = `curl -w %{response_code} $proto $quiet -o "$txt" "$url"`;
+        my @out = `carl -w %{response_code} $proto $quiet -o "$txt" "$url"`;
         if(!$? && @out && $out[0] == 200) {
           $fetched = 1;
           report "Downloaded $txt";
         }
         else {
-          report "Failed downloading via HTTPS with curl";
+          report "Failed downloading via HTTPS with carl";
           if(-e $txt && !unlink($txt)) {
             report "Failed to remove '$txt': $!";
           }
         }
       }
       else {
-        report "curl lacks https support";
+        report "carl lacks https support";
       }
     }
     else {
-      report "curl not found";
+      report "carl not found";
     }
   }
 
@@ -406,7 +406,7 @@ print CRT <<EOT;
 ## ${url}
 ##
 ## It contains the certificates in ${format}PEM format and therefore
-## can be directly used with curl / libcurl / php_curl, or with
+## can be directly used with carl / libcarl / php_carl, or with
 ## an Apache+mod_ssl webserver for SSL client authentication.
 ## Just configure this file as the SSLCACertificateFile.
 ##

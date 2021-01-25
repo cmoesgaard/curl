@@ -13,8 +13,8 @@ HTTP Digest auth
 
  Explanation for the duplicate 400 requests:
 
- libcurl doesn't detect that a given Digest password is wrong already on the
- first 401 response (as the data400 gives). libcurl will instead consider the
+ libcarl doesn't detect that a given Digest password is wrong already on the
+ first 401 response (as the data400 gives). libcarl will instead consider the
  new response just as a duplicate and it sends another and detects the auth
  problem on the second 401 response!
 
@@ -187,7 +187,7 @@ HTTP authorization retry (Digest)
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -195,7 +195,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://%HOSTIP:%HTTPPORT/2027 digest digest
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 

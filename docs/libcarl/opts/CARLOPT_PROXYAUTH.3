@@ -1,0 +1,69 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_PROXYAUTH 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_PROXYAUTH \- set HTTP proxy authentication methods to try
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_PROXYAUTH, long bitmask);
+.SH DESCRIPTION
+Pass a long as parameter, which is set to a bitmask, to tell libcarl which
+HTTP authentication method(s) you want it to use for your proxy
+authentication.  If more than one bit is set, libcarl will first query the
+site to see what authentication methods it supports and then pick the best one
+you allow it to use. For some methods, this will induce an extra network
+round-trip. Set the actual name and password with the
+\fICARLOPT_PROXYUSERPWD(3)\fP option.
+
+The bitmask can be constructed by or'ing together the bits fully listed and
+described in the \fICARLOPT_HTTPAUTH(3)\fP man page.
+.SH DEFAULT
+CARLAUTH_BASIC
+.SH PROTOCOLS
+HTTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  /* use this proxy */
+  carl_easy_setopt(carl, CARLOPT_PROXY, "http://local.example.com:1080");
+  /* allow whatever auth the proxy speaks */
+  carl_easy_setopt(carl, CARLOPT_PROXYAUTH, CARLAUTH_ANY);
+  /* set the proxy credentials */
+  carl_easy_setopt(carl, CARLOPT_PROXYUSERPWD, "james:007");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.10.7
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_NOT_BUILT_IN if the bitmask specified no supported authentication
+methods.
+.SH "SEE ALSO"
+.BR CARLOPT_PROXY "(3), " CARLOPT_PROXYTYPE "(3), "
+.BR CARLOPT_PROXYUSERPWD "(3), " CARLOPT_PROXYPORT "(3), "

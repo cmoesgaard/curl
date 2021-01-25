@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SLIST_WC_H
-#define HEADER_CURL_SLIST_WC_H
+#ifndef HEADER_CARL_SLIST_WC_H
+#define HEADER_CARL_SLIST_WC_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,16 +23,16 @@
  ***************************************************************************/
 
 #include "tool_setup.h"
-#ifndef CURL_DISABLE_LIBCURL_OPTION
+#ifndef CARL_DISABLE_LIBCARL_OPTION
 
 /* linked-list structure with last node cache for easysrc */
 struct slist_wc {
-  struct curl_slist *first;
-  struct curl_slist *last;
+  struct carl_slist *first;
+  struct carl_slist *last;
 };
 
 /*
- * NAME curl_slist_wc_append()
+ * NAME carl_slist_wc_append()
  *
  * DESCRIPTION
  *
@@ -42,14 +42,14 @@ struct slist_wc {
 struct slist_wc *slist_wc_append(struct slist_wc *, const char *);
 
 /*
- * NAME curl_slist_free_all()
+ * NAME carl_slist_free_all()
  *
  * DESCRIPTION
  *
- * free a previously built curl_slist_wc.
+ * free a previously built carl_slist_wc.
  */
 void slist_wc_free_all(struct slist_wc *);
 
-#endif /* CURL_DISABLE_LIBCURL_OPTION */
+#endif /* CARL_DISABLE_LIBCARL_OPTION */
 
-#endif /* HEADER_CURL_SLIST_WC_H */
+#endif /* HEADER_CARL_SLIST_WC_H */

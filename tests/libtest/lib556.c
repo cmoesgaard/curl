@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,31 +37,31 @@
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_CONNECT_ONLY, 1L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
   if(!res) {
     /* we are connected, now get a HTTP document the raw way */
     const char *request =
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
       /* ASCII representation with escape sequences for non-ASCII platforms */
       "\x47\x45\x54\x20\x2f\x35\x35\x36\x20\x48\x54\x54\x50\x2f\x31\x2e"
       "\x32\x0d\x0a\x48\x6f\x73\x74\x3a\x20\x6e\x69\x6e\x6a\x61\x0d\x0a"
@@ -72,7 +72,7 @@ int test(char *URL)
 #endif
     size_t iolen = 0;
 
-    res = curl_easy_send(curl, request, strlen(request), &iolen);
+    res = carl_easy_send(carl, request, strlen(request), &iolen);
 
     if(!res) {
       /* we assume that sending always work */
@@ -80,7 +80,7 @@ int test(char *URL)
       do {
         char buf[1024];
         /* busy-read like crazy */
-        res = curl_easy_recv(curl, buf, sizeof(buf), &iolen);
+        res = carl_easy_recv(carl, buf, sizeof(buf), &iolen);
 
 #ifdef TPF
         sleep(1); /* avoid ctl-10 dump */
@@ -92,17 +92,17 @@ int test(char *URL)
             break;
         }
 
-      } while((res == CURLE_OK && iolen != 0) || (res == CURLE_AGAIN));
+      } while((res == CARLE_OK && iolen != 0) || (res == CARLE_AGAIN));
     }
 
     if(iolen != 0)
-      res = (CURLcode)TEST_ERR_FAILURE;
+      res = (CARLcode)TEST_ERR_FAILURE;
   }
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

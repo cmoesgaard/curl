@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,11 +32,11 @@
 int test(char *URL)
 {
   int res = 0;
-  CURL *curl = NULL;
+  CARL *carl = NULL;
   int i;
   char target_url[256];
   char dnsentry[256];
-  struct curl_slist *slist = NULL, *slist2;
+  struct carl_slist *slist = NULL, *slist2;
   char *port = libtest_arg3;
   char *address = libtest_arg2;
 
@@ -47,9 +47,9 @@ int test(char *URL)
     msnprintf(dnsentry, sizeof(dnsentry), "server%d.example.com:%s:%s", i + 1,
               port, address);
     printf("%s\n", dnsentry);
-    slist2 = curl_slist_append(slist, dnsentry);
+    slist2 = carl_slist_append(slist, dnsentry);
     if(!slist2) {
-      fprintf(stderr, "curl_slist_append() failed\n");
+      fprintf(stderr, "carl_slist_append() failed\n");
       goto test_cleanup;
     }
     slist = slist2;
@@ -57,19 +57,19 @@ int test(char *URL)
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   /* get an easy handle */
-  easy_init(curl);
+  easy_init(carl);
 
   /* go verbose */
-  easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+  easy_setopt(carl, CARLOPT_VERBOSE, 1L);
   /* include headers */
-  easy_setopt(curl, CURLOPT_HEADER, 1L);
+  easy_setopt(carl, CARLOPT_HEADER, 1L);
 
-  easy_setopt(curl, CURLOPT_RESOLVE, slist);
+  easy_setopt(carl, CARLOPT_RESOLVE, slist);
 
-  easy_setopt(curl, CURLOPT_MAXCONNECTS, 3L);
+  easy_setopt(carl, CARLOPT_MAXCONNECTS, 3L);
 
   /* get NUM_HANDLES easy handles */
   for(i = 0; i < NUM_URLS; i++) {
@@ -78,9 +78,9 @@ int test(char *URL)
               "http://server%d.example.com:%s/path/1510%04i",
               i + 1, port, i + 1);
     target_url[sizeof(target_url) - 1] = '\0';
-    easy_setopt(curl, CURLOPT_URL, target_url);
+    easy_setopt(carl, CARLOPT_URL, target_url);
 
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
 
     abort_on_test_timeout();
   }
@@ -89,11 +89,11 @@ test_cleanup:
 
   /* proper cleanup sequence - type PB */
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
-  curl_slist_free_all(slist);
+  carl_slist_free_all(slist);
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return res;
 }

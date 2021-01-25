@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,37 +20,37 @@
  *
  ***************************************************************************/
 /* <DESC>
- * Use CURLOPT_RESOLVE to feed custom IP addresses for given host name + port
+ * Use CARLOPT_RESOLVE to feed custom IP addresses for given host name + port
  * number combinations.
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
 
   /* Each single name resolve string should be written using the format
-     HOST:PORT:ADDRESS where HOST is the name libcurl will try to resolve,
-     PORT is the port number of the service where libcurl wants to connect to
+     HOST:PORT:ADDRESS where HOST is the name libcarl will try to resolve,
+     PORT is the port number of the service where libcarl wants to connect to
      the HOST and ADDRESS is the numerical IP address
    */
-  struct curl_slist *host = curl_slist_append(NULL,
+  struct carl_slist *host = carl_slist_append(NULL,
                                               "example.com:443:127.0.0.1");
 
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_RESOLVE, host);
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com");
-    res = curl_easy_perform(curl);
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_RESOLVE, host);
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+    res = carl_easy_perform(carl);
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
-  curl_slist_free_all(host);
+  carl_slist_free_all(host);
 
   return (int)res;
 }

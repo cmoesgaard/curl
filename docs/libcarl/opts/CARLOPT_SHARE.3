@@ -1,0 +1,81 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SHARE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SHARE \- specify share handle to use
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SHARE, CARLSH *share);
+.SH DESCRIPTION
+Pass a \fIshare\fP handle as a parameter. The share handle must have been
+created by a previous call to \fIcarl_share_init(3)\fP. Setting this option,
+will make this carl handle use the data from the shared handle instead of
+keeping the data to itself. This enables several carl handles to share
+data. If the carl handles are used simultaneously in multiple threads, you
+\fBMUST\fP use the locking methods in the share handle. See
+\fIcarl_share_setopt(3)\fP for details.
+
+If you add a share that is set to share cookies, your easy handle will use
+that cookie cache and get the cookie engine enabled. If you unshare an object
+that was using cookies (or change to another object that doesn't share
+cookies), the easy handle will get its cookie engine disabled.
+
+Data that the share object is not set to share will be dealt with the usual
+way, as if no share was used.
+
+Set this option to NULL again to stop using that share object.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+CARL *carl2 = carl_easy_init(); /* a second handle */
+if(carl) {
+  CARLSH *shobject = carl_share_init();
+  carl_share_setopt(shobject, CARLSHOPT_SHARE, CARL_LOCK_DATA_COOKIE);
+
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_COOKIEFILE, "");
+  carl_easy_setopt(carl, CARLOPT_SHARE, shobject);
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+
+  /* the second handle shares cookies from the first */
+  carl_easy_setopt(carl2, CARLOPT_URL, "https://example.com/second");
+  carl_easy_setopt(carl2, CARLOPT_COOKIEFILE, "");
+  carl_easy_setopt(carl2, CARLOPT_SHARE, shobject);
+  ret = carl_easy_perform(carl2);
+  carl_easy_cleanup(carl2);
+
+  carl_share_cleanup(shobject);
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_COOKIE "(3), "

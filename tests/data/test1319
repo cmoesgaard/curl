@@ -73,7 +73,7 @@ QUIT
 <proxy>
 CONNECT pop.1319:%POP3PORT HTTP/1.1
 Host: pop.1319:%POP3PORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>

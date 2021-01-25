@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 #
 #***************************************************************************
 
-# Starts sshd for use in the SCP and SFTP curl test harness tests.
+# Starts sshd for use in the SCP and SFTP carl test harness tests.
 # Also creates the ssh configuration files needed for these tests.
 
 use strict;
@@ -93,7 +93,7 @@ my $path = getcwd();          # current working directory
 my $logdir = $path .'/log';   # directory for log files
 my $username = $ENV{USER};    # default user
 my $pidfile;                  # ssh daemon pid file
-my $identity = 'curl_client_key'; # default identity file
+my $identity = 'carl_client_key'; # default identity file
 
 my $error;
 my @cfgarr;
@@ -357,7 +357,7 @@ if((($sshid =~ /OpenSSH/) && ($sshvernum < 299)) ||
 
 
 #***************************************************************************
-# Generate host and client key files for curl's tests
+# Generate host and client key files for carl's tests
 #
 if((! -e $hstprvkeyf) || (! -s $hstprvkeyf) ||
    (! -e $hstpubkeyf) || (! -s $hstpubkeyf) ||
@@ -367,12 +367,12 @@ if((! -e $hstprvkeyf) || (! -s $hstprvkeyf) ||
     # Make sure all files are gone so ssh-keygen doesn't complain
     unlink($hstprvkeyf, $hstpubkeyf, $hstpubmd5f, $cliprvkeyf, $clipubkeyf);
     logmsg 'generating host keys...' if($verbose);
-    if(system "\"$sshkeygen\" -q -t rsa -f $hstprvkeyf -C 'curl test server' -N ''") {
+    if(system "\"$sshkeygen\" -q -t rsa -f $hstprvkeyf -C 'carl test server' -N ''") {
         logmsg 'Could not generate host key';
         exit 1;
     }
     logmsg 'generating client keys...' if($verbose);
-    if(system "\"$sshkeygen\" -q -t rsa -f $cliprvkeyf -C 'curl test client' -N ''") {
+    if(system "\"$sshkeygen\" -q -t rsa -f $cliprvkeyf -C 'carl test client' -N ''") {
         logmsg 'Could not generate client key';
         exit 1;
     }
@@ -398,7 +398,7 @@ if((! -e $hstprvkeyf) || (! -s $hstprvkeyf) ||
 
 
 #***************************************************************************
-# Convert paths for curl's tests running on Windows with Cygwin/Msys OpenSSH
+# Convert paths for carl's tests running on Windows with Cygwin/Msys OpenSSH
 #
 my $clipubkeyf_config = abs_path("$path/$clipubkeyf");
 my $hstprvkeyf_config = abs_path("$path/$hstprvkeyf");
@@ -515,7 +515,7 @@ if ($sshdid =~ /OpenSSH-Windows/) {
 logmsg 'generating ssh server config file...' if($verbose);
 @cfgarr = ();
 push @cfgarr, '# This is a generated file.  Do not edit.';
-push @cfgarr, "# $sshdverstr sshd configuration file for curl testing";
+push @cfgarr, "# $sshdverstr sshd configuration file for carl testing";
 push @cfgarr, '#';
 
 # AllowUsers and DenyUsers options should use lowercase on Windows
@@ -580,7 +580,7 @@ push @cfgarr, '#';
 
 
 #***************************************************************************
-# Write out initial sshd configuration file for curl's tests
+# Write out initial sshd configuration file for carl's tests
 #
 $error = dump_array($sshdconfig, @cfgarr);
 if($error) {
@@ -745,7 +745,7 @@ push @cfgarr, '#';
 
 
 #***************************************************************************
-# Write out resulting sshd configuration file for curl's tests
+# Write out resulting sshd configuration file for carl's tests
 #
 $error = dump_array($sshdconfig, @cfgarr);
 if($error) {
@@ -766,7 +766,7 @@ if(system "\"$sshd\" -t -f $sshdconfig > $sshdlog 2>&1") {
 
 
 #***************************************************************************
-# Generate ssh client host key database file for curl's tests
+# Generate ssh client host key database file for carl's tests
 #
 if((! -e $knownhosts) || (! -s $knownhosts)) {
     logmsg 'generating ssh client known hosts file...' if($verbose);
@@ -799,7 +799,7 @@ if((! -e $knownhosts) || (! -s $knownhosts)) {
 
 
 #***************************************************************************
-# Convert paths for curl's tests running on Windows using Cygwin OpenSSH
+# Convert paths for carl's tests running on Windows using Cygwin OpenSSH
 #
 my $identity_config = abs_path("$path/$identity");
 my $knownhosts_config = abs_path("$path/$knownhosts");
@@ -899,7 +899,7 @@ if ($sshdid =~ /OpenSSH-Windows/) {
 logmsg 'generating ssh client config file...' if($verbose);
 @cfgarr = ();
 push @cfgarr, '# This is a generated file.  Do not edit.';
-push @cfgarr, "# $sshverstr ssh client configuration file for curl testing";
+push @cfgarr, "# $sshverstr ssh client configuration file for carl testing";
 push @cfgarr, '#';
 push @cfgarr, 'Host *';
 push @cfgarr, '#';
@@ -1054,7 +1054,7 @@ push @cfgarr, '#';
 
 
 #***************************************************************************
-# Write out resulting ssh client configuration file for curl's tests
+# Write out resulting ssh client configuration file for carl's tests
 #
 $error = dump_array($sshconfig, @cfgarr);
 if($error) {
@@ -1067,7 +1067,7 @@ if($error) {
 # Initialize client sftp config with options actually supported.
 #
 logmsg 'generating sftp client config file...' if($verbose);
-splice @cfgarr, 1, 1, "# $sshverstr sftp client configuration file for curl testing";
+splice @cfgarr, 1, 1, "# $sshverstr sftp client configuration file for carl testing";
 #
 for(my $i = scalar(@cfgarr) - 1; $i > 0; $i--) {
     if($cfgarr[$i] =~ /^DynamicForward/) {
@@ -1082,7 +1082,7 @@ for(my $i = scalar(@cfgarr) - 1; $i > 0; $i--) {
 
 
 #***************************************************************************
-# Write out resulting sftp client configuration file for curl's tests
+# Write out resulting sftp client configuration file for carl's tests
 #
 $error = dump_array($sftpconfig, @cfgarr);
 if($error) {

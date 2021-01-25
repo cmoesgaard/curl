@@ -1,0 +1,53 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_easy_duphandle 3 "19 Sep 2014" "libcarl" "libcarl Manual"
+.SH NAME
+carl_easy_duphandle - Clone a libcarl session handle
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+
+.BI "CARL *carl_easy_duphandle(CARL *"handle ");"
+
+.SH DESCRIPTION
+This function will return a new carl handle, a duplicate, using all the
+options previously set in the input carl \fIhandle\fP. Both handles can
+subsequently be used independently and they must both be freed with
+\fIcarl_easy_cleanup(3)\fP.
+
+All strings that the input handle has been told to point to (as opposed to
+copy) with previous calls to \fIcarl_easy_setopt(3)\fP using char * inputs,
+will be pointed to by the new handle as well. You must therefore make sure to
+keep the data around until both handles have been cleaned up.
+
+The new handle will \fBnot\fP inherit any state information, no connections,
+no SSL sessions and no cookies. It also will not inherit any share object
+states or options (it will be made as if \fICARLOPT_SHARE(3)\fP was set to
+NULL).
+
+In multi-threaded programs, this function must be called in a synchronous way,
+the input handle may not be in use when cloned.
+.SH RETURN VALUE
+If this function returns NULL, something went wrong and no valid handle was
+returned.
+.SH "SEE ALSO"
+.BR carl_easy_init "(3)," carl_easy_cleanup "(3)," carl_easy_reset "(3),"
+.BR carl_global_init "(3)"

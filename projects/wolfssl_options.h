@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 /*
 By default wolfSSL has a very conservative configuration that can result in
 connections to servers failing due to certificate or algorithm problems.
-To remedy this issue for libcurl I've generated this options file that
+To remedy this issue for libcarl I've generated this options file that
 build-wolfssl will copy to the wolfSSL include directories and will result in
 maximum compatibility.
 

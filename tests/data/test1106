@@ -2,7 +2,7 @@
 <info>
 <keywords>
 FTP
-CURLOPT_PORT
+CARLOPT_PORT
 HTTP proxy
 </keywords>
 </info>
@@ -47,7 +47,7 @@ ftp://%HOSTIP:23456/1106
 <protocol>
 GET ftp://%HOSTIP:23456/1106 HTTP/1.1
 Host: %HOSTIP:23456
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

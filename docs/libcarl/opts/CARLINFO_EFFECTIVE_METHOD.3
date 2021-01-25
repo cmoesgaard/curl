@@ -1,0 +1,68 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLINFO_EFFECTIVE_METHOD 3 "28 Aug 2015" "libcarl 7.72.0" "carl_easy_getinfo options"
+.SH NAME
+CARLINFO_EFFECTIVE_METHOD \- get the last used HTTP method
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode carl_easy_getinfo(CARL *handle, CARLINFO_EFFECTIVE_METHOD,
+                           char **methodp);
+.fi
+.SH DESCRIPTION
+Pass in a pointer to a char pointer and get the last used effective HTTP
+method.
+
+In cases when you've asked libcarl to follow redirects, the method may very
+well not be the same method the first request would use.
+
+The \fBmethodp\fP pointer will be NULL or pointing to private memory you MUST
+NOT free - it gets freed when you call \fIcarl_easy_cleanup(3)\fP on the
+corresponding CARL handle.
+.SH PROTOCOLS
+HTTP(S)
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode res;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+  carl_easy_setopt(carl, CARLOPT_POSTFIELDS, "data");
+  carl_easy_setopt(carl, CARLOPT_FOLLOWLOCATION, 1L);
+  res = carl_easy_perform(carl);
+  if(res == CARLE_OK) {
+    char *method = NULL;
+    carl_easy_getinfo(carl, CARLINFO_EFFECTIVE_METHOD, &method);
+    if(method)
+      printf("Redirected to method: %s\\n", method);
+  }
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.72.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR carl_easy_getinfo "(3), " carl_easy_setopt "(3), "

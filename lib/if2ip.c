@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
@@ -54,8 +54,8 @@
 #include "strcase.h"
 #include "if2ip.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* ------------------------------------------------------------------ */
@@ -188,7 +188,7 @@ if2ip_result_t Curl_if2ip(int af, unsigned int remote_scope,
   struct ifreq req;
   struct in_addr in;
   struct sockaddr_in *s;
-  curl_socket_t dummy;
+  carl_socket_t dummy;
   size_t len;
   const char *r;
 
@@ -203,7 +203,7 @@ if2ip_result_t Curl_if2ip(int af, unsigned int remote_scope,
     return IF2IP_NOT_FOUND;
 
   dummy = socket(AF_INET, SOCK_STREAM, 0);
-  if(CURL_SOCKET_BAD == dummy)
+  if(CARL_SOCKET_BAD == dummy)
     return IF2IP_NOT_FOUND;
 
   memset(&req, 0, sizeof(req));

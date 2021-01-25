@@ -44,7 +44,7 @@ http://%HOSTIP:%HTTPPORT/we/want/our/1270 -w '%{redirect_url}\n' -s
 <protocol>
 GET /we/want/our/1270 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

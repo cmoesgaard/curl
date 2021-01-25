@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "urldata.h"
 #include "url.h"
@@ -36,8 +36,8 @@
 #include "connect.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define HASHKEY_SIZE 128
@@ -49,18 +49,18 @@ static void conn_llist_dtor(void *user, void *element)
   conn->bundle = NULL;
 }
 
-static CURLcode bundle_create(struct connectbundle **bundlep)
+static CARLcode bundle_create(struct connectbundle **bundlep)
 {
   DEBUGASSERT(*bundlep == NULL);
   *bundlep = malloc(sizeof(struct connectbundle));
   if(!*bundlep)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   (*bundlep)->num_connections = 0;
   (*bundlep)->multiuse = BUNDLE_UNKNOWN;
 
   Curl_llist_init(&(*bundlep)->conn_list, (Curl_llist_dtor) conn_llist_dtor);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void bundle_destroy(struct connectbundle *bundle)
@@ -115,7 +115,7 @@ int Curl_conncache_init(struct conncache *connc, int size)
   int rc;
 
   /* allocate a new easy handle to use when closing cached connections */
-  connc->closure_handle = curl_easy_init();
+  connc->closure_handle = carl_easy_init();
   if(!connc->closure_handle)
     return 1; /* bad */
 
@@ -143,7 +143,7 @@ static void hashkey(struct connectdata *conn, char *buf,
   const char *hostname;
   long port = conn->remote_port;
 
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
     hostname = conn->http_proxy.host.name;
     port = conn->port;
@@ -229,9 +229,9 @@ static void conncache_remove_bundle(struct conncache *connc,
   }
 }
 
-CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
+CARLcode Curl_conncache_add_conn(struct Curl_easy *data)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectbundle *bundle = NULL;
   struct connectdata *conn = data->conn;
   struct conncache *connc = data->state.conn_cache;
@@ -254,7 +254,7 @@ CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
 
     if(!rc) {
       bundle_destroy(bundle);
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
       goto unlock;
     }
   }
@@ -437,7 +437,7 @@ Curl_conncache_extract_bundle(struct Curl_easy *data,
   struct Curl_llist_element *curr;
   timediff_t highscore = -1;
   timediff_t score;
-  struct curltime now;
+  struct carltime now;
   struct connectdata *conn_candidate = NULL;
   struct connectdata *conn;
 
@@ -487,7 +487,7 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
   struct Curl_hash_element *he;
   timediff_t highscore =- 1;
   timediff_t score;
-  struct curltime now;
+  struct carltime now;
   struct connectdata *conn_candidate = NULL;
   struct connectbundle *bundle;
   struct connectbundle *bundle_candidate = NULL;

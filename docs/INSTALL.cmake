@@ -8,27 +8,27 @@
 
 Building with CMake
 ==========================
-   This document describes how to compile, build and install curl and libcurl
+   This document describes how to compile, build and install carl and libcarl
    from source code using the CMake build tool. To build with CMake, you will
    of course have to first install CMake.  The minimum required version of
-   CMake is specified in the file CMakeLists.txt found in the top of the curl
+   CMake is specified in the file CMakeLists.txt found in the top of the carl
    source tree. Once the correct version of CMake is installed you can follow
    the instructions below for the platform you are building on.
 
    CMake builds can be configured either from the command line, or from one
    of CMake's GUI's.
 
-Current flaws in the curl CMake build
+Current flaws in the carl CMake build
 =====================================
 
    Missing features in the cmake build:
 
-   - Builds libcurl without large file support
+   - Builds libcarl without large file support
    - Does not support all SSL libraries (only OpenSSL, Schannel,
      Secure Transport, and mbed TLS, NSS, WolfSSL)
    - Doesn't allow different resolver backends (no c-ares build support)
    - No RTMP support built
-   - Doesn't allow build curl and libcurl debug enabled
+   - Doesn't allow build carl and libcarl debug enabled
    - Doesn't allow a custom CA bundle path
    - Doesn't allow you to disable specific protocols from the build
    - Doesn't find or use krb4 or GSS
@@ -38,21 +38,21 @@ Current flaws in the curl CMake build
 
 Command Line CMake
 ==================
-   A CMake build of curl is similar to the autotools build of curl. It
+   A CMake build of carl is similar to the autotools build of carl. It
    consists of the following steps after you have unpacked the source.
 
-    1. Create an out of source build tree parallel to the curl source
+    1. Create an out of source build tree parallel to the carl source
        tree and change into that directory
 
-    $ mkdir curl-build
-    $ cd curl-build
+    $ mkdir carl-build
+    $ cd carl-build
 
     2. Run CMake from the build tree, giving it the path to the top of
-       the curl source tree.  CMake will pick a compiler for you. If you
+       the carl source tree.  CMake will pick a compiler for you. If you
        want to specify the compile, you can set the CC environment
        variable prior to running CMake.
 
-    $ cmake ../curl
+    $ cmake ../carl
     $ make
 
     3. Install to default location:
@@ -64,8 +64,8 @@ Command Line CMake
 ccmake
 =========
      CMake comes with a curses based interface called ccmake.  To run ccmake on
-     a curl use the instructions for the command line cmake, but substitute
-     ccmake ../curl for cmake ../curl.  This will bring up a curses interface
+     a carl use the instructions for the command line cmake, but substitute
+     ccmake ../carl for cmake ../carl.  This will bring up a curses interface
      with instructions on the bottom of the screen. You can press the "c" key
      to configure the project, and the "g" key to generate the project. After
      the project is generated, you can run make.
@@ -75,10 +75,10 @@ cmake-gui
      CMake also comes with a Qt based GUI called cmake-gui. To configure with
      cmake-gui, you run cmake-gui and follow these steps:
         1. Fill in the "Where is the source code" combo box with the path to
-        the curl source tree.
+        the carl source tree.
         2. Fill in the "Where to build the binaries" combo box with the path
         to the directory for your build tree, ideally this should not be the
-        same as the source tree, but a parallel directory called curl-build or
+        same as the source tree, but a parallel directory called carl-build or
         something similar.
         3. Once the source and binary directories are specified, press the
         "Configure" button.

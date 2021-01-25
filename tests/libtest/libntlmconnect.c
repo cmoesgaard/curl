@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,38 +32,38 @@
 #define MAX_EASY_HANDLES 3
 
 static int counter[MAX_EASY_HANDLES];
-static CURL *easy[MAX_EASY_HANDLES];
-static curl_socket_t sockets[MAX_EASY_HANDLES];
+static CARL *easy[MAX_EASY_HANDLES];
+static carl_socket_t sockets[MAX_EASY_HANDLES];
 static int res = 0;
 
 static size_t callback(char *ptr, size_t size, size_t nmemb, void *data)
 {
-  ssize_t idx = ((CURL **) data) - easy;
-  curl_socket_t sock;
+  ssize_t idx = ((CARL **) data) - easy;
+  carl_socket_t sock;
   long longdata;
-  CURLcode code;
+  CARLcode code;
   const size_t failure = (size && nmemb) ? 0 : 1;
   (void)ptr;
 
   counter[idx] += (int)(size * nmemb);
 
-  /* Get socket being used for this easy handle, otherwise CURL_SOCKET_BAD */
-  code = curl_easy_getinfo(easy[idx], CURLINFO_LASTSOCKET, &longdata);
-  if(CURLE_OK != code) {
-    fprintf(stderr, "%s:%d curl_easy_getinfo() failed, "
+  /* Get socket being used for this easy handle, otherwise CARL_SOCKET_BAD */
+  code = carl_easy_getinfo(easy[idx], CARLINFO_LASTSOCKET, &longdata);
+  if(CARLE_OK != code) {
+    fprintf(stderr, "%s:%d carl_easy_getinfo() failed, "
             "with code %d (%s)\n",
-            __FILE__, __LINE__, (int)code, curl_easy_strerror(code));
+            __FILE__, __LINE__, (int)code, carl_easy_strerror(code));
     res = TEST_ERR_MAJOR_BAD;
     return failure;
   }
   if(longdata == -1L)
-    sock = CURL_SOCKET_BAD;
+    sock = CARL_SOCKET_BAD;
   else
-    sock = (curl_socket_t)longdata;
+    sock = (carl_socket_t)longdata;
 
-  if(sock != CURL_SOCKET_BAD) {
+  if(sock != CARL_SOCKET_BAD) {
     /* Track relationship between this easy handle and the socket. */
-    if(sockets[idx] == CURL_SOCKET_BAD) {
+    if(sockets[idx] == CARL_SOCKET_BAD) {
       /* An easy handle without previous socket, record the socket. */
       sockets[idx] = sock;
     }
@@ -71,7 +71,7 @@ static size_t callback(char *ptr, size_t size, size_t nmemb, void *data)
       /* An easy handle with a socket different to previously
          tracked one, log and fail right away. Known bug #37. */
       fprintf(stderr, "Handle %d started on socket %d and moved to %d\n",
-              curlx_sztosi(idx), (int)sockets[idx], (int)sock);
+              carlx_sztosi(idx), (int)sockets[idx], (int)sock);
       res = TEST_ERR_MAJOR_BAD;
       return failure;
     }
@@ -87,7 +87,7 @@ enum HandleState {
 
 int test(char *url)
 {
-  CURLM *multi = NULL;
+  CARLM *multi = NULL;
   int running;
   int i;
   int num_handles = 0;
@@ -104,10 +104,10 @@ int test(char *url)
 
   for(i = 0; i < MAX_EASY_HANDLES; ++i) {
     easy[i] = NULL;
-    sockets[i] = CURL_SOCKET_BAD;
+    sockets[i] = CARL_SOCKET_BAD;
   }
 
-  res_global_init(CURL_GLOBAL_ALL);
+  res_global_init(CARL_GLOBAL_ALL);
   if(res) {
     free(full_url);
     return res;
@@ -116,9 +116,9 @@ int test(char *url)
   multi_init(multi);
 
 #ifdef USE_PIPELINING
-  multi_setopt(multi, CURLMOPT_PIPELINING, 1L);
-  multi_setopt(multi, CURLMOPT_MAX_HOST_CONNECTIONS, 5L);
-  multi_setopt(multi, CURLMOPT_MAX_TOTAL_CONNECTIONS, 10L);
+  multi_setopt(multi, CARLMOPT_PIPELINING, 1L);
+  multi_setopt(multi, CARLMOPT_MAX_HOST_CONNECTIONS, 5L);
+  multi_setopt(multi, CARLMOPT_MAX_TOTAL_CONNECTIONS, 10L);
 #endif
 
   for(;;) {
@@ -136,20 +136,20 @@ int test(char *url)
 
       if(num_handles % 3 == 2) {
         msnprintf(full_url, urllen, "%s0200", url);
-        easy_setopt(easy[num_handles], CURLOPT_HTTPAUTH, CURLAUTH_NTLM);
+        easy_setopt(easy[num_handles], CARLOPT_HTTPAUTH, CARLAUTH_NTLM);
       }
       else {
         msnprintf(full_url, urllen, "%s0100", url);
-        easy_setopt(easy[num_handles], CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        easy_setopt(easy[num_handles], CARLOPT_HTTPAUTH, CARLAUTH_BASIC);
       }
-      easy_setopt(easy[num_handles], CURLOPT_FRESH_CONNECT, 1L);
-      easy_setopt(easy[num_handles], CURLOPT_URL, full_url);
-      easy_setopt(easy[num_handles], CURLOPT_VERBOSE, 1L);
-      easy_setopt(easy[num_handles], CURLOPT_HTTPGET, 1L);
-      easy_setopt(easy[num_handles], CURLOPT_USERPWD, "testuser:testpass");
-      easy_setopt(easy[num_handles], CURLOPT_WRITEFUNCTION, callback);
-      easy_setopt(easy[num_handles], CURLOPT_WRITEDATA, easy + num_handles);
-      easy_setopt(easy[num_handles], CURLOPT_HEADER, 1L);
+      easy_setopt(easy[num_handles], CARLOPT_FRESH_CONNECT, 1L);
+      easy_setopt(easy[num_handles], CARLOPT_URL, full_url);
+      easy_setopt(easy[num_handles], CARLOPT_VERBOSE, 1L);
+      easy_setopt(easy[num_handles], CARLOPT_HTTPGET, 1L);
+      easy_setopt(easy[num_handles], CARLOPT_USERPWD, "testuser:testpass");
+      easy_setopt(easy[num_handles], CARLOPT_WRITEFUNCTION, callback);
+      easy_setopt(easy[num_handles], CARLOPT_WRITEDATA, easy + num_handles);
+      easy_setopt(easy[num_handles], CARLOPT_HEADER, 1L);
 
       multi_add_handle(multi, easy[num_handles]);
       num_handles += 1;
@@ -221,12 +221,12 @@ test_cleanup:
 
   for(i = 0; i < MAX_EASY_HANDLES; i++) {
     printf("Data connection %d: %d\n", i, counter[i]);
-    curl_multi_remove_handle(multi, easy[i]);
-    curl_easy_cleanup(easy[i]);
+    carl_multi_remove_handle(multi, easy[i]);
+    carl_easy_cleanup(easy[i]);
   }
 
-  curl_multi_cleanup(multi);
-  curl_global_cleanup();
+  carl_multi_cleanup(multi);
+  carl_global_cleanup();
 
   free(full_url);
 

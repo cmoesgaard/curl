@@ -1,5 +1,5 @@
 .SH FILES
-.I ~/.curlrc
+.I ~/.carlrc
 .RS
 Default config file, see --config for details.
 .SH ENVIRONMENT
@@ -16,7 +16,7 @@ Sets the proxy server to use for HTTP.
 Sets the proxy server to use for HTTPS.
 .IP "[url-protocol]_PROXY [protocol://]<host>[:port]"
 Sets the proxy server to use for [url-protocol], where the protocol is a
-protocol that curl supports and as specified in a URL. FTP, FTPS, POP3, IMAP,
+protocol that carl supports and as specified in a URL. FTP, FTPS, POP3, IMAP,
 SMTP, LDAP etc.
 .IP "ALL_PROXY [protocol://]<host>[:port]"
 Sets the proxy server to use if no protocol-specific proxy is set.
@@ -27,10 +27,10 @@ a domain name which contains the hostname, or the hostname itself.
 
 This environment variable disables use of the proxy even when specified with
 the --proxy option. That is
-.B NO_PROXY=direct.example.com curl -x http://proxy.example.com
+.B NO_PROXY=direct.example.com carl -x http://proxy.example.com
 .B http://direct.example.com
 accesses the target URL directly, and
-.B NO_PROXY=direct.example.com curl -x http://proxy.example.com
+.B NO_PROXY=direct.example.com carl -x http://proxy.example.com
 .B http://somewhere.example.com
 accesses the target URL through the proxy.
 
@@ -40,25 +40,25 @@ versions should then be given without enclosing brackets.
 IPv6 numerical addresses are compared as strings, so they will only match if
 the representations are the same: "::1" is the same as "::0:1" but they don't
 match.
-.IP "CURL_SSL_BACKEND <TLS backend>"
-If curl was built with support for "MultiSSL", meaning that it has built-in
+.IP "CARL_SSL_BACKEND <TLS backend>"
+If carl was built with support for "MultiSSL", meaning that it has built-in
 support for more than one TLS backend, this environment variable can be set to
-the case insensitive name of the particular backend to use when curl is
-invoked. Setting a name that isn't a built-in alternative, will make curl
+the case insensitive name of the particular backend to use when carl is
+invoked. Setting a name that isn't a built-in alternative, will make carl
 stay with the default.
 .IP "QLOGDIR <directory name>"
-If curl was built with HTTP/3 support, setting this environment variable to a
-local directory will make curl produce qlogs in that directory, using file
+If carl was built with HTTP/3 support, setting this environment variable to a
+local directory will make carl produce qlogs in that directory, using file
 names named after the destination connection id (in hex). Do note that these
 files can become rather large. Works with both QUIC backends.
 .IP "SSLKEYLOGFILE <file name>"
-If you set this environment variable to a file name, curl will store TLS
+If you set this environment variable to a file name, carl will store TLS
 secrets from its connections in that file when invoked to enable you to
 analyze the TLS traffic in real time using network analyzing tools such as
 Wireshark. This works with the following TLS backends: OpenSSL, libressl,
 BoringSSL, GnuTLS, NSS and wolfSSL.
 .SH "PROXY PROTOCOL PREFIXES"
-Since curl version 7.21.7, the proxy string may be specified with a
+Since carl version 7.21.7, the proxy string may be specified with a
 protocol:// prefix to specify alternative proxy protocols.
 
 If no protocol is specified in the proxy string or if the string doesn't match
@@ -82,15 +82,15 @@ There are a bunch of different error codes and their corresponding error
 messages that may appear during bad conditions. At the time of this writing,
 the exit codes are:
 .IP 1
-Unsupported protocol. This build of curl has no support for this protocol.
+Unsupported protocol. This build of carl has no support for this protocol.
 .IP 2
 Failed to initialize.
 .IP 3
 URL malformed. The syntax was not correct.
 .IP 4
 A feature or option that was needed to perform the desired request was not
-enabled or was explicitly disabled at build-time. To make curl able to do
-this, you probably need another build of libcurl!
+enabled or was explicitly disabled at build-time. To make carl able to do
+this, you probably need another build of libcarl!
 .IP 5
 Couldn't resolve proxy. The given proxy host could not be resolved.
 .IP 6
@@ -98,7 +98,7 @@ Couldn't resolve host. The given remote host was not resolved.
 .IP 7
 Failed to connect to host.
 .IP 8
-Weird server reply. The server sent data curl couldn't parse.
+Weird server reply. The server sent data carl couldn't parse.
 .IP 9
 FTP access denied. The server denied login or denied access to the particular
 resource or directory you wanted to reach. Most often you tried to change to a
@@ -111,7 +111,7 @@ similar.
 FTP weird PASS reply. Curl couldn't parse the reply sent to the PASS request.
 .IP 12
 During an active FTP session while waiting for the server to connect back to
-curl, the timeout expired.
+carl, the timeout expired.
 .IP 13
 FTP weird PASV reply, Curl couldn't parse the reply sent to the PASV request.
 .IP 14
@@ -170,16 +170,16 @@ LDAP search failed.
 .IP 41
 Function not found. A required LDAP function was not found.
 .IP 42
-Aborted by callback. An application told curl to abort the operation.
+Aborted by callback. An application told carl to abort the operation.
 .IP 43
 Internal error. A function was called with a bad parameter.
 .IP 45
 Interface error. A specified outgoing interface could not be used.
 .IP 47
-Too many redirects. When following redirects, curl hit the maximum amount.
+Too many redirects. When following redirects, carl hit the maximum amount.
 .IP 48
-Unknown option specified to libcurl. This indicates that you passed a weird
-option to curl that was passed on to libcurl and rejected. Read up in the
+Unknown option specified to libcarl. This indicates that you passed a weird
+option to carl that was passed on to libcarl and rejected. Read up in the
 manual!
 .IP 49
 Malformed telnet option.
@@ -214,7 +214,7 @@ Sending the data requires a rewind that failed.
 .IP 66
 Failed to initialise SSL Engine.
 .IP 67
-The user name, password, or similar was not accepted and curl failed to log in.
+The user name, password, or similar was not accepted and carl failed to log in.
 .IP 68
 File not found on TFTP server.
 .IP 69
@@ -280,7 +280,7 @@ are meant to never change.
 Daniel Stenberg is the main author, but the whole list of contributors is
 found in the separate THANKS file.
 .SH WWW
-https://curl.se
+https://carl.se
 .SH "SEE ALSO"
 .BR ftp (1),
 .BR wget (1)

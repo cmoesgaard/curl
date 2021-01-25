@@ -28,7 +28,7 @@ http
 HTTP custom Content-Type with parameter
  </name>
  <command>
-http://%HOSTIP:%HTTPPORT/we/want/669 -H 'Content-type: multipart/form-data; charset=utf-8' -F name=daniel -F tool=curl
+http://%HOSTIP:%HTTPPORT/we/want/669 -H 'Content-type: multipart/form-data; charset=utf-8' -F name=daniel -F tool=carl
 </command>
 </client>
 
@@ -41,7 +41,7 @@ s/boundary=------------------------[a-z0-9]*/boundary=--------------------------
 <protocol>
 POST /we/want/669 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 242
 Content-Type: multipart/form-data; charset=utf-8; boundary=----------------------------
@@ -53,7 +53,7 @@ daniel
 ------------------------------
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 --------------------------------
 </protocol>
 </verify>

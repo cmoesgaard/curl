@@ -1,0 +1,187 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_DEBUGFUNCTION 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_DEBUGFUNCTION \- debug callback
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+typedef enum {
+  CARLINFO_TEXT = 0,
+  CARLINFO_HEADER_IN,    /* 1 */
+  CARLINFO_HEADER_OUT,   /* 2 */
+  CARLINFO_DATA_IN,      /* 3 */
+  CARLINFO_DATA_OUT,     /* 4 */
+  CARLINFO_SSL_DATA_IN,  /* 5 */
+  CARLINFO_SSL_DATA_OUT, /* 6 */
+  CARLINFO_END
+} carl_infotype;
+
+int debug_callback(CARL *handle,
+                   carl_infotype type,
+                   char *data,
+                   size_t size,
+                   void *userptr);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_DEBUGFUNCTION,
+                          debug_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+\fICARLOPT_DEBUGFUNCTION(3)\fP replaces the standard debug function used when
+\fICARLOPT_VERBOSE(3)\fP is in effect. This callback receives debug
+information, as specified in the \fItype\fP argument. This function must
+return 0. The \fIdata\fP pointed to by the char * passed to this function WILL
+NOT be null-terminated, but will be exactly of the \fIsize\fP as told by the
+\fIsize\fP argument.
+
+The \fIuserptr\fP argument is the pointer set with \fICARLOPT_DEBUGDATA(3)\fP.
+
+Available carl_infotype values:
+.IP CARLINFO_TEXT
+The data is informational text.
+.IP CARLINFO_HEADER_IN
+The data is header (or header-like) data received from the peer.
+.IP CARLINFO_HEADER_OUT
+The data is header (or header-like) data sent to the peer.
+.IP CARLINFO_DATA_IN
+The data is protocol data received from the peer.
+.IP CARLINFO_DATA_OUT
+The data is protocol data sent to the peer.
+.IP CARLINFO_SSL_DATA_OUT
+The data is SSL/TLS (binary) data sent to the peer.
+.IP CARLINFO_SSL_DATA_IN
+The data is SSL/TLS (binary) data received from the peer.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+static
+void dump(const char *text,
+          FILE *stream, unsigned char *ptr, size_t size)
+{
+  size_t i;
+  size_t c;
+  unsigned int width=0x10;
+
+  fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\\n",
+          text, (long)size, (long)size);
+
+  for(i=0; i<size; i+= width) {
+    fprintf(stream, "%4.4lx: ", (long)i);
+
+    /* show hex to the left */
+    for(c = 0; c < width; c++) {
+      if(i+c < size)
+        fprintf(stream, "%02x ", ptr[i+c]);
+      else
+        fputs("   ", stream);
+    }
+
+    /* show data on the right */
+    for(c = 0; (c < width) && (i+c < size); c++) {
+      char x = (ptr[i+c] >= 0x20 && ptr[i+c] < 0x80) ? ptr[i+c] : '.';
+      fputc(x, stream);
+    }
+
+    fputc('\\n', stream); /* newline */
+  }
+}
+
+static
+int my_trace(CARL *handle, carl_infotype type,
+             char *data, size_t size,
+             void *userp)
+{
+  const char *text;
+  (void)handle; /* prevent compiler warning */
+  (void)userp;
+
+  switch (type) {
+  case CARLINFO_TEXT:
+    fprintf(stderr, "== Info: %s", data);
+  default: /* in case a new one is introduced to shock us */
+    return 0;
+
+  case CARLINFO_HEADER_OUT:
+    text = "=> Send header";
+    break;
+  case CARLINFO_DATA_OUT:
+    text = "=> Send data";
+    break;
+  case CARLINFO_SSL_DATA_OUT:
+    text = "=> Send SSL data";
+    break;
+  case CARLINFO_HEADER_IN:
+    text = "<= Recv header";
+    break;
+  case CARLINFO_DATA_IN:
+    text = "<= Recv data";
+    break;
+  case CARLINFO_SSL_DATA_IN:
+    text = "<= Recv SSL data";
+    break;
+  }
+
+  dump(text, stderr, (unsigned char *)data, size);
+  return 0;
+}
+
+int main(void)
+{
+  CARL *carl;
+  CARLcode res;
+
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_DEBUGFUNCTION, my_trace);
+
+    /* the DEBUGFUNCTION has no effect until we enable VERBOSE */
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+
+    /* example.com is redirected, so we tell libcarl to follow redirection */
+    carl_easy_setopt(carl, CARLOPT_FOLLOWLOCATION, 1L);
+
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+    res = carl_easy_perform(carl);
+    /* Check for errors */
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\\n",
+              carl_easy_strerror(res));
+
+    /* always cleanup */
+    carl_easy_cleanup(carl);
+  }
+  return 0;
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_VERBOSE "(3), " CARLOPT_DEBUGDATA "(3), "

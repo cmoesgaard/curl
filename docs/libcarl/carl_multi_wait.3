@@ -1,0 +1,123 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_multi_wait 3 "12 Jul 2012" "libcarl 7.28.0" "libcarl Manual"
+.SH NAME
+carl_multi_wait - polls on all easy handles in a multi handle
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLMcode carl_multi_wait(CARLM *multi_handle,
+                          struct carl_waitfd extra_fds[],
+                          unsigned int extra_nfds,
+                          int timeout_ms,
+                          int *numfds);
+.ad
+.SH DESCRIPTION
+\fIcarl_multi_wait(3)\fP polls all file descriptors used by the carl easy
+handles contained in the given multi handle set.  It will block until activity
+is detected on at least one of the handles or \fItimeout_ms\fP has passed.
+Alternatively, if the multi handle has a pending internal timeout that has a
+shorter expiry time than \fItimeout_ms\fP, that shorter time will be used
+instead to make sure timeout accuracy is reasonably kept.
+
+The calling application may pass additional carl_waitfd structures which are
+similar to \fIpoll(2)\fP's pollfd structure to be waited on in the same call.
+
+On completion, if \fInumfds\fP is non-NULL, it will be populated with the
+total number of file descriptors on which interesting events occurred. This
+number can include both libcarl internal descriptors as well as descriptors
+provided in \fIextra_fds\fP.
+
+If no extra file descriptors are provided and libcarl has no file descriptor
+to offer to wait for, this function will return immediately. (Try
+\fIcarl_multi_poll(3)\fP instead if you rather avoid this behavior.)
+
+This function is encouraged to be used instead of select(3) when using the
+multi interface to allow applications to easier circumvent the common problem
+with 1024 maximum file descriptors.
+.SH carl_waitfd
+.nf
+struct carl_waitfd {
+  carl_socket_t fd;
+  short events;
+  short revents;
+};
+.fi
+.IP CARL_WAIT_POLLIN
+Bit flag to carl_waitfd.events indicating the socket should poll on read
+events such as new data received.
+.IP CARL_WAIT_POLLPRI
+Bit flag to carl_waitfd.events indicating the socket should poll on high
+priority read events such as out of band data.
+.IP CARL_WAIT_POLLOUT
+Bit flag to carl_waitfd.events indicating the socket should poll on write
+events such as the socket being clear to write without blocking.
+.SH EXAMPLE
+.nf
+CARL *easy_handle;
+CARLM *multi_handle;
+
+/* add the individual easy handle */
+carl_multi_add_handle(multi_handle, easy_handle);
+
+do {
+  CARLMcode mc;
+  int numfds;
+
+  mc = carl_multi_perform(multi_handle, &still_running);
+
+  if(mc == CARLM_OK ) {
+    /* wait for activity, timeout or "nothing" */
+    mc = carl_multi_wait(multi_handle, NULL, 0, 1000, &numfds);
+  }
+
+  if(mc != CARLM_OK) {
+    fprintf(stderr, "carl_multi failed, code %d.\\n", mc);
+    break;
+  }
+
+  /* 'numfds' being zero means either a timeout or no file descriptors to
+     wait for. Try timeout on first occurrence, then assume no file
+     descriptors and no file descriptors to wait for means wait for 100
+     milliseconds. */
+
+  if(!numfds) {
+    repeats++; /* count number of repeated zero numfds */
+    if(repeats > 1) {
+      WAITMS(100); /* sleep 100 milliseconds */
+    }
+  }
+  else
+    repeats = 0;
+
+} while(still_running);
+
+carl_multi_remove_handle(multi_handle, easy_handle);
+.fi
+.SH RETURN VALUE
+CARLMcode type, general libcarl multi interface error code. See
+\fIlibcarl-errors(3)\fP
+.SH AVAILABILITY
+This function was added in libcarl 7.28.0.
+.SH "SEE ALSO"
+.BR carl_multi_fdset "(3), " carl_multi_perform "(3)", carl_multi_poll "(3) ",

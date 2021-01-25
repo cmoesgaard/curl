@@ -4,6 +4,6 @@ Added: 7.17.1
 See-also: proxy-anyauth proxy-basic
 Category: proxy auth
 ---
-Tells curl to use HTTP Negotiate (SPNEGO) authentication when communicating
+Tells carl to use HTTP Negotiate (SPNEGO) authentication when communicating
 with the given proxy. Use --negotiate for enabling HTTP Negotiate (SPNEGO)
 with a remote host.

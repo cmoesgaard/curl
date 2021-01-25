@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -29,7 +29,7 @@ struct libtest_trace_cfg {
 
 extern struct libtest_trace_cfg libtest_debug_config;
 
-int libtest_debug_cb(CURL *handle, curl_infotype type,
+int libtest_debug_cb(CARL *handle, carl_infotype type,
                      unsigned char *data, size_t size,
                      void *userp);
 

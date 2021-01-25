@@ -46,7 +46,7 @@ HTTP HEAD with --range
 HEAD /1032 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=1-3
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -1,6 +1,6 @@
-VC*/src/*curl.vcproj.dist
-VC*/lib/*curl.vcproj.dist
-VC*/src/*curl.vcxproj.dist
-VC*/lib/*curl.vcxproj.dist
-VC6/lib/libcurl.dsp.dist
-VC6/src/curl.dsp.dist
+VC*/src/*carl.vcproj.dist
+VC*/lib/*carl.vcproj.dist
+VC*/src/*carl.vcxproj.dist
+VC*/lib/*carl.vcxproj.dist
+VC6/lib/libcarl.dsp.dist
+VC6/src/carl.dsp.dist

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -39,64 +39,64 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(int argc, char *argv[])
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
-  curl_mime *form = NULL;
-  curl_mimepart *field = NULL;
-  struct curl_slist *headerlist = NULL;
+  carl_mime *form = NULL;
+  carl_mimepart *field = NULL;
+  struct carl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  curl = curl_easy_init();
-  if(curl) {
+  carl = carl_easy_init();
+  if(carl) {
     /* Create the form */
-    form = curl_mime_init(curl);
+    form = carl_mime_init(carl);
 
     /* Fill in the file upload field */
-    field = curl_mime_addpart(form);
-    curl_mime_name(field, "sendfile");
-    curl_mime_filedata(field, "postit2.c");
+    field = carl_mime_addpart(form);
+    carl_mime_name(field, "sendfile");
+    carl_mime_filedata(field, "postit2.c");
 
     /* Fill in the filename field */
-    field = curl_mime_addpart(form);
-    curl_mime_name(field, "filename");
-    curl_mime_data(field, "postit2.c", CURL_ZERO_TERMINATED);
+    field = carl_mime_addpart(form);
+    carl_mime_name(field, "filename");
+    carl_mime_data(field, "postit2.c", CARL_ZERO_TERMINATED);
 
     /* Fill in the submit field too, even if this is rarely needed */
-    field = curl_mime_addpart(form);
-    curl_mime_name(field, "submit");
-    curl_mime_data(field, "send", CURL_ZERO_TERMINATED);
+    field = carl_mime_addpart(form);
+    carl_mime_name(field, "submit");
+    carl_mime_data(field, "send", CARL_ZERO_TERMINATED);
 
     /* initialize custom header list (stating that Expect: 100-continue is not
        wanted */
-    headerlist = curl_slist_append(headerlist, buf);
+    headerlist = carl_slist_append(headerlist, buf);
     /* what URL that receives this POST */
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/examplepost.cgi");
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/examplepost.cgi");
     if((argc == 2) && (!strcmp(argv[1], "noexpectheader")))
       /* only disable 100-continue header if explicitly requested */
-      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+      carl_easy_setopt(carl, CARLOPT_HTTPHEADER, headerlist);
+    carl_easy_setopt(carl, CARLOPT_MIMEPOST, form);
 
     /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
 
     /* then cleanup the form */
-    curl_mime_free(form);
+    carl_mime_free(form);
     /* free slist */
-    curl_slist_free_all(headerlist);
+    carl_slist_free_all(headerlist);
   }
   return 0;
 }

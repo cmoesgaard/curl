@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_SDECLS_H
-#define HEADER_CURL_TOOL_SDECLS_H
+#ifndef HEADER_CARL_TOOL_SDECLS_H
+#define HEADER_CARL_TOOL_SDECLS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,7 +27,7 @@
 #endif /* USE_METALINK */
 
 /*
- * OutStruct variables keep track of information relative to curl's
+ * OutStruct variables keep track of information relative to carl's
  * output writing, which may take place to a standard stream or a file.
  *
  * 'filename' member is either a pointer to a file name string or NULL
@@ -69,8 +69,8 @@ struct OutStruct {
   bool s_isreg;
   bool fopened;
   FILE *stream;
-  curl_off_t bytes;
-  curl_off_t init;
+  carl_off_t bytes;
+  carl_off_t init;
 #ifdef USE_METALINK
   metalink_parser_context_t *metalink_parser;
 #endif /* USE_METALINK */
@@ -78,7 +78,7 @@ struct OutStruct {
 
 
 /*
- * InStruct variables keep track of information relative to curl's
+ * InStruct variables keep track of information relative to carl's
  * input reading, which may take place from stdin or from some file.
  *
  * 'fd' member is either 'stdin' file descriptor number STDIN_FILENO
@@ -116,7 +116,7 @@ struct getout {
 #define GETOUT_METALINK   (1<<5)  /* set when Metalink download */
 
 /*
- * 'trace' enumeration represents curl's output look'n feel possibilities.
+ * 'trace' enumeration represents carl's output look'n feel possibilities.
  */
 
 typedef enum {
@@ -147,4 +147,4 @@ typedef enum {
 
 #include "tool_cfgable.h"
 
-#endif /* HEADER_CURL_TOOL_SDECLS_H */
+#endif /* HEADER_CARL_TOOL_SDECLS_H */

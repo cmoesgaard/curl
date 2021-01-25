@@ -46,7 +46,7 @@ http://%HOSTIP:%HTTPPORT/33 -Tlog/test33.txt -C 50
 PUT /33 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Content-Range: bytes 50-99/100
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 50
 Expect: 100-continue

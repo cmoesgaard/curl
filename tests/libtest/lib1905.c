@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,35 +27,35 @@
 
 int test(char *URL)
 {
-  CURLSH *sh = NULL;
-  CURL *ch = NULL;
+  CARLSH *sh = NULL;
+  CARL *ch = NULL;
   int unfinished;
-  CURLM *cm;
+  CARLM *cm;
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  cm = curl_multi_init();
+  cm = carl_multi_init();
   if(!cm) {
-    curl_global_cleanup();
+    carl_global_cleanup();
     return 1;
   }
-  sh = curl_share_init();
+  sh = carl_share_init();
   if(!sh)
     goto cleanup;
 
-  curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
-  curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+  carl_share_setopt(sh, CARLSHOPT_SHARE, CARL_LOCK_DATA_COOKIE);
+  carl_share_setopt(sh, CARLSHOPT_SHARE, CARL_LOCK_DATA_COOKIE);
 
-  ch = curl_easy_init();
+  ch = carl_easy_init();
   if(!ch)
     goto cleanup;
 
-  curl_easy_setopt(ch, CURLOPT_SHARE, sh);
-  curl_easy_setopt(ch, CURLOPT_URL, URL);
-  curl_easy_setopt(ch, CURLOPT_COOKIEFILE, "log/cookies1905");
-  curl_easy_setopt(ch, CURLOPT_COOKIEJAR, "log/cookies1905");
+  carl_easy_setopt(ch, CARLOPT_SHARE, sh);
+  carl_easy_setopt(ch, CARLOPT_URL, URL);
+  carl_easy_setopt(ch, CARLOPT_COOKIEFILE, "log/cookies1905");
+  carl_easy_setopt(ch, CARLOPT_COOKIEJAR, "log/cookies1905");
 
-  curl_multi_add_handle(cm, ch);
+  carl_multi_add_handle(cm, ch);
 
   unfinished = 1;
   while(unfinished) {
@@ -67,10 +67,10 @@ int test(char *URL)
     FD_ZERO(&R);
     FD_ZERO(&W);
     FD_ZERO(&E);
-    curl_multi_perform(cm, &unfinished);
+    carl_multi_perform(cm, &unfinished);
 
-    curl_multi_fdset(cm, &R, &W, &E, &MAX);
-    curl_multi_timeout(cm, &max_tout);
+    carl_multi_fdset(cm, &R, &W, &E, &MAX);
+    carl_multi_timeout(cm, &max_tout);
 
     if(max_tout > 0) {
       timeout.tv_sec = max_tout / 1000;
@@ -84,15 +84,15 @@ int test(char *URL)
     select(MAX + 1, &R, &W, &E, &timeout);
   }
 
-  curl_easy_setopt(ch, CURLOPT_COOKIELIST, "FLUSH");
-  curl_easy_setopt(ch, CURLOPT_SHARE, NULL);
+  carl_easy_setopt(ch, CARLOPT_COOKIELIST, "FLUSH");
+  carl_easy_setopt(ch, CARLOPT_SHARE, NULL);
 
-  curl_multi_remove_handle(cm, ch);
+  carl_multi_remove_handle(cm, ch);
   cleanup:
-  curl_easy_cleanup(ch);
-  curl_share_cleanup(sh);
-  curl_multi_cleanup(cm);
-  curl_global_cleanup();
+  carl_easy_cleanup(ch);
+  carl_share_cleanup(sh);
+  carl_multi_cleanup(cm);
+  carl_global_cleanup();
 
   return 0;
 }

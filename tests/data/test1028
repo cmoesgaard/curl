@@ -55,7 +55,7 @@ http://%HOSTIP:%HTTPPORT/10280001 -L
 <protocol>
 GET /10280001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 USER anonymous

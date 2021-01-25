@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HTTP_DIGEST_H
-#define HEADER_CURL_HTTP_DIGEST_H
+#ifndef HEADER_CARL_HTTP_DIGEST_H
+#define HEADER_CARL_HTTP_DIGEST_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,16 +21,16 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_CRYPTO_AUTH)
 
 /* this is for digest header input */
-CURLcode Curl_input_digest(struct Curl_easy *data,
+CARLcode Curl_input_digest(struct Curl_easy *data,
                            bool proxy, const char *header);
 
 /* this is for creating digest header output */
-CURLcode Curl_output_digest(struct Curl_easy *data,
+CARLcode Curl_output_digest(struct Curl_easy *data,
                             struct connectdata *conn,
                             bool proxy,
                             const unsigned char *request,
@@ -38,6 +38,6 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
 
 void Curl_http_auth_cleanup_digest(struct Curl_easy *data);
 
-#endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_CRYPTO_AUTH */
+#endif /* !CARL_DISABLE_HTTP && !CARL_DISABLE_CRYPTO_AUTH */
 
-#endif /* HEADER_CURL_HTTP_DIGEST_H */
+#endif /* HEADER_CARL_HTTP_DIGEST_H */

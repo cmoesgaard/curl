@@ -53,12 +53,12 @@ http://%HOSTIP:%HTTPPORT/1089 -w "%{num_connects}\n%{num_redirects}\n%{size_down
 <protocol>
 GET /1089 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /10890001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

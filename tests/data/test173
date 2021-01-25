@@ -28,7 +28,7 @@ http
 HTTP RFC1867-formpost a file from stdin with "faked" filename
  </name>
  <command>
-http://%HOSTIP:%HTTPPORT/we/want/173 -F field1=contents1 -F "fileupload=@-;filename=/dev/null;type=text/x-null;format=x-curl"
+http://%HOSTIP:%HTTPPORT/we/want/173 -F field1=contents1 -F "fileupload=@-;filename=/dev/null;type=text/x-null;format=x-carl"
 </command>
 
 <stdin>
@@ -51,7 +51,7 @@ line8
 <protocol>
 POST /we/want/173 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 360
 Content-Type: multipart/form-data; boundary=----------------------------5dbea401cd8c
@@ -62,7 +62,7 @@ Content-Disposition: form-data; name="field1"
 contents1
 ------------------------------5dbea401cd8c
 Content-Disposition: form-data; name="fileupload"; filename="/dev/null"
-Content-Type: text/x-null;format=x-curl
+Content-Type: text/x-null;format=x-carl
 
 line1
 line2

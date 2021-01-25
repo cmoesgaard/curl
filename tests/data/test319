@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/319 --raw
 <protocol>
 GET /319 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

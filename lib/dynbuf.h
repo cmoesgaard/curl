@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_DYNBUF_H
-#define HEADER_CURL_DYNBUF_H
+#ifndef HEADER_CARL_DYNBUF_H
+#define HEADER_CARL_DYNBUF_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,21 +22,21 @@
  *
  ***************************************************************************/
 
-#ifndef BUILDING_LIBCURL
+#ifndef BUILDING_LIBCARL
 /* this renames the functions so that the tool code can use the same code
    without getting symbol collisions */
-#define Curl_dyn_init(a,b) curlx_dyn_init(a,b)
-#define Curl_dyn_add(a,b) curlx_dyn_add(a,b)
-#define Curl_dyn_addn(a,b,c) curlx_dyn_addn(a,b,c)
-#define Curl_dyn_addf curlx_dyn_addf
-#define Curl_dyn_vaddf curlx_dyn_vaddf
-#define Curl_dyn_free(a) curlx_dyn_free(a)
-#define Curl_dyn_ptr(a) curlx_dyn_ptr(a)
-#define Curl_dyn_uptr(a) curlx_dyn_uptr(a)
-#define Curl_dyn_len(a) curlx_dyn_len(a)
-#define Curl_dyn_reset(a) curlx_dyn_reset(a)
-#define Curl_dyn_tail(a,b) curlx_dyn_tail(a,b)
-#define curlx_dynbuf dynbuf /* for the struct name */
+#define Curl_dyn_init(a,b) carlx_dyn_init(a,b)
+#define Curl_dyn_add(a,b) carlx_dyn_add(a,b)
+#define Curl_dyn_addn(a,b,c) carlx_dyn_addn(a,b,c)
+#define Curl_dyn_addf carlx_dyn_addf
+#define Curl_dyn_vaddf carlx_dyn_vaddf
+#define Curl_dyn_free(a) carlx_dyn_free(a)
+#define Curl_dyn_ptr(a) carlx_dyn_ptr(a)
+#define Curl_dyn_uptr(a) carlx_dyn_uptr(a)
+#define Curl_dyn_len(a) carlx_dyn_len(a)
+#define Curl_dyn_reset(a) carlx_dyn_reset(a)
+#define Curl_dyn_tail(a,b) carlx_dyn_tail(a,b)
+#define carlx_dynbuf dynbuf /* for the struct name */
 #endif
 
 struct dynbuf {
@@ -51,16 +51,16 @@ struct dynbuf {
 
 void Curl_dyn_init(struct dynbuf *s, size_t toobig);
 void Curl_dyn_free(struct dynbuf *s);
-CURLcode Curl_dyn_addn(struct dynbuf *s, const void *mem, size_t len)
+CARLcode Curl_dyn_addn(struct dynbuf *s, const void *mem, size_t len)
   WARN_UNUSED_RESULT;
-CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)
+CARLcode Curl_dyn_add(struct dynbuf *s, const char *str)
   WARN_UNUSED_RESULT;
-CURLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
+CARLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
   WARN_UNUSED_RESULT;
-CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
+CARLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
   WARN_UNUSED_RESULT;
 void Curl_dyn_reset(struct dynbuf *s);
-CURLcode Curl_dyn_tail(struct dynbuf *s, size_t trail);
+CARLcode Curl_dyn_tail(struct dynbuf *s, size_t trail);
 char *Curl_dyn_ptr(const struct dynbuf *s);
 unsigned char *Curl_dyn_uptr(const struct dynbuf *s);
 size_t Curl_dyn_len(const struct dynbuf *s);

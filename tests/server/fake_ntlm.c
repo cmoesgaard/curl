@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,13 +24,13 @@
 
 /*
  * This is a fake ntlm_auth, which is used for testing NTLM single-sign-on.
- * When DEBUGBUILD is defined, libcurl invoke this tool instead of real winbind
+ * When DEBUGBUILD is defined, libcarl invoke this tool instead of real winbind
  * daemon helper /usr/bin/ntlm_auth. This tool will accept commands and
  * responses with a pre-written string saved in test case test2005.
  */
 
-#define ENABLE_CURLX_PRINTF
-#include "curlx.h" /* from the private lib dir */
+#define ENABLE_CARLX_PRINTF
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "util.h"
 
@@ -157,18 +157,18 @@ int main(int argc, char *argv[])
     }
   }
 
-  env = getenv("CURL_NTLM_AUTH_TESTNUM");
+  env = getenv("CARL_NTLM_AUTH_TESTNUM");
   if(env) {
     char *endptr;
     long lnum = strtol(env, &endptr, 10);
     if((endptr != env + strlen(env)) || (lnum < 1L)) {
-      fprintf(stderr, "Test number not valid in CURL_NTLM_AUTH_TESTNUM");
+      fprintf(stderr, "Test number not valid in CARL_NTLM_AUTH_TESTNUM");
       exit(1);
     }
     testnum = lnum;
   }
   else {
-    fprintf(stderr, "Test number not specified in CURL_NTLM_AUTH_TESTNUM");
+    fprintf(stderr, "Test number not specified in CARL_NTLM_AUTH_TESTNUM");
     exit(1);
   }
 
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
          helper_user, helper_proto, helper_domain,
          (use_cached_creds) ? "yes" : "no");
 
-  env = getenv("CURL_NTLM_AUTH_SRCDIR");
+  env = getenv("CARL_NTLM_AUTH_SRCDIR");
   if(env) {
     path = env;
   }

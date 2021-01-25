@@ -15,10 +15,10 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 /*
- * Original code by Paul Vixie. "curlified" by Gisle Vanem.
+ * Original code by Paul Vixie. "carlified" by Gisle Vanem.
  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifndef HAVE_INET_NTOP
 
@@ -33,7 +33,7 @@
 #endif
 
 #include "inet_ntop.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 #define IN6ADDRSZ       16
 #define INADDRSZ         4

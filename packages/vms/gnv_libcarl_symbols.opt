@@ -1,0 +1,181 @@
+! File GNV$LIBCARL_SYMBOLS.OPT
+!
+! $Id$
+!
+! This file must be manually maintained to allow upward compatibility
+! The SYMBOL_VECTORs are set up so that applications can be compiled
+! with either case sensitive symbol names or the default of uppercase.
+! This is because many of the Open Source applications that would call
+! the LIBCARL library need to be built with case sensitive names.
+!
+! Automatic generation is currently not practical because the order of
+! the entries are important for upward compatibility.
+!
+! The GSMATCH is manually set to the major version of 1, with the minor
+! version being the next two sections multiplied by a power of 10 to
+! become the minor version.
+! So LIBCARL 7.18.1 becomes 1,718010.
+! And a future LIBCARL of 7.18.2 would be 1,718020 if new routines were added.
+!
+! This leaves some spare digits for minor patches.
+!
+! Note that the GSMATCH does not need to have any real relationship to the
+! actual package version number.
+!
+! New SYMBOL_VECTORs must be added to the end of this list, and added
+! in pairs for both exact and with an uppercase alias.
+! If the public symbol is more than 31 characters long, then a special
+! shortened symbol will be exported, and three aliases should be created,
+! The aliases will be the special shortened uppercase alias, and both
+! upper and lowercase versions of a truncated name (preferred) or a
+! modified manually shortened name if a truncated name will not be
+! unique.
+!
+! Routines can not be removed, the functionality must be maintained.
+! If a new routine is supplied where the arguments are incompatible with
+! the older version, both versions are needed to be maintained.
+! The old version can be given a different name, but must be in the same
+! SYMBOL_VECTOR positions in this file.
+!
+! Changing the number of parameters for an existing routine does not require
+! maintaining multiple versions as long as the routine can be called with
+! the old number of parameters.
+!
+! Copyright 2009 - 2020, John Malmberg
+!
+! Permission to use, copy, modify, and/or distribute this software for any
+! purpose with or without fee is hereby granted, provided that the above
+! copyright notice and this permission notice appear in all copies.
+!
+! THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+! WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+! MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+! ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+! WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+! ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+! OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+!============================================================================
+GSMATCH=LEQUAL,1,719050
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(carl_strequal=PROCEDURE)
+SYMBOL_VECTOR=(CARL_STREQUAL/carl_strequal=PROCEDURE)
+SYMBOL_VECTOR=(carl_strnequal=PROCEDURE)
+SYMBOL_VECTOR=(CARL_STRNEQUAL/carl_strnequal=PROCEDURE)
+SYMBOL_VECTOR=(carl_formadd=PROCEDURE)
+SYMBOL_VECTOR=(CARL_FORMADD/carl_formadd=PROCEDURE)
+SYMBOL_VECTOR=(carl_formget=PROCEDURE)
+SYMBOL_VECTOR=(CARL_FORMGET/carl_formget=PROCEDURE)
+SYMBOL_VECTOR=(carl_formfree=PROCEDURE)
+SYMBOL_VECTOR=(CARL_FORMFREE/carl_formfree=PROCEDURE)
+SYMBOL_VECTOR=(carl_getenv=PROCEDURE)
+SYMBOL_VECTOR=(CARL_GETENV/carl_getenv=PROCEDURE)
+SYMBOL_VECTOR=(carl_version=PROCEDURE)
+SYMBOL_VECTOR=(CARL_VERSION/carl_version=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_escape=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_ESCAPE/carl_easy_escape=PROCEDURE)
+SYMBOL_VECTOR=(carl_escape=PROCEDURE)
+SYMBOL_VECTOR=(CARL_ESCAPE/carl_escape=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_unescape=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_UNESCAPE/carl_easy_unescape=PROCEDURE)
+SYMBOL_VECTOR=(carl_unescape=PROCEDURE)
+SYMBOL_VECTOR=(CARL_UNESCAPE/carl_unescape=PROCEDURE)
+SYMBOL_VECTOR=(carl_free=PROCEDURE)
+SYMBOL_VECTOR=(CARL_FREE/carl_free=PROCEDURE)
+SYMBOL_VECTOR=(carl_global_init=PROCEDURE)
+SYMBOL_VECTOR=(CARL_GLOBAL_INIT/carl_global_init=PROCEDURE)
+SYMBOL_VECTOR=(carl_global_init_mem=PROCEDURE)
+SYMBOL_VECTOR=(CARL_GLOBAL_INIT_MEM/carl_global_init_mem=PROCEDURE)
+SYMBOL_VECTOR=(carl_global_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(CARL_GLOBAL_CLEANUP/carl_global_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(carl_slist_append=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SLIST_APPEND/carl_slist_append=PROCEDURE)
+SYMBOL_VECTOR=(carl_slist_free_all=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SLIST_FREE_ALL/carl_slist_free_all=PROCEDURE)
+SYMBOL_VECTOR=(carl_getdate=PROCEDURE)
+SYMBOL_VECTOR=(CARL_GETDATE/carl_getdate=PROCEDURE)
+SYMBOL_VECTOR=(carl_share_init=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SHARE_INIT/carl_share_init=PROCEDURE)
+SYMBOL_VECTOR=(carl_share_setopt=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SHARE_SETOPT/carl_share_setopt=PROCEDURE)
+SYMBOL_VECTOR=(carl_share_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SHARE_CLEANUP/carl_share_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(carl_version_info=PROCEDURE)
+SYMBOL_VECTOR=(CARL_VERSION_INFO/carl_version_info=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_strerror=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_STRERROR/carl_easy_strerror=PROCEDURE)
+SYMBOL_VECTOR=(carl_share_strerror=PROCEDURE)
+SYMBOL_VECTOR=(CARL_SHARE_STRERROR/carl_share_strerror=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_pause=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_PAUSE/carl_easy_pause=PROCEDURE)
+!
+! easy.h
+SYMBOL_VECTOR=(carl_easy_init=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_INIT/carl_easy_init=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_setopt=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_SETOPT/carl_easy_setopt=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_perform=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_PERFORM/carl_easy_perform=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_CLEANUP/carl_easy_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_getinfo=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_GETINFO/carl_easy_getinfo=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_duphandle=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_DUPHANDLE/carl_easy_duphandle=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_reset=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_RESET/carl_easy_reset=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_recv=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_RECV/carl_easy_recv=PROCEDURE)
+SYMBOL_VECTOR=(carl_easy_send=PROCEDURE)
+SYMBOL_VECTOR=(CARL_EASY_SEND/carl_easy_send=PROCEDURE)
+!
+! multi.h
+SYMBOL_VECTOR=(carl_multi_init=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_INIT/carl_multi_init=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_add_handle=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_ADD_HANDLE/carl_multi_add_handle=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_remove_handle=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_REMOVE_HANDLE/carl_multi_remove_handle=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_fdset=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_FDSET/carl_multi_fdset=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_perform=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_PERFORM/carl_multi_perform=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_CLEANUP/carl_multi_cleanup=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_info_read=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_INFO_READ/carl_multi_info_read=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_strerror=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_STRERROR/carl_multi_strerror=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_socket=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_SOCKET/carl_multi_socket=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_socket_action=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_SOCKET_ACTION/carl_multi_socket_action=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_socket_all=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_SOCKET_ALL/carl_multi_socket_all=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_timeout=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_TIMEOUT/carl_multi_timeout=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_setopt=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_SETOPT/carl_multi_setopt=PROCEDURE)
+SYMBOL_VECTOR=(carl_multi_assign=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MULTI_ASSIGN/carl_multi_assign=PROCEDURE)
+!
+! mprintf.h
+SYMBOL_VECTOR=(carl_mprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MPRINTF/carl_mprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mfprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MFPRINTF/carl_mfprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_msprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MSPRINTF/carl_msprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_msnprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MSNPRINTF/carl_msnprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mvprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MVPRINTF/carl_mvprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mvfprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MVFPRINTF/carl_mvfprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mvsprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MVSPRINTF/carl_mvsprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mvsnprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MVSNPRINTF/carl_mvsnprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_maprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MAPRINTF/carl_maprintf=PROCEDURE)
+SYMBOL_VECTOR=(carl_mvaprintf=PROCEDURE)
+SYMBOL_VECTOR=(CARL_MVAPRINTF/carl_mvaprintf=PROCEDURE)

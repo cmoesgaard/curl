@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,22 +22,22 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(HAVE_GSSAPI) && defined(USE_SPNEGO)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "vauth/vauth.h"
 #include "urldata.h"
-#include "curl_base64.h"
-#include "curl_gssapi.h"
+#include "carl_base64.h"
+#include "carl_gssapi.h"
 #include "warnless.h"
-#include "curl_multibyte.h"
+#include "carl_multibyte.h"
 #include "sendf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -70,9 +70,9 @@ bool Curl_auth_is_spnego_supported(void)
  * chlg64      [in]     - The optional base64 encoded challenge message.
  * nego        [in/out] - The Negotiate data struct being used and modified.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
+CARLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
                                          const char *user,
                                          const char *password,
                                          const char *service,
@@ -80,7 +80,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
                                          const char *chlg64,
                                          struct negotiatedata *nego)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t chlglen = 0;
   unsigned char *chlg = NULL;
   OM_uint32 major_status;
@@ -98,14 +98,14 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
      * rejected it (since we're again here). Exit with an error since we
      * can't invent anything better */
     Curl_auth_cleanup_spnego(nego);
-    return CURLE_LOGIN_DENIED;
+    return CARLE_LOGIN_DENIED;
   }
 
   if(!nego->spn) {
     /* Generate our SPN */
     char *spn = Curl_auth_build_spn(service, NULL, host);
     if(!spn)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     /* Populate the SPN structure */
     spn_token.value = spn;
@@ -121,7 +121,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
       free(spn);
 
-      return CURLE_AUTH_ERROR;
+      return CARLE_AUTH_ERROR;
     }
 
     free(spn);
@@ -139,7 +139,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
     if(!chlg) {
       infof(data, "SPNEGO handshake failure (empty challenge message)\n");
 
-      return CURLE_BAD_CONTENT_ENCODING;
+      return CARLE_BAD_CONTENT_ENCODING;
     }
 
     /* Setup the challenge "input" security buffer */
@@ -170,14 +170,14 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
     Curl_gss_log_error(data, "gss_init_sec_context() failed: ",
                        major_status, minor_status);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   if(!output_token.value || !output_token.length) {
     if(output_token.value)
       gss_release_buffer(&unused_status, &output_token);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   /* Free previous token */
@@ -186,7 +186,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
   nego->output_token = output_token;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -203,13 +203,13 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
  *                        holding the result will be stored upon completion.
  * outlen      [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_spnego_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_spnego_message(struct Curl_easy *data,
                                          struct negotiatedata *nego,
                                          char **outptr, size_t *outlen)
 {
-  CURLcode result;
+  CARLcode result;
   OM_uint32 minor_status;
 
   /* Base64 encode the already generated response */
@@ -231,10 +231,10 @@ CURLcode Curl_auth_create_spnego_message(struct Curl_easy *data,
     nego->output_token.value = NULL;
     nego->output_token.length = 0;
 
-    return CURLE_REMOTE_ACCESS_DENIED;
+    return CARLE_REMOTE_ACCESS_DENIED;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*

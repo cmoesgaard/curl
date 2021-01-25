@@ -1,0 +1,58 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_FTP_USE_PRET 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_FTP_USE_PRET \- enable the PRET command
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_FTP_USE_PRET, long enable);
+.SH DESCRIPTION
+Pass a long. If the value is 1, it tells carl to send a PRET command before
+PASV (and EPSV). Certain FTP servers, mainly drftpd, require this non-standard
+command for directory listings as well as up and downloads in PASV mode. Has
+no effect when using the active FTP transfers mode.
+.SH DEFAULT
+0
+.SH PROTOCOLS
+FTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/old-server/file.txt");
+
+  /* a drftpd server, do it! */
+  carl_easy_setopt(carl, CARLOPT_FTP_USE_PRET, 1L);
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.20.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_FTP_USE_EPRT "(3), " CARLOPT_FTP_USE_EPSV "(3), "

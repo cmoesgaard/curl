@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -35,14 +35,14 @@ SRCPF="${LIBIFSNAME}/H.FILE"
 
 if action_needed "${SRCPF}"
 then    CMD="CRTSRCPF FILE(${TARGETLIB}/H) RCDLEN(112)"
-        CMD="${CMD} CCSID(${TGTCCSID}) TEXT('curl: Header files')"
+        CMD="${CMD} CCSID(${TGTCCSID}) TEXT('carl: Header files')"
         system "${CMD}"
 fi
 
 
 #       Create the IFS directory for the header files.
 
-IFSINCLUDE="${IFSDIR}/include/curl"
+IFSINCLUDE="${IFSDIR}/include/carl"
 
 if action_needed "${IFSINCLUDE}"
 then    mkdir -p "${IFSINCLUDE}"
@@ -68,7 +68,7 @@ copy_hfile()
 
 #       Copy the header files.
 
-for HFILE in curl/*.h ${SCRIPTDIR}/ccsidcurl.h
+for HFILE in carl/*.h ${SCRIPTDIR}/ccsidcarl.h
 do      case "`basename \"${HFILE}\" .h`" in
         stdcheaders|typecheck-gcc)
                 continue;;
@@ -87,18 +87,18 @@ done
 
 #       Copy the ILE/RPG header file, setting-up version number.
 
-versioned_copy "${SCRIPTDIR}/curl.inc.in" "${SRCPF}/CURL.INC.MBR"
-rm -f "${IFSINCLUDE}/curl.inc.rpgle"
-ln -s "${SRCPF}/CURL.INC.MBR" "${IFSINCLUDE}/curl.inc.rpgle"
+versioned_copy "${SCRIPTDIR}/carl.inc.in" "${SRCPF}/CARL.INC.MBR"
+rm -f "${IFSINCLUDE}/carl.inc.rpgle"
+ln -s "${SRCPF}/CARL.INC.MBR" "${IFSINCLUDE}/carl.inc.rpgle"
 
 
-#       Duplicate file H as CURL to support more include path forms.
+#       Duplicate file H as CARL to support more include path forms.
 
-if action_needed "${LIBIFSNAME}/CURL.FILE"
+if action_needed "${LIBIFSNAME}/CARL.FILE"
 then    :
-else    system "DLTF FILE(${TARGETLIB}/CURL)"
+else    system "DLTF FILE(${TARGETLIB}/CARL)"
 fi
 
 CMD="CRTDUPOBJ OBJ(H) FROMLIB(${TARGETLIB}) OBJTYPE(*FILE) TOLIB(*FROMLIB)"
-CMD="${CMD} NEWOBJ(CURL) DATA(*YES)"
+CMD="${CMD} NEWOBJ(CARL) DATA(*YES)"
 system "${CMD}"

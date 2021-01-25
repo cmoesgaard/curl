@@ -1,77 +1,77 @@
-# curl tutorial
+# carl tutorial
 
 ## Simple Usage
 
 Get the main page from a web-server:
 
-    curl https://www.example.com/
+    carl https://www.example.com/
 
 Get the README file the user's home directory at funet's ftp-server:
 
-    curl ftp://ftp.funet.fi/README
+    carl ftp://ftp.funet.fi/README
 
 Get a web page from a server using port 8000:
 
-    curl http://www.weirdserver.com:8000/
+    carl http://www.weirdserver.com:8000/
 
 Get a directory listing of an FTP site:
 
-    curl ftp://ftp.funet.fi
+    carl ftp://ftp.funet.fi
 
-Get the definition of curl from a dictionary:
+Get the definition of carl from a dictionary:
 
-    curl dict://dict.org/m:curl
+    carl dict://dict.org/m:carl
 
 Fetch two documents at once:
 
-    curl ftp://ftp.funet.fi/ http://www.weirdserver.com:8000/
+    carl ftp://ftp.funet.fi/ http://www.weirdserver.com:8000/
 
 Get a file off an FTPS server:
 
-    curl ftps://files.are.secure.com/secrets.txt
+    carl ftps://files.are.secure.com/secrets.txt
 
 or use the more appropriate FTPS way to get the same file:
 
-    curl --ftp-ssl ftp://files.are.secure.com/secrets.txt
+    carl --ftp-ssl ftp://files.are.secure.com/secrets.txt
 
 Get a file from an SSH server using SFTP:
 
-    curl -u username sftp://example.com/etc/issue
+    carl -u username sftp://example.com/etc/issue
 
 Get a file from an SSH server using SCP using a private key (not
 password-protected) to authenticate:
 
-    curl -u username: --key ~/.ssh/id_rsa scp://example.com/~/file.txt
+    carl -u username: --key ~/.ssh/id_rsa scp://example.com/~/file.txt
 
 Get a file from an SSH server using SCP using a private key
 (password-protected) to authenticate:
 
-    curl -u username: --key ~/.ssh/id_rsa --pass private_key_password
+    carl -u username: --key ~/.ssh/id_rsa --pass private_key_password
     scp://example.com/~/file.txt
 
 Get the main page from an IPv6 web server:
 
-    curl "http://[2001:1890:1112:1::20]/"
+    carl "http://[2001:1890:1112:1::20]/"
 
 Get a file from an SMB server:
 
-    curl -u "domain\username:passwd" smb://server.example.com/share/file.txt
+    carl -u "domain\username:passwd" smb://server.example.com/share/file.txt
 
 ## Download to a File
 
 Get a web page and store in a local file with a specific name:
 
-    curl -o thatpage.html http://www.example.com/
+    carl -o thatpage.html http://www.example.com/
 
 Get a web page and store in a local file, make the local file get the name of
 the remote document (if no file name part is specified in the URL, this will
 fail):
 
-    curl -O http://www.example.com/index.html
+    carl -O http://www.example.com/index.html
 
 Fetch two files and store them with their remote names:
 
-    curl -O www.haxx.se/index.html -O curl.se/download.html
+    carl -O www.haxx.se/index.html -O carl.se/download.html
 
 ## Using Passwords
 
@@ -79,11 +79,11 @@ Fetch two files and store them with their remote names:
 
 To ftp files using name+passwd, include them in the URL like:
 
-    curl ftp://name:passwd@machine.domain:port/full/path/to/file
+    carl ftp://name:passwd@machine.domain:port/full/path/to/file
 
 or specify them with the -u flag like
 
-    curl -u name:passwd ftp://machine.domain:port/full/path/to/file
+    carl -u name:passwd ftp://machine.domain:port/full/path/to/file
 
 ### FTPS
 
@@ -100,8 +100,8 @@ This is similar to FTP, but you can use the `--key` option to specify a
 private key to use instead of a password. Note that the private key may itself
 be protected by a password that is unrelated to the login password of the
 remote system; this password is specified using the `--pass` option.
-Typically, curl will automatically extract the public key from the private key
-file, but in cases where curl does not have the proper library support, a
+Typically, carl will automatically extract the public key from the private key
+file, but in cases where carl does not have the proper library support, a
 matching public key file must be specified using the `--pubkey` option.
 
 ### HTTP
@@ -109,21 +109,21 @@ matching public key file must be specified using the `--pubkey` option.
 Curl also supports user and password in HTTP URLs, thus you can pick a file
 like:
 
-    curl http://name:passwd@machine.domain/full/path/to/file
+    carl http://name:passwd@machine.domain/full/path/to/file
 
 or specify user and password separately like in
 
-    curl -u name:passwd http://machine.domain/full/path/to/file
+    carl -u name:passwd http://machine.domain/full/path/to/file
 
-HTTP offers many different methods of authentication and curl supports
+HTTP offers many different methods of authentication and carl supports
 several: Basic, Digest, NTLM and Negotiate (SPNEGO). Without telling which
-method to use, curl defaults to Basic. You can also ask curl to pick the most
+method to use, carl defaults to Basic. You can also ask carl to pick the most
 secure ones out of the ones that the server accepts for the given URL, by
 using `--anyauth`.
 
 **Note**! According to the URL specification, HTTP URLs can not contain a user
-and password, so that style will not work when using curl via a proxy, even
-though curl allows it at other times. When using a proxy, you _must_ use the
+and password, so that style will not work when using carl via a proxy, even
+though carl allows it at other times. When using a proxy, you _must_ use the
 `-u` style for user and password.
 
 ### HTTPS
@@ -132,7 +132,7 @@ Probably most commonly used with private certificates, as explained below.
 
 ## Proxy
 
-curl supports both HTTP and SOCKS proxy servers, with optional authentication.
+carl supports both HTTP and SOCKS proxy servers, with optional authentication.
 It does not have special support for FTP proxy servers since there are no
 standards for those, but it can still be made to work with many of them. You
 can also use both HTTP and SOCKS proxies to transfer files to and from FTP
@@ -140,42 +140,42 @@ servers.
 
 Get an ftp file using an HTTP proxy named my-proxy that uses port 888:
 
-    curl -x my-proxy:888 ftp://ftp.leachsite.com/README
+    carl -x my-proxy:888 ftp://ftp.leachsite.com/README
 
 Get a file from an HTTP server that requires user and password, using the
 same proxy as above:
 
-    curl -u user:passwd -x my-proxy:888 http://www.get.this/
+    carl -u user:passwd -x my-proxy:888 http://www.get.this/
 
 Some proxies require special authentication. Specify by using -U as above:
 
-    curl -U user:passwd -x my-proxy:888 http://www.get.this/
+    carl -U user:passwd -x my-proxy:888 http://www.get.this/
 
 A comma-separated list of hosts and domains which do not use the proxy can be
 specified as:
 
-    curl --noproxy localhost,get.this -x my-proxy:888 http://www.get.this/
+    carl --noproxy localhost,get.this -x my-proxy:888 http://www.get.this/
 
 If the proxy is specified with `--proxy1.0` instead of `--proxy` or `-x`, then
-curl will use HTTP/1.0 instead of HTTP/1.1 for any `CONNECT` attempts.
+carl will use HTTP/1.0 instead of HTTP/1.1 for any `CONNECT` attempts.
 
-curl also supports SOCKS4 and SOCKS5 proxies with `--socks4` and `--socks5`.
+carl also supports SOCKS4 and SOCKS5 proxies with `--socks4` and `--socks5`.
 
 See also the environment variables Curl supports that offer further proxy
 control.
 
 Most FTP proxy servers are set up to appear as a normal FTP server from the
 client's perspective, with special commands to select the remote FTP server.
-curl supports the `-u`, `-Q` and `--ftp-account` options that can be used to
+carl supports the `-u`, `-Q` and `--ftp-account` options that can be used to
 set up transfers through many FTP proxies. For example, a file can be uploaded
 to a remote FTP server using a Blue Coat FTP proxy with the options:
 
-    curl -u "username@ftp.server Proxy-Username:Remote-Pass"
+    carl -u "username@ftp.server Proxy-Username:Remote-Pass"
       --ftp-account Proxy-Password --upload-file local-file
       ftp://my-ftp.proxy.server:21/remote/upload/path/
 
 See the manual for your FTP proxy to determine the form it expects to set up
-transfers, and curl's `-v` option to see exactly what curl is sending.
+transfers, and carl's `-v` option to see exactly what carl is sending.
 
 ## Ranges
 
@@ -185,18 +185,18 @@ flag.
 
 Get the first 100 bytes of a document:
 
-    curl -r 0-99 http://www.get.this/
+    carl -r 0-99 http://www.get.this/
 
 Get the last 500 bytes of a document:
 
-    curl -r -500 http://www.get.this/
+    carl -r -500 http://www.get.this/
 
 Curl also supports simple ranges for FTP files as well. Then you can only
 specify start and stop position.
 
 Get the first 100 bytes of a document using FTP:
 
-    curl -r 0-99 ftp://www.get.this/README
+    carl -r 0-99 ftp://www.get.this/README
 
 ## Uploading
 
@@ -204,37 +204,37 @@ Get the first 100 bytes of a document using FTP:
 
 Upload all data on stdin to a specified server:
 
-    curl -T - ftp://ftp.upload.com/myfile
+    carl -T - ftp://ftp.upload.com/myfile
 
 Upload data from a specified file, login with user and password:
 
-    curl -T uploadfile -u user:passwd ftp://ftp.upload.com/myfile
+    carl -T uploadfile -u user:passwd ftp://ftp.upload.com/myfile
 
 Upload a local file to the remote site, and use the local file name at the
 remote site too:
 
-    curl -T uploadfile -u user:passwd ftp://ftp.upload.com/
+    carl -T uploadfile -u user:passwd ftp://ftp.upload.com/
 
 Upload a local file to get appended to the remote file:
 
-    curl -T localfile -a ftp://ftp.upload.com/remotefile
+    carl -T localfile -a ftp://ftp.upload.com/remotefile
 
 Curl also supports ftp upload through a proxy, but only if the proxy is
-configured to allow that kind of tunneling. If it does, you can run curl in a
+configured to allow that kind of tunneling. If it does, you can run carl in a
 fashion similar to:
 
-    curl --proxytunnel -x proxy:port -T localfile ftp.upload.com
+    carl --proxytunnel -x proxy:port -T localfile ftp.upload.com
 
 ### SMB / SMBS
 
-    curl -T file.txt -u "domain\username:passwd"
+    carl -T file.txt -u "domain\username:passwd"
       smb://server.example.com/share/
 
 ### HTTP
 
 Upload all data on stdin to a specified HTTP site:
 
-    curl -T - http://www.upload.com/myfile
+    carl -T - http://www.upload.com/myfile
 
 Note that the HTTP server must have been configured to accept PUT before this
 can be done successfully.
@@ -243,25 +243,25 @@ For other ways to do HTTP data upload, see the POST section below.
 
 ## Verbose / Debug
 
-If curl fails where it isn't supposed to, if the servers don't let you in, if
+If carl fails where it isn't supposed to, if the servers don't let you in, if
 you can't understand the responses: use the `-v` flag to get verbose
 fetching. Curl will output lots of info and what it sends and receives in
 order to let the user see all client-server interaction (but it won't show you
 the actual data).
 
-    curl -v ftp://ftp.upload.com/
+    carl -v ftp://ftp.upload.com/
 
-To get even more details and information on what curl does, try using the
+To get even more details and information on what carl does, try using the
 `--trace` or `--trace-ascii` options with a given file name to log to, like
 this:
 
-    curl --trace trace.txt www.haxx.se
+    carl --trace trace.txt www.haxx.se
 
 
 ## Detailed Information
 
 Different protocols provide different ways of getting detailed information
-about specific files/documents. To get curl to show detailed information about
+about specific files/documents. To get carl to show detailed information about
 a single file, you should use `-I`/`--head` option. It displays all available
 info on a single file for HTTP and FTP. The HTTP information is a lot more
 extensive.
@@ -273,22 +273,22 @@ will then store the headers in the specified file.
 
 Store the HTTP headers in a separate file (headers.txt in the example):
 
-      curl --dump-header headers.txt curl.se
+      carl --dump-header headers.txt carl.se
 
 Note that headers stored in a separate file can be very useful at a later time
-if you want curl to use cookies sent by the server. More about that in the
+if you want carl to use cookies sent by the server. More about that in the
 cookies section.
 
 ## POST (HTTP)
 
-It's easy to post data using curl. This is done using the `-d <data>` option.
+It's easy to post data using carl. This is done using the `-d <data>` option.
 The post data must be urlencoded.
 
 Post a simple "name" and "phone" guestbook.
 
-    curl -d "name=Rafael%20Sagula&phone=3320780" http://www.where.com/guest.cgi
+    carl -d "name=Rafael%20Sagula&phone=3320780" http://www.where.com/guest.cgi
 
-How to post a form with curl, lesson #1:
+How to post a form with carl, lesson #1:
 
 Dig out all the `<input>` tags in the form that you want to fill in.
 
@@ -318,13 +318,13 @@ Example:
 
 We want to enter user 'foobar' with password '12345'.
 
-To post to this, you enter a curl command line like:
+To post to this, you enter a carl command line like:
 
-    curl -d "user=foobar&pass=12345&id=blablabla&ding=submit"
+    carl -d "user=foobar&pass=12345&id=blablabla&ding=submit"
       http://www.formpost.com/getthis/post.cgi
 
 While `-d` uses the application/x-www-form-urlencoded mime-type, generally
-understood by CGI's and similar, curl also supports the more capable
+understood by CGI's and similar, carl also supports the more capable
 multipart/form-data type. This latter type supports things like file upload.
 
 `-F` accepts parameters like `-F "name=contents"`. If you want the contents to
@@ -334,10 +334,10 @@ file name. You can also post the contents of several files in one field.  For
 example, the field name 'coolfiles' is used to send three files, with
 different content types using the following syntax:
 
-    curl -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"
+    carl -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"
       http://www.post.com/postit.cgi
 
-If the content-type is not specified, curl will try to guess from the file
+If the content-type is not specified, carl will try to guess from the file
 extension (it only knows a few), or use the previously specified type (from an
 earlier file if several files are specified in a list) or else it will use the
 default type 'application/octet-stream'.
@@ -345,12 +345,12 @@ default type 'application/octet-stream'.
 Emulate a fill-in form with `-F`. Let's say you fill in three fields in a
 form. One field is a file name which to post, one field is your name and one
 field is a file description. We want to post the file we have written named
-"cooltext.txt". To let curl do the posting of this data instead of your
+"cooltext.txt". To let carl do the posting of this data instead of your
 favourite browser, you have to read the HTML source of the form page and find
 the names of the input fields. In our example, the input field names are
 'file', 'yourname' and 'filedescription'.
 
-    curl -F "file=@cooltext.txt" -F "yourname=Daniel"
+    carl -F "file=@cooltext.txt" -F "yourname=Daniel"
       -F "filedescription=Cool text file with cool text inside"
       http://www.post.com/postit.cgi
 
@@ -358,17 +358,17 @@ To send two files in one post you can do it in two ways:
 
 Send multiple files in a single "field" with a single field name:
 
-    curl -F "pictures=@dog.gif,cat.gif" $URL
+    carl -F "pictures=@dog.gif,cat.gif" $URL
 
 Send two fields with two field names
 
-    curl -F "docpicture=@dog.gif" -F "catpicture=@cat.gif" $URL
+    carl -F "docpicture=@dog.gif" -F "catpicture=@cat.gif" $URL
 
 To send a field value literally without interpreting a leading `@` or `<`, or
 an embedded `;type=`, use `--form-string` instead of `-F`. This is recommended
 when the value is obtained from a user or some other unpredictable
 source. Under these circumstances, using `-F` instead of `--form-string` could
-allow a user to trick curl into uploading a file.
+allow a user to trick carl into uploading a file.
 
 ## Referrer
 
@@ -378,7 +378,7 @@ used on the command line. It is especially useful to fool or trick stupid
 servers or CGI scripts that rely on that information being available or
 contain certain data.
 
-    curl -e www.coolsite.com http://www.showme.com/
+    carl -e www.coolsite.com http://www.showme.com/
 
 ## User Agent
 
@@ -389,7 +389,7 @@ accept certain browsers.
 
 Example:
 
-    curl -A 'Mozilla/3.0 (Win95; I)' http://www.nationsbank.com/
+    carl -A 'Mozilla/3.0 (Win95; I)' http://www.nationsbank.com/
 
 Other common strings:
 
@@ -430,44 +430,44 @@ path beginning with "/foo".
 
 Example, get a page that wants my name passed in a cookie:
 
-    curl -b "name=Daniel" www.sillypage.com
+    carl -b "name=Daniel" www.sillypage.com
 
 Curl also has the ability to use previously received cookies in following
 sessions. If you get cookies from a server and store them in a file in a
 manner similar to:
 
-    curl --dump-header headers www.example.com
+    carl --dump-header headers www.example.com
 
 ... you can then in a second connect to that (or another) site, use the
 cookies from the 'headers' file like:
 
-    curl -b headers www.example.com
+    carl -b headers www.example.com
 
 While saving headers to a file is a working way to store cookies, it is
-however error-prone and not the preferred way to do this. Instead, make curl
+however error-prone and not the preferred way to do this. Instead, make carl
 save the incoming cookies using the well-known netscape cookie format like
 this:
 
-    curl -c cookies.txt www.example.com
+    carl -c cookies.txt www.example.com
 
 Note that by specifying `-b` you enable the "cookie awareness" and with `-L`
-you can make curl follow a location: (which often is used in combination with
+you can make carl follow a location: (which often is used in combination with
 cookies). So that if a site sends cookies and a location, you can use a
 non-existing file to trigger the cookie awareness like:
 
-    curl -L -b empty.txt www.example.com
+    carl -L -b empty.txt www.example.com
 
 The file to read cookies from must be formatted using plain HTTP headers OR as
 netscape's cookie file. Curl will determine what kind it is based on the file
-contents.  In the above command, curl will parse the header and store the
-cookies received from www.example.com.  curl will send to the server the
+contents.  In the above command, carl will parse the header and store the
+cookies received from www.example.com.  carl will send to the server the
 stored cookies which match the request as it follows the location.  The file
 "empty.txt" may be a nonexistent file.
 
 To read and write cookies from a netscape cookie file, you can set both `-b`
 and `-c` to use the same file:
 
-    curl -b cookies.txt -c cookies.txt www.example.com
+    carl -b cookies.txt -c cookies.txt www.example.com
 
 ## Progress Meter
 
@@ -501,35 +501,35 @@ need much explanation!
 
 Curl allows the user to set the transfer speed conditions that must be met to
 let the transfer keep going. By using the switch `-y` and `-Y` you can make
-curl abort transfers if the transfer speed is below the specified lowest limit
+carl abort transfers if the transfer speed is below the specified lowest limit
 for a specified time.
 
-To have curl abort the download if the speed is slower than 3000 bytes per
+To have carl abort the download if the speed is slower than 3000 bytes per
 second for 1 minute, run:
 
-    curl -Y 3000 -y 60 www.far-away-site.com
+    carl -Y 3000 -y 60 www.far-away-site.com
 
 This can very well be used in combination with the overall time limit, so
 that the above operation must be completed in whole within 30 minutes:
 
-    curl -m 1800 -Y 3000 -y 60 www.far-away-site.com
+    carl -m 1800 -Y 3000 -y 60 www.far-away-site.com
 
-Forcing curl not to transfer data faster than a given rate is also possible,
+Forcing carl not to transfer data faster than a given rate is also possible,
 which might be useful if you're using a limited bandwidth connection and you
 don't want your transfer to use all of it (sometimes referred to as
 "bandwidth throttle").
 
-Make curl transfer data no faster than 10 kilobytes per second:
+Make carl transfer data no faster than 10 kilobytes per second:
 
-    curl --limit-rate 10K www.far-away-site.com
+    carl --limit-rate 10K www.far-away-site.com
 
 or
 
-    curl --limit-rate 10240 www.far-away-site.com
+    carl --limit-rate 10240 www.far-away-site.com
 
-Or prevent curl from uploading data faster than 1 megabyte per second:
+Or prevent carl from uploading data faster than 1 megabyte per second:
 
-    curl -T upload --limit-rate 1M ftp://uploadshereplease.com
+    carl -T upload --limit-rate 1M ftp://uploadshereplease.com
 
 When using the `--limit-rate` option, the transfer rate is regulated on a
 per-second basis, which will cause the total transfer speed to become lower
@@ -538,7 +538,7 @@ transfer stalls during periods.
 
 ## Config File
 
-Curl automatically tries to read the `.curlrc` file (or `_curlrc` file on
+Curl automatically tries to read the `.carlrc` file (or `_carlrc` file on
 Microsoft Windows systems) from the user's home dir on startup.
 
 The config file could be made up with normal command line switches, but you
@@ -563,42 +563,42 @@ Example, set default time out and proxy in a config file:
 Whitespaces ARE significant at the end of lines, but all whitespace leading
 up to the first characters of each line are ignored.
 
-Prevent curl from reading the default file by using -q as the first command
+Prevent carl from reading the default file by using -q as the first command
 line parameter, like:
 
-    curl -q www.thatsite.com
+    carl -q www.thatsite.com
 
-Force curl to get and display a local help page in case it is invoked without
+Force carl to get and display a local help page in case it is invoked without
 URL by making a config file similar to:
 
     # default url to get
-    url = "http://help.with.curl.com/curlhelp.html"
+    url = "http://help.with.carl.com/carlhelp.html"
 
 You can specify another config file to be read by using the `-K`/`--config`
 flag. If you set config file name to `-` it'll read the config from stdin,
 which can be handy if you want to hide options from being visible in process
 tables etc:
 
-    echo "user = user:passwd" | curl -K - http://that.secret.site.com
+    echo "user = user:passwd" | carl -K - http://that.secret.site.com
 
 ## Extra Headers
 
-When using curl in your own very special programs, you may end up needing
+When using carl in your own very special programs, you may end up needing
 to pass on your own custom headers when getting a web page. You can do
 this by using the `-H` flag.
 
 Example, send the header `X-you-and-me: yes` to the server when getting a
 page:
 
-    curl -H "X-you-and-me: yes" www.love.com
+    carl -H "X-you-and-me: yes" www.love.com
 
-This can also be useful in case you want curl to send a different text in a
+This can also be useful in case you want carl to send a different text in a
 header than it normally does. The `-H` header you specify then replaces the
-header curl would normally send. If you replace an internal header with an
+header carl would normally send. If you replace an internal header with an
 empty one, you prevent that header from being sent. To prevent the `Host:`
 header from being used:
 
-    curl -H "Host:" www.server.com
+    carl -H "Host:" www.server.com
 
 ## FTP and Path Names
 
@@ -606,12 +606,12 @@ Do note that when getting files with a `ftp://` URL, the given path is
 relative the directory you enter. To get the file `README` from your home
 directory at your ftp site, do:
 
-    curl ftp://user:passwd@my.site.com/README
+    carl ftp://user:passwd@my.site.com/README
 
 But if you want the README file from the root directory of that very same
 site, you need to specify the absolute file name:
 
-    curl ftp://user:passwd@my.site.com//README
+    carl ftp://user:passwd@my.site.com//README
 
 (I.e with an extra slash in front of the file name.)
 
@@ -621,7 +621,7 @@ With sftp: and scp: URLs, the path name given is the absolute name on the
 server. To access a file relative to the remote user's home directory, prefix
 the file with `/~/` , such as:
 
-    curl -u $USER sftp://home.example.com/~/.bashrc
+    carl -u $USER sftp://home.example.com/~/.bashrc
 
 ## FTP and Firewalls
 
@@ -629,12 +629,12 @@ The FTP protocol requires one of the involved parties to open a second
 connection as soon as data is about to get transferred. There are two ways to
 do this.
 
-The default way for curl is to issue the PASV command which causes the server
+The default way for carl is to issue the PASV command which causes the server
 to open another port and await another connection performed by the
 client. This is good if the client is behind a firewall that doesn't allow
 incoming connections.
 
-    curl ftp.download.com
+    carl ftp.download.com
 
 If the server, for example, is behind a firewall that doesn't allow
 connections on ports other than 21 (or if it just doesn't support the `PASV`
@@ -642,103 +642,103 @@ command), the other way to do it is to use the `PORT` command and instruct the
 server to connect to the client on the given IP number and port (as parameters
 to the PORT command).
 
-The `-P` flag to curl supports a few different options. Your machine may have
-several IP-addresses and/or network interfaces and curl allows you to select
+The `-P` flag to carl supports a few different options. Your machine may have
+several IP-addresses and/or network interfaces and carl allows you to select
 which of them to use. Default address can also be used:
 
-    curl -P - ftp.download.com
+    carl -P - ftp.download.com
 
 Download with `PORT` but use the IP address of our `le0` interface (this does
 not work on windows):
 
-    curl -P le0 ftp.download.com
+    carl -P le0 ftp.download.com
 
 Download with `PORT` but use 192.168.0.10 as our IP address to use:
 
-    curl -P 192.168.0.10 ftp.download.com
+    carl -P 192.168.0.10 ftp.download.com
 
 ## Network Interface
 
 Get a web page from a server using a specified port for the interface:
 
-    curl --interface eth0:1 http://www.example.com/
+    carl --interface eth0:1 http://www.example.com/
 
 or
 
-    curl --interface 192.168.1.10 http://www.example.com/
+    carl --interface 192.168.1.10 http://www.example.com/
 
 ## HTTPS
 
-Secure HTTP requires a TLS library to be installed and used when curl is
-built. If that is done, curl is capable of retrieving and posting documents
+Secure HTTP requires a TLS library to be installed and used when carl is
+built. If that is done, carl is capable of retrieving and posting documents
 using the HTTPS protocol.
 
 Example:
 
-    curl https://www.secure-site.com
+    carl https://www.secure-site.com
 
-curl is also capable of using client certificates to get/post files from sites
+carl is also capable of using client certificates to get/post files from sites
 that require valid certificates. The only drawback is that the certificate
 needs to be in PEM-format. PEM is a standard and open format to store
 certificates with, but it is not used by the most commonly used browsers. If
-you want curl to use the certificates you use with your (favourite) browser,
+you want carl to use the certificates you use with your (favourite) browser,
 you may need to download/compile a converter that can convert your browser's
 formatted certificates to PEM formatted ones.
 
 Example on how to automatically retrieve a document using a certificate with a
 personal password:
 
-    curl -E /path/to/cert.pem:password https://secure.site.com/
+    carl -E /path/to/cert.pem:password https://secure.site.com/
 
 If you neglect to specify the password on the command line, you will be
 prompted for the correct password before any data can be received.
 
 Many older HTTPS servers have problems with specific SSL or TLS versions,
 which newer versions of OpenSSL etc use, therefore it is sometimes useful to
-specify what SSL-version curl should use. Use -3, -2 or -1 to specify that
+specify what SSL-version carl should use. Use -3, -2 or -1 to specify that
 exact SSL version to use (for SSLv3, SSLv2 or TLSv1 respectively):
 
-    curl -2 https://secure.site.com/
+    carl -2 https://secure.site.com/
 
-Otherwise, curl will attempt to use a sensible TLS default version.
+Otherwise, carl will attempt to use a sensible TLS default version.
 
 ## Resuming File Transfers
 
-To continue a file transfer where it was previously aborted, curl supports
+To continue a file transfer where it was previously aborted, carl supports
 resume on HTTP(S) downloads as well as FTP uploads and downloads.
 
 Continue downloading a document:
 
-    curl -C - -o file ftp://ftp.server.com/path/file
+    carl -C - -o file ftp://ftp.server.com/path/file
 
 Continue uploading a document:
 
-    curl -C - -T file ftp://ftp.server.com/path/file
+    carl -C - -T file ftp://ftp.server.com/path/file
 
 Continue downloading a document from a web server
 
-    curl -C - -o file http://www.server.com/
+    carl -C - -o file http://www.server.com/
 
 ## Time Conditions
 
 HTTP allows a client to specify a time condition for the document it requests.
-It is `If-Modified-Since` or `If-Unmodified-Since`. curl allows you to specify
+It is `If-Modified-Since` or `If-Unmodified-Since`. carl allows you to specify
 them with the `-z`/`--time-cond` flag.
 
 For example, you can easily make a download that only gets performed if the
 remote file is newer than a local copy. It would be made like:
 
-    curl -z local.html http://remote.server.com/remote.html
+    carl -z local.html http://remote.server.com/remote.html
 
 Or you can download a file only if the local file is newer than the remote
 one. Do this by prepending the date string with a `-`, as in:
 
-    curl -z -local.html http://remote.server.com/remote.html
+    carl -z -local.html http://remote.server.com/remote.html
 
-You can specify a "free text" date as condition. Tell curl to only download
+You can specify a "free text" date as condition. Tell carl to only download
 the file if it was updated since January 12, 2012:
 
-    curl -z "Jan 12 2012" http://remote.server.com/remote.html
+    carl -z "Jan 12 2012" http://remote.server.com/remote.html
 
 Curl will then accept a wide range of date formats. You always make the date
 check the other way around by prepending it with a dash (`-`).
@@ -747,55 +747,55 @@ check the other way around by prepending it with a dash (`-`).
 
 For fun try
 
-    curl dict://dict.org/m:curl
-    curl dict://dict.org/d:heisenbug:jargon
-    curl dict://dict.org/d:daniel:gcide
+    carl dict://dict.org/m:carl
+    carl dict://dict.org/d:heisenbug:jargon
+    carl dict://dict.org/d:daniel:gcide
 
 Aliases for 'm' are 'match' and 'find', and aliases for 'd' are 'define' and
 'lookup'. For example,
 
-    curl dict://dict.org/find:curl
+    carl dict://dict.org/find:carl
 
 Commands that break the URL description of the RFC (but not the DICT
 protocol) are
 
-    curl dict://dict.org/show:db
-    curl dict://dict.org/show:strat
+    carl dict://dict.org/show:db
+    carl dict://dict.org/show:strat
 
 Authentication support is still missing
 
 ## LDAP
 
-If you have installed the OpenLDAP library, curl can take advantage of it and
-offer `ldap://` support.  On Windows, curl will use WinLDAP from Platform SDK
+If you have installed the OpenLDAP library, carl can take advantage of it and
+offer `ldap://` support.  On Windows, carl will use WinLDAP from Platform SDK
 by default.
 
-Default protocol version used by curl is LDAPv3. LDAPv2 will be used as
+Default protocol version used by carl is LDAPv3. LDAPv2 will be used as
 fallback mechanism in case if LDAPv3 will fail to connect.
 
 LDAP is a complex thing and writing an LDAP query is not an easy task. I do
 advise you to dig up the syntax description for that elsewhere. One such place
 might be: [RFC 2255, The LDAP URL
-Format](https://curl.se/rfc/rfc2255.txt)
+Format](https://carl.se/rfc/rfc2255.txt)
 
 To show you an example, this is how I can get all people from my local LDAP
 server that has a certain sub-domain in their email address:
 
-    curl -B "ldap://ldap.frontec.se/o=frontec??sub?mail=*sth.frontec.se"
+    carl -B "ldap://ldap.frontec.se/o=frontec??sub?mail=*sth.frontec.se"
 
 If I want the same info in HTML format, I can get it by not using the `-B`
 (enforce ASCII) flag.
 
 You also can use authentication when accessing LDAP catalog:
 
-    curl -u user:passwd "ldap://ldap.frontec.se/o=frontec??sub?mail=*"
-    curl "ldap://user:passwd@ldap.frontec.se/o=frontec??sub?mail=*"
+    carl -u user:passwd "ldap://ldap.frontec.se/o=frontec??sub?mail=*"
+    carl "ldap://user:passwd@ldap.frontec.se/o=frontec??sub?mail=*"
 
 By default, if user and password provided, OpenLDAP/WinLDAP will use basic
 authentication. On Windows you can control this behavior by providing one of
-`--basic`, `--ntlm` or `--digest` option in curl command line
+`--basic`, `--ntlm` or `--digest` option in carl command line
 
-    curl --ntlm "ldap://user:passwd@ldap.frontec.se/o=frontec??sub?mail=*"
+    carl --ntlm "ldap://user:passwd@ldap.frontec.se/o=frontec??sub?mail=*"
 
 On Windows, if no user/password specified, auto-negotiation mechanism will be
 used with current logon credentials (SSPI/SPNEGO).
@@ -833,47 +833,47 @@ to specify name and password for commonly visited FTP sites in a file so that
 you don't have to type them in each time you visit those sites. You realize
 this is a big security risk if someone else gets hold of your passwords, so
 therefore most unix programs won't read this file unless it is only readable
-by yourself (curl doesn't care though).
+by yourself (carl doesn't care though).
 
 Curl supports `.netrc` files if told to (using the `-n`/`--netrc` and
-`--netrc-optional` options). This is not restricted to just FTP, so curl can
+`--netrc-optional` options). This is not restricted to just FTP, so carl can
 use it for all protocols where authentication is used.
 
 A very simple `.netrc` file could look something like:
 
-    machine curl.se login iamdaniel password mysecret
+    machine carl.se login iamdaniel password mysecret
 
 ## Custom Output
 
-To better allow script programmers to get to know about the progress of curl,
+To better allow script programmers to get to know about the progress of carl,
 the `-w`/`--write-out` option was introduced. Using this, you can specify what
 information from the previous transfer you want to extract.
 
 To display the amount of bytes downloaded together with some text and an
 ending newline:
 
-    curl -w 'We downloaded %{size_download} bytes\n' www.download.com
+    carl -w 'We downloaded %{size_download} bytes\n' www.download.com
 
 ## Kerberos FTP Transfer
 
 Curl supports kerberos4 and kerberos5/GSSAPI for FTP transfers. You need the
-kerberos package installed and used at curl build time for it to be available.
+kerberos package installed and used at carl build time for it to be available.
 
 First, get the krb-ticket the normal way, like with the kinit/kauth tool.
-Then use curl in way similar to:
+Then use carl in way similar to:
 
-    curl --krb private ftp://krb4site.com -u username:fakepwd
+    carl --krb private ftp://krb4site.com -u username:fakepwd
 
 There's no use for a password on the `-u` switch, but a blank one will make
-curl ask for one and you already entered the real password to kinit/kauth.
+carl ask for one and you already entered the real password to kinit/kauth.
 
 ## TELNET
 
-The curl telnet support is basic and very easy to use. Curl passes all data
+The carl telnet support is basic and very easy to use. Curl passes all data
 passed to it on stdin to the remote server. Connect to a remote telnet server
 using a command line similar to:
 
-    curl telnet://remote.server.com
+    carl telnet://remote.server.com
 
 And enter the data to pass to the server on stdin. The result will be sent to
 stdout or to the file you specify with `-o`.
@@ -884,7 +884,7 @@ for slow connections or similar.
 Pass options to the telnet protocol negotiation, by using the `-t` option. To
 tell the server we use a vt100 terminal, try something like:
 
-    curl -tTTYPE=vt100 telnet://remote.server.com
+    carl -tTTYPE=vt100 telnet://remote.server.com
 
 Other interesting options for it `-t` include:
 
@@ -892,23 +892,23 @@ Other interesting options for it `-t` include:
  - `NEW_ENV=<var,val>` Sets an environment variable.
 
 NOTE: The telnet protocol does not specify any way to login with a specified
-user and password so curl can't do that automatically. To do that, you need to
+user and password so carl can't do that automatically. To do that, you need to
 track when the login prompt is received and send the username and password
 accordingly.
 
 ## Persistent Connections
 
-Specifying multiple files on a single command line will make curl transfer all
+Specifying multiple files on a single command line will make carl transfer all
 of them, one after the other in the specified order.
 
-libcurl will attempt to use persistent connections for the transfers so that
+libcarl will attempt to use persistent connections for the transfers so that
 the second transfer to the same host can use the same connection that was
 already initiated and was left open in the previous transfer. This greatly
 decreases connection time for all but the first transfer and it makes a far
 better use of the network.
 
-Note that curl cannot use persistent connections for transfers that are used
-in subsequence curl invokes. Try to stuff as many URLs as possible on the same
+Note that carl cannot use persistent connections for transfers that are used
+in subsequence carl invokes. Try to stuff as many URLs as possible on the same
 command line if they are using the same host, as that'll make the transfers
 faster. If you use an HTTP proxy for file transfers, practically all transfers
 will be persistent.
@@ -924,15 +924,15 @@ URL you specify. Note that this also goes for the `-O` option (but not
 For example: get two files and use `-O` for the first and a custom file
 name for the second:
 
-    curl -O http://url.com/file.txt ftp://ftp.com/moo.exe -o moo.jpg
+    carl -O http://url.com/file.txt ftp://ftp.com/moo.exe -o moo.jpg
 
 You can also upload multiple files in a similar fashion:
 
-    curl -T local1 ftp://ftp.com/moo.exe -T local2 ftp://ftp.com/moo2.txt
+    carl -T local1 ftp://ftp.com/moo.exe -T local2 ftp://ftp.com/moo2.txt
 
 ## IPv6
 
-curl will connect to a server with IPv6 when a host lookup returns an IPv6
+carl will connect to a server with IPv6 when a host lookup returns an IPv6
 address and fall back to IPv4 if the connection fails. The `--ipv4` and
 `--ipv6` options can specify which address to use when both are
 available. IPv6 addresses can also be specified directly in URLs using the
@@ -940,7 +940,7 @@ syntax:
 
     http://[2001:1890:1112:1::20]/overview.html
 
-When this style is used, the `-g` option must be given to stop curl from
+When this style is used, the `-g` option must be given to stop carl from
 interpreting the square brackets as special globbing characters.  Link local
 and site local addresses including a scope identifier, such as `fe80::1234%1`,
 may also be used, but the scope portion must be numeric or match an existing
@@ -963,12 +963,12 @@ not stored in the local file system.
 
 Example to use a remote Metalink file:
 
-    curl --metalink http://www.example.com/example.metalink
+    carl --metalink http://www.example.com/example.metalink
 
 To use a Metalink file in the local file system, use FILE protocol
 (`file://`):
 
-    curl --metalink file://example.metalink
+    carl --metalink file://example.metalink
 
 Please note that if FILE protocol is disabled, there is no way to use a local
 Metalink file at the time of this writing. Also note that if `--metalink` and
@@ -979,37 +979,37 @@ fail.
 
 ## Mailing Lists
 
-For your convenience, we have several open mailing lists to discuss curl, its
+For your convenience, we have several open mailing lists to discuss carl, its
 development and things relevant to this. Get all info at
-https://curl.se/mail/.
+https://carl.se/mail/.
 
-Please direct curl questions, feature requests and trouble reports to one of
+Please direct carl questions, feature requests and trouble reports to one of
 these mailing lists instead of mailing any individual.
 
 Available lists include:
 
-### curl-users
+### carl-users
 
 Users of the command line tool. How to use it, what doesn't work, new
 features, related tools, questions, news, installations, compilations,
 running, porting etc.
 
-### curl-library
+### carl-library
 
-Developers using or developing libcurl. Bugs, extensions, improvements.
+Developers using or developing libcarl. Bugs, extensions, improvements.
 
-### curl-announce
+### carl-announce
 
 Low-traffic. Only receives announcements of new public versions. At worst,
 that makes something like one or two mails per month, but usually only one
 mail every second month.
 
-### curl-and-php
+### carl-and-php
 
-Using the curl functions in PHP. Everything curl with a PHP angle. Or PHP with
-a curl angle.
+Using the carl functions in PHP. Everything carl with a PHP angle. Or PHP with
+a carl angle.
 
-### curl-and-python
+### carl-and-python
 
-Python hackers using curl with or without the python binding pycurl.
+Python hackers using carl with or without the python binding pycarl.
 

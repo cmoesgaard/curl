@@ -1,0 +1,131 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SSH_KEYFUNCTION 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SSH_KEYFUNCTION \- callback for known host matching logic
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+enum carl_khstat {
+  CARLKHSTAT_FINE_ADD_TO_FILE,
+  CARLKHSTAT_FINE,
+  CARLKHSTAT_REJECT, /* reject the connection, return an error */
+  CARLKHSTAT_DEFER,  /* do not accept it, but we can't answer right
+                        now so this causes a CARLE_DEFER error but
+                        otherwise the connection will be left intact
+                        etc */
+  CARLKHSTAT_FINE_REPLACE
+};
+
+enum carl_khmatch {
+  CARLKHMATCH_OK,       /* match */
+  CARLKHMATCH_MISMATCH, /* host found, key mismatch! */
+  CARLKHMATCH_MISSING,  /* no matching host/key found */
+};
+
+struct carl_khkey {
+  const char *key; /* points to a null-terminated string encoded with
+                      base64 if len is zero, otherwise to the "raw"
+                      data */
+  size_t len;
+  enum carl_khtype keytype;
+};
+
+int ssh_keycallback(CARL *easy,
+                    const struct carl_khkey *knownkey,
+                    const struct carl_khkey *foundkey,
+                    enum carl_khmatch,
+                    void *clientp);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SSH_KEYFUNCTION,
+                          ssh_keycallback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+It gets called when the known_host matching has been done, to allow the
+application to act and decide for libcarl how to proceed. The callback will
+only be called if \fICARLOPT_SSH_KNOWNHOSTS(3)\fP is also set.
+
+This callback function gets passed the CARL handle, the key from the
+known_hosts file \fIknownkey\fP, the key from the remote site \fIfoundkey\fP,
+info from libcarl on the matching status and a custom pointer (set with
+\fICARLOPT_SSH_KEYDATA(3)\fP). It MUST return one of the following return
+codes to tell libcarl how to act:
+.IP CARLKHSTAT_FINE_REPLACE
+The new host+key is accepted and libcarl will replace the old host+key into
+the known_hosts file before continuing with the connection.  This will also
+add the new host+key combo to the known_host pool kept in memory if it wasn't
+already present there. The adding of data to the file is done by completely
+replacing the file with a new copy, so the permissions of the file must allow
+this. (Added in 7.73.0)
+.IP CARLKHSTAT_FINE_ADD_TO_FILE
+The host+key is accepted and libcarl will append it to the known_hosts file
+before continuing with the connection. This will also add the host+key combo
+to the known_host pool kept in memory if it wasn't already present there. The
+adding of data to the file is done by completely replacing the file with a new
+copy, so the permissions of the file must allow this.
+.IP CARLKHSTAT_FINE
+The host+key is accepted libcarl will continue with the connection. This will
+also add the host+key combo to the known_host pool kept in memory if it wasn't
+already present there.
+.IP CARLKHSTAT_REJECT
+The host+key is rejected. libcarl will deny the connection to continue and it
+will be closed.
+.IP CARLKHSTAT_DEFER
+The host+key is rejected, but the SSH connection is asked to be kept alive.
+This feature could be used when the app wants to somehow return back and act
+on the host+key situation and then retry without needing the overhead of
+setting it up from scratch again.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+SFTP and SCP
+.SH EXAMPLE
+.nf
+static int keycb(CARL *easy,
+                 const struct carl_khkey *knownkey,
+                 const struct carl_khkey *foundkey,
+                 enum carl_khmatch,
+                 void *clientp)
+{
+  /* 'clientp' points to the callback_data struct */
+  /* investigate the situation and return the correct value */
+  return CARLKHSTAT_FINE_ADD_TO_FILE;
+}
+{
+  carl_easy_setopt(carl, CARLOPT_URL, "sftp://example.com/thisfile.txt");
+  carl_easy_setopt(carl, CARLOPT_SSH_KEYFUNCTION, keycb);
+  carl_easy_setopt(carl, CARLOPT_SSH_KEYDATA, &callback_data);
+  carl_easy_setopt(carl, CARLOPT_SSH_KNOWNHOSTS, "/home/user/known_hosts");
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.19.6
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SSH_KEYDATA "(3), " CARLOPT_SSH_KNOWNHOSTS "(3), "

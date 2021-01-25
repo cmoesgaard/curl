@@ -1,0 +1,100 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_CONV_TO_NETWORK_FUNCTION 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_CONV_TO_NETWORK_FUNCTION \- convert data to network from host encoding
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode conv_callback(char *ptr, size_t length);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_CONV_TO_NETWORK_FUNCTION,
+                          conv_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+Applies to non-ASCII platforms. \fIcarl_version_info(3)\fP will return the
+CARL_VERSION_CONV feature bit set if this option is provided.
+
+The data to be converted is in a buffer pointed to by the \fIptr\fP parameter.
+The amount of data to convert is indicated by the \fIlength\fP parameter.  The
+converted data overlays the input data in the buffer pointed to by the ptr
+parameter. \fICARLE_OK\fP must be returned upon successful conversion.  A
+CARLcode return value defined by carl.h, such as \fICARLE_CONV_FAILED\fP,
+should be returned if an error was encountered.
+
+\fBCARLOPT_CONV_TO_NETWORK_FUNCTION\fP converts from host encoding to the
+network encoding.  It is used when commands or ASCII data are sent over the
+network.
+
+If you set a callback pointer to NULL, or don't set it at all, the built-in
+libcarl iconv functions will be used.  If HAVE_ICONV was not defined when
+libcarl was built, and no callback has been established, conversion will
+return the CARLE_CONV_REQD error code.
+
+If HAVE_ICONV is defined, CARL_ICONV_CODESET_OF_HOST must also be defined.
+For example:
+
+ \&#define CARL_ICONV_CODESET_OF_HOST "IBM-1047"
+
+The iconv code in libcarl will default the network and UTF8 codeset names as
+follows:
+
+ \&#define CARL_ICONV_CODESET_OF_NETWORK "ISO8859-1"
+
+ \&#define CARL_ICONV_CODESET_FOR_UTF8   "UTF-8"
+
+You will need to override these definitions if they are different on your
+system.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+FTP, SMTP, IMAP, POP3
+.SH EXAMPLE
+.nf
+static CARLcode my_conv_from_ebcdic_to_ascii(char *buffer, size_t length)
+{
+  char *tempptrin, *tempptrout;
+  size_t bytes = length;
+  int rc;
+  tempptrin = tempptrout = buffer;
+  rc = platform_e2a(&tempptrin, &bytes, &tempptrout, &bytes);
+  if(rc == PLATFORM_CONV_OK) {
+    return CARLE_OK;
+  }
+  else {
+    return CARLE_CONV_FAILED;
+  }
+}
+
+carl_easy_setopt(carl, CARLOPT_CONV_TO_NETWORK_FUNCTION,
+                 my_conv_from_ebcdic_to_ascii);
+.fi
+.SH AVAILABILITY
+Available only if \fBCARL_DOES_CONVERSIONS\fP was defined when libcarl was built.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_CONV_FROM_NETWORK_FUNCTION "(3), " CARLOPT_CONV_FROM_UTF8_FUNCTION "(3), "

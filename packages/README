@@ -8,7 +8,7 @@ PACKAGES
 
  This directory and all its subdirectories are for special package
 information, template, scripts and docs. The files herein should be of use for
-those of you who want to package curl in a binary or source format using one
+those of you who want to package carl in a binary or source format using one
 of those custom formats.
 
  The hierarchy for these directories is something like this:

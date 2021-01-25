@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_TPF_H
-#define HEADER_CURL_CONFIG_TPF_H
+#ifndef HEADER_CARL_CONFIG_TPF_H
+#define HEADER_CARL_CONFIG_TPF_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -33,34 +33,34 @@
 /* NOTE: Refer also to the .mak file for some of the flags below */
 
 /* to disable cookies support */
-/* #undef CURL_DISABLE_COOKIES */
+/* #undef CARL_DISABLE_COOKIES */
 
 /* to disable cryptographic authentication */
-/* #undef CURL_DISABLE_CRYPTO_AUTH */
+/* #undef CARL_DISABLE_CRYPTO_AUTH */
 
 /* to disable DICT */
-/* #undef CURL_DISABLE_DICT */
+/* #undef CARL_DISABLE_DICT */
 
 /* to disable FILE */
-/* #undef CURL_DISABLE_FILE */
+/* #undef CARL_DISABLE_FILE */
 
 /* to disable FTP */
-/* #undef CURL_DISABLE_FTP */
+/* #undef CARL_DISABLE_FTP */
 
 /* to disable HTTP */
-/* #undef CURL_DISABLE_HTTP */
+/* #undef CARL_DISABLE_HTTP */
 
 /* to disable LDAP */
-/* #undef CURL_DISABLE_LDAP */
+/* #undef CARL_DISABLE_LDAP */
 
 /* to disable TELNET */
-/* #undef CURL_DISABLE_TELNET */
+/* #undef CARL_DISABLE_TELNET */
 
 /* to disable TFTP */
-/* #undef CURL_DISABLE_TFTP */
+/* #undef CARL_DISABLE_TFTP */
 
 /* to disable verbose strings */
-/* #undef CURL_DISABLE_VERBOSE_STRINGS */
+/* #undef CARL_DISABLE_VERBOSE_STRINGS */
 
 /* lber dynamic library file */
 /* #undef DL_LBER_FILE */
@@ -557,20 +557,20 @@
 #define OS "s390x-ibm-tpf"
 
 /* Name of package */
-#define PACKAGE "curl"
+#define PACKAGE "carl"
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT \
-  "a suitable curl mailing list => https://curl.se/mail/"
+  "a suitable carl mailing list => https://carl.se/mail/"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "curl"
+#define PACKAGE_NAME "carl"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "curl -"
+#define PACKAGE_STRING "carl -"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "curl"
+#define PACKAGE_TARNAME "carl"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "-"
@@ -623,7 +623,7 @@
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
-/* If you want to build curl with the built-in manual */
+/* If you want to build carl with the built-in manual */
 /* #undef USE_MANUAL */
 
 /* if OpenSSL is in use */
@@ -747,10 +747,10 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV int
 
-#define CURL_DOES_CONVERSIONS
-#ifndef CURL_ICONV_CODESET_OF_HOST
-#define CURL_ICONV_CODESET_OF_HOST "IBM-1047"
+#define CARL_DOES_CONVERSIONS
+#ifndef CARL_ICONV_CODESET_OF_HOST
+#define CARL_ICONV_CODESET_OF_HOST "IBM-1047"
 #endif
 
 
-#endif /* HEADER_CURL_CONFIG_TPF_H */
+#endif /* HEADER_CARL_CONFIG_TPF_H */

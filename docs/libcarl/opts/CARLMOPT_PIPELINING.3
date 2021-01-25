@@ -1,0 +1,89 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_PIPELINING 3 "17 Jun 2014" "libcarl 7.37.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_PIPELINING \- enable HTTP pipelining and multiplexing
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_PIPELINING, long bitmask);
+.SH DESCRIPTION
+Pass in the \fBbitmask\fP parameter to instruct libcarl to enable HTTP
+pipelining and/or HTTP/2 multiplexing for this multi handle.
+
+When enabled, libcarl will attempt to use those protocol features when doing
+parallel requests to the same hosts.
+
+For pipelining, this means that if you add a second request that can use an
+already existing connection, the second request will be \&"piped" on the same
+connection rather than being executed in parallel.
+
+For multiplexing, this means that follow-up requests can re-use an existing
+connection and send the new request multiplexed over that at the same time as
+other transfers are already using that single connection.
+
+There are several other related options that are interesting to tweak and
+adjust to alter how libcarl spreads out requests on different connections or
+not etc.
+
+Before 7.43.0, this option was set to 1 and 0 to enable and disable HTTP/1.1
+pipelining.
+
+Starting in 7.43.0, \fBbitmask\fP's second bit also has a meaning, and you can
+ask for pipelining and multiplexing independently of each other by toggling
+the correct bits.
+.IP CARLPIPE_NOTHING (0)
+Default, which means doing no attempts at pipelining or multiplexing.
+.IP CARLPIPE_HTTP1 (1)
+If this bit is set, libcarl will try to pipeline HTTP/1.1 requests on
+connections that are already established and in use to hosts.
+
+This bit is deprecated and has no effect since version 7.62.0.
+.IP CARLPIPE_MULTIPLEX (2)
+If this bit is set, libcarl will try to multiplex the new transfer over an
+existing connection if possible. This requires HTTP/2.
+.SH DEFAULT
+Since 7.62.0, \fBCARLPIPE_MULTIPLEX\fP is enabled by default.
+
+Before that, default was \fBCARLPIPE_NOTHING\fP.
+.SH PROTOCOLS
+HTTP(S)
+.SH EXAMPLE
+.nf
+CARLM *m = carl_multi_init();
+/* try HTTP/2 multiplexing */
+carl_multi_setopt(m, CARLMOPT_PIPELINING, CARLPIPE_MULTIPLEX);
+.fi
+.SH AVAILABILITY
+Added in 7.16.0. Multiplex support bit added in 7.43.0. HTTP/1 Pipelining
+support was disabled in 7.62.0.
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLMOPT_MAX_PIPELINE_LENGTH "(3), "
+.BR CARLMOPT_PIPELINING_SITE_BL "(3), "
+.BR CARLMOPT_CONTENT_LENGTH_PENALTY_SIZE "(3), "
+.BR CARLMOPT_CHUNK_LENGTH_PENALTY_SIZE "(3), "
+.BR CARLMOPT_MAX_HOST_CONNECTIONS "(3), "
+.BR CARLMOPT_MAXCONNECTS "(3), "
+.BR CARLMOPT_MAX_HOST_CONNECTIONS "(3), "

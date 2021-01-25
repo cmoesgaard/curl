@@ -5,7 +5,7 @@ See-also: limit-rate
 Category: connection
 ---
 Specify the maximum size (in bytes) of a file to download. If the file
-requested is larger than this value, the transfer will not start and curl will
+requested is larger than this value, the transfer will not start and carl will
 return with exit code 63.
 
 A size modifier may be used. For example, Appending 'k' or 'K' will count the

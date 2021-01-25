@@ -46,7 +46,7 @@ http://%HOSTIP:%HTTPPORT/this/is/the/3011 -O --output-dir %PWD/log/tmp --create-
 <protocol>
 GET /this/is/the/3011 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -49,7 +49,7 @@ perl -e "print 'Test requires default test client host address' if ( '%CLIENT6IP
 
 # Verify data after the test has been "shot"
 <verify>
-# Strip all valid kinds of EPRT that curl can send
+# Strip all valid kinds of EPRT that carl can send
 <strippart>
 s/^(EPRT \|2\|::1\|)(.*)/$1/
 </strippart>

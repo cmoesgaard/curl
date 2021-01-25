@@ -50,7 +50,7 @@ $! 09-Apr-2005	J. Malmberg	Update for RSYNC and large file.
 $! 29-Sep-2011	J. Malmberg	Update for Bash 4.2
 $! 01-Mar-2012	J. Malmberg	Warn about getcwd(0,0)
 $! 21-Dec-2012	J. Malmberg	Update for gawk
-$! 29-Dec-2012	J. Malmberg	Update for curl
+$! 29-Dec-2012	J. Malmberg	Update for carl
 $!============================================================================
 $!
 $ss_normal = 1

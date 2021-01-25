@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM)
+#if !defined(CARL_DISABLE_HTTP) && defined(USE_NTLM)
 
 /*
  * NTLM details:
@@ -37,20 +37,20 @@
 #include "sendf.h"
 #include "strcase.h"
 #include "http_ntlm.h"
-#include "curl_ntlm_core.h"
-#include "curl_ntlm_wb.h"
+#include "carl_ntlm_core.h"
+#include "carl_ntlm_wb.h"
 #include "vauth/vauth.h"
 #include "url.h"
 
 /* SSL backend-specific #if branches in this file must be kept in the order
-   documented in curl_ntlm_core. */
+   documented in carl_ntlm_core. */
 #if defined(USE_WINDOWS_SSPI)
-#include "curl_sspi.h"
+#include "carl_sspi.h"
 #endif
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #if DEBUG_ME
@@ -59,15 +59,15 @@
 # define DEBUG_OUT(x) Curl_nop_stmt
 #endif
 
-CURLcode Curl_input_ntlm(struct Curl_easy *data,
+CARLcode Curl_input_ntlm(struct Curl_easy *data,
                          bool proxy,         /* if proxy or not */
                          const char *header) /* rest of the www-authenticate:
                                                 header */
 {
   /* point to the correct struct with this */
   struct ntlmdata *ntlm;
-  curlntlm *state;
-  CURLcode result = CURLE_OK;
+  carlntlm *state;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
 
   ntlm = proxy ? &conn->proxyntlm : &conn->ntlm;
@@ -95,11 +95,11 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
         infof(data, "NTLM handshake rejected\n");
         Curl_http_auth_cleanup_ntlm(conn);
         *state = NTLMSTATE_NONE;
-        return CURLE_REMOTE_ACCESS_DENIED;
+        return CARLE_REMOTE_ACCESS_DENIED;
       }
       else if(*state >= NTLMSTATE_TYPE1) {
         infof(data, "NTLM handshake failure (internal error)\n");
-        return CURLE_REMOTE_ACCESS_DENIED;
+        return CARLE_REMOTE_ACCESS_DENIED;
       }
 
       *state = NTLMSTATE_TYPE1; /* We should send away a type-1 */
@@ -112,11 +112,11 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
 /*
  * This is for creating ntlm header output
  */
-CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
+CARLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 {
   char *base64 = NULL;
   size_t len = 0;
-  CURLcode result;
+  CARLcode result;
 
   /* point to the address of the pointer that holds the string to send to the
      server, which is for a plain host or for a HTTP proxy */
@@ -130,7 +130,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 
   /* point to the correct struct with this */
   struct ntlmdata *ntlm;
-  curlntlm *state;
+  carlntlm *state;
   struct auth *authp;
   struct connectdata *conn = data->conn;
 
@@ -138,7 +138,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   DEBUGASSERT(data);
 
   if(proxy) {
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
     allocuserpwd = &data->state.aptr.proxyuserpwd;
     userp = conn->http_proxy.user;
     passwdp = conn->http_proxy.passwd;
@@ -149,7 +149,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
     state = &conn->proxy_ntlm_state;
     authp = &data->state.authproxy;
 #else
-    return CURLE_NOT_BUILT_IN;
+    return CARLE_NOT_BUILT_IN;
 #endif
   }
   else {
@@ -174,8 +174,8 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 
 #ifdef USE_WINDOWS_SSPI
   if(s_hSecDll == NULL) {
-    /* not thread safe and leaks - use curl_global_init() to avoid */
-    CURLcode err = Curl_sspi_global_init();
+    /* not thread safe and leaks - use carl_global_init() to avoid */
+    CARLcode err = Curl_sspi_global_init();
     if(s_hSecDll == NULL)
       return err;
   }
@@ -202,7 +202,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
                               base64);
       free(base64);
       if(!*allocuserpwd)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
 
       DEBUG_OUT(fprintf(stderr, "**** Header %s\n ", *allocuserpwd));
     }
@@ -222,7 +222,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
                               base64);
       free(base64);
       if(!*allocuserpwd)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
 
       DEBUG_OUT(fprintf(stderr, "**** %s\n ", *allocuserpwd));
 
@@ -242,7 +242,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
     break;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 void Curl_http_auth_cleanup_ntlm(struct connectdata *conn)
@@ -255,4 +255,4 @@ void Curl_http_auth_cleanup_ntlm(struct connectdata *conn)
 #endif
 }
 
-#endif /* !CURL_DISABLE_HTTP && USE_NTLM */
+#endif /* !CARL_DISABLE_HTTP && USE_NTLM */

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,42 +32,42 @@
 int test(char *URL)
 {
   int res = 0;
-  CURL *curl[NUM_HANDLES];
+  CARL *carl[NUM_HANDLES];
   int running;
-  CURLM *m = NULL;
+  CARLM *m = NULL;
   int i;
   char target_url[256];
   int handles_added = 0;
 
   for(i = 0; i < NUM_HANDLES; i++)
-    curl[i] = NULL;
+    carl[i] = NULL;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(m);
 
   /* get NUM_HANDLES easy handles */
   for(i = 0; i < NUM_HANDLES; i++) {
     /* get an easy handle */
-    easy_init(curl[i]);
+    easy_init(carl[i]);
     /* specify target */
     msnprintf(target_url, sizeof(target_url), "%s%04i", URL, i + 1);
     target_url[sizeof(target_url) - 1] = '\0';
-    easy_setopt(curl[i], CURLOPT_URL, target_url);
+    easy_setopt(carl[i], CARLOPT_URL, target_url);
     /* go verbose */
-    easy_setopt(curl[i], CURLOPT_VERBOSE, 1L);
+    easy_setopt(carl[i], CARLOPT_VERBOSE, 1L);
     /* include headers */
-    easy_setopt(curl[i], CURLOPT_HEADER, 1L);
+    easy_setopt(carl[i], CARLOPT_HEADER, 1L);
   }
 
-  /* Add the first handle to multi. We do this to let libcurl detect
+  /* Add the first handle to multi. We do this to let libcarl detect
      that the server can do pipelining. The rest of the handles will be
      added later. */
-  multi_add_handle(m, curl[handles_added++]);
+  multi_add_handle(m, carl[handles_added++]);
 
-  multi_setopt(m, CURLMOPT_PIPELINING, 1L);
+  multi_setopt(m, CARLMOPT_PIPELINING, 1L);
 
   fprintf(stderr, "Start at URL 0\n");
 
@@ -90,7 +90,7 @@ int test(char *URL)
       /* Add the rest of the handles now that the first handle has completed
          its request. */
       while(handles_added < NUM_HANDLES)
-        multi_add_handle(m, curl[handles_added++]);
+        multi_add_handle(m, carl[handles_added++]);
     }
 
     FD_ZERO(&rd);
@@ -111,12 +111,12 @@ test_cleanup:
   /* proper cleanup sequence - type PB */
 
   for(i = 0; i < NUM_HANDLES; i++) {
-    curl_multi_remove_handle(m, curl[i]);
-    curl_easy_cleanup(curl[i]);
+    carl_multi_remove_handle(m, carl[i]);
+    carl_easy_cleanup(carl[i]);
   }
 
-  curl_multi_cleanup(m);
-  curl_global_cleanup();
+  carl_multi_cleanup(m);
+  carl_global_cleanup();
 
   return res;
 }

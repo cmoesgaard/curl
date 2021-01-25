@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,38 +20,38 @@
 #
 ###########################################################################
 EXTRA_DIST = \
- backup_gnv_curl_src.com \
- build_curl-config_script.com \
- build_gnv_curl.com \
- build_gnv_curl_pcsi_desc.com \
- build_gnv_curl_pcsi_text.com \
- build_gnv_curl_release_notes.com \
- build_libcurl_pc.com \
+ backup_gnv_carl_src.com \
+ build_carl-config_script.com \
+ build_gnv_carl.com \
+ build_gnv_carl_pcsi_desc.com \
+ build_gnv_carl_pcsi_text.com \
+ build_gnv_carl_release_notes.com \
+ build_libcarl_pc.com \
  build_vms.com \
- clean_gnv_curl.com \
- compare_curl_source.com \
+ clean_gnv_carl.com \
+ compare_carl_source.com \
  config_h.com \
- curl_crtl_init.c \
- curl_gnv_build_steps.txt \
- curl_release_note_start.txt \
- curl_startup.com \
- curlmsg.h \
- curlmsg.msg \
- curlmsg.sdl \
- curlmsg_vms.h \
- generate_config_vms_h_curl.com \
+ carl_crtl_init.c \
+ carl_gnv_build_steps.txt \
+ carl_release_note_start.txt \
+ carl_startup.com \
+ carlmsg.h \
+ carlmsg.msg \
+ carlmsg.sdl \
+ carlmsg_vms.h \
+ generate_config_vms_h_carl.com \
  generate_vax_transfer.com \
  gnv_conftest.c_first \
- gnv_curl_configure.sh \
- gnv_libcurl_symbols.opt \
- gnv_link_curl.com \
+ gnv_carl_configure.sh \
+ gnv_libcarl_symbols.opt \
+ gnv_link_carl.com \
  macro32_exactcase.patch \
- make_gnv_curl_install.sh \
- make_pcsi_curl_kit_name.com \
- pcsi_gnv_curl_file_list.txt \
- pcsi_product_gnv_curl.com \
+ make_gnv_carl_install.sh \
+ make_pcsi_carl_kit_name.com \
+ pcsi_gnv_carl_file_list.txt \
+ pcsi_product_gnv_carl.com \
  readme \
  report_openssl_version.c \
- setup_gnv_curl_build.com \
- stage_curl_install.com \
+ setup_gnv_carl_build.com \
+ stage_carl_install.com \
  vms_eco_level.h

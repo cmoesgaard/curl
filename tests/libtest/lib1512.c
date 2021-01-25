@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 /*
  * Use global DNS cache (while deprecated it should still work), populate it
- * with CURLOPT_RESOLVE in the first request and then make sure a subsequent
+ * with CARLOPT_RESOLVE in the first request and then make sure a subsequent
  * easy transfer finds and uses the populated stuff.
  */
 
@@ -35,56 +35,56 @@
 int test(char *URL)
 {
   int res = 0;
-  CURL *curl[NUM_HANDLES] = {NULL, NULL};
+  CARL *carl[NUM_HANDLES] = {NULL, NULL};
   char *port = libtest_arg3;
   char *address = libtest_arg2;
   char dnsentry[256];
-  struct curl_slist *slist = NULL;
+  struct carl_slist *slist = NULL;
   int i;
   char target_url[256];
   (void)URL; /* URL is setup in the code */
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  msnprintf(dnsentry, sizeof(dnsentry), "server.example.curl:%s:%s",
+  msnprintf(dnsentry, sizeof(dnsentry), "server.example.carl:%s:%s",
             port, address);
   printf("%s\n", dnsentry);
-  slist = curl_slist_append(slist, dnsentry);
+  slist = carl_slist_append(slist, dnsentry);
 
   /* get NUM_HANDLES easy handles */
   for(i = 0; i < NUM_HANDLES; i++) {
     /* get an easy handle */
-    easy_init(curl[i]);
+    easy_init(carl[i]);
     /* specify target */
     msnprintf(target_url, sizeof(target_url),
-              "http://server.example.curl:%s/path/1512%04i",
+              "http://server.example.carl:%s/path/1512%04i",
               port, i + 1);
     target_url[sizeof(target_url) - 1] = '\0';
-    easy_setopt(curl[i], CURLOPT_URL, target_url);
+    easy_setopt(carl[i], CARLOPT_URL, target_url);
     /* go verbose */
-    easy_setopt(curl[i], CURLOPT_VERBOSE, 1L);
+    easy_setopt(carl[i], CARLOPT_VERBOSE, 1L);
     /* include headers */
-    easy_setopt(curl[i], CURLOPT_HEADER, 1L);
+    easy_setopt(carl[i], CARLOPT_HEADER, 1L);
 
-    easy_setopt(curl[i], CURLOPT_DNS_USE_GLOBAL_CACHE, 1L);
+    easy_setopt(carl[i], CARLOPT_DNS_USE_GLOBAL_CACHE, 1L);
   }
 
   /* make the first one populate the GLOBAL cache */
-  easy_setopt(curl[0], CURLOPT_RESOLVE, slist);
+  easy_setopt(carl[0], CARLOPT_RESOLVE, slist);
 
   /* run NUM_HANDLES transfers */
   for(i = 0; (i < NUM_HANDLES) && !res; i++)
-    res = curl_easy_perform(curl[i]);
+    res = carl_easy_perform(carl[i]);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl[0]);
-  curl_easy_cleanup(curl[1]);
-  curl_slist_free_all(slist);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl[0]);
+  carl_easy_cleanup(carl[1]);
+  carl_slist_free_all(slist);
+  carl_global_cleanup();
 
   return res;
 }

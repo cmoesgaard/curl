@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,31 +27,31 @@
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
-  long curlResponseCode;
-  long curlRedirectCount;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
+  long carlResponseCode;
+  long carlRedirectCount;
   char *effectiveUrl = NULL;
   char *redirectUrl = NULL;
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
   /* just to make it explicit and visible in this test: */
-  test_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
+  test_setopt(carl, CARLOPT_FOLLOWLOCATION, 0L);
 
   /* Perform the request, res will get the return code */
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &curlResponseCode);
-  curl_easy_getinfo(curl, CURLINFO_REDIRECT_COUNT, &curlRedirectCount);
-  curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effectiveUrl);
-  curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &redirectUrl);
+  carl_easy_getinfo(carl, CARLINFO_RESPONSE_CODE, &carlResponseCode);
+  carl_easy_getinfo(carl, CARLINFO_REDIRECT_COUNT, &carlRedirectCount);
+  carl_easy_getinfo(carl, CARLINFO_EFFECTIVE_URL, &effectiveUrl);
+  carl_easy_getinfo(carl, CARLINFO_REDIRECT_URL, &redirectUrl);
 
   printf("res: %d\n"
          "status: %d\n"
@@ -59,16 +59,16 @@ int test(char *URL)
          "effectiveurl: %s\n"
          "redirecturl: %s\n",
          (int)res,
-         (int)curlResponseCode,
-         (int)curlRedirectCount,
+         (int)carlResponseCode,
+         (int)carlRedirectCount,
          effectiveUrl,
          redirectUrl);
 
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

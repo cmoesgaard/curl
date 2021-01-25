@@ -6,7 +6,7 @@ HTTP GET
 HTTP CONNECT
 HTTP proxy
 proxytunnel
-CURLOPT_CONNECT_TO
+CARLOPT_CONNECT_TO
 </keywords>
 </info>
 
@@ -64,14 +64,14 @@ proxy
 <proxy>
 CONNECT connect.example.com.2050:%HTTPPORT HTTP/1.1
 Host: connect.example.com.2050:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>
 <protocol>
 GET /2050 HTTP/1.1
 Host: www.example.com.2050
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

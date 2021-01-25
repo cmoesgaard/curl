@@ -10,7 +10,7 @@ rem * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
 rem *
 rem * This software is licensed as described in the file COPYING, which
 rem * you should have received as part of this distribution. The terms
-rem * are also available at https://curl.se/docs/copyright.html.
+rem * are also available at https://carl.se/docs/copyright.html.
 rem *
 rem * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 rem * copies of the Software, and permit persons to whom the Software is
@@ -35,7 +35,7 @@ rem
   rem Switch to this batch file's directory
   cd /d "%~0\.." 1>NUL 2>&1
 
-  rem Check we are running from a curl git repository
+  rem Check we are running from a carl git repository
   if not exist GIT-INFO goto norepo
 
   rem Detect programs. HAVE_<PROGNAME>
@@ -199,10 +199,10 @@ rem
       echo #ifndef HAVE_LIBZ>> src\tool_hugehelp.c
     )
 
-    %ROFFCMD% docs\curl.1 2>NUL | perl src\mkhelp.pl docs\MANUAL >> src\tool_hugehelp.c
+    %ROFFCMD% docs\carl.1 2>NUL | perl src\mkhelp.pl docs\MANUAL >> src\tool_hugehelp.c
     if defined HAVE_GZIP (
       echo #else>> src\tool_hugehelp.c
-      %ROFFCMD% docs\curl.1 2>NUL | perl src\mkhelp.pl -c docs\MANUAL >> src\tool_hugehelp.c
+      %ROFFCMD% docs\carl.1 2>NUL | perl src\mkhelp.pl -c docs\MANUAL >> src\tool_hugehelp.c
       echo #endif /^* HAVE_LIBZ ^*/>> src\tool_hugehelp.c
     )
 
@@ -268,7 +268,7 @@ rem
 
 :norepo
   echo.
-  echo Error: This batch file should only be used with a curl git repository
+  echo Error: This batch file should only be used with a carl git repository
   goto error
 
 :nogenmakefile
@@ -293,10 +293,10 @@ rem
 
 :warning
   echo.
-  echo Warning: The curl manual could not be integrated in the source. This means when
-  echo you build curl the manual will not be available (curl --man^). Integration of
+  echo Warning: The carl manual could not be integrated in the source. This means when
+  echo you build carl the manual will not be available (carl --man^). Integration of
   echo the manual is not required and a summary of the options will still be available
-  echo (curl --help^). To integrate the manual your PATH is required to have
+  echo (carl --help^). To integrate the manual your PATH is required to have
   echo groff/nroff, perl and optionally gzip for compression.
   goto success
 

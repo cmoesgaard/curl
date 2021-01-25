@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
@@ -31,8 +31,8 @@
 #  include <arpa/inet.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
-#include "curlx.h"
+#define ENABLE_CARLX_PRINTF
+#include "carlx.h"
 
 #include "hash.h"
 #include "hostip.h"
@@ -44,22 +44,22 @@ static struct Curl_hash hp;
 static char *data_key;
 static struct Curl_dns_entry *data_node;
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
   int rc;
-  data = curl_easy_init();
+  data = carl_easy_init();
   if(!data) {
-    curl_global_cleanup();
-    return CURLE_OUT_OF_MEMORY;
+    carl_global_cleanup();
+    return CARLE_OUT_OF_MEMORY;
   }
 
   rc = Curl_mk_dnscache(&hp);
   if(rc) {
-    curl_easy_cleanup(data);
-    curl_global_cleanup();
-    return CURLE_OUT_OF_MEMORY;
+    carl_easy_cleanup(data);
+    carl_global_cleanup();
+    return CARLE_OUT_OF_MEMORY;
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -71,8 +71,8 @@ static void unit_stop(void)
   free(data_key);
   Curl_hash_destroy(&hp);
 
-  curl_easy_cleanup(data);
-  curl_global_cleanup();
+  carl_easy_cleanup(data);
+  carl_global_cleanup();
 }
 
 static struct Curl_addrinfo *fake_ai(void)
@@ -97,21 +97,21 @@ static struct Curl_addrinfo *fake_ai(void)
   return ai;
 }
 
-static CURLcode create_node(void)
+static CARLcode create_node(void)
 {
   data_key = aprintf("%s:%d", "dummy", 0);
   if(!data_key)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   data_node = calloc(1, sizeof(struct Curl_dns_entry));
   if(!data_node)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   data_node->addr = fake_ai();
   if(!data_node->addr)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
@@ -122,8 +122,8 @@ UNITTEST_START
 
   /* Test 1305 exits without adding anything to the hash */
   if(strcmp(arg, "1305") != 0) {
-    CURLcode rc = create_node();
-    abort_unless(rc == CURLE_OK, "data node creation failed");
+    CARLcode rc = create_node();
+    abort_unless(rc == CARLE_OK, "data node creation failed");
     key_len = strlen(data_key);
 
     data_node->inuse = 1; /* hash will hold the reference */

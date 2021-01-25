@@ -59,12 +59,12 @@ http://%HOSTIP:%HTTPPORT/we/are/all/twits/51 -L
 <protocol>
 GET /we/are/all/twits/51 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /510002 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

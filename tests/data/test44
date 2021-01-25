@@ -27,7 +27,7 @@ http
 HTTP RFC1867-type formposting without Expect: header
  </name>
  <command>
-http://%HOSTIP:%HTTPPORT/we/want/44 -F name=daniel -F tool=curl -F file=@log/test44.txt -H "Expect:"
+http://%HOSTIP:%HTTPPORT/we/want/44 -F name=daniel -F tool=carl -F file=@log/test44.txt -H "Expect:"
 </command>
 # We create this file before the command is invoked!
 <file name="log/test44.txt">
@@ -45,7 +45,7 @@ bar
 <protocol>
 POST /we/want/44 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 408
 Content-Type: multipart/form-data; boundary=----------------------------7c633d5c27ce
@@ -57,7 +57,7 @@ daniel
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------7c633d5c27ce
 Content-Disposition: form-data; name="file"; filename="test44.txt"
 Content-Type: text/plain

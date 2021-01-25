@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SELECT_H
-#define HEADER_CURL_SELECT_H
+#ifndef HEADER_CARL_SELECT_H
+#define HEADER_CARL_SELECT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef HAVE_POLL_H
 #include <poll.h>
@@ -48,7 +48,7 @@
 
 struct pollfd
 {
-    curl_socket_t fd;
+    carl_socket_t fd;
     short   events;
     short   revents;
 };
@@ -70,27 +70,27 @@ struct pollfd
 /* there are three CSELECT defines that are defined in the public header that
    are exposed to users, but this *IN2 bit is only ever used internally and
    therefore defined here */
-#define CURL_CSELECT_IN2 (CURL_CSELECT_ERR << 1)
+#define CARL_CSELECT_IN2 (CARL_CSELECT_ERR << 1)
 
-int Curl_select(curl_socket_t maxfd,
+int Curl_select(carl_socket_t maxfd,
                 fd_set *fds_read,
                 fd_set *fds_write,
                 fd_set *fds_err,
                 timediff_t timeout_ms);
 
-int Curl_socket_check(curl_socket_t readfd, curl_socket_t readfd2,
-                      curl_socket_t writefd,
+int Curl_socket_check(carl_socket_t readfd, carl_socket_t readfd2,
+                      carl_socket_t writefd,
                       timediff_t timeout_ms);
 #define SOCKET_READABLE(x,z) \
-  Curl_socket_check(x, CURL_SOCKET_BAD, CURL_SOCKET_BAD, z)
+  Curl_socket_check(x, CARL_SOCKET_BAD, CARL_SOCKET_BAD, z)
 #define SOCKET_WRITABLE(x,z) \
-  Curl_socket_check(CURL_SOCKET_BAD, CURL_SOCKET_BAD, x, z)
+  Curl_socket_check(CARL_SOCKET_BAD, CARL_SOCKET_BAD, x, z)
 
 int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms);
 int Curl_wait_ms(timediff_t timeout_ms);
 
 #ifdef TPF
-int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
+int tpf_select_libcarl(int maxfds, fd_set* reads, fd_set* writes,
                        fd_set* excepts, struct timeval *tv);
 #endif
 
@@ -121,4 +121,4 @@ int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
 } while(0)
 #endif
 
-#endif /* HEADER_CURL_SELECT_H */
+#endif /* HEADER_CARL_SELECT_H */

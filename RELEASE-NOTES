@@ -1,16 +1,16 @@
-curl and libcurl 7.75.0
+carl and libcarl 7.75.0
 
- Public curl releases:         197
+ Public carl releases:         197
  Command line options:         237
- curl_easy_setopt() options:   285
- Public functions in libcurl:  85
+ carl_easy_setopt() options:   285
+ Public functions in libcarl:  85
  Contributors:                 2319
 
 This release includes the following changes:
 
- o curl: add --create-file-mode [mode] [28]
- o curl: add new variables to --write-out [25]
- o dns: extend CURLOPT_RESOLVE syntax for adding non-permanent entries [53]
+ o carl: add --create-file-mode [mode] [28]
+ o carl: add new variables to --write-out [25]
+ o dns: extend CARLOPT_RESOLVE syntax for adding non-permanent entries [53]
  o gopher: implement secure gopher protocol [2]
  o http: add Hyper as new optional HTTP backend [24]
  o http: introduce AWS HTTP v4 Signature support [26]
@@ -22,8 +22,8 @@ This release includes the following bugfixes:
  o BUG-BOUNTY: minor language updates [5]
  o cleanup: fix empty expression statement has no effect
  o cmake: Add an option to disable libidn2 [48]
- o cmake: enable gophers correctly in curl-config [10]
- o cmake: expose CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG [32]
+ o cmake: enable gophers correctly in carl-config [10]
+ o cmake: expose CARL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG [32]
  o cmdline-opts/gen.pl: return hard on errors [11]
  o cmdline-opts/retry.d: mention response code 429 as well [47]
  o configure: set -Wextra-semi-stmt for clang with --enable-debug [52]
@@ -32,14 +32,14 @@ This release includes the following bugfixes:
  o connect: on linux, enable reporting of all ICMP errors on UDP sockets [27]
  o connect: zero variable on stack to silence valgrind complaint [23]
  o cookie: avoid the C1001 internal compiler error with MSVC 14 [36]
- o curl.1: fix typo microsft -> microsoft [56]
- o curl: fix handling of -q option [39]
- o curl_easy_pause.3: add multiplexed pause effects [41]
- o CURLINFO_PRETRANSFER_TIME.3: clarify [61]
- o CURLOPT_URL.3: remove scheme specific details [12]
+ o carl.1: fix typo microsft -> microsoft [56]
+ o carl: fix handling of -q option [39]
+ o carl_easy_pause.3: add multiplexed pause effects [41]
+ o CARLINFO_PRETRANSFER_TIME.3: clarify [61]
+ o CARLOPT_URL.3: remove scheme specific details [12]
  o digest_sspi: Show InitializeSecurityContext errors in verbose mode [8]
- o docs/examples: adjust prototypes for CURLOPT_READFUNCTION [51]
- o docs/URL-SYNTAX: the URL syntax curl accepts and works with [15]
+ o docs/examples: adjust prototypes for CARLOPT_READFUNCTION [51]
+ o docs/URL-SYNTAX: the URL syntax carl accepts and works with [15]
  o docs: enable syntax highlighting in several docs files [16]
  o docs: fix line length bug in gen.pl [70]
  o docs: fix typos in NEW-PROTOCOL.md [102]
@@ -55,17 +55,17 @@ This release includes the following bugfixes:
  o h2: do not wait for RECV on paused transfers [43]
  o HISTORY: added dates to early history
  o http: empty reply connection are not left intact [80]
- o http: get CURLOPT_REQUEST_TARGET working with a HTTP proxy [83]
- o http: have CURLOPT_FAILONERROR fail after all headers [54]
+ o http: get CARLOPT_REQUEST_TARGET working with a HTTP proxy [83]
+ o http: have CARLOPT_FAILONERROR fail after all headers [54]
  o http: make providing Proxy-Connection header not cause duplicated headers [92]
  o http: show the request as headers even when split-sending [7]
  o http_chunks: correct and clarify a comment on hexnumber length [88]
  o http_proxy: Fix CONNECT chunked encoding race condition [76]
  o httpauth: make multi-request auth work with custom port [45]
  o INSTALL: now at 85 operating systems
- o INSTALL: update the list known OSes and CPU archs curl has run on [38]
- o lib/unit tests: add missing curl_global_cleanup() calls
- o lib1564/5: verify that curl_multi_wakeup returns OK
+ o INSTALL: update the list known OSes and CPU archs carl has run on [38]
+ o lib/unit tests: add missing carl_global_cleanup() calls
+ o lib1564/5: verify that carl_multi_wakeup returns OK
  o lib: pass in 'struct Curl_easy *' to most functions [101]
  o lib: remove Curl_ prefix from many static functions [66]
  o lib: save a bit of space with some structure packing [82]
@@ -84,7 +84,7 @@ This release includes the following bugfixes:
  o multi_runsingle: bail out early on data->conn == NULL [74]
  o ngtcp2: make it build it current master again [21]
  o nss: get the run-time version instead of build-time [67]
- o OS400: update ccsidcurl.c [20]
+ o OS400: update ccsidcarl.c [20]
  o pretransfer: setup the User-Agent header here [60]
  o quiche: remove fprintf() leftover
  o Revert "CI/github: work-around for brew breakage on macOS" [17]
@@ -101,7 +101,7 @@ This release includes the following bugfixes:
  o test179: use consistent header line endings
  o test410: verify HTTPS GET with a 49K request header
  o tests/mqttd: extract the client id from the correct offset [13]
- o tests: make --libcurl tests only test FTP options if ftp enabled [18]
+ o tests: make --libcarl tests only test FTP options if ftp enabled [18]
  o tool_doswin: Restore original console settings on CTRL signal [68]
  o tool_operate: fix the suppression logic of some error messages [33]
  o tool_operate: spellfix a comment
@@ -116,7 +116,7 @@ This release includes the following bugfixes:
 
 This release includes the following known bugs:
 
- o see docs/KNOWN_BUGS (https://curl.se/docs/knownbugs.html)
+ o see docs/KNOWN_BUGS (https://carl.se/docs/knownbugs.html)
 
 This release would not have looked like this without help, code, reports and
 advice from friends like these:
@@ -140,89 +140,89 @@ advice from friends like these:
 References to bug reports and discussions on issues:
 
  [1] = https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=28735
- [2] = https://curl.se/bug/?i=6208
- [3] = https://curl.se/bug/?i=6331
+ [2] = https://carl.se/bug/?i=6208
+ [3] = https://carl.se/bug/?i=6331
  [4] = https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=28676
- [5] = https://curl.se/bug/?i=6318
- [6] = https://curl.se/bug/?i=6321
- [7] = https://curl.se/bug/?i=6328
- [8] = https://curl.se/bug/?i=6315
- [9] = https://curl.se/bug/?i=6333
- [10] = https://curl.se/bug/?i=6336
- [11] = https://curl.se/bug/?i=6354
- [12] = https://curl.se/bug/?i=6307
- [13] = https://curl.se/bug/?i=6334
- [14] = https://curl.se/bug/?i=6176
- [15] = https://curl.se/bug/?i=6285
- [16] = https://curl.se/bug/?i=6286
- [17] = https://curl.se/bug/?i=6332
- [18] = https://curl.se/bug/?i=6303
- [19] = https://curl.se/bug/?i=6304
- [20] = https://curl.se/bug/?i=6292
- [21] = https://curl.se/bug/?i=6296
- [22] = https://curl.se/bug/?i=6295
- [23] = https://curl.se/bug/?i=6289
- [24] = https://curl.se/bug/?i=6110
- [25] = https://curl.se/bug/?i=6199
- [26] = https://curl.se/bug/?i=5703
- [27] = https://curl.se/bug/?i=6341
- [28] = https://curl.se/bug/?i=6244
- [29] = https://curl.se/bug/?i=6423
- [30] = https://github.com/curl/curl/commit/08e8455dddc5e48e58a12ade3815c01ae3da3b64#commitcomment-45433279
- [31] = https://curl.se/bug/?i=6349
- [32] = https://curl.se/bug/?i=6435
- [33] = https://curl.se/mail/archive-2020-12/0017.html
- [34] = https://curl.se/bug/?i=6345
- [35] = https://curl.se/bug/?i=6365
- [36] = https://curl.se/bug/?i=6112
- [37] = https://curl.se/mail/lib-2020-12/0121.html
- [38] = https://curl.se/bug/?i=6366
- [39] = https://curl.se/bug/?i=6364
- [40] = https://curl.se/mail/lib-2020-12/0084.html
- [41] = https://curl.se/bug/?i=6360
- [42] = https://curl.se/bug/?i=6358
- [43] = https://curl.se/bug/?i=6356
- [44] = https://curl.se/bug/?i=6403
- [45] = https://curl.se/bug/?i=6397
- [47] = https://curl.se/mail/archive-2020-12/0018.html
- [48] = https://curl.se/bug/?i=6361
- [49] = https://curl.se/bug/?i=6421
- [50] = https://curl.se/bug/?i=6459
- [51] = https://curl.se/bug/?i=6392
- [52] = https://curl.se/bug/?i=6378
- [53] = https://curl.se/bug/?i=6294
- [54] = https://curl.se/bug/?i=6408
- [55] = https://curl.se/bug/?i=6385
- [56] = https://curl.se/bug/?i=6380
- [57] = https://curl.se/bug/?i=6375
- [58] = https://curl.se/bug/?i=6455
- [59] = https://curl.se/bug/?i=6454
- [60] = https://curl.se/bug/?i=6312
- [61] = https://curl.se/bug/?i=6453
- [62] = https://curl.se/bug/?i=6413
- [63] = https://curl.se/bug/?i=6411
- [64] = https://curl.se/bug/?i=6457
- [65] = https://github.com/curl/curl/discussions/6427
- [66] = https://curl.se/bug/?i=6443
- [67] = https://curl.se/bug/?i=6445
- [68] = https://curl.se/bug/?i=6226
- [70] = https://curl.se/bug/?i=6438
- [71] = https://curl.se/bug/?i=6436
- [72] = https://curl.se/bug/?i=6493
- [73] = https://curl.se/mail/lib-2021-01/0063.html
- [74] = https://curl.se/bug/?i=6433
- [75] = https://curl.se/bug/?i=6431
- [76] = https://curl.se/mail/lib-2021-01/0033.html
- [78] = https://curl.se/bug/?i=6504
+ [5] = https://carl.se/bug/?i=6318
+ [6] = https://carl.se/bug/?i=6321
+ [7] = https://carl.se/bug/?i=6328
+ [8] = https://carl.se/bug/?i=6315
+ [9] = https://carl.se/bug/?i=6333
+ [10] = https://carl.se/bug/?i=6336
+ [11] = https://carl.se/bug/?i=6354
+ [12] = https://carl.se/bug/?i=6307
+ [13] = https://carl.se/bug/?i=6334
+ [14] = https://carl.se/bug/?i=6176
+ [15] = https://carl.se/bug/?i=6285
+ [16] = https://carl.se/bug/?i=6286
+ [17] = https://carl.se/bug/?i=6332
+ [18] = https://carl.se/bug/?i=6303
+ [19] = https://carl.se/bug/?i=6304
+ [20] = https://carl.se/bug/?i=6292
+ [21] = https://carl.se/bug/?i=6296
+ [22] = https://carl.se/bug/?i=6295
+ [23] = https://carl.se/bug/?i=6289
+ [24] = https://carl.se/bug/?i=6110
+ [25] = https://carl.se/bug/?i=6199
+ [26] = https://carl.se/bug/?i=5703
+ [27] = https://carl.se/bug/?i=6341
+ [28] = https://carl.se/bug/?i=6244
+ [29] = https://carl.se/bug/?i=6423
+ [30] = https://github.com/carl/carl/commit/08e8455dddc5e48e58a12ade3815c01ae3da3b64#commitcomment-45433279
+ [31] = https://carl.se/bug/?i=6349
+ [32] = https://carl.se/bug/?i=6435
+ [33] = https://carl.se/mail/archive-2020-12/0017.html
+ [34] = https://carl.se/bug/?i=6345
+ [35] = https://carl.se/bug/?i=6365
+ [36] = https://carl.se/bug/?i=6112
+ [37] = https://carl.se/mail/lib-2020-12/0121.html
+ [38] = https://carl.se/bug/?i=6366
+ [39] = https://carl.se/bug/?i=6364
+ [40] = https://carl.se/mail/lib-2020-12/0084.html
+ [41] = https://carl.se/bug/?i=6360
+ [42] = https://carl.se/bug/?i=6358
+ [43] = https://carl.se/bug/?i=6356
+ [44] = https://carl.se/bug/?i=6403
+ [45] = https://carl.se/bug/?i=6397
+ [47] = https://carl.se/mail/archive-2020-12/0018.html
+ [48] = https://carl.se/bug/?i=6361
+ [49] = https://carl.se/bug/?i=6421
+ [50] = https://carl.se/bug/?i=6459
+ [51] = https://carl.se/bug/?i=6392
+ [52] = https://carl.se/bug/?i=6378
+ [53] = https://carl.se/bug/?i=6294
+ [54] = https://carl.se/bug/?i=6408
+ [55] = https://carl.se/bug/?i=6385
+ [56] = https://carl.se/bug/?i=6380
+ [57] = https://carl.se/bug/?i=6375
+ [58] = https://carl.se/bug/?i=6455
+ [59] = https://carl.se/bug/?i=6454
+ [60] = https://carl.se/bug/?i=6312
+ [61] = https://carl.se/bug/?i=6453
+ [62] = https://carl.se/bug/?i=6413
+ [63] = https://carl.se/bug/?i=6411
+ [64] = https://carl.se/bug/?i=6457
+ [65] = https://github.com/carl/carl/discussions/6427
+ [66] = https://carl.se/bug/?i=6443
+ [67] = https://carl.se/bug/?i=6445
+ [68] = https://carl.se/bug/?i=6226
+ [70] = https://carl.se/bug/?i=6438
+ [71] = https://carl.se/bug/?i=6436
+ [72] = https://carl.se/bug/?i=6493
+ [73] = https://carl.se/mail/lib-2021-01/0063.html
+ [74] = https://carl.se/bug/?i=6433
+ [75] = https://carl.se/bug/?i=6431
+ [76] = https://carl.se/mail/lib-2021-01/0033.html
+ [78] = https://carl.se/bug/?i=6504
  [80] = https://twitter.com/mholt6/status/1352130240265375744
- [82] = https://curl.se/bug/?i=6483
- [83] = https://curl.se/bug/?i=6490
- [85] = https://curl.se/bug/?i=6492
- [86] = https://curl.se/bug/?i=6491
- [87] = https://curl.se/bug/?i=6484
- [88] = https://curl.se/bug/?i=6489
- [92] = https://curl.se/mail/lib-2021-01/0095.html
- [93] = https://curl.se/bug/?i=6477
- [99] = https://curl.se/bug/?i=6481
- [101] = https://curl.se/bug/?i=6425
- [102] = https://curl.se/bug/?i=6471
+ [82] = https://carl.se/bug/?i=6483
+ [83] = https://carl.se/bug/?i=6490
+ [85] = https://carl.se/bug/?i=6492
+ [86] = https://carl.se/bug/?i=6491
+ [87] = https://carl.se/bug/?i=6484
+ [88] = https://carl.se/bug/?i=6489
+ [92] = https://carl.se/mail/lib-2021-01/0095.html
+ [93] = https://carl.se/bug/?i=6477
+ [99] = https://carl.se/bug/?i=6481
+ [101] = https://carl.se/bug/?i=6425
+ [102] = https://carl.se/bug/?i=6471

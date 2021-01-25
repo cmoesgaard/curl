@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,28 +20,28 @@
  *
  ***************************************************************************/
 /* <DESC>
- * Checks if HTTP/3 support is present in libcurl.
+ * Checks if HTTP/3 support is present in libcarl.
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(void)
 {
-  curl_version_info_data *ver;
+  carl_version_info_data *ver;
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  ver = curl_version_info(CURLVERSION_NOW);
-  if(ver->features & CURL_VERSION_HTTP2)
+  ver = carl_version_info(CARLVERSION_NOW);
+  if(ver->features & CARL_VERSION_HTTP2)
     printf("HTTP/2 support is present\n");
 
-  if(ver->features & CURL_VERSION_HTTP3)
+  if(ver->features & CARL_VERSION_HTTP3)
     printf("HTTP/3 support is present\n");
 
-  if(ver->features & CURL_VERSION_ALTSVC)
+  if(ver->features & CARL_VERSION_ALTSVC)
     printf("Alt-svc support is present\n");
 
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

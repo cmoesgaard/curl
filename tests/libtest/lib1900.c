@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -31,7 +31,7 @@
 
 static int urltime[MAX_URLS];
 static char *urlstring[MAX_URLS];
-static CURL *handles[MAX_URLS];
+static CARL *handles[MAX_URLS];
 static char *site_blocklist[MAX_BLOCKLIST];
 static char *server_blocklist[MAX_BLOCKLIST];
 static int num_handles;
@@ -104,22 +104,22 @@ static int create_handles(void)
   int i;
 
   for(i = 0; i < num_handles; i++) {
-    handles[i] = curl_easy_init();
+    handles[i] = carl_easy_init();
   }
   return 0;
 }
 
-static void setup_handle(char *base_url, CURLM *m, int handlenum)
+static void setup_handle(char *base_url, CARLM *m, int handlenum)
 {
   char urlbuf[256];
 
   msnprintf(urlbuf, sizeof(urlbuf), "%s%s", base_url, urlstring[handlenum]);
-  curl_easy_setopt(handles[handlenum], CURLOPT_URL, urlbuf);
-  curl_easy_setopt(handles[handlenum], CURLOPT_VERBOSE, 1L);
-  curl_easy_setopt(handles[handlenum], CURLOPT_FAILONERROR, 1L);
-  curl_easy_setopt(handles[handlenum], CURLOPT_WRITEFUNCTION, write_callback);
-  curl_easy_setopt(handles[handlenum], CURLOPT_WRITEDATA, NULL);
-  curl_multi_add_handle(m, handles[handlenum]);
+  carl_easy_setopt(handles[handlenum], CARLOPT_URL, urlbuf);
+  carl_easy_setopt(handles[handlenum], CARLOPT_VERBOSE, 1L);
+  carl_easy_setopt(handles[handlenum], CARLOPT_FAILONERROR, 1L);
+  carl_easy_setopt(handles[handlenum], CARLOPT_WRITEFUNCTION, write_callback);
+  carl_easy_setopt(handles[handlenum], CARLOPT_WRITEDATA, NULL);
+  carl_multi_add_handle(m, handles[handlenum]);
 }
 
 static void remove_handles(void)
@@ -128,15 +128,15 @@ static void remove_handles(void)
 
   for(i = 0; i < num_handles; i++) {
     if(handles[i])
-      curl_easy_cleanup(handles[i]);
+      carl_easy_cleanup(handles[i]);
   }
 }
 
 int test(char *URL)
 {
   int res = 0;
-  CURLM *m = NULL;
-  CURLMsg *msg; /* for picking up messages with the transfer status */
+  CARLM *m = NULL;
+  CARLMsg *msg; /* for picking up messages with the transfer status */
   int msgs_left; /* how many messages are left */
   int running = 0;
   int handlenum = 0;
@@ -147,20 +147,20 @@ int test(char *URL)
 
   start_test_timing();
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
   multi_init(m);
 
   create_handles();
 
-  multi_setopt(m, CURLMOPT_PIPELINING, 1L);
-  multi_setopt(m, CURLMOPT_MAX_HOST_CONNECTIONS, 2L);
-  multi_setopt(m, CURLMOPT_MAX_PIPELINE_LENGTH, 3L);
-  multi_setopt(m, CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE, 15000L);
-  multi_setopt(m, CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE, 10000L);
+  multi_setopt(m, CARLMOPT_PIPELINING, 1L);
+  multi_setopt(m, CARLMOPT_MAX_HOST_CONNECTIONS, 2L);
+  multi_setopt(m, CARLMOPT_MAX_PIPELINE_LENGTH, 3L);
+  multi_setopt(m, CARLMOPT_CONTENT_LENGTH_PENALTY_SIZE, 15000L);
+  multi_setopt(m, CARLMOPT_CHUNK_LENGTH_PENALTY_SIZE, 10000L);
 
-  multi_setopt(m, CURLMOPT_PIPELINING_SITE_BL, site_blocklist);
-  multi_setopt(m, CURLMOPT_PIPELINING_SERVER_BL, server_blocklist);
+  multi_setopt(m, CARLMOPT_PIPELINING_SITE_BL, site_blocklist);
+  multi_setopt(m, CARLMOPT_PIPELINING_SERVER_BL, server_blocklist);
 
   last_handle_add = tutil_tvnow();
 
@@ -184,14 +184,14 @@ int test(char *URL)
       }
     }
 
-    curl_multi_perform(m, &running);
+    carl_multi_perform(m, &running);
 
     abort_on_test_timeout();
 
     /* See how the transfers went */
     do {
-      msg = curl_multi_info_read(m, &msgs_left);
-      if(msg && msg->msg == CURLMSG_DONE) {
+      msg = carl_multi_info_read(m, &msgs_left);
+      if(msg && msg->msg == CARLMSG_DONE) {
         int i;
 
         /* Find out which handle this message is about */
@@ -202,7 +202,7 @@ int test(char *URL)
         }
 
         printf("Handle %d Completed with status %d\n", i, msg->data.result);
-        curl_multi_remove_handle(m, handles[i]);
+        carl_multi_remove_handle(m, handles[i]);
       }
     } while(msg);
 
@@ -214,11 +214,11 @@ int test(char *URL)
     FD_ZERO(&wr);
     FD_ZERO(&exc);
 
-    curl_multi_fdset(m, &rd, &wr, &exc, &maxfd);
+    carl_multi_fdset(m, &rd, &wr, &exc, &maxfd);
 
     /* At this point, maxfd is guaranteed to be greater or equal than -1. */
 
-    curl_multi_timeout(m, &timeout);
+    carl_multi_timeout(m, &timeout);
 
     if(timeout < 0)
       timeout = 1;
@@ -240,8 +240,8 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UB */
 
-  curl_multi_cleanup(m);
-  curl_global_cleanup();
+  carl_multi_cleanup(m);
+  carl_global_cleanup();
 
   free_urls();
   return res;

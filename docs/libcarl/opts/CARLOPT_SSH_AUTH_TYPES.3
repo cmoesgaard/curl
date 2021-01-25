@@ -1,0 +1,59 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SSH_AUTH_TYPES 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SSH_AUTH_TYPES \- set desired auth types for SFTP and SCP
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SSH_AUTH_TYPES, long bitmask);
+.SH DESCRIPTION
+Pass a long set to a bitmask consisting of one or more of
+CARLSSH_AUTH_PUBLICKEY, CARLSSH_AUTH_PASSWORD, CARLSSH_AUTH_HOST,
+CARLSSH_AUTH_KEYBOARD and CARLSSH_AUTH_AGENT.
+
+Set \fICARLSSH_AUTH_ANY\fP to let libcarl pick a suitable one. Currently
+CARLSSH_AUTH_HOST has no effect. If CARLSSH_AUTH_AGENT is used, libcarl
+attempts to connect to ssh-agent or pageant and let the agent attempt the
+authentication.
+.SH DEFAULT
+None
+.SH PROTOCOLS
+SFTP and SCP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "sftp://example.com/file");
+  carl_easy_setopt(carl, CARLOPT_SSH_AUTH_TYPES,
+                   CARLSSH_AUTH_PUBLICKEY | CARLSSH_AUTH_KEYBOARD);
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+CARLSSH_AUTH_HOST was added in 7.16.1, CARLSSH_AUTH_AGENT was added in 7.28.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SSH_HOST_PUBLIC_KEY_MD5 "(3), " CARLOPT_SSH_PUBLIC_KEYFILE "(3), "

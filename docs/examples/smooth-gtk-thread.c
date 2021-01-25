@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,10 +26,10 @@
  */
 /*
  * Written by Jud Bishop after studying the other examples provided with
- * libcurl.
+ * libcarl.
  *
  * To compile (on a single line):
- * gcc -ggdb `pkg-config --cflags  --libs gtk+-2.0` -lcurl -lssl -lcrypto
+ * gcc -ggdb `pkg-config --cflags  --libs gtk+-2.0` -lcarl -lssl -lcrypto
  *   -lgthread-2.0 -dl  smooth-gtk-thread.c -o smooth-gtk-thread
  */
 
@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #define NUMT 4
 
@@ -70,7 +70,7 @@ void *pull_one_url(void *NaN)
   /* Stop threads from entering unless j is incremented */
   pthread_mutex_lock(&lock);
   while(j < num_urls) {
-    CURL *curl;
+    CARL *carl;
     gchar *http;
 
     printf("j = %d\n", j);
@@ -81,27 +81,27 @@ void *pull_one_url(void *NaN)
 
     printf("http %s", http);
 
-    curl = curl_easy_init();
-    if(curl) {
+    carl = carl_easy_init();
+    if(carl) {
 
       FILE *outfile = fopen(urls[j], "wb");
 
       /* Set the URL and transfer type */
-      curl_easy_setopt(curl, CURLOPT_URL, http);
+      carl_easy_setopt(carl, CARLOPT_URL, http);
 
       /* Write to the file */
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, outfile);
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_file);
+      carl_easy_setopt(carl, CARLOPT_WRITEDATA, outfile);
+      carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, write_file);
 
       j++;  /* critical line */
       pthread_mutex_unlock(&lock);
 
-      curl_easy_perform(curl);
+      carl_easy_perform(carl);
 
       fclose(outfile);
       printf("fclose\n");
 
-      curl_easy_cleanup(curl);
+      carl_easy_cleanup(carl);
     }
     g_free(http);
 
@@ -174,8 +174,8 @@ int main(int argc, char **argv)
 {
   GtkWidget *top_window, *outside_frame, *inside_frame, *progress_bar;
 
-  /* Must initialize libcurl before any threads are started */
-  curl_global_init(CURL_GLOBAL_ALL);
+  /* Must initialize libcarl before any threads are started */
+  carl_global_init(CARL_GLOBAL_ALL);
 
   /* Init thread */
   g_thread_init(NULL);

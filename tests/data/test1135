@@ -2,7 +2,7 @@
 <info>
 <keywords>
 source analysis
-CURL_EXTERN
+CARL_EXTERN
 </keywords>
 </info>
 
@@ -13,12 +13,12 @@ CURL_EXTERN
 none
 </server>
 
-# The VMS and OS/400 builds extract the CURL_EXTERN protos and use in
+# The VMS and OS/400 builds extract the CARL_EXTERN protos and use in
 # the build. We break binary compatibility by changing order. Only add
 # new entries last or bump the SONAME.
 #
  <name>
-Verify CURL_EXTERN order
+Verify CARL_EXTERN order
  </name>
 
 <command type="perl">
@@ -28,83 +28,83 @@ Verify CURL_EXTERN order
 
 <verify>
 <stdout>
-CURL_EXTERN int curl_strequal(const char *s1, const char *s2);
-CURL_EXTERN int curl_strnequal(const char *s1, const char *s2, size_t n);
-CURL_EXTERN curl_mime *curl_mime_init(CURL *easy);
-CURL_EXTERN void curl_mime_free(curl_mime *mime);
-CURL_EXTERN curl_mimepart *curl_mime_addpart(curl_mime *mime);
-CURL_EXTERN CURLcode curl_mime_name(curl_mimepart *part, const char *name);
-CURL_EXTERN CURLcode curl_mime_filename(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_type(curl_mimepart *part, const char *mimetype);
-CURL_EXTERN CURLcode curl_mime_encoder(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_data(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_filedata(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_data_cb(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_subparts(curl_mimepart *part,
-CURL_EXTERN CURLcode curl_mime_headers(curl_mimepart *part,
-CURL_EXTERN CURLFORMcode curl_formadd(struct curl_httppost **httppost,
-CURL_EXTERN int curl_formget(struct curl_httppost *form, void *arg,
-CURL_EXTERN void curl_formfree(struct curl_httppost *form);
-CURL_EXTERN char *curl_getenv(const char *variable);
-CURL_EXTERN char *curl_version(void);
-CURL_EXTERN char *curl_easy_escape(CURL *handle,
-CURL_EXTERN char *curl_escape(const char *string,
-CURL_EXTERN char *curl_easy_unescape(CURL *handle,
-CURL_EXTERN char *curl_unescape(const char *string,
-CURL_EXTERN void curl_free(void *p);
-CURL_EXTERN CURLcode curl_global_init(long flags);
-CURL_EXTERN CURLcode curl_global_init_mem(long flags,
-CURL_EXTERN void curl_global_cleanup(void);
-CURL_EXTERN CURLsslset curl_global_sslset(curl_sslbackend id, const char *name,
-CURL_EXTERN struct curl_slist *curl_slist_append(struct curl_slist *,
-CURL_EXTERN void curl_slist_free_all(struct curl_slist *);
-CURL_EXTERN time_t curl_getdate(const char *p, const time_t *unused);
-CURL_EXTERN CURLSH *curl_share_init(void);
-CURL_EXTERN CURLSHcode curl_share_setopt(CURLSH *, CURLSHoption option, ...);
-CURL_EXTERN CURLSHcode curl_share_cleanup(CURLSH *);
-CURL_EXTERN curl_version_info_data *curl_version_info(CURLversion);
-CURL_EXTERN const char *curl_easy_strerror(CURLcode);
-CURL_EXTERN const char *curl_share_strerror(CURLSHcode);
-CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);
-CURL_EXTERN CURL *curl_easy_init(void);
-CURL_EXTERN CURLcode curl_easy_setopt(CURL *curl, CURLoption option, ...);
-CURL_EXTERN CURLcode curl_easy_perform(CURL *curl);
-CURL_EXTERN void curl_easy_cleanup(CURL *curl);
-CURL_EXTERN CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info, ...);
-CURL_EXTERN CURL *curl_easy_duphandle(CURL *curl);
-CURL_EXTERN void curl_easy_reset(CURL *curl);
-CURL_EXTERN CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen,
-CURL_EXTERN CURLcode curl_easy_send(CURL *curl, const void *buffer,
-CURL_EXTERN CURLcode curl_easy_upkeep(CURL *curl);
-CURL_EXTERN int curl_mprintf(const char *format, ...);
-CURL_EXTERN int curl_mfprintf(FILE *fd, const char *format, ...);
-CURL_EXTERN int curl_msprintf(char *buffer, const char *format, ...);
-CURL_EXTERN int curl_msnprintf(char *buffer, size_t maxlength,
-CURL_EXTERN int curl_mvprintf(const char *format, va_list args);
-CURL_EXTERN int curl_mvfprintf(FILE *fd, const char *format, va_list args);
-CURL_EXTERN int curl_mvsprintf(char *buffer, const char *format, va_list args);
-CURL_EXTERN int curl_mvsnprintf(char *buffer, size_t maxlength,
-CURL_EXTERN char *curl_maprintf(const char *format, ...);
-CURL_EXTERN char *curl_mvaprintf(const char *format, va_list args);
-CURL_EXTERN CURLM *curl_multi_init(void);
-CURL_EXTERN CURLMcode curl_multi_add_handle(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_remove_handle(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_fdset(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_wait(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_poll(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_wakeup(CURLM *multi_handle);
-CURL_EXTERN CURLMcode curl_multi_perform(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_cleanup(CURLM *multi_handle);
-CURL_EXTERN CURLMsg *curl_multi_info_read(CURLM *multi_handle,
-CURL_EXTERN const char *curl_multi_strerror(CURLMcode);
-CURL_EXTERN CURLMcode curl_multi_socket(CURLM *multi_handle, curl_socket_t s,
-CURL_EXTERN CURLMcode curl_multi_socket_action(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_socket_all(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_timeout(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_setopt(CURLM *multi_handle,
-CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
-CURL_EXTERN char *curl_pushheader_bynum(struct curl_pushheaders *h,
-CURL_EXTERN char *curl_pushheader_byname(struct curl_pushheaders *h,
+CARL_EXTERN int carl_strequal(const char *s1, const char *s2);
+CARL_EXTERN int carl_strnequal(const char *s1, const char *s2, size_t n);
+CARL_EXTERN carl_mime *carl_mime_init(CARL *easy);
+CARL_EXTERN void carl_mime_free(carl_mime *mime);
+CARL_EXTERN carl_mimepart *carl_mime_addpart(carl_mime *mime);
+CARL_EXTERN CARLcode carl_mime_name(carl_mimepart *part, const char *name);
+CARL_EXTERN CARLcode carl_mime_filename(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_type(carl_mimepart *part, const char *mimetype);
+CARL_EXTERN CARLcode carl_mime_encoder(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_data(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_filedata(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_data_cb(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_subparts(carl_mimepart *part,
+CARL_EXTERN CARLcode carl_mime_headers(carl_mimepart *part,
+CARL_EXTERN CARLFORMcode carl_formadd(struct carl_httppost **httppost,
+CARL_EXTERN int carl_formget(struct carl_httppost *form, void *arg,
+CARL_EXTERN void carl_formfree(struct carl_httppost *form);
+CARL_EXTERN char *carl_getenv(const char *variable);
+CARL_EXTERN char *carl_version(void);
+CARL_EXTERN char *carl_easy_escape(CARL *handle,
+CARL_EXTERN char *carl_escape(const char *string,
+CARL_EXTERN char *carl_easy_unescape(CARL *handle,
+CARL_EXTERN char *carl_unescape(const char *string,
+CARL_EXTERN void carl_free(void *p);
+CARL_EXTERN CARLcode carl_global_init(long flags);
+CARL_EXTERN CARLcode carl_global_init_mem(long flags,
+CARL_EXTERN void carl_global_cleanup(void);
+CARL_EXTERN CARLsslset carl_global_sslset(carl_sslbackend id, const char *name,
+CARL_EXTERN struct carl_slist *carl_slist_append(struct carl_slist *,
+CARL_EXTERN void carl_slist_free_all(struct carl_slist *);
+CARL_EXTERN time_t carl_getdate(const char *p, const time_t *unused);
+CARL_EXTERN CARLSH *carl_share_init(void);
+CARL_EXTERN CARLSHcode carl_share_setopt(CARLSH *, CARLSHoption option, ...);
+CARL_EXTERN CARLSHcode carl_share_cleanup(CARLSH *);
+CARL_EXTERN carl_version_info_data *carl_version_info(CARLversion);
+CARL_EXTERN const char *carl_easy_strerror(CARLcode);
+CARL_EXTERN const char *carl_share_strerror(CARLSHcode);
+CARL_EXTERN CARLcode carl_easy_pause(CARL *handle, int bitmask);
+CARL_EXTERN CARL *carl_easy_init(void);
+CARL_EXTERN CARLcode carl_easy_setopt(CARL *carl, CARLoption option, ...);
+CARL_EXTERN CARLcode carl_easy_perform(CARL *carl);
+CARL_EXTERN void carl_easy_cleanup(CARL *carl);
+CARL_EXTERN CARLcode carl_easy_getinfo(CARL *carl, CARLINFO info, ...);
+CARL_EXTERN CARL *carl_easy_duphandle(CARL *carl);
+CARL_EXTERN void carl_easy_reset(CARL *carl);
+CARL_EXTERN CARLcode carl_easy_recv(CARL *carl, void *buffer, size_t buflen,
+CARL_EXTERN CARLcode carl_easy_send(CARL *carl, const void *buffer,
+CARL_EXTERN CARLcode carl_easy_upkeep(CARL *carl);
+CARL_EXTERN int carl_mprintf(const char *format, ...);
+CARL_EXTERN int carl_mfprintf(FILE *fd, const char *format, ...);
+CARL_EXTERN int carl_msprintf(char *buffer, const char *format, ...);
+CARL_EXTERN int carl_msnprintf(char *buffer, size_t maxlength,
+CARL_EXTERN int carl_mvprintf(const char *format, va_list args);
+CARL_EXTERN int carl_mvfprintf(FILE *fd, const char *format, va_list args);
+CARL_EXTERN int carl_mvsprintf(char *buffer, const char *format, va_list args);
+CARL_EXTERN int carl_mvsnprintf(char *buffer, size_t maxlength,
+CARL_EXTERN char *carl_maprintf(const char *format, ...);
+CARL_EXTERN char *carl_mvaprintf(const char *format, va_list args);
+CARL_EXTERN CARLM *carl_multi_init(void);
+CARL_EXTERN CARLMcode carl_multi_add_handle(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_remove_handle(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_fdset(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_wait(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_poll(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_wakeup(CARLM *multi_handle);
+CARL_EXTERN CARLMcode carl_multi_perform(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_cleanup(CARLM *multi_handle);
+CARL_EXTERN CARLMsg *carl_multi_info_read(CARLM *multi_handle,
+CARL_EXTERN const char *carl_multi_strerror(CARLMcode);
+CARL_EXTERN CARLMcode carl_multi_socket(CARLM *multi_handle, carl_socket_t s,
+CARL_EXTERN CARLMcode carl_multi_socket_action(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_socket_all(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_timeout(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_setopt(CARLM *multi_handle,
+CARL_EXTERN CARLMcode carl_multi_assign(CARLM *multi_handle,
+CARL_EXTERN char *carl_pushheader_bynum(struct carl_pushheaders *h,
+CARL_EXTERN char *carl_pushheader_byname(struct carl_pushheaders *h,
 </stdout>
 </verify>
 

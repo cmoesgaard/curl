@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -29,26 +29,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /*
- * An SSL-enabled libcurl is required for this sample to work (at least one
+ * An SSL-enabled libcarl is required for this sample to work (at least one
  * SSL backend has to be configured).
  *
- *  **** This example only works with libcurl 7.56.0 and later! ****
+ *  **** This example only works with libcarl 7.56.0 and later! ****
 */
 
 int main(int argc, char **argv)
 {
   const char *name = argc > 1 ? argv[1] : "openssl";
-  CURLsslset result;
+  CARLsslset result;
 
   if(!strcmp("list", name)) {
-    const curl_ssl_backend **list;
+    const carl_ssl_backend **list;
     int i;
 
-    result = curl_global_sslset((curl_sslbackend)-1, NULL, &list);
-    assert(result == CURLSSLSET_UNKNOWN_BACKEND);
+    result = carl_global_sslset((carl_sslbackend)-1, NULL, &list);
+    assert(result == CARLSSLSET_UNKNOWN_BACKEND);
 
     for(i = 0; list[i]; i++)
       printf("SSL backend #%d: '%s' (ID: %d)\n",
@@ -59,19 +59,19 @@ int main(int argc, char **argv)
   else if(isdigit((int)(unsigned char)*name)) {
     int id = atoi(name);
 
-    result = curl_global_sslset((curl_sslbackend)id, NULL, NULL);
+    result = carl_global_sslset((carl_sslbackend)id, NULL, NULL);
   }
   else
-    result = curl_global_sslset((curl_sslbackend)-1, name, NULL);
+    result = carl_global_sslset((carl_sslbackend)-1, name, NULL);
 
-  if(result == CURLSSLSET_UNKNOWN_BACKEND) {
+  if(result == CARLSSLSET_UNKNOWN_BACKEND) {
     fprintf(stderr, "Unknown SSL backend id: %s\n", name);
     return 1;
   }
 
-  assert(result == CURLSSLSET_OK);
+  assert(result == CARLSSLSET_OK);
 
-  printf("Version with SSL backend '%s':\n\n\t%s\n", name, curl_version());
+  printf("Version with SSL backend '%s':\n\n\t%s\n", name, carl_version());
 
   return 0;
 }

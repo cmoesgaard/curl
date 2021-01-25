@@ -1,0 +1,126 @@
+! File: PCSI_GNV_CARL_FILE_LIST.TXT
+!
+! $Id$
+!
+! File list for building a PCSI kit.
+! Very simple format so that the parsing logic can be simple.
+! links first, directory second, and files third.
+!
+! link -> file tells procedure to create/remove a link on install/uninstall
+! If more than one link, consider using an alias file.
+!
+! [xxx.yyy]foo.dir is a directory file for the rename phase.
+! [xxx.yyy.foo] is a directory file for the create phase.
+! Each subdirectory needs to be on its own pair of lines.
+!
+! [xxx.yyy]file.ext is a file for the rename and add phases.
+!
+! Copyright 2009 - 2020, John Malmberg
+!
+! Permission to use, copy, modify, and/or distribute this software for any
+! purpose with or without fee is hereby granted, provided that the above
+! copyright notice and this permission notice appear in all copies.
+!
+! THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+! WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+! MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+! ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+! WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+! ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+! OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+!
+! 15-Jun-2009  J. Malmberg
+!============================================================================
+[gnv.usr.bin]carl. -> [gnv.usr.bin]gnv$carl.exe
+[gnv.usr.bin]carl.exe -> [gnv.usr.bin]gnv$carl.exe
+[gnv]
+[000000]gnv.dir
+[gnv.usr]
+[gnv]usr.dir
+[gnv.usr]bin.dir
+[gnv.usr.bin]
+[gnv.usr]include.dir
+[gnv.usr.include]
+[gnv.usr.include]carl.dir
+[gnv.usr.include.carl]
+[gnv.usr]lib.dir
+[gnv.usr.lib]
+[gnv.usr.lib]pkgconfig.dir
+[gnv.usr.lib.pkgconfig]
+[gnv.usr]share.dir
+[gnv.usr.share]
+[gnv.usr.share]man.dir
+[gnv.usr.share.man]
+[gnv.usr.share.man]man1.dir
+[gnv.usr.share.man.man1]
+[gnv.usr.share.man]man3.dir
+[gnv.usr.share.man.man3]
+[gnv.usr.bin]carl-config.
+[gnv.usr.bin]gnv$carl.exe
+[gnv.usr.include.carl]carl.h
+[gnv.usr.include.carl]system.h
+[gnv.usr.include.carl]carlver.h
+[gnv.usr.include.carl]easy.h
+[gnv.usr.include.carl]mprintf.h
+[gnv.usr.include.carl]multi.h
+[gnv.usr.include.carl]stdcheaders.h
+[gnv.usr.include.carl]typecheck-gcc.h
+[gnv.usr.lib]gnv$libcarl.exe
+[gnv.usr.lib]gnv$carlmsg.exe
+[gnv.usr.lib.pkgconfig]libcarl.pc
+[gnv.usr.share.man.man1]carl-config.1
+[gnv.usr.share.man.man1]carl.1
+[gnv.usr.share.man.man3]carl_easy_cleanup.3
+[gnv.usr.share.man.man3]carl_easy_duphandle.3
+[gnv.usr.share.man.man3]carl_easy_escape.3
+[gnv.usr.share.man.man3]carl_easy_getinfo.3
+[gnv.usr.share.man.man3]carl_easy_init.3
+[gnv.usr.share.man.man3]carl_easy_pause.3
+[gnv.usr.share.man.man3]carl_easy_perform.3
+[gnv.usr.share.man.man3]carl_easy_recv.3
+[gnv.usr.share.man.man3]carl_easy_reset.3
+[gnv.usr.share.man.man3]carl_easy_send.3
+[gnv.usr.share.man.man3]carl_easy_setopt.3
+[gnv.usr.share.man.man3]carl_easy_strerror.3
+[gnv.usr.share.man.man3]carl_easy_unescape.3
+[gnv.usr.share.man.man3]carl_escape.3
+[gnv.usr.share.man.man3]carl_formadd.3
+[gnv.usr.share.man.man3]carl_formfree.3
+[gnv.usr.share.man.man3]carl_formget.3
+[gnv.usr.share.man.man3]carl_free.3
+[gnv.usr.share.man.man3]carl_getdate.3
+[gnv.usr.share.man.man3]carl_getenv.3
+[gnv.usr.share.man.man3]carl_global_cleanup.3
+[gnv.usr.share.man.man3]carl_global_init.3
+[gnv.usr.share.man.man3]carl_global_init_mem.3
+[gnv.usr.share.man.man3]carl_mprintf.3
+[gnv.usr.share.man.man3]carl_multi_add_handle.3
+[gnv.usr.share.man.man3]carl_multi_assign.3
+[gnv.usr.share.man.man3]carl_multi_cleanup.3
+[gnv.usr.share.man.man3]carl_multi_fdset.3
+[gnv.usr.share.man.man3]carl_multi_info_read.3
+[gnv.usr.share.man.man3]carl_multi_init.3
+[gnv.usr.share.man.man3]carl_multi_perform.3
+[gnv.usr.share.man.man3]carl_multi_remove_handle.3
+[gnv.usr.share.man.man3]carl_multi_setopt.3
+[gnv.usr.share.man.man3]carl_multi_socket.3
+[gnv.usr.share.man.man3]carl_multi_socket_action.3
+[gnv.usr.share.man.man3]carl_multi_strerror.3
+[gnv.usr.share.man.man3]carl_multi_timeout.3
+[gnv.usr.share.man.man3]carl_multi_wait.3
+[gnv.usr.share.man.man3]carl_share_cleanup.3
+[gnv.usr.share.man.man3]carl_share_init.3
+[gnv.usr.share.man.man3]carl_share_setopt.3
+[gnv.usr.share.man.man3]carl_share_strerror.3
+[gnv.usr.share.man.man3]carl_slist_append.3
+[gnv.usr.share.man.man3]carl_slist_free_all.3
+[gnv.usr.share.man.man3]carl_strequal.3
+[gnv.usr.share.man.man3]carl_unescape.3
+[gnv.usr.share.man.man3]carl_version.3
+[gnv.usr.share.man.man3]carl_version_info.3
+[gnv.usr.share.man.man3]libcarl-easy.3
+[gnv.usr.share.man.man3]libcarl-errors.3
+[gnv.usr.share.man.man3]libcarl-multi.3
+[gnv.usr.share.man.man3]libcarl-share.3
+[gnv.usr.share.man.man3]libcarl-tutorial.3
+[gnv.usr.share.man.man3]libcarl.3

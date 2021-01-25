@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -45,9 +45,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_binmode.h"
 #include "tool_cfgable.h"
@@ -85,12 +85,12 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-#ifdef CURLDEBUG
-/* libcurl's debug builds provide an extra function */
-CURLcode curl_easy_perform_ev(CURL *easy);
+#ifdef CARLDEBUG
+/* libcarl's debug builds provide an extra function */
+CARLcode carl_easy_perform_ev(CARL *easy);
 #endif
 
-#define CURLseparator  "--_curl_--"
+#define CARLseparator  "--_carl_--"
 
 #ifndef O_BINARY
 /* since O_BINARY as used in bitmasks, setting it to zero makes it usable in
@@ -98,30 +98,30 @@ CURLcode curl_easy_perform_ev(CURL *easy);
 #  define O_BINARY 0
 #endif
 
-#define CURL_CA_CERT_ERRORMSG                                               \
-  "More details here: https://curl.se/docs/sslcerts.html\n\n"          \
-  "curl failed to verify the legitimacy of the server and therefore "       \
+#define CARL_CA_CERT_ERRORMSG                                               \
+  "More details here: https://carl.se/docs/sslcerts.html\n\n"          \
+  "carl failed to verify the legitimacy of the server and therefore "       \
   "could not\nestablish a secure connection to it. To learn more about "    \
   "this situation and\nhow to fix it, please visit the web page mentioned " \
   "above.\n"
 
-static CURLcode single_transfer(struct GlobalConfig *global,
+static CARLcode single_transfer(struct GlobalConfig *global,
                                 struct OperationConfig *config,
-                                CURLSH *share,
+                                CARLSH *share,
                                 bool capath_from_env,
                                 bool *added);
-static CURLcode create_transfer(struct GlobalConfig *global,
-                                CURLSH *share,
+static CARLcode create_transfer(struct GlobalConfig *global,
+                                CARLSH *share,
                                 bool *added);
 
-static bool is_fatal_error(CURLcode code)
+static bool is_fatal_error(CARLcode code)
 {
   switch(code) {
-  case CURLE_FAILED_INIT:
-  case CURLE_OUT_OF_MEMORY:
-  case CURLE_UNKNOWN_OPTION:
-  case CURLE_FUNCTION_NOT_FOUND:
-  case CURLE_BAD_FUNCTION_ARGUMENT:
+  case CARLE_FAILED_INIT:
+  case CARLE_OUT_OF_MEMORY:
+  case CARLE_UNKNOWN_OPTION:
+  case CARLE_FUNCTION_NOT_FOUND:
+  case CARLE_BAD_FUNCTION_ARGUMENT:
     /* critical error */
     return TRUE;
   default:
@@ -137,7 +137,7 @@ static bool is_fatal_error(CURLcode code)
  */
 static bool is_pkcs11_uri(const char *string)
 {
-  if(curl_strnequal(string, "pkcs11:", 7)) {
+  if(carl_strnequal(string, "pkcs11:", 7)) {
     return TRUE;
   }
   else {
@@ -156,11 +156,11 @@ static bool is_pkcs11_uri(const char *string)
  * and CD/DVD images should be either a STREAM_LF format or a fixed format.
  *
  */
-static curl_off_t vms_realfilesize(const char *name,
+static carl_off_t vms_realfilesize(const char *name,
                                    const struct_stat *stat_buf)
 {
   char buffer[8192];
-  curl_off_t count;
+  carl_off_t count;
   int ret_stat;
   FILE * file;
 
@@ -187,7 +187,7 @@ static curl_off_t vms_realfilesize(const char *name,
  *  if not to call a routine to get the correct size.
  *
  */
-static curl_off_t VmsSpecialSize(const char *name,
+static carl_off_t VmsSpecialSize(const char *name,
                                  const struct_stat *stat_buf)
 {
   switch(stat_buf->st_fab_rfm) {
@@ -208,12 +208,12 @@ static struct per_transfer *transfersl; /* last node */
 
 /* add_per_transfer creates a new 'per_transfer' node in the linked
    list of transfers */
-static CURLcode add_per_transfer(struct per_transfer **per)
+static CARLcode add_per_transfer(struct per_transfer **per)
 {
   struct per_transfer *p;
   p = calloc(sizeof(struct per_transfer), 1);
   if(!p)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   if(!transfers)
     /* first entry */
     transfersl = transfers = p;
@@ -227,7 +227,7 @@ static CURLcode add_per_transfer(struct per_transfer **per)
   }
   *per = p;
   all_xfers++; /* count total number of transfers added */
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /* Remove the specified transfer from the list (and free it), return the next
@@ -258,12 +258,12 @@ static struct per_transfer *del_per_transfer(struct per_transfer *per)
   return n;
 }
 
-static CURLcode pre_transfer(struct GlobalConfig *global,
+static CARLcode pre_transfer(struct GlobalConfig *global,
                              struct per_transfer *per)
 {
-  curl_off_t uploadfilesize = -1;
+  carl_off_t uploadfilesize = -1;
   struct_stat fileinfo;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   if(per->separator_err)
     fprintf(global->errors, "%s\n", per->separator_err);
@@ -312,7 +312,7 @@ static CURLcode pre_transfer(struct GlobalConfig *global,
         close(per->infd);
         per->infd = STDIN_FILENO;
       }
-      return CURLE_READ_ERROR;
+      return CARLE_READ_ERROR;
     }
     per->infdopen = TRUE;
 
@@ -322,10 +322,10 @@ static CURLcode pre_transfer(struct GlobalConfig *global,
 
     if(uploadfilesize != -1) {
       struct OperationConfig *config = per->config; /* for the macro below */
-#ifdef CURL_DISABLE_LIBCURL_OPTION
+#ifdef CARL_DISABLE_LIBCARL_OPTION
       (void)config;
 #endif
-      my_setopt(per->curl, CURLOPT_INFILESIZE_LARGE, uploadfilesize);
+      my_setopt(per->carl, CARLOPT_INFILESIZE_LARGE, uploadfilesize);
     }
     per->input.fd = per->infd;
   }
@@ -335,17 +335,17 @@ static CURLcode pre_transfer(struct GlobalConfig *global,
 /*
  * Call this after a transfer has completed.
  */
-static CURLcode post_per_transfer(struct GlobalConfig *global,
+static CARLcode post_per_transfer(struct GlobalConfig *global,
                                   struct per_transfer *per,
-                                  CURLcode result,
+                                  CARLcode result,
                                   bool *retryp,
                                   long *delay) /* milliseconds! */
 {
   struct OutStruct *outs = &per->outs;
-  CURL *curl = per->curl;
+  CARL *carl = per->carl;
   struct OperationConfig *config = per->config;
 
-  if(!curl || !config)
+  if(!carl || !config)
     return result;
 
   *retryp = FALSE;
@@ -363,16 +363,16 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
   else
 #endif
     if(!config->synthetic_error && result && global->showerror) {
-      fprintf(global->errors, "curl: (%d) %s\n", result,
+      fprintf(global->errors, "carl: (%d) %s\n", result,
               (per->errorbuffer[0]) ? per->errorbuffer :
-              curl_easy_strerror(result));
-      if(result == CURLE_PEER_FAILED_VERIFICATION)
-        fputs(CURL_CA_CERT_ERRORMSG, global->errors);
+              carl_easy_strerror(result));
+      if(result == CARLE_PEER_FAILED_VERIFICATION)
+        fputs(CARL_CA_CERT_ERRORMSG, global->errors);
     }
 
   /* Set file extended attributes */
   if(!result && config->xattr && outs->fopened && outs->stream) {
-    int rc = fwrite_xattr(curl, fileno(outs->stream));
+    int rc = fwrite_xattr(carl, fileno(outs->stream));
     if(rc)
       warnf(config->global, "Error setting extended attributes: %s\n",
             strerror(errno));
@@ -385,9 +385,9 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
     long cond_unmet = 0L;
     /* do not create (or even overwrite) the file in case we get no
        data because of unmet condition */
-    curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &cond_unmet);
+    carl_easy_getinfo(carl, CARLINFO_CONDITION_UNMET, &cond_unmet);
     if(!cond_unmet && !tool_create_output_file(outs, config))
-      result = CURLE_WRITE_ERROR;
+      result = CARLE_WRITE_ERROR;
   }
 
   if(!outs->s_isreg && outs->stream) {
@@ -395,9 +395,9 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
     int rc = fflush(outs->stream);
     if(!result && rc) {
       /* something went wrong in the writing process */
-      result = CURLE_WRITE_ERROR;
+      result = CARLE_WRITE_ERROR;
       if(global->showerror)
-        fprintf(global->errors, "curl: (%d) Failed writing body\n", result);
+        fprintf(global->errors, "carl: (%d) Failed writing body\n", result);
     }
   }
 
@@ -406,7 +406,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
     fprintf(global->errors, "Metalink: fetching (%s) from (%s) OK\n",
             per->mlfile->filename, per->this_url);
 
-  if(!per->metalink && config->use_metalink && result == CURLE_OK) {
+  if(!per->metalink && config->use_metalink && result == CARLE_OK) {
     int rv = parse_metalink(config, outs, per->this_url);
     if(!rv) {
       fprintf(config->global->errors, "Metalink: parsing (%s) OK\n",
@@ -416,7 +416,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
       fprintf(config->global->errors, "Metalink: parsing (%s) FAILED\n",
               per->this_url);
   }
-  else if(per->metalink && result == CURLE_OK && !per->metalink_next_res) {
+  else if(per->metalink && result == CARLE_OK && !per->metalink_next_res) {
     int rv;
     (void)fflush(outs->stream);
     rv = metalink_check_hash(global, per->mlfile, outs->filename);
@@ -446,30 +446,30 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
       RETRY_LAST /* not used */
     } retry = RETRY_NO;
     long response = 0;
-    if((CURLE_OPERATION_TIMEDOUT == result) ||
-       (CURLE_COULDNT_RESOLVE_HOST == result) ||
-       (CURLE_COULDNT_RESOLVE_PROXY == result) ||
-       (CURLE_FTP_ACCEPT_TIMEOUT == result))
+    if((CARLE_OPERATION_TIMEDOUT == result) ||
+       (CARLE_COULDNT_RESOLVE_HOST == result) ||
+       (CARLE_COULDNT_RESOLVE_PROXY == result) ||
+       (CARLE_FTP_ACCEPT_TIMEOUT == result))
       /* retry timeout always */
       retry = RETRY_TIMEOUT;
     else if(config->retry_connrefused &&
-            (CURLE_COULDNT_CONNECT == result)) {
+            (CARLE_COULDNT_CONNECT == result)) {
       long oserrno = 0;
-      curl_easy_getinfo(curl, CURLINFO_OS_ERRNO, &oserrno);
+      carl_easy_getinfo(carl, CARLINFO_OS_ERRNO, &oserrno);
       if(ECONNREFUSED == oserrno)
         retry = RETRY_CONNREFUSED;
     }
-    else if((CURLE_OK == result) ||
+    else if((CARLE_OK == result) ||
             (config->failonerror &&
-             (CURLE_HTTP_RETURNED_ERROR == result))) {
+             (CARLE_HTTP_RETURNED_ERROR == result))) {
       /* If it returned OK. _or_ failonerror was enabled and it
          returned due to such an error, check for HTTP transient
          errors to retry on. */
       long protocol = 0;
-      curl_easy_getinfo(curl, CURLINFO_PROTOCOL, &protocol);
-      if((protocol == CURLPROTO_HTTP) || (protocol == CURLPROTO_HTTPS)) {
+      carl_easy_getinfo(carl, CARLINFO_PROTOCOL, &protocol);
+      if((protocol == CARLPROTO_HTTP) || (protocol == CARLPROTO_HTTPS)) {
         /* This was HTTP(S) */
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+        carl_easy_getinfo(carl, CARLINFO_RESPONSE_CODE, &response);
 
         switch(response) {
         case 408: /* Request Timeout */
@@ -492,14 +492,14 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
           break;
         }
       }
-    } /* if CURLE_OK */
+    } /* if CARLE_OK */
     else if(result) {
       long protocol = 0;
 
-      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
-      curl_easy_getinfo(curl, CURLINFO_PROTOCOL, &protocol);
+      carl_easy_getinfo(carl, CARLINFO_RESPONSE_CODE, &response);
+      carl_easy_getinfo(carl, CARLINFO_PROTOCOL, &protocol);
 
-      if((protocol == CURLPROTO_FTP || protocol == CURLPROTO_FTPS) &&
+      if((protocol == CARLPROTO_FTP || protocol == CARLPROTO_FTPS) &&
          response / 100 == 4)
         /*
          * This is typically when the FTP server only allows a certain
@@ -514,7 +514,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
 
     if(retry) {
       long sleeptime = 0;
-      curl_off_t retry_after = 0;
+      carl_off_t retry_after = 0;
       static const char * const m[]={
         NULL,
         "(retrying all errors)",
@@ -526,7 +526,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
 
       sleeptime = per->retry_sleep;
       if(RETRY_HTTP == retry) {
-        curl_easy_getinfo(curl, CURLINFO_RETRY_AFTER, &retry_after);
+        carl_easy_getinfo(carl, CARLINFO_RETRY_AFTER, &retry_after);
         if(retry_after) {
           /* store in a 'long', make sure it doesn't overflow */
           if(retry_after > LONG_MAX/1000)
@@ -552,7 +552,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
          */
         if(!global->mute)
           fprintf(global->errors, "Throwing away %"
-                  CURL_FORMAT_CURL_OFF_T " bytes\n",
+                  CARL_FORMAT_CARL_OFF_T " bytes\n",
                   outs->bytes);
         fflush(outs->stream);
         /* truncate file at the position where we started appending */
@@ -562,8 +562,8 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
              create something strange, bail out */
           if(global->showerror)
             fprintf(global->errors,
-                    "curl: (23) Failed to truncate file\n");
-          return CURLE_WRITE_ERROR;
+                    "carl: (23) Failed to truncate file\n");
+          return CARLE_WRITE_ERROR;
         }
         /* now seek to the end of the file, the position where we
            just truncated the file in a large file-safe way */
@@ -578,29 +578,29 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
         if(rc) {
           if(global->showerror)
             fprintf(global->errors,
-                    "curl: (23) Failed seeking to end of file\n");
-          return CURLE_WRITE_ERROR;
+                    "carl: (23) Failed seeking to end of file\n");
+          return CARLE_WRITE_ERROR;
         }
         outs->bytes = 0; /* clear for next round */
       }
       *retryp = TRUE;
       *delay = sleeptime;
-      return CURLE_OK;
+      return CARLE_OK;
     }
   } /* if retry_numretries */
   else if(per->metalink) {
     /* Metalink: Decide to try the next resource or not. Try the next resource
        if download was not successful. */
     long response = 0;
-    if(CURLE_OK == result) {
+    if(CARLE_OK == result) {
       /* TODO We want to try next resource when download was
          not successful. How to know that? */
       char *effective_url = NULL;
-      curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effective_url);
+      carl_easy_getinfo(carl, CARLINFO_EFFECTIVE_URL, &effective_url);
       if(effective_url &&
-         curl_strnequal(effective_url, "http", 4)) {
+         carl_strnequal(effective_url, "http", 4)) {
         /* This was HTTP(S) */
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+        carl_easy_getinfo(carl, CARLINFO_RESPONSE_CODE, &response);
         if(response != 200 && response != 206) {
           per->metalink_next_res = 1;
           fprintf(global->errors,
@@ -615,35 +615,35 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
       fprintf(global->errors,
               "Metalink: fetching (%s) from (%s) FAILED (%s)\n",
               per->mlfile->filename, per->this_url,
-              curl_easy_strerror(result));
+              carl_easy_strerror(result));
     }
   }
 
-  if((global->progressmode == CURL_PROGRESS_BAR) &&
+  if((global->progressmode == CARL_PROGRESS_BAR) &&
      per->progressbar.calls)
     /* if the custom progress bar has been displayed, we output a
        newline here */
     fputs("\n", per->progressbar.out);
 
   if(config->writeout)
-    ourWriteOut(per->curl, per, config->writeout, result);
+    ourWriteOut(per->carl, per, config->writeout, result);
 
   /* Close the outs file */
   if(outs->fopened && outs->stream) {
     int rc = fclose(outs->stream);
     if(!result && rc) {
       /* something went wrong in the writing process */
-      result = CURLE_WRITE_ERROR;
+      result = CARLE_WRITE_ERROR;
       if(global->showerror)
-        fprintf(global->errors, "curl: (%d) Failed writing body\n", result);
+        fprintf(global->errors, "carl: (%d) Failed writing body\n", result);
     }
   }
 
   /* File time can only be set _after_ the file has been closed */
   if(!result && config->remote_time && outs->s_isreg && outs->filename) {
-    /* Ask libcurl if we got a remote file time */
-    curl_off_t filetime = -1;
-    curl_easy_getinfo(curl, CURLINFO_FILETIME_T, &filetime);
+    /* Ask libcarl if we got a remote file time */
+    carl_off_t filetime = -1;
+    carl_easy_getinfo(carl, CARLINFO_FILETIME_T, &filetime);
     setfiletime(filetime, outs->filename, config->global->errors);
   }
 
@@ -660,7 +660,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
   if(per->etag_save.alloc_filename)
     Curl_safefree(per->etag_save.filename);
 
-  curl_easy_cleanup(per->curl);
+  carl_easy_cleanup(per->carl);
   if(outs->alloc_filename)
     free(outs->filename);
   free(per->this_url);
@@ -669,7 +669,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
   free(per->outfile);
   free(per->uploadfile);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void single_transfer_cleanup(struct OperationConfig *config)
@@ -694,13 +694,13 @@ static void single_transfer_cleanup(struct OperationConfig *config)
 
 /* create the next (singular) transfer */
 
-static CURLcode single_transfer(struct GlobalConfig *global,
+static CARLcode single_transfer(struct GlobalConfig *global,
                                 struct OperationConfig *config,
-                                CURLSH *share,
+                                CARLSH *share,
                                 bool capath_from_env,
                                 bool *added)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct getout *urlnode;
   struct metalinkfile *mlfile_last = NULL;
   bool orig_noprogress = global->noprogress;
@@ -717,18 +717,18 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         Curl_safefree(config->postfields);
         if(!httpgetfields) {
           errorf(global, "out of memory\n");
-          result = CURLE_OUT_OF_MEMORY;
+          result = CARLE_OUT_OF_MEMORY;
         }
         else if(SetHTTPrequest(config,
                                (config->no_body?HTTPREQ_HEAD:HTTPREQ_GET),
                                &config->httpreq)) {
-          result = CURLE_FAILED_INIT;
+          result = CARLE_FAILED_INIT;
         }
       }
     }
     else {
       if(SetHTTPrequest(config, HTTPREQ_SIMPLEPOST, &config->httpreq))
-        result = CURLE_FAILED_INIT;
+        result = CARLE_FAILED_INIT;
     }
     if(result) {
       single_transfer_cleanup(config);
@@ -781,7 +781,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
       state->outfiles = strdup(urlnode->outfile);
       if(!state->outfiles) {
         errorf(global, "out of memory\n");
-        result = CURLE_OUT_OF_MEMORY;
+        result = CARLE_OUT_OF_MEMORY;
         break;
       }
     }
@@ -807,14 +807,14 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(!state->uploadfile) {
           if(inglob) {
             result = glob_next_url(&state->uploadfile, inglob);
-            if(result == CURLE_OUT_OF_MEMORY)
+            if(result == CARLE_OUT_OF_MEMORY)
               errorf(global, "out of memory\n");
           }
           else if(!state->up) {
             state->uploadfile = strdup(infiles);
             if(!state->uploadfile) {
               errorf(global, "out of memory\n");
-              result = CURLE_OUT_OF_MEMORY;
+              result = CARLE_OUT_OF_MEMORY;
             }
           }
         }
@@ -854,24 +854,24 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         struct OutStruct *heads;
         struct OutStruct *etag_save;
         struct HdrCbData *hdrcbdata = NULL;
-        CURL *curl = curl_easy_init();
+        CARL *carl = carl_easy_init();
         result = add_per_transfer(&per);
-        if(result || !curl) {
-          curl_easy_cleanup(curl);
-          result = CURLE_OUT_OF_MEMORY;
+        if(result || !carl) {
+          carl_easy_cleanup(carl);
+          result = CARLE_OUT_OF_MEMORY;
           break;
         }
         if(state->uploadfile) {
           per->uploadfile = strdup(state->uploadfile);
           if(!per->uploadfile) {
-            curl_easy_cleanup(curl);
-            result = CURLE_OUT_OF_MEMORY;
+            carl_easy_cleanup(carl);
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
         }
         *added = TRUE;
         per->config = config;
-        per->curl = curl;
+        per->carl = carl;
         per->urlnum = urlnode->num;
 
         /* default headers output stream is stdout */
@@ -886,7 +886,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             newfile = fopen(config->headerfile, per->prev == NULL?"wb":"ab");
             if(!newfile) {
               warnf(config->global, "Failed to open %s\n", config->headerfile);
-              result = CURLE_WRITE_ERROR;
+              result = CARLE_WRITE_ERROR;
               break;
             }
             else {
@@ -924,7 +924,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           if(!file && !config->etag_save_file) {
             errorf(config->global,
                    "Failed to open %s\n", config->etag_compare_file);
-            result = CURLE_READ_ERROR;
+            result = CARLE_READ_ERROR;
             break;
           }
 
@@ -941,7 +941,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
               fclose(file);
             errorf(config->global,
                    "Failed to allocate memory for custom etag header\n");
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
 
@@ -968,7 +968,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
                 config->global,
                 "Failed to open %s\n", config->etag_save_file);
 
-              result = CURLE_WRITE_ERROR;
+              result = CARLE_WRITE_ERROR;
               break;
             }
             else {
@@ -989,12 +989,12 @@ static CURLcode single_transfer(struct GlobalConfig *global,
              filename. */
           per->outfile = strdup(mlfile->filename);
           if(!per->outfile) {
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
           per->this_url = strdup(mlres->url);
           if(!per->this_url) {
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
           per->mlfile = mlfile;
@@ -1008,7 +1008,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           else if(!state->li) {
             per->this_url = strdup(urlnode->url);
             if(!per->this_url) {
-              result = CURLE_OUT_OF_MEMORY;
+              result = CARLE_OUT_OF_MEMORY;
               break;
             }
           }
@@ -1020,7 +1020,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           if(state->outfiles) {
             per->outfile = strdup(state->outfiles);
             if(!per->outfile) {
-              result = CURLE_OUT_OF_MEMORY;
+              result = CARLE_OUT_OF_MEMORY;
               break;
             }
           }
@@ -1042,7 +1042,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
               break;
             if(!*per->outfile && !config->content_disposition) {
               errorf(global, "Remote file name has no length!\n");
-              result = CURLE_WRITE_ERROR;
+              result = CARLE_WRITE_ERROR;
               break;
             }
           }
@@ -1061,7 +1061,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           if(config->output_dir) {
             char *d = aprintf("%s/%s", config->output_dir, per->outfile);
             if(!d) {
-              result = CURLE_WRITE_ERROR;
+              result = CARLE_WRITE_ERROR;
               break;
             }
             free(per->outfile);
@@ -1072,7 +1072,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
           if(config->create_dirs || metalink) {
             result = create_dir_hierarchy(per->outfile, global->errors);
-            /* create_dir_hierarchy shows error upon CURLE_WRITE_ERROR */
+            /* create_dir_hierarchy shows error upon CARLE_WRITE_ERROR */
             if(result)
               break;
           }
@@ -1108,7 +1108,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 #endif
             if(!file) {
               errorf(global, "Can't open '%s'!\n", per->outfile);
-              result = CURLE_WRITE_ERROR;
+              result = CARLE_WRITE_ERROR;
               break;
             }
             outs->fopened = TRUE;
@@ -1128,7 +1128,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
            */
           char *nurl = add_file_name_to_url(per->this_url, per->uploadfile);
           if(!nurl) {
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
           per->this_url = nurl;
@@ -1164,7 +1164,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
           set_binmode(stdin);
           if(!strcmp(per->uploadfile, ".")) {
-            if(curlx_nonblock((curl_socket_t)per->infd, TRUE) < 0)
+            if(carlx_nonblock((carl_socket_t)per->infd, TRUE) < 0)
               warnf(config->global,
                     "fcntl failed on fd=%d: %s\n", per->infd, strerror(errno));
           }
@@ -1191,7 +1191,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
                     state->li + 1, urlnum, per->this_url,
                     per->outfile ? per->outfile : "<stdout>");
           if(separator)
-            per->separator = aprintf("%s%s", CURLseparator, per->this_url);
+            per->separator = aprintf("%s%s", CARLseparator, per->this_url);
         }
         if(httpgetfields) {
           char *urlbuffer;
@@ -1225,7 +1225,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             urlbuffer = aprintf("%s/?%s", per->this_url, httpgetfields);
 
           if(!urlbuffer) {
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
 
@@ -1247,142 +1247,142 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         config->terminal_binary_ok =
           (per->outfile && !strcmp(per->outfile, "-"));
 
-        /* Avoid having this setopt added to the --libcurl source output. */
-        result = curl_easy_setopt(curl, CURLOPT_SHARE, share);
+        /* Avoid having this setopt added to the --libcarl source output. */
+        result = carl_easy_setopt(carl, CARLOPT_SHARE, share);
         if(result)
           break;
 
         if(!config->tcp_nodelay)
-          my_setopt(curl, CURLOPT_TCP_NODELAY, 0L);
+          my_setopt(carl, CARLOPT_TCP_NODELAY, 0L);
 
         if(config->tcp_fastopen)
-          my_setopt(curl, CURLOPT_TCP_FASTOPEN, 1L);
+          my_setopt(carl, CARLOPT_TCP_FASTOPEN, 1L);
 
         /* where to store */
-        my_setopt(curl, CURLOPT_WRITEDATA, per);
-        my_setopt(curl, CURLOPT_INTERLEAVEDATA, per);
+        my_setopt(carl, CARLOPT_WRITEDATA, per);
+        my_setopt(carl, CARLOPT_INTERLEAVEDATA, per);
 
         if(metalink || !config->use_metalink)
           /* what call to write */
-          my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
+          my_setopt(carl, CARLOPT_WRITEFUNCTION, tool_write_cb);
 #ifdef USE_METALINK
         else
           /* Set Metalink specific write callback function to parse
              XML data progressively. */
-          my_setopt(curl, CURLOPT_WRITEFUNCTION, metalink_write_cb);
+          my_setopt(carl, CARLOPT_WRITEFUNCTION, metalink_write_cb);
 #endif /* USE_METALINK */
 
         /* for uploads */
         input->config = config;
-        /* Note that if CURLOPT_READFUNCTION is fread (the default), then
+        /* Note that if CARLOPT_READFUNCTION is fread (the default), then
          * lib/telnet.c will Curl_poll() on the input file descriptor
          * rather then calling the READFUNCTION at regular intervals.
          * The circumstances in which it is preferable to enable this
          * behavior, by omitting to set the READFUNCTION & READDATA options,
          * have not been determined.
          */
-        my_setopt(curl, CURLOPT_READDATA, input);
+        my_setopt(carl, CARLOPT_READDATA, input);
         /* what call to read */
-        my_setopt(curl, CURLOPT_READFUNCTION, tool_read_cb);
+        my_setopt(carl, CARLOPT_READFUNCTION, tool_read_cb);
 
-        /* in 7.18.0, the CURLOPT_SEEKFUNCTION/DATA pair is taking over what
-           CURLOPT_IOCTLFUNCTION/DATA pair previously provided for seeking */
-        my_setopt(curl, CURLOPT_SEEKDATA, input);
-        my_setopt(curl, CURLOPT_SEEKFUNCTION, tool_seek_cb);
+        /* in 7.18.0, the CARLOPT_SEEKFUNCTION/DATA pair is taking over what
+           CARLOPT_IOCTLFUNCTION/DATA pair previously provided for seeking */
+        my_setopt(carl, CARLOPT_SEEKDATA, input);
+        my_setopt(carl, CARLOPT_SEEKFUNCTION, tool_seek_cb);
 
         if(config->recvpersecond &&
            (config->recvpersecond < BUFFER_SIZE))
           /* use a smaller sized buffer for better sleeps */
-          my_setopt(curl, CURLOPT_BUFFERSIZE, (long)config->recvpersecond);
+          my_setopt(carl, CARLOPT_BUFFERSIZE, (long)config->recvpersecond);
         else
-          my_setopt(curl, CURLOPT_BUFFERSIZE, (long)BUFFER_SIZE);
+          my_setopt(carl, CARLOPT_BUFFERSIZE, (long)BUFFER_SIZE);
 
-        my_setopt_str(curl, CURLOPT_URL, per->this_url);
-        my_setopt(curl, CURLOPT_NOPROGRESS, global->noprogress?1L:0L);
+        my_setopt_str(carl, CARLOPT_URL, per->this_url);
+        my_setopt(carl, CARLOPT_NOPROGRESS, global->noprogress?1L:0L);
         if(config->no_body)
-          my_setopt(curl, CURLOPT_NOBODY, 1L);
+          my_setopt(carl, CARLOPT_NOBODY, 1L);
 
         if(config->oauth_bearer)
-          my_setopt_str(curl, CURLOPT_XOAUTH2_BEARER, config->oauth_bearer);
+          my_setopt_str(carl, CARLOPT_XOAUTH2_BEARER, config->oauth_bearer);
 
         {
-          my_setopt_str(curl, CURLOPT_PROXY, config->proxy);
-          /* new in libcurl 7.5 */
+          my_setopt_str(carl, CARLOPT_PROXY, config->proxy);
+          /* new in libcarl 7.5 */
           if(config->proxy)
-            my_setopt_enum(curl, CURLOPT_PROXYTYPE, config->proxyver);
+            my_setopt_enum(carl, CARLOPT_PROXYTYPE, config->proxyver);
 
-          my_setopt_str(curl, CURLOPT_PROXYUSERPWD, config->proxyuserpwd);
+          my_setopt_str(carl, CARLOPT_PROXYUSERPWD, config->proxyuserpwd);
 
-          /* new in libcurl 7.3 */
-          my_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, config->proxytunnel?1L:0L);
+          /* new in libcarl 7.3 */
+          my_setopt(carl, CARLOPT_HTTPPROXYTUNNEL, config->proxytunnel?1L:0L);
 
-          /* new in libcurl 7.52.0 */
+          /* new in libcarl 7.52.0 */
           if(config->preproxy)
-            my_setopt_str(curl, CURLOPT_PRE_PROXY, config->preproxy);
+            my_setopt_str(carl, CARLOPT_PRE_PROXY, config->preproxy);
 
-          /* new in libcurl 7.10.6 */
+          /* new in libcarl 7.10.6 */
           if(config->proxyanyauth)
-            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
-                              (long)CURLAUTH_ANY);
+            my_setopt_bitmask(carl, CARLOPT_PROXYAUTH,
+                              (long)CARLAUTH_ANY);
           else if(config->proxynegotiate)
-            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
-                              (long)CURLAUTH_GSSNEGOTIATE);
+            my_setopt_bitmask(carl, CARLOPT_PROXYAUTH,
+                              (long)CARLAUTH_GSSNEGOTIATE);
           else if(config->proxyntlm)
-            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
-                              (long)CURLAUTH_NTLM);
+            my_setopt_bitmask(carl, CARLOPT_PROXYAUTH,
+                              (long)CARLAUTH_NTLM);
           else if(config->proxydigest)
-            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
-                              (long)CURLAUTH_DIGEST);
+            my_setopt_bitmask(carl, CARLOPT_PROXYAUTH,
+                              (long)CARLAUTH_DIGEST);
           else if(config->proxybasic)
-            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
-                              (long)CURLAUTH_BASIC);
+            my_setopt_bitmask(carl, CARLOPT_PROXYAUTH,
+                              (long)CARLAUTH_BASIC);
 
-          /* new in libcurl 7.19.4 */
-          my_setopt_str(curl, CURLOPT_NOPROXY, config->noproxy);
+          /* new in libcarl 7.19.4 */
+          my_setopt_str(carl, CARLOPT_NOPROXY, config->noproxy);
 
-          my_setopt(curl, CURLOPT_SUPPRESS_CONNECT_HEADERS,
+          my_setopt(carl, CARLOPT_SUPPRESS_CONNECT_HEADERS,
                     config->suppress_connect_headers?1L:0L);
         }
 
-        my_setopt(curl, CURLOPT_FAILONERROR, config->failonerror?1L:0L);
-        my_setopt(curl, CURLOPT_REQUEST_TARGET, config->request_target);
-        my_setopt(curl, CURLOPT_UPLOAD, per->uploadfile?1L:0L);
-        my_setopt(curl, CURLOPT_DIRLISTONLY, config->dirlistonly?1L:0L);
-        my_setopt(curl, CURLOPT_APPEND, config->ftp_append?1L:0L);
+        my_setopt(carl, CARLOPT_FAILONERROR, config->failonerror?1L:0L);
+        my_setopt(carl, CARLOPT_REQUEST_TARGET, config->request_target);
+        my_setopt(carl, CARLOPT_UPLOAD, per->uploadfile?1L:0L);
+        my_setopt(carl, CARLOPT_DIRLISTONLY, config->dirlistonly?1L:0L);
+        my_setopt(carl, CARLOPT_APPEND, config->ftp_append?1L:0L);
 
         if(config->netrc_opt)
-          my_setopt_enum(curl, CURLOPT_NETRC, (long)CURL_NETRC_OPTIONAL);
+          my_setopt_enum(carl, CARLOPT_NETRC, (long)CARL_NETRC_OPTIONAL);
         else if(config->netrc || config->netrc_file)
-          my_setopt_enum(curl, CURLOPT_NETRC, (long)CURL_NETRC_REQUIRED);
+          my_setopt_enum(carl, CARLOPT_NETRC, (long)CARL_NETRC_REQUIRED);
         else
-          my_setopt_enum(curl, CURLOPT_NETRC, (long)CURL_NETRC_IGNORED);
+          my_setopt_enum(carl, CARLOPT_NETRC, (long)CARL_NETRC_IGNORED);
 
         if(config->netrc_file)
-          my_setopt_str(curl, CURLOPT_NETRC_FILE, config->netrc_file);
+          my_setopt_str(carl, CARLOPT_NETRC_FILE, config->netrc_file);
 
-        my_setopt(curl, CURLOPT_TRANSFERTEXT, config->use_ascii?1L:0L);
+        my_setopt(carl, CARLOPT_TRANSFERTEXT, config->use_ascii?1L:0L);
         if(config->login_options)
-          my_setopt_str(curl, CURLOPT_LOGIN_OPTIONS, config->login_options);
-        my_setopt_str(curl, CURLOPT_USERPWD, config->userpwd);
-        my_setopt_str(curl, CURLOPT_RANGE, config->range);
-        my_setopt(curl, CURLOPT_ERRORBUFFER, per->errorbuffer);
-        my_setopt(curl, CURLOPT_TIMEOUT_MS, (long)(config->timeout * 1000));
+          my_setopt_str(carl, CARLOPT_LOGIN_OPTIONS, config->login_options);
+        my_setopt_str(carl, CARLOPT_USERPWD, config->userpwd);
+        my_setopt_str(carl, CARLOPT_RANGE, config->range);
+        my_setopt(carl, CARLOPT_ERRORBUFFER, per->errorbuffer);
+        my_setopt(carl, CARLOPT_TIMEOUT_MS, (long)(config->timeout * 1000));
 
         switch(config->httpreq) {
         case HTTPREQ_SIMPLEPOST:
-          my_setopt_str(curl, CURLOPT_POSTFIELDS,
+          my_setopt_str(carl, CARLOPT_POSTFIELDS,
                         config->postfields);
-          my_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
+          my_setopt(carl, CARLOPT_POSTFIELDSIZE_LARGE,
                     config->postfieldsize);
           break;
         case HTTPREQ_MIMEPOST:
           /* free previous remainders */
-          curl_mime_free(config->mimepost);
+          carl_mime_free(config->mimepost);
           config->mimepost = NULL;
-          result = tool2curlmime(curl, config->mimeroot, &config->mimepost);
+          result = tool2carlmime(carl, config->mimeroot, &config->mimepost);
           if(result)
             break;
-          my_setopt_mimepost(curl, CURLOPT_MIMEPOST, config->mimepost);
+          my_setopt_mimepost(carl, CARLOPT_MIMEPOST, config->mimepost);
           break;
         default:
           break;
@@ -1390,110 +1390,110 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(result)
           break;
 
-        /* new in libcurl 7.10.6 (default is Basic) */
+        /* new in libcarl 7.10.6 (default is Basic) */
         if(config->authtype)
-          my_setopt_bitmask(curl, CURLOPT_HTTPAUTH, (long)config->authtype);
+          my_setopt_bitmask(carl, CARLOPT_HTTPAUTH, (long)config->authtype);
 
-        my_setopt_slist(curl, CURLOPT_HTTPHEADER, config->headers);
+        my_setopt_slist(carl, CARLOPT_HTTPHEADER, config->headers);
 
-        if(built_in_protos & (CURLPROTO_HTTP | CURLPROTO_RTSP)) {
-          my_setopt_str(curl, CURLOPT_REFERER, config->referer);
-          my_setopt_str(curl, CURLOPT_USERAGENT, config->useragent);
+        if(built_in_protos & (CARLPROTO_HTTP | CARLPROTO_RTSP)) {
+          my_setopt_str(carl, CARLOPT_REFERER, config->referer);
+          my_setopt_str(carl, CARLOPT_USERAGENT, config->useragent);
         }
 
-        if(built_in_protos & CURLPROTO_HTTP) {
+        if(built_in_protos & CARLPROTO_HTTP) {
 
           long postRedir = 0;
 
-          my_setopt(curl, CURLOPT_FOLLOWLOCATION,
+          my_setopt(carl, CARLOPT_FOLLOWLOCATION,
                     config->followlocation?1L:0L);
-          my_setopt(curl, CURLOPT_UNRESTRICTED_AUTH,
+          my_setopt(carl, CARLOPT_UNRESTRICTED_AUTH,
                     config->unrestricted_auth?1L:0L);
 
-          my_setopt(curl, CURLOPT_AUTOREFERER, config->autoreferer?1L:0L);
+          my_setopt(carl, CARLOPT_AUTOREFERER, config->autoreferer?1L:0L);
 
-          /* new in libcurl 7.36.0 */
+          /* new in libcarl 7.36.0 */
           if(config->proxyheaders) {
-            my_setopt_slist(curl, CURLOPT_PROXYHEADER, config->proxyheaders);
-            my_setopt(curl, CURLOPT_HEADEROPT, CURLHEADER_SEPARATE);
+            my_setopt_slist(carl, CARLOPT_PROXYHEADER, config->proxyheaders);
+            my_setopt(carl, CARLOPT_HEADEROPT, CARLHEADER_SEPARATE);
           }
 
-          /* new in libcurl 7.5 */
-          my_setopt(curl, CURLOPT_MAXREDIRS, config->maxredirs);
+          /* new in libcarl 7.5 */
+          my_setopt(carl, CARLOPT_MAXREDIRS, config->maxredirs);
 
           if(config->httpversion)
-            my_setopt_enum(curl, CURLOPT_HTTP_VERSION, config->httpversion);
-          else if(curlinfo->features & CURL_VERSION_HTTP2) {
-            my_setopt_enum(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+            my_setopt_enum(carl, CARLOPT_HTTP_VERSION, config->httpversion);
+          else if(carlinfo->features & CARL_VERSION_HTTP2) {
+            my_setopt_enum(carl, CARLOPT_HTTP_VERSION, CARL_HTTP_VERSION_2TLS);
           }
 
-          /* curl 7.19.1 (the 301 version existed in 7.18.2),
+          /* carl 7.19.1 (the 301 version existed in 7.18.2),
              303 was added in 7.26.0 */
           if(config->post301)
-            postRedir |= CURL_REDIR_POST_301;
+            postRedir |= CARL_REDIR_POST_301;
           if(config->post302)
-            postRedir |= CURL_REDIR_POST_302;
+            postRedir |= CARL_REDIR_POST_302;
           if(config->post303)
-            postRedir |= CURL_REDIR_POST_303;
-          my_setopt(curl, CURLOPT_POSTREDIR, postRedir);
+            postRedir |= CARL_REDIR_POST_303;
+          my_setopt(carl, CARLOPT_POSTREDIR, postRedir);
 
-          /* new in libcurl 7.21.6 */
+          /* new in libcarl 7.21.6 */
           if(config->encoding)
-            my_setopt_str(curl, CURLOPT_ACCEPT_ENCODING, "");
+            my_setopt_str(carl, CARLOPT_ACCEPT_ENCODING, "");
 
-          /* new in libcurl 7.21.6 */
+          /* new in libcarl 7.21.6 */
           if(config->tr_encoding)
-            my_setopt(curl, CURLOPT_TRANSFER_ENCODING, 1L);
-          /* new in libcurl 7.64.0 */
-          my_setopt(curl, CURLOPT_HTTP09_ALLOWED,
+            my_setopt(carl, CARLOPT_TRANSFER_ENCODING, 1L);
+          /* new in libcarl 7.64.0 */
+          my_setopt(carl, CARLOPT_HTTP09_ALLOWED,
                     config->http09_allowed ? 1L : 0L);
 
-        } /* (built_in_protos & CURLPROTO_HTTP) */
+        } /* (built_in_protos & CARLPROTO_HTTP) */
 
-        my_setopt_str(curl, CURLOPT_FTPPORT, config->ftpport);
-        my_setopt(curl, CURLOPT_LOW_SPEED_LIMIT,
+        my_setopt_str(carl, CARLOPT_FTPPORT, config->ftpport);
+        my_setopt(carl, CARLOPT_LOW_SPEED_LIMIT,
                   config->low_speed_limit);
-        my_setopt(curl, CURLOPT_LOW_SPEED_TIME, config->low_speed_time);
-        my_setopt(curl, CURLOPT_MAX_SEND_SPEED_LARGE,
+        my_setopt(carl, CARLOPT_LOW_SPEED_TIME, config->low_speed_time);
+        my_setopt(carl, CARLOPT_MAX_SEND_SPEED_LARGE,
                   config->sendpersecond);
-        my_setopt(curl, CURLOPT_MAX_RECV_SPEED_LARGE,
+        my_setopt(carl, CARLOPT_MAX_RECV_SPEED_LARGE,
                   config->recvpersecond);
 
         if(config->use_resume)
-          my_setopt(curl, CURLOPT_RESUME_FROM_LARGE, config->resume_from);
+          my_setopt(carl, CARLOPT_RESUME_FROM_LARGE, config->resume_from);
         else
-          my_setopt(curl, CURLOPT_RESUME_FROM_LARGE, CURL_OFF_T_C(0));
+          my_setopt(carl, CARLOPT_RESUME_FROM_LARGE, CARL_OFF_T_C(0));
 
-        my_setopt_str(curl, CURLOPT_KEYPASSWD, config->key_passwd);
-        my_setopt_str(curl, CURLOPT_PROXY_KEYPASSWD, config->proxy_key_passwd);
+        my_setopt_str(carl, CARLOPT_KEYPASSWD, config->key_passwd);
+        my_setopt_str(carl, CARLOPT_PROXY_KEYPASSWD, config->proxy_key_passwd);
 
-        if(built_in_protos & (CURLPROTO_SCP|CURLPROTO_SFTP)) {
+        if(built_in_protos & (CARLPROTO_SCP|CARLPROTO_SFTP)) {
 
           /* SSH and SSL private key uses same command-line option */
-          /* new in libcurl 7.16.1 */
-          my_setopt_str(curl, CURLOPT_SSH_PRIVATE_KEYFILE, config->key);
-          /* new in libcurl 7.16.1 */
-          my_setopt_str(curl, CURLOPT_SSH_PUBLIC_KEYFILE, config->pubkey);
+          /* new in libcarl 7.16.1 */
+          my_setopt_str(carl, CARLOPT_SSH_PRIVATE_KEYFILE, config->key);
+          /* new in libcarl 7.16.1 */
+          my_setopt_str(carl, CARLOPT_SSH_PUBLIC_KEYFILE, config->pubkey);
 
-          /* new in libcurl 7.17.1: SSH host key md5 checking allows us
+          /* new in libcarl 7.17.1: SSH host key md5 checking allows us
              to fail if we are not talking to who we think we should */
-          my_setopt_str(curl, CURLOPT_SSH_HOST_PUBLIC_KEY_MD5,
+          my_setopt_str(carl, CARLOPT_SSH_HOST_PUBLIC_KEY_MD5,
                         config->hostpubmd5);
 
-          /* new in libcurl 7.56.0 */
+          /* new in libcarl 7.56.0 */
           if(config->ssh_compression)
-            my_setopt(curl, CURLOPT_SSH_COMPRESSION, 1L);
+            my_setopt(carl, CARLOPT_SSH_COMPRESSION, 1L);
         }
 
         if(config->cacert)
-          my_setopt_str(curl, CURLOPT_CAINFO, config->cacert);
+          my_setopt_str(carl, CARLOPT_CAINFO, config->cacert);
         if(config->proxy_cacert)
-          my_setopt_str(curl, CURLOPT_PROXY_CAINFO, config->proxy_cacert);
+          my_setopt_str(carl, CARLOPT_PROXY_CAINFO, config->proxy_cacert);
 
         if(config->capath) {
-          result = res_setopt_str(curl, CURLOPT_CAPATH, config->capath);
-          if(result == CURLE_NOT_BUILT_IN) {
-            warnf(config->global, "ignoring %s, not supported by libcurl\n",
+          result = res_setopt_str(carl, CARLOPT_CAPATH, config->capath);
+          if(result == CARLE_NOT_BUILT_IN) {
+            warnf(config->global, "ignoring %s, not supported by libcarl\n",
                   capath_from_env?
                   "SSL_CERT_DIR environment variable":"--capath");
           }
@@ -1503,15 +1503,15 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         /* For the time being if --proxy-capath is not set then we use the
            --capath value for it, if any. See #1257 */
         if((config->proxy_capath || config->capath) &&
-           !tool_setopt_skip(CURLOPT_PROXY_CAPATH)) {
-          result = res_setopt_str(curl, CURLOPT_PROXY_CAPATH,
+           !tool_setopt_skip(CARLOPT_PROXY_CAPATH)) {
+          result = res_setopt_str(carl, CARLOPT_PROXY_CAPATH,
                                   (config->proxy_capath ?
                                    config->proxy_capath :
                                    config->capath));
-          if(result == CURLE_NOT_BUILT_IN) {
+          if(result == CARLE_NOT_BUILT_IN) {
             if(config->proxy_capath) {
               warnf(config->global,
-                    "ignoring --proxy-capath, not supported by libcurl\n");
+                    "ignoring --proxy-capath, not supported by libcarl\n");
             }
           }
           else if(result)
@@ -1519,19 +1519,19 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         }
 
         if(config->crlfile)
-          my_setopt_str(curl, CURLOPT_CRLFILE, config->crlfile);
+          my_setopt_str(carl, CARLOPT_CRLFILE, config->crlfile);
         if(config->proxy_crlfile)
-          my_setopt_str(curl, CURLOPT_PROXY_CRLFILE, config->proxy_crlfile);
-        else if(config->crlfile) /* CURLOPT_PROXY_CRLFILE default is crlfile */
-          my_setopt_str(curl, CURLOPT_PROXY_CRLFILE, config->crlfile);
+          my_setopt_str(carl, CARLOPT_PROXY_CRLFILE, config->proxy_crlfile);
+        else if(config->crlfile) /* CARLOPT_PROXY_CRLFILE default is crlfile */
+          my_setopt_str(carl, CARLOPT_PROXY_CRLFILE, config->crlfile);
 
         if(config->pinnedpubkey)
-          my_setopt_str(curl, CURLOPT_PINNEDPUBLICKEY, config->pinnedpubkey);
+          my_setopt_str(carl, CARLOPT_PINNEDPUBLICKEY, config->pinnedpubkey);
 
         if(config->ssl_ec_curves)
-          my_setopt_str(curl, CURLOPT_SSL_EC_CURVES, config->ssl_ec_curves);
+          my_setopt_str(carl, CARLOPT_SSL_EC_CURVES, config->ssl_ec_curves);
 
-        if(curlinfo->features & CURL_VERSION_SSL) {
+        if(carlinfo->features & CARL_VERSION_SSL) {
           /* Check if config->cert is a PKCS#11 URI and set the
            * config->cert_type if necessary */
           if(config->cert) {
@@ -1572,12 +1572,12 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             }
           }
 
-          /* In debug build of curl tool, using
+          /* In debug build of carl tool, using
            *    --cert loadmem=<filename>:<password> --cert-type p12
            *  must do the same thing than classic:
            *    --cert <filename>:<password> --cert-type p12
            *  but is designed to test blob */
-#if defined(CURLDEBUG) || defined(DEBUGBUILD)
+#if defined(CARLDEBUG) || defined(DEBUGBUILD)
           if(config->cert && (strlen(config->cert) > 8) &&
              (memcmp(config->cert, "loadmem=",8) == 0)) {
             FILE *fInCert = fopen(config->cert + 8, "rb");
@@ -1600,11 +1600,11 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             if(fInCert)
               fclose(fInCert);
             if((filesize > 0) && continue_reading) {
-              struct curl_blob structblob;
+              struct carl_blob structblob;
               structblob.data = certdata;
               structblob.len = (size_t)filesize;
-              structblob.flags = CURL_BLOB_COPY;
-              my_setopt_str(curl, CURLOPT_SSLCERT_BLOB, &structblob);
+              structblob.flags = CARL_BLOB_COPY;
+              my_setopt_str(carl, CARLOPT_SSLCERT_BLOB, &structblob);
               /* if test run well, we are sure we don't reuse
                * original mem pointer */
               memset(certdata, 0, (size_t)filesize);
@@ -1613,14 +1613,14 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           }
           else
 #endif
-          my_setopt_str(curl, CURLOPT_SSLCERT, config->cert);
-          my_setopt_str(curl, CURLOPT_PROXY_SSLCERT, config->proxy_cert);
-          my_setopt_str(curl, CURLOPT_SSLCERTTYPE, config->cert_type);
-          my_setopt_str(curl, CURLOPT_PROXY_SSLCERTTYPE,
+          my_setopt_str(carl, CARLOPT_SSLCERT, config->cert);
+          my_setopt_str(carl, CARLOPT_PROXY_SSLCERT, config->proxy_cert);
+          my_setopt_str(carl, CARLOPT_SSLCERTTYPE, config->cert_type);
+          my_setopt_str(carl, CARLOPT_PROXY_SSLCERTTYPE,
                         config->proxy_cert_type);
 
 
-#if defined(CURLDEBUG) || defined(DEBUGBUILD)
+#if defined(CARLDEBUG) || defined(DEBUGBUILD)
           if(config->key && (strlen(config->key) > 8) &&
              (memcmp(config->key, "loadmem=",8) == 0)) {
             FILE *fInCert = fopen(config->key + 8, "rb");
@@ -1643,11 +1643,11 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             if(fInCert)
               fclose(fInCert);
             if((filesize > 0) && continue_reading) {
-              struct curl_blob structblob;
+              struct carl_blob structblob;
               structblob.data = certdata;
               structblob.len = (size_t)filesize;
-              structblob.flags = CURL_BLOB_COPY;
-              my_setopt_str(curl, CURLOPT_SSLKEY_BLOB, &structblob);
+              structblob.flags = CARL_BLOB_COPY;
+              my_setopt_str(carl, CARLOPT_SSLKEY_BLOB, &structblob);
               /* if test run well, we are sure we don't reuse
                * original mem pointer */
               memset(certdata, 0, (size_t)filesize);
@@ -1656,75 +1656,75 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           }
           else
 #endif
-          my_setopt_str(curl, CURLOPT_SSLKEY, config->key);
-          my_setopt_str(curl, CURLOPT_PROXY_SSLKEY, config->proxy_key);
-          my_setopt_str(curl, CURLOPT_SSLKEYTYPE, config->key_type);
-          my_setopt_str(curl, CURLOPT_PROXY_SSLKEYTYPE,
+          my_setopt_str(carl, CARLOPT_SSLKEY, config->key);
+          my_setopt_str(carl, CARLOPT_PROXY_SSLKEY, config->proxy_key);
+          my_setopt_str(carl, CARLOPT_SSLKEYTYPE, config->key_type);
+          my_setopt_str(carl, CARLOPT_PROXY_SSLKEYTYPE,
                         config->proxy_key_type);
-          my_setopt_str(curl, CURLOPT_AWS_SIGV4,
+          my_setopt_str(carl, CARLOPT_AWS_SIGV4,
                         config->aws_sigv4_provider);
 
           if(config->insecure_ok) {
-            my_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+            my_setopt(carl, CARLOPT_SSL_VERIFYPEER, 0L);
+            my_setopt(carl, CARLOPT_SSL_VERIFYHOST, 0L);
           }
           else {
-            my_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-            /* libcurl default is strict verifyhost -> 2L   */
-            /* my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L); */
+            my_setopt(carl, CARLOPT_SSL_VERIFYPEER, 1L);
+            /* libcarl default is strict verifyhost -> 2L   */
+            /* my_setopt(carl, CARLOPT_SSL_VERIFYHOST, 2L); */
           }
           if(config->proxy_insecure_ok) {
-            my_setopt(curl, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
-            my_setopt(curl, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
+            my_setopt(carl, CARLOPT_PROXY_SSL_VERIFYPEER, 0L);
+            my_setopt(carl, CARLOPT_PROXY_SSL_VERIFYHOST, 0L);
           }
           else {
-            my_setopt(curl, CURLOPT_PROXY_SSL_VERIFYPEER, 1L);
+            my_setopt(carl, CARLOPT_PROXY_SSL_VERIFYPEER, 1L);
           }
 
           if(config->verifystatus)
-            my_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, 1L);
+            my_setopt(carl, CARLOPT_SSL_VERIFYSTATUS, 1L);
 
           if(config->falsestart)
-            my_setopt(curl, CURLOPT_SSL_FALSESTART, 1L);
+            my_setopt(carl, CARLOPT_SSL_FALSESTART, 1L);
 
-          my_setopt_enum(curl, CURLOPT_SSLVERSION,
+          my_setopt_enum(carl, CARLOPT_SSLVERSION,
                          config->ssl_version | config->ssl_version_max);
-          my_setopt_enum(curl, CURLOPT_PROXY_SSLVERSION,
+          my_setopt_enum(carl, CARLOPT_PROXY_SSLVERSION,
                          config->proxy_ssl_version);
 
           {
             long mask =
-              (config->ssl_allow_beast ? CURLSSLOPT_ALLOW_BEAST : 0) |
+              (config->ssl_allow_beast ? CARLSSLOPT_ALLOW_BEAST : 0) |
               (config->ssl_revoke_best_effort ?
-               CURLSSLOPT_REVOKE_BEST_EFFORT : 0) |
+               CARLSSLOPT_REVOKE_BEST_EFFORT : 0) |
               (config->native_ca_store ?
-               CURLSSLOPT_NATIVE_CA : 0) |
-              (config->ssl_no_revoke ? CURLSSLOPT_NO_REVOKE : 0);
+               CARLSSLOPT_NATIVE_CA : 0) |
+              (config->ssl_no_revoke ? CARLSSLOPT_NO_REVOKE : 0);
 
             if(mask)
-              my_setopt_bitmask(curl, CURLOPT_SSL_OPTIONS, mask);
+              my_setopt_bitmask(carl, CARLOPT_SSL_OPTIONS, mask);
           }
 
           if(config->proxy_ssl_allow_beast)
-            my_setopt(curl, CURLOPT_PROXY_SSL_OPTIONS,
-                      (long)CURLSSLOPT_ALLOW_BEAST);
+            my_setopt(carl, CARLOPT_PROXY_SSL_OPTIONS,
+                      (long)CARLSSLOPT_ALLOW_BEAST);
         }
 
         if(config->path_as_is)
-          my_setopt(curl, CURLOPT_PATH_AS_IS, 1L);
+          my_setopt(carl, CARLOPT_PATH_AS_IS, 1L);
 
-        if((built_in_protos & (CURLPROTO_SCP|CURLPROTO_SFTP)) &&
+        if((built_in_protos & (CARLPROTO_SCP|CARLPROTO_SFTP)) &&
            !config->insecure_ok) {
           char *home = homedir(NULL);
           if(home) {
             char *file = aprintf("%s/.ssh/known_hosts", home);
             if(file) {
-              /* new in curl 7.19.6 */
-              result = res_setopt_str(curl, CURLOPT_SSH_KNOWNHOSTS, file);
-              curl_free(file);
-              if(result == CURLE_UNKNOWN_OPTION)
+              /* new in carl 7.19.6 */
+              result = res_setopt_str(carl, CARLOPT_SSH_KNOWNHOSTS, file);
+              carl_free(file);
+              if(result == CARLE_UNKNOWN_OPTION)
                 /* libssh2 version older than 1.1.1 */
-                result = CURLE_OK;
+                result = CARLE_OK;
             }
             Curl_safefree(home);
             if(result)
@@ -1736,229 +1736,229 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
         if(config->no_body || config->remote_time) {
           /* no body or use remote time */
-          my_setopt(curl, CURLOPT_FILETIME, 1L);
+          my_setopt(carl, CARLOPT_FILETIME, 1L);
         }
 
-        my_setopt(curl, CURLOPT_CRLF, config->crlf?1L:0L);
-        my_setopt_slist(curl, CURLOPT_QUOTE, config->quote);
-        my_setopt_slist(curl, CURLOPT_POSTQUOTE, config->postquote);
-        my_setopt_slist(curl, CURLOPT_PREQUOTE, config->prequote);
+        my_setopt(carl, CARLOPT_CRLF, config->crlf?1L:0L);
+        my_setopt_slist(carl, CARLOPT_QUOTE, config->quote);
+        my_setopt_slist(carl, CARLOPT_POSTQUOTE, config->postquote);
+        my_setopt_slist(carl, CARLOPT_PREQUOTE, config->prequote);
 
         if(config->cookie)
-          my_setopt_str(curl, CURLOPT_COOKIE, config->cookie);
+          my_setopt_str(carl, CARLOPT_COOKIE, config->cookie);
 
         if(config->cookiefile)
-          my_setopt_str(curl, CURLOPT_COOKIEFILE, config->cookiefile);
+          my_setopt_str(carl, CARLOPT_COOKIEFILE, config->cookiefile);
 
-        /* new in libcurl 7.9 */
+        /* new in libcarl 7.9 */
         if(config->cookiejar)
-          my_setopt_str(curl, CURLOPT_COOKIEJAR, config->cookiejar);
+          my_setopt_str(carl, CARLOPT_COOKIEJAR, config->cookiejar);
 
-        /* new in libcurl 7.9.7 */
-        my_setopt(curl, CURLOPT_COOKIESESSION, config->cookiesession?1L:0L);
+        /* new in libcarl 7.9.7 */
+        my_setopt(carl, CARLOPT_COOKIESESSION, config->cookiesession?1L:0L);
 
-        my_setopt_enum(curl, CURLOPT_TIMECONDITION, (long)config->timecond);
-        my_setopt(curl, CURLOPT_TIMEVALUE_LARGE, config->condtime);
-        my_setopt_str(curl, CURLOPT_CUSTOMREQUEST, config->customrequest);
+        my_setopt_enum(carl, CARLOPT_TIMECONDITION, (long)config->timecond);
+        my_setopt(carl, CARLOPT_TIMEVALUE_LARGE, config->condtime);
+        my_setopt_str(carl, CARLOPT_CUSTOMREQUEST, config->customrequest);
         customrequest_helper(config, config->httpreq, config->customrequest);
-        my_setopt(curl, CURLOPT_STDERR, global->errors);
+        my_setopt(carl, CARLOPT_STDERR, global->errors);
 
-        /* three new ones in libcurl 7.3: */
-        my_setopt_str(curl, CURLOPT_INTERFACE, config->iface);
-        my_setopt_str(curl, CURLOPT_KRBLEVEL, config->krblevel);
+        /* three new ones in libcarl 7.3: */
+        my_setopt_str(carl, CARLOPT_INTERFACE, config->iface);
+        my_setopt_str(carl, CARLOPT_KRBLEVEL, config->krblevel);
         progressbarinit(&per->progressbar, config);
 
-        if((global->progressmode == CURL_PROGRESS_BAR) &&
+        if((global->progressmode == CARL_PROGRESS_BAR) &&
            !global->noprogress && !global->mute) {
           /* we want the alternative style, then we have to implement it
              ourselves! */
-          my_setopt(curl, CURLOPT_XFERINFOFUNCTION, tool_progress_cb);
-          my_setopt(curl, CURLOPT_XFERINFODATA, per);
+          my_setopt(carl, CARLOPT_XFERINFOFUNCTION, tool_progress_cb);
+          my_setopt(carl, CARLOPT_XFERINFODATA, per);
         }
         else if(per->uploadfile && !strcmp(per->uploadfile, ".")) {
           /* when reading from stdin in non-blocking mode, we use the progress
              function to unpause a busy read */
-          my_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-          my_setopt(curl, CURLOPT_XFERINFOFUNCTION, tool_readbusy_cb);
-          my_setopt(curl, CURLOPT_XFERINFODATA, per);
+          my_setopt(carl, CARLOPT_NOPROGRESS, 0L);
+          my_setopt(carl, CARLOPT_XFERINFOFUNCTION, tool_readbusy_cb);
+          my_setopt(carl, CARLOPT_XFERINFODATA, per);
         }
 
-        /* new in libcurl 7.24.0: */
+        /* new in libcarl 7.24.0: */
         if(config->dns_servers)
-          my_setopt_str(curl, CURLOPT_DNS_SERVERS, config->dns_servers);
+          my_setopt_str(carl, CARLOPT_DNS_SERVERS, config->dns_servers);
 
-        /* new in libcurl 7.33.0: */
+        /* new in libcarl 7.33.0: */
         if(config->dns_interface)
-          my_setopt_str(curl, CURLOPT_DNS_INTERFACE, config->dns_interface);
+          my_setopt_str(carl, CARLOPT_DNS_INTERFACE, config->dns_interface);
         if(config->dns_ipv4_addr)
-          my_setopt_str(curl, CURLOPT_DNS_LOCAL_IP4, config->dns_ipv4_addr);
+          my_setopt_str(carl, CARLOPT_DNS_LOCAL_IP4, config->dns_ipv4_addr);
         if(config->dns_ipv6_addr)
-        my_setopt_str(curl, CURLOPT_DNS_LOCAL_IP6, config->dns_ipv6_addr);
+        my_setopt_str(carl, CARLOPT_DNS_LOCAL_IP6, config->dns_ipv6_addr);
 
-        /* new in libcurl 7.6.2: */
-        my_setopt_slist(curl, CURLOPT_TELNETOPTIONS, config->telnet_options);
+        /* new in libcarl 7.6.2: */
+        my_setopt_slist(carl, CARLOPT_TELNETOPTIONS, config->telnet_options);
 
-        /* new in libcurl 7.7: */
-        my_setopt_str(curl, CURLOPT_RANDOM_FILE, config->random_file);
-        my_setopt_str(curl, CURLOPT_EGDSOCKET, config->egd_file);
-        my_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS,
+        /* new in libcarl 7.7: */
+        my_setopt_str(carl, CARLOPT_RANDOM_FILE, config->random_file);
+        my_setopt_str(carl, CARLOPT_EGDSOCKET, config->egd_file);
+        my_setopt(carl, CARLOPT_CONNECTTIMEOUT_MS,
                   (long)(config->connecttimeout * 1000));
 
         if(config->doh_url)
-          my_setopt_str(curl, CURLOPT_DOH_URL, config->doh_url);
+          my_setopt_str(carl, CARLOPT_DOH_URL, config->doh_url);
 
         if(config->cipher_list)
-          my_setopt_str(curl, CURLOPT_SSL_CIPHER_LIST, config->cipher_list);
+          my_setopt_str(carl, CARLOPT_SSL_CIPHER_LIST, config->cipher_list);
 
         if(config->proxy_cipher_list)
-          my_setopt_str(curl, CURLOPT_PROXY_SSL_CIPHER_LIST,
+          my_setopt_str(carl, CARLOPT_PROXY_SSL_CIPHER_LIST,
                         config->proxy_cipher_list);
 
         if(config->cipher13_list)
-          my_setopt_str(curl, CURLOPT_TLS13_CIPHERS, config->cipher13_list);
+          my_setopt_str(carl, CARLOPT_TLS13_CIPHERS, config->cipher13_list);
 
         if(config->proxy_cipher13_list)
-          my_setopt_str(curl, CURLOPT_PROXY_TLS13_CIPHERS,
+          my_setopt_str(carl, CARLOPT_PROXY_TLS13_CIPHERS,
                         config->proxy_cipher13_list);
 
-        /* new in libcurl 7.9.2: */
+        /* new in libcarl 7.9.2: */
         if(config->disable_epsv)
           /* disable it */
-          my_setopt(curl, CURLOPT_FTP_USE_EPSV, 0L);
+          my_setopt(carl, CARLOPT_FTP_USE_EPSV, 0L);
 
-        /* new in libcurl 7.10.5 */
+        /* new in libcarl 7.10.5 */
         if(config->disable_eprt)
           /* disable it */
-          my_setopt(curl, CURLOPT_FTP_USE_EPRT, 0L);
+          my_setopt(carl, CARLOPT_FTP_USE_EPRT, 0L);
 
         if(global->tracetype != TRACE_NONE) {
-          my_setopt(curl, CURLOPT_DEBUGFUNCTION, tool_debug_cb);
-          my_setopt(curl, CURLOPT_DEBUGDATA, config);
-          my_setopt(curl, CURLOPT_VERBOSE, 1L);
+          my_setopt(carl, CARLOPT_DEBUGFUNCTION, tool_debug_cb);
+          my_setopt(carl, CARLOPT_DEBUGDATA, config);
+          my_setopt(carl, CARLOPT_VERBOSE, 1L);
         }
 
-        /* new in curl 7.9.3 */
+        /* new in carl 7.9.3 */
         if(config->engine) {
-          result = res_setopt_str(curl, CURLOPT_SSLENGINE, config->engine);
+          result = res_setopt_str(carl, CARLOPT_SSLENGINE, config->engine);
           if(result)
             break;
         }
 
-        /* new in curl 7.10.7, extended in 7.19.4. Modified to use
+        /* new in carl 7.10.7, extended in 7.19.4. Modified to use
            CREATE_DIR_RETRY in 7.49.0 */
-        my_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS,
+        my_setopt(carl, CARLOPT_FTP_CREATE_MISSING_DIRS,
                   (long)(config->ftp_create_dirs?
-                         CURLFTP_CREATE_DIR_RETRY:
-                         CURLFTP_CREATE_DIR_NONE));
+                         CARLFTP_CREATE_DIR_RETRY:
+                         CARLFTP_CREATE_DIR_NONE));
 
-        /* new in curl 7.10.8 */
+        /* new in carl 7.10.8 */
         if(config->max_filesize)
-          my_setopt(curl, CURLOPT_MAXFILESIZE_LARGE,
+          my_setopt(carl, CARLOPT_MAXFILESIZE_LARGE,
                     config->max_filesize);
 
-        my_setopt(curl, CURLOPT_IPRESOLVE, config->ip_version);
+        my_setopt(carl, CARLOPT_IPRESOLVE, config->ip_version);
 
-        /* new in curl 7.15.5 */
+        /* new in carl 7.15.5 */
         if(config->ftp_ssl_reqd)
-          my_setopt_enum(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+          my_setopt_enum(carl, CARLOPT_USE_SSL, (long)CARLUSESSL_ALL);
 
-        /* new in curl 7.11.0 */
+        /* new in carl 7.11.0 */
         else if(config->ftp_ssl)
-          my_setopt_enum(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_TRY);
+          my_setopt_enum(carl, CARLOPT_USE_SSL, (long)CARLUSESSL_TRY);
 
-        /* new in curl 7.16.0 */
+        /* new in carl 7.16.0 */
         else if(config->ftp_ssl_control)
-          my_setopt_enum(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_CONTROL);
+          my_setopt_enum(carl, CARLOPT_USE_SSL, (long)CARLUSESSL_CONTROL);
 
-        /* new in curl 7.16.1 */
+        /* new in carl 7.16.1 */
         if(config->ftp_ssl_ccc)
-          my_setopt_enum(curl, CURLOPT_FTP_SSL_CCC,
+          my_setopt_enum(carl, CARLOPT_FTP_SSL_CCC,
                          (long)config->ftp_ssl_ccc_mode);
 
-        /* new in curl 7.19.4 */
+        /* new in carl 7.19.4 */
         if(config->socks5_gssapi_nec)
-          my_setopt_str(curl, CURLOPT_SOCKS5_GSSAPI_NEC,
+          my_setopt_str(carl, CARLOPT_SOCKS5_GSSAPI_NEC,
                         config->socks5_gssapi_nec);
 
-        /* new in curl 7.55.0 */
+        /* new in carl 7.55.0 */
         if(config->socks5_auth)
-          my_setopt_bitmask(curl, CURLOPT_SOCKS5_AUTH,
+          my_setopt_bitmask(carl, CARLOPT_SOCKS5_AUTH,
                             (long)config->socks5_auth);
 
-        /* new in curl 7.43.0 */
+        /* new in carl 7.43.0 */
         if(config->proxy_service_name)
-          my_setopt_str(curl, CURLOPT_PROXY_SERVICE_NAME,
+          my_setopt_str(carl, CARLOPT_PROXY_SERVICE_NAME,
                         config->proxy_service_name);
 
-        /* new in curl 7.43.0 */
+        /* new in carl 7.43.0 */
         if(config->service_name)
-          my_setopt_str(curl, CURLOPT_SERVICE_NAME,
+          my_setopt_str(carl, CARLOPT_SERVICE_NAME,
                         config->service_name);
 
-        /* curl 7.13.0 */
-        my_setopt_str(curl, CURLOPT_FTP_ACCOUNT, config->ftp_account);
-        my_setopt(curl, CURLOPT_IGNORE_CONTENT_LENGTH, config->ignorecl?1L:0L);
+        /* carl 7.13.0 */
+        my_setopt_str(carl, CARLOPT_FTP_ACCOUNT, config->ftp_account);
+        my_setopt(carl, CARLOPT_IGNORE_CONTENT_LENGTH, config->ignorecl?1L:0L);
 
-        /* curl 7.14.2 */
-        my_setopt(curl, CURLOPT_FTP_SKIP_PASV_IP, config->ftp_skip_ip?1L:0L);
+        /* carl 7.14.2 */
+        my_setopt(carl, CARLOPT_FTP_SKIP_PASV_IP, config->ftp_skip_ip?1L:0L);
 
-        /* curl 7.15.1 */
-        my_setopt(curl, CURLOPT_FTP_FILEMETHOD, (long)config->ftp_filemethod);
+        /* carl 7.15.1 */
+        my_setopt(carl, CARLOPT_FTP_FILEMETHOD, (long)config->ftp_filemethod);
 
-        /* curl 7.15.2 */
+        /* carl 7.15.2 */
         if(config->localport) {
-          my_setopt(curl, CURLOPT_LOCALPORT, config->localport);
-          my_setopt_str(curl, CURLOPT_LOCALPORTRANGE, config->localportrange);
+          my_setopt(carl, CARLOPT_LOCALPORT, config->localport);
+          my_setopt_str(carl, CARLOPT_LOCALPORTRANGE, config->localportrange);
         }
 
-        /* curl 7.15.5 */
-        my_setopt_str(curl, CURLOPT_FTP_ALTERNATIVE_TO_USER,
+        /* carl 7.15.5 */
+        my_setopt_str(carl, CARLOPT_FTP_ALTERNATIVE_TO_USER,
                       config->ftp_alternative_to_user);
 
-        /* curl 7.16.0 */
+        /* carl 7.16.0 */
         if(config->disable_sessionid)
           /* disable it */
-          my_setopt(curl, CURLOPT_SSL_SESSIONID_CACHE, 0L);
+          my_setopt(carl, CARLOPT_SSL_SESSIONID_CACHE, 0L);
 
-        /* curl 7.16.2 */
+        /* carl 7.16.2 */
         if(config->raw) {
-          my_setopt(curl, CURLOPT_HTTP_CONTENT_DECODING, 0L);
-          my_setopt(curl, CURLOPT_HTTP_TRANSFER_DECODING, 0L);
+          my_setopt(carl, CARLOPT_HTTP_CONTENT_DECODING, 0L);
+          my_setopt(carl, CARLOPT_HTTP_TRANSFER_DECODING, 0L);
         }
 
-        /* curl 7.17.1 */
+        /* carl 7.17.1 */
         if(!config->nokeepalive) {
-          my_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+          my_setopt(carl, CARLOPT_TCP_KEEPALIVE, 1L);
           if(config->alivetime != 0) {
-            my_setopt(curl, CURLOPT_TCP_KEEPIDLE, config->alivetime);
-            my_setopt(curl, CURLOPT_TCP_KEEPINTVL, config->alivetime);
+            my_setopt(carl, CARLOPT_TCP_KEEPIDLE, config->alivetime);
+            my_setopt(carl, CARLOPT_TCP_KEEPINTVL, config->alivetime);
           }
         }
         else
-          my_setopt(curl, CURLOPT_TCP_KEEPALIVE, 0L);
+          my_setopt(carl, CARLOPT_TCP_KEEPALIVE, 0L);
 
-        /* curl 7.20.0 */
+        /* carl 7.20.0 */
         if(config->tftp_blksize)
-          my_setopt(curl, CURLOPT_TFTP_BLKSIZE, config->tftp_blksize);
+          my_setopt(carl, CARLOPT_TFTP_BLKSIZE, config->tftp_blksize);
 
         if(config->mail_from)
-          my_setopt_str(curl, CURLOPT_MAIL_FROM, config->mail_from);
+          my_setopt_str(carl, CARLOPT_MAIL_FROM, config->mail_from);
 
         if(config->mail_rcpt)
-          my_setopt_slist(curl, CURLOPT_MAIL_RCPT, config->mail_rcpt);
+          my_setopt_slist(carl, CARLOPT_MAIL_RCPT, config->mail_rcpt);
 
-        /* curl 7.69.x */
-        my_setopt(curl, CURLOPT_MAIL_RCPT_ALLLOWFAILS,
+        /* carl 7.69.x */
+        my_setopt(carl, CARLOPT_MAIL_RCPT_ALLLOWFAILS,
           config->mail_rcpt_allowfails ? 1L : 0L);
 
-        /* curl 7.20.x */
+        /* carl 7.20.x */
         if(config->ftp_pret)
-          my_setopt(curl, CURLOPT_FTP_USE_PRET, 1L);
+          my_setopt(carl, CARLOPT_FTP_USE_PRET, 1L);
 
         if(config->proto_present)
-          my_setopt_flags(curl, CURLOPT_PROTOCOLS, config->proto);
+          my_setopt_flags(carl, CARLOPT_PROTOCOLS, config->proto);
         if(config->proto_redir_present)
-          my_setopt_flags(curl, CURLOPT_REDIR_PROTOCOLS, config->proto_redir);
+          my_setopt_flags(carl, CARLOPT_REDIR_PROTOCOLS, config->proto_redir);
 
         if(config->content_disposition
            && (urlnode->flags & GETOUT_USEREMOTE))
@@ -1972,111 +1972,111 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         hdrcbdata->global = global;
         hdrcbdata->config = config;
 
-        my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
-        my_setopt(curl, CURLOPT_HEADERDATA, per);
+        my_setopt(carl, CARLOPT_HEADERFUNCTION, tool_header_cb);
+        my_setopt(carl, CARLOPT_HEADERDATA, per);
 
         if(config->resolve)
           /* new in 7.21.3 */
-          my_setopt_slist(curl, CURLOPT_RESOLVE, config->resolve);
+          my_setopt_slist(carl, CARLOPT_RESOLVE, config->resolve);
 
         if(config->connect_to)
           /* new in 7.49.0 */
-          my_setopt_slist(curl, CURLOPT_CONNECT_TO, config->connect_to);
+          my_setopt_slist(carl, CARLOPT_CONNECT_TO, config->connect_to);
 
         /* new in 7.21.4 */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP) {
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP) {
           if(config->tls_username)
-            my_setopt_str(curl, CURLOPT_TLSAUTH_USERNAME,
+            my_setopt_str(carl, CARLOPT_TLSAUTH_USERNAME,
                           config->tls_username);
           if(config->tls_password)
-            my_setopt_str(curl, CURLOPT_TLSAUTH_PASSWORD,
+            my_setopt_str(carl, CARLOPT_TLSAUTH_PASSWORD,
                           config->tls_password);
           if(config->tls_authtype)
-            my_setopt_str(curl, CURLOPT_TLSAUTH_TYPE,
+            my_setopt_str(carl, CARLOPT_TLSAUTH_TYPE,
                           config->tls_authtype);
           if(config->proxy_tls_username)
-            my_setopt_str(curl, CURLOPT_PROXY_TLSAUTH_USERNAME,
+            my_setopt_str(carl, CARLOPT_PROXY_TLSAUTH_USERNAME,
                           config->proxy_tls_username);
           if(config->proxy_tls_password)
-            my_setopt_str(curl, CURLOPT_PROXY_TLSAUTH_PASSWORD,
+            my_setopt_str(carl, CARLOPT_PROXY_TLSAUTH_PASSWORD,
                           config->proxy_tls_password);
           if(config->proxy_tls_authtype)
-            my_setopt_str(curl, CURLOPT_PROXY_TLSAUTH_TYPE,
+            my_setopt_str(carl, CARLOPT_PROXY_TLSAUTH_TYPE,
                           config->proxy_tls_authtype);
         }
 
         /* new in 7.22.0 */
         if(config->gssapi_delegation)
-          my_setopt_str(curl, CURLOPT_GSSAPI_DELEGATION,
+          my_setopt_str(carl, CARLOPT_GSSAPI_DELEGATION,
                         config->gssapi_delegation);
 
         if(config->mail_auth)
-          my_setopt_str(curl, CURLOPT_MAIL_AUTH, config->mail_auth);
+          my_setopt_str(carl, CARLOPT_MAIL_AUTH, config->mail_auth);
 
         /* new in 7.66.0 */
         if(config->sasl_authzid)
-          my_setopt_str(curl, CURLOPT_SASL_AUTHZID, config->sasl_authzid);
+          my_setopt_str(carl, CARLOPT_SASL_AUTHZID, config->sasl_authzid);
 
         /* new in 7.31.0 */
         if(config->sasl_ir)
-          my_setopt(curl, CURLOPT_SASL_IR, 1L);
+          my_setopt(carl, CARLOPT_SASL_IR, 1L);
 
         if(config->nonpn) {
-          my_setopt(curl, CURLOPT_SSL_ENABLE_NPN, 0L);
+          my_setopt(carl, CARLOPT_SSL_ENABLE_NPN, 0L);
         }
 
         if(config->noalpn) {
-          my_setopt(curl, CURLOPT_SSL_ENABLE_ALPN, 0L);
+          my_setopt(carl, CARLOPT_SSL_ENABLE_ALPN, 0L);
         }
 
         /* new in 7.40.0, abstract support added in 7.53.0 */
         if(config->unix_socket_path) {
           if(config->abstract_unix_socket) {
-            my_setopt_str(curl, CURLOPT_ABSTRACT_UNIX_SOCKET,
+            my_setopt_str(carl, CARLOPT_ABSTRACT_UNIX_SOCKET,
                           config->unix_socket_path);
           }
           else {
-            my_setopt_str(curl, CURLOPT_UNIX_SOCKET_PATH,
+            my_setopt_str(carl, CARLOPT_UNIX_SOCKET_PATH,
                           config->unix_socket_path);
           }
         }
 
         /* new in 7.45.0 */
         if(config->proto_default)
-          my_setopt_str(curl, CURLOPT_DEFAULT_PROTOCOL, config->proto_default);
+          my_setopt_str(carl, CARLOPT_DEFAULT_PROTOCOL, config->proto_default);
 
         /* new in 7.47.0 */
         if(config->expect100timeout > 0)
-          my_setopt_str(curl, CURLOPT_EXPECT_100_TIMEOUT_MS,
+          my_setopt_str(carl, CARLOPT_EXPECT_100_TIMEOUT_MS,
                         (long)(config->expect100timeout*1000));
 
         /* new in 7.48.0 */
         if(config->tftp_no_options)
-          my_setopt(curl, CURLOPT_TFTP_NO_OPTIONS, 1L);
+          my_setopt(carl, CARLOPT_TFTP_NO_OPTIONS, 1L);
 
         /* new in 7.59.0 */
-        if(config->happy_eyeballs_timeout_ms != CURL_HET_DEFAULT)
-          my_setopt(curl, CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS,
+        if(config->happy_eyeballs_timeout_ms != CARL_HET_DEFAULT)
+          my_setopt(carl, CARLOPT_HAPPY_EYEBALLS_TIMEOUT_MS,
                     config->happy_eyeballs_timeout_ms);
 
         /* new in 7.60.0 */
         if(config->haproxy_protocol)
-          my_setopt(curl, CURLOPT_HAPROXYPROTOCOL, 1L);
+          my_setopt(carl, CARLOPT_HAPROXYPROTOCOL, 1L);
 
         if(config->disallow_username_in_url)
-          my_setopt(curl, CURLOPT_DISALLOW_USERNAME_IN_URL, 1L);
+          my_setopt(carl, CARLOPT_DISALLOW_USERNAME_IN_URL, 1L);
 
         if(config->altsvc)
-          my_setopt_str(curl, CURLOPT_ALTSVC, config->altsvc);
+          my_setopt_str(carl, CARLOPT_ALTSVC, config->altsvc);
 
         if(config->hsts)
-          my_setopt_str(curl, CURLOPT_HSTS, config->hsts);
+          my_setopt_str(carl, CARLOPT_HSTS, config->hsts);
 
 #ifdef USE_METALINK
         if(!metalink && config->use_metalink) {
           outs->metalink_parser = metalink_parser_context_new();
           if(outs->metalink_parser == NULL) {
-            result = CURLE_OUT_OF_MEMORY;
+            result = CARLE_OUT_OF_MEMORY;
             break;
           }
           fprintf(config->global->errors,
@@ -2146,15 +2146,15 @@ static long all_added; /* number of easy handles currently added */
  * to add even after this call returns. sets 'addedp' to TRUE if one or more
  * transfers were added.
  */
-static CURLcode add_parallel_transfers(struct GlobalConfig *global,
-                                       CURLM *multi,
-                                       CURLSH *share,
+static CARLcode add_parallel_transfers(struct GlobalConfig *global,
+                                       CARLM *multi,
+                                       CARLSH *share,
                                        bool *morep,
                                        bool *addedp)
 {
   struct per_transfer *per;
-  CURLcode result = CURLE_OK;
-  CURLMcode mcode;
+  CARLcode result = CARLE_OK;
+  CARLMcode mcode;
   bool sleeping = FALSE;
   *addedp = FALSE;
   *morep = FALSE;
@@ -2178,16 +2178,16 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
       return result;
 
     /* parallel connect means that we don't set PIPEWAIT since pipewait
-       will make libcurl prefer multiplexing */
-    (void)curl_easy_setopt(per->curl, CURLOPT_PIPEWAIT,
+       will make libcarl prefer multiplexing */
+    (void)carl_easy_setopt(per->carl, CARLOPT_PIPEWAIT,
                            global->parallel_connect ? 0L : 1L);
-    (void)curl_easy_setopt(per->curl, CURLOPT_PRIVATE, per);
-    (void)curl_easy_setopt(per->curl, CURLOPT_XFERINFOFUNCTION, xferinfo_cb);
-    (void)curl_easy_setopt(per->curl, CURLOPT_XFERINFODATA, per);
+    (void)carl_easy_setopt(per->carl, CARLOPT_PRIVATE, per);
+    (void)carl_easy_setopt(per->carl, CARLOPT_XFERINFOFUNCTION, xferinfo_cb);
+    (void)carl_easy_setopt(per->carl, CARLOPT_XFERINFODATA, per);
 
-    mcode = curl_multi_add_handle(multi, per->curl);
+    mcode = carl_multi_add_handle(multi, per->carl);
     if(mcode)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     result = create_transfer(global, share, &getadded);
     if(result)
@@ -2197,53 +2197,53 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
     *addedp = TRUE;
   }
   *morep = (per || sleeping) ? TRUE : FALSE;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode parallel_transfers(struct GlobalConfig *global,
-                                   CURLSH *share)
+static CARLcode parallel_transfers(struct GlobalConfig *global,
+                                   CARLSH *share)
 {
-  CURLM *multi;
-  CURLMcode mcode = CURLM_OK;
-  CURLcode result = CURLE_OK;
+  CARLM *multi;
+  CARLMcode mcode = CARLM_OK;
+  CARLcode result = CARLE_OK;
   int still_running = 1;
   struct timeval start = tvnow();
   bool more_transfers;
   bool added_transfers;
   time_t tick = time(NULL);
 
-  multi = curl_multi_init();
+  multi = carl_multi_init();
   if(!multi)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   result = add_parallel_transfers(global, multi, share,
                                   &more_transfers, &added_transfers);
   if(result) {
-    curl_multi_cleanup(multi);
+    carl_multi_cleanup(multi);
     return result;
   }
 
   while(!mcode && (still_running || more_transfers)) {
-    mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
+    mcode = carl_multi_poll(multi, NULL, 0, 1000, NULL);
     if(!mcode)
-      mcode = curl_multi_perform(multi, &still_running);
+      mcode = carl_multi_perform(multi, &still_running);
 
     progress_meter(global, &start, FALSE);
 
     if(!mcode) {
       int rc;
-      CURLMsg *msg;
+      CARLMsg *msg;
       bool checkmore = FALSE;
       do {
-        msg = curl_multi_info_read(multi, &rc);
+        msg = carl_multi_info_read(multi, &rc);
         if(msg) {
           bool retry;
           long delay;
           struct per_transfer *ended;
-          CURL *easy = msg->easy_handle;
+          CARL *easy = msg->easy_handle;
           result = msg->data.result;
-          curl_easy_getinfo(easy, CURLINFO_PRIVATE, (void *)&ended);
-          curl_multi_remove_handle(multi, easy);
+          carl_easy_getinfo(easy, CARLINFO_PRIVATE, (void *)&ended);
+          carl_multi_remove_handle(multi, easy);
 
           result = post_per_transfer(global, ended, result, &retry, &delay);
           progress_finalize(ended); /* before it goes away */
@@ -2281,22 +2281,22 @@ static CURLcode parallel_transfers(struct GlobalConfig *global,
 
   /* Make sure to return some kind of error if there was a multi problem */
   if(mcode) {
-    result = (mcode == CURLM_OUT_OF_MEMORY) ? CURLE_OUT_OF_MEMORY :
+    result = (mcode == CARLM_OUT_OF_MEMORY) ? CARLE_OUT_OF_MEMORY :
       /* The other multi errors should never happen, so return
          something suitably generic */
-      CURLE_BAD_FUNCTION_ARGUMENT;
+      CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
-  curl_multi_cleanup(multi);
+  carl_multi_cleanup(multi);
 
   return result;
 }
 
-static CURLcode serial_transfers(struct GlobalConfig *global,
-                                 CURLSH *share)
+static CARLcode serial_transfers(struct GlobalConfig *global,
+                                 CARLSH *share)
 {
-  CURLcode returncode = CURLE_OK;
-  CURLcode result = CURLE_OK;
+  CARLcode returncode = CARLE_OK;
+  CARLcode result = CARLE_OK;
   struct per_transfer *per;
   bool added = FALSE;
 
@@ -2311,19 +2311,19 @@ static CURLcode serial_transfers(struct GlobalConfig *global,
     if(result)
       break;
 
-#ifndef CURL_DISABLE_LIBCURL_OPTION
-    if(global->libcurl) {
+#ifndef CARL_DISABLE_LIBCARL_OPTION
+    if(global->libcarl) {
       result = easysrc_perform();
       if(result)
         break;
     }
 #endif
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
     if(global->test_event_based)
-      result = curl_easy_perform_ev(per->curl);
+      result = carl_easy_perform_ev(per->carl);
     else
 #endif
-      result = curl_easy_perform(per->curl);
+      result = carl_easy_perform(per->carl);
 
     /* store the result of the actual transfer */
     returncode = result;
@@ -2364,24 +2364,24 @@ static CURLcode serial_transfers(struct GlobalConfig *global,
 }
 
 /* setup a transfer for the given config */
-static CURLcode transfer_per_config(struct GlobalConfig *global,
+static CARLcode transfer_per_config(struct GlobalConfig *global,
                                     struct OperationConfig *config,
-                                    CURLSH *share,
+                                    CARLSH *share,
                                     bool *added)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   bool capath_from_env;
   *added = FALSE;
 
   /* Check we have a url */
   if(!config->url_list || !config->url_list->url) {
     helpf(global->errors, "no URL specified!\n");
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 
-  /* On WIN32 we can't set the path to curl-ca-bundle.crt
+  /* On WIN32 we can't set the path to carl-ca-bundle.crt
    * at compile time. So we look here for the file in two ways:
-   * 1: look at the environment variable CURL_CA_BUNDLE for a path
+   * 1: look at the environment variable CARL_CA_BUNDLE for a path
    * 2: if #1 isn't found, use the windows API function SearchPath()
    *    to find it along the app's path (includes app's dir and CWD)
    *
@@ -2392,71 +2392,71 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
   if(!config->cacert &&
      !config->capath &&
      !config->insecure_ok) {
-    CURL *curltls = curl_easy_init();
-    struct curl_tlssessioninfo *tls_backend_info = NULL;
+    CARL *carltls = carl_easy_init();
+    struct carl_tlssessioninfo *tls_backend_info = NULL;
 
     /* With the addition of CAINFO support for Schannel, this search could find
      * a certificate bundle that was previously ignored. To maintain backward
      * compatibility, only perform this search if not using Schannel.
      */
-    result = curl_easy_getinfo(curltls, CURLINFO_TLS_SSL_PTR,
+    result = carl_easy_getinfo(carltls, CARLINFO_TLS_SSL_PTR,
                                &tls_backend_info);
     if(result)
       return result;
 
     /* Set the CA cert locations specified in the environment. For Windows if
      * no environment-specified filename is found then check for CA bundle
-     * default filename curl-ca-bundle.crt in the user's PATH.
+     * default filename carl-ca-bundle.crt in the user's PATH.
      *
      * If Schannel is the selected SSL backend then these locations are
      * ignored. We allow setting CA location for schannel only when explicitly
-     * specified by the user via CURLOPT_CAINFO / --cacert.
+     * specified by the user via CARLOPT_CAINFO / --cacert.
      */
-    if(tls_backend_info->backend != CURLSSLBACKEND_SCHANNEL) {
+    if(tls_backend_info->backend != CARLSSLBACKEND_SCHANNEL) {
       char *env;
-      env = curlx_getenv("CURL_CA_BUNDLE");
+      env = carlx_getenv("CARL_CA_BUNDLE");
       if(env) {
         config->cacert = strdup(env);
         if(!config->cacert) {
-          curl_free(env);
+          carl_free(env);
           errorf(global, "out of memory\n");
-          return CURLE_OUT_OF_MEMORY;
+          return CARLE_OUT_OF_MEMORY;
         }
       }
       else {
-        env = curlx_getenv("SSL_CERT_DIR");
+        env = carlx_getenv("SSL_CERT_DIR");
         if(env) {
           config->capath = strdup(env);
           if(!config->capath) {
-            curl_free(env);
+            carl_free(env);
             helpf(global->errors, "out of memory\n");
-            return CURLE_OUT_OF_MEMORY;
+            return CARLE_OUT_OF_MEMORY;
           }
           capath_from_env = true;
         }
         else {
-          env = curlx_getenv("SSL_CERT_FILE");
+          env = carlx_getenv("SSL_CERT_FILE");
           if(env) {
             config->cacert = strdup(env);
             if(!config->cacert) {
-              curl_free(env);
+              carl_free(env);
               errorf(global, "out of memory\n");
-              return CURLE_OUT_OF_MEMORY;
+              return CARLE_OUT_OF_MEMORY;
             }
           }
         }
       }
 
       if(env)
-        curl_free(env);
+        carl_free(env);
 #ifdef WIN32
       else {
         result = FindWin32CACert(config, tls_backend_info->backend,
-                                 TEXT("curl-ca-bundle.crt"));
+                                 TEXT("carl-ca-bundle.crt"));
       }
 #endif
     }
-    curl_easy_cleanup(curltls);
+    carl_easy_cleanup(carltls);
   }
 
   if(!result)
@@ -2469,11 +2469,11 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
  * 'create_transfer' gets the details and sets up a new transfer if 'added'
  * returns TRUE.
  */
-static CURLcode create_transfer(struct GlobalConfig *global,
-                                CURLSH *share,
+static CARLcode create_transfer(struct GlobalConfig *global,
+                                CARLSH *share,
                                 bool *added)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   *added = FALSE;
   while(global->current) {
     result = transfer_per_config(global, global->current, share, added);
@@ -2487,9 +2487,9 @@ static CURLcode create_transfer(struct GlobalConfig *global,
   return result;
 }
 
-static CURLcode run_all_transfers(struct GlobalConfig *global,
-                                  CURLSH *share,
-                                  CURLcode result)
+static CARLcode run_all_transfers(struct GlobalConfig *global,
+                                  CARLSH *share,
+                                  CARLcode result)
 {
   /* Save the values of noprogress and isatty to restore them later on */
   bool orig_noprogress = global->noprogress;
@@ -2508,7 +2508,7 @@ static CURLcode run_all_transfers(struct GlobalConfig *global,
   for(per = transfers; per;) {
     bool retry;
     long delay;
-    CURLcode result2 = post_per_transfer(global, per, result, &retry, &delay);
+    CARLcode result2 = post_per_transfer(global, per, result, &retry, &delay);
     if(!result)
       /* don't overwrite the original error */
       result = result2;
@@ -2529,36 +2529,36 @@ static CURLcode run_all_transfers(struct GlobalConfig *global,
   return result;
 }
 
-CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
+CARLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
 {
-  CURLcode result = CURLE_OK;
-  char *first_arg = curlx_convert_tchar_to_UTF8(argv[1]);
+  CARLcode result = CARLE_OK;
+  char *first_arg = carlx_convert_tchar_to_UTF8(argv[1]);
 
   /* Setup proper locale from environment */
 #ifdef HAVE_SETLOCALE
   setlocale(LC_ALL, "");
 #endif
 
-  /* Parse .curlrc if necessary */
+  /* Parse .carlrc if necessary */
   if((argc == 1) ||
      (first_arg && strncmp(first_arg, "-q", 2) &&
-      !curl_strequal(first_arg, "--disable"))) {
+      !carl_strequal(first_arg, "--disable"))) {
     parseconfig(NULL, global); /* ignore possible failure */
 
-    /* If we had no arguments then make sure a url was specified in .curlrc */
+    /* If we had no arguments then make sure a url was specified in .carlrc */
     if((argc < 2) && (!global->first->url_list)) {
       helpf(global->errors, NULL);
-      result = CURLE_FAILED_INIT;
+      result = CARLE_FAILED_INIT;
     }
   }
 
-  curlx_unicodefree(first_arg);
+  carlx_unicodefree(first_arg);
 
   if(!result) {
     /* Parse the command line arguments */
     ParameterError res = parse_args(global, argc, argv);
     if(res) {
-      result = CURLE_OK;
+      result = CARLE_OK;
 
       /* Check if we were asked for the help */
       if(res == PARAM_HELP_REQUESTED)
@@ -2572,15 +2572,15 @@ CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
       /* Check if we were asked to list the SSL engines */
       else if(res == PARAM_ENGINES_REQUESTED)
         tool_list_engines();
-      else if(res == PARAM_LIBCURL_UNSUPPORTED_PROTOCOL)
-        result = CURLE_UNSUPPORTED_PROTOCOL;
+      else if(res == PARAM_LIBCARL_UNSUPPORTED_PROTOCOL)
+        result = CARLE_UNSUPPORTED_PROTOCOL;
       else
-        result = CURLE_FAILED_INIT;
+        result = CARLE_FAILED_INIT;
     }
     else {
-#ifndef CURL_DISABLE_LIBCURL_OPTION
-      if(global->libcurl) {
-        /* Initialise the libcurl source output */
+#ifndef CARL_DISABLE_LIBCARL_OPTION
+      if(global->libcarl) {
+        /* Initialise the libcarl source output */
         result = easysrc_init();
       }
 #endif
@@ -2589,22 +2589,22 @@ CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
       if(!result) {
         size_t count = 0;
         struct OperationConfig *operation = global->first;
-        CURLSH *share = curl_share_init();
+        CARLSH *share = carl_share_init();
         if(!share) {
-#ifndef CURL_DISABLE_LIBCURL_OPTION
-          if(global->libcurl) {
-            /* Cleanup the libcurl source output */
+#ifndef CARL_DISABLE_LIBCARL_OPTION
+          if(global->libcarl) {
+            /* Cleanup the libcarl source output */
             easysrc_cleanup();
           }
 #endif
-          return CURLE_OUT_OF_MEMORY;
+          return CARLE_OUT_OF_MEMORY;
         }
 
-        curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
-        curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
-        curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
-        curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
-        curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_PSL);
+        carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_COOKIE);
+        carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_DNS);
+        carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_SSL_SESSION);
+        carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_CONNECT);
+        carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_PSL);
 
         /* Get the required arguments for each operation */
         do {
@@ -2619,13 +2619,13 @@ CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
         /* now run! */
         result = run_all_transfers(global, share, result);
 
-        curl_share_cleanup(share);
-#ifndef CURL_DISABLE_LIBCURL_OPTION
-        if(global->libcurl) {
-          /* Cleanup the libcurl source output */
+        carl_share_cleanup(share);
+#ifndef CARL_DISABLE_LIBCARL_OPTION
+        if(global->libcarl) {
+          /* Cleanup the libcarl source output */
           easysrc_cleanup();
 
-          /* Dump the libcurl code if previously enabled */
+          /* Dump the libcarl code if previously enabled */
           dumpeasysrc(global);
         }
 #endif

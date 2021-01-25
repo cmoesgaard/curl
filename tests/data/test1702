@@ -50,7 +50,7 @@ http://%HOSTIP:%HTTP2PORT/1702 --http2 --head
 <protocol>
 HEAD /1702 HTTP/1.1
 Host: %HOSTIP:%HTTP2PORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

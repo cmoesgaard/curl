@@ -1,0 +1,68 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH carl_easy_escape 3 "7 April 2006" "libcarl 7.15.4" "libcarl Manual"
+.SH NAME
+carl_easy_escape - URL encodes the given string
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "char *carl_easy_escape( CARL *" carl ", const char *" string
+.BI ", int "length " );"
+.ad
+.SH DESCRIPTION
+This function converts the given input \fIstring\fP to a URL encoded string
+and returns that as a new allocated string. All input characters that are not
+a-z, A-Z, 0-9, '-', '.', '_' or '~' are converted to their "URL escaped"
+version (%NN where NN is a two-digit hexadecimal number).
+
+If \fIlength\fP is set to 0 (zero), \fIcarl_easy_escape(3)\fP uses strlen() on
+the input \fIstring\fP to find out the size. This function does not accept
+input strings longer than \fBCARL_MAX_INPUT_LENGTH\fP (8 MB).
+
+You must \fIcarl_free(3)\fP the returned string when you're done with it.
+.SH ENCODING
+libcarl is typically not aware of, nor does it care about, character
+encodings. \fIcarl_easy_escape(3)\fP encodes the data byte-by-byte into the
+URL encoded version without knowledge or care for what particular character
+encoding the application or the receiving server may assume that the data
+uses.
+
+The caller of \fIcarl_easy_escape(3)\fP must make sure that the data passed in
+to the function is encoded correctly.
+.SH AVAILABILITY
+Added in 7.15.4 and replaces the old \fIcarl_escape(3)\fP function.
+.SH RETURN VALUE
+A pointer to a null-terminated string or NULL if it failed.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  char *output = carl_easy_escape(carl, "data to convert", 15);
+  if(output) {
+    printf("Encoded: %s\\n", output);
+    carl_free(output);
+  }
+}
+.fi
+.SH "SEE ALSO"
+.BR carl_easy_unescape "(3), " carl_free "(3), " RFC 3986

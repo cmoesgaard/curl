@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -35,19 +35,19 @@
 
 int test(char *URL)
 {
-  CURL *handle = NULL;
-  CURLM *mhandle = NULL;
+  CARL *handle = NULL;
+  CARLM *mhandle = NULL;
   int res = 0;
   int still_running = 0;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   easy_init(handle);
 
-  easy_setopt(handle, CURLOPT_URL, URL);
-  easy_setopt(handle, CURLOPT_VERBOSE, 1L);
+  easy_setopt(handle, CARLOPT_URL, URL);
+  easy_setopt(handle, CARLOPT_VERBOSE, 1L);
 
   multi_init(mhandle);
 
@@ -103,9 +103,9 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UA */
 
-  curl_multi_cleanup(mhandle);
-  curl_easy_cleanup(handle);
-  curl_global_cleanup();
+  carl_multi_cleanup(mhandle);
+  carl_easy_cleanup(handle);
+  carl_global_cleanup();
 
   return res;
 }

@@ -1,0 +1,82 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_TIMERDATA 3 "17 Jun 2014" "libcarl 7.37.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_TIMERDATA \- custom pointer to pass to timer callback
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_TIMERDATA, void *pointer);
+.SH DESCRIPTION
+A data \fBpointer\fP to pass to the timer callback set with the
+\fICARLMOPT_TIMERFUNCTION(3)\fP option.
+
+This pointer will not be touched by libcarl but will only be passed in to the
+timer callbacks's \fBuserp\fP argument.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+static gboolean timeout_cb(gpointer user_data)
+{
+  int running;
+  if(user_data) {
+    g_free(user_data);
+    carl_multi_setopt(carl_handle, CARLMOPT_TIMERDATA, NULL);
+  }
+  carl_multi_socket_action(multi, CARL_SOCKET_TIMEOUT, 0, &running);
+  return G_SOURCE_REMOVE;
+}
+
+static int timerfunc(CARLM *multi, long timeout_ms, void *userp)
+{
+  guint *id = userp;
+
+  if(id)
+    g_source_remove(*id);
+
+  /* -1 means we should just delete our timer. */
+  if(timeout_ms == -1) {
+    g_free(id);
+    id = NULL;
+  }
+  else {
+    if(!id)
+      id = g_new(guint, 1);
+    *id = g_timeout_add(timeout_ms, timeout_cb, id);
+  }
+  carl_multi_setopt(multi, CARLMOPT_TIMERDATA, id);
+  return 0;
+}
+
+carl_multi_setopt(multi, CARLMOPT_TIMERFUNCTION, timerfunc);
+.fi
+.SH AVAILABILITY
+Added in 7.16.0
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLMOPT_TIMERFUNCTION "(3), " CARLMOPT_SOCKETFUNCTION "(3), "

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -207,7 +207,7 @@ static int rlimit(int keep_open)
   } /* (rl.rlim_cur != rl.rlim_max) */
 
   /*
-   * test 537 is all about testing libcurl functionality
+   * test 537 is all about testing libcarl functionality
    * when the system has nearly exhausted the number of
    * available file descriptors. Test 537 will try to run
    * with a very small number of file descriptors available.
@@ -388,9 +388,9 @@ static int rlimit(int keep_open)
 
   /*
    * when using select() instead of poll() we cannot test
-   * libcurl functionality with a socket number equal or
+   * libcarl functionality with a socket number equal or
    * greater than FD_SETSIZE. In any case, macro VERIFY_SOCK
-   * in lib/select.c enforces this check and protects libcurl
+   * in lib/select.c enforces this check and protects libcarl
    * from a possible crash. The effect of this protection
    * is that test 537 will always fail, since the actual
    * call to select() never takes place. We skip test 537
@@ -463,8 +463,8 @@ static int rlimit(int keep_open)
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
 
   if(!strcmp(URL, "check")) {
     /* used by the test script to ask if we can run this test or not */
@@ -483,30 +483,30 @@ int test(char *URL)
   /* run the test with the bunch of open file descriptors
      and close them all once the test is over */
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     close_file_descriptors();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
     close_file_descriptors();
-    curl_global_cleanup();
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   close_file_descriptors();
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

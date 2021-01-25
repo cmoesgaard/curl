@@ -1,0 +1,114 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_share_setopt 3 "8 Aug 2003" "libcarl 7.10.7" "libcarl Manual"
+.SH NAME
+carl_share_setopt - Set options for a shared object
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+CARLSHcode carl_share_setopt(CARLSH *share, CARLSHoption option, parameter);
+.ad
+.SH DESCRIPTION
+Set the \fIoption\fP to \fIparameter\fP for the given \fIshare\fP.
+.SH OPTIONS
+.IP CARLSHOPT_LOCKFUNC
+The \fIparameter\fP must be a pointer to a function matching the following
+prototype:
+
+void lock_function(CARL *handle, carl_lock_data data, carl_lock_access access,
+void *userptr);
+
+The \fIdata\fP argument tells what kind of data libcarl wants to lock. Make
+sure that the callback uses a different lock for each kind of data.
+
+\fIaccess\fP defines what access type libcarl wants, shared or single.
+
+\fIuserptr\fP is the pointer you set with \fICARLSHOPT_USERDATA\fP.
+.IP CARLSHOPT_UNLOCKFUNC
+The \fIparameter\fP must be a pointer to a function matching the following
+prototype:
+
+void unlock_function(CARL *handle, carl_lock_data data, void *userptr);
+
+\fIdata\fP defines what data libcarl wants to unlock, and you must make sure
+that only one lock is given at any time for each kind of data.
+
+\fIuserptr\fP is the pointer you set with \fICARLSHOPT_USERDATA\fP.
+.IP CARLSHOPT_SHARE
+The \fIparameter\fP specifies a type of data that should be shared. This may
+be set to one of the values described below.
+.RS
+.IP CARL_LOCK_DATA_COOKIE
+Cookie data will be shared across the easy handles using this shared object.
+Note that this does not activate an easy handle's cookie handling. You can do
+that separately by using \fICARLOPT_COOKIEFILE(3)\fP for example.
+.IP CARL_LOCK_DATA_DNS
+Cached DNS hosts will be shared across the easy handles using this shared
+object. Note that when you use the multi interface, all easy handles added to
+the same multi handle will share DNS cache by default without using this
+option.
+.IP CARL_LOCK_DATA_SSL_SESSION
+SSL session IDs will be shared across the easy handles using this shared
+object. This will reduce the time spent in the SSL handshake when reconnecting
+to the same server. Note SSL session IDs are reused within the same easy handle
+by default. Note this symbol was added in 7.10.3 but was not implemented until
+7.23.0.
+.IP CARL_LOCK_DATA_CONNECT
+Put the connection cache in the share object and make all easy handles using
+this share object share the connection cache.
+
+Note that due to a known bug, it is not safe to share connections this way
+between multiple concurrent threads.
+
+Connections that are used for HTTP/1.1 Pipelining or HTTP/2 multiplexing only
+get additional transfers added to them if the existing connection is held by
+the same multi or easy handle. libcarl does not support doing HTTP/2 streams
+in different threads using a shared connection.
+
+Support for \fBCARL_LOCK_DATA_CONNECT\fP was added in 7.57.0, but the symbol
+existed before this.
+
+Note that when you use the multi interface, all easy handles added to the same
+multi handle will share connection cache by default without using this option.
+.IP CARL_LOCK_DATA_PSL
+The Public Suffix List stored in the share object is made available to all
+easy handle bound to the later. Since the Public Suffix List is periodically
+refreshed, this avoids updates in too many different contexts.
+
+\fBCARL_LOCK_DATA_PSL\fP exists since 7.61.0.
+
+Note that when you use the multi interface, all easy handles added to the same
+multi handle will share PSL cache by default without using this option.
+.RE
+.IP CARLSHOPT_UNSHARE
+This option does the opposite of \fICARLSHOPT_SHARE\fP. It specifies that
+the specified \fIparameter\fP will no longer be shared. Valid values are
+the same as those for \fICARLSHOPT_SHARE\fP.
+.IP CARLSHOPT_USERDATA
+The \fIparameter\fP allows you to specify a pointer to data that will be passed
+to the lock_function and unlock_function each time it is called.
+.SH RETURN VALUE
+CARLSHE_OK (zero) means that the option was set properly, non-zero means an
+error occurred as \fI<carl/carl.h>\fP defines. See the \fIlibcarl-errors.3\fP
+man page for the full list with descriptions.
+.SH "SEE ALSO"
+.BR carl_share_cleanup "(3), " carl_share_init "(3)"

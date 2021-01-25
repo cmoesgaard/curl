@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,10 +19,10 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
-#define ENABLE_CURLX_PRINTF
-#include "curlx.h"
+#define ENABLE_CARLX_PRINTF
+#include "carlx.h"
 
 #include "hash.h"
 
@@ -36,7 +36,7 @@ static void mydtor(void *p)
   free(ptr);
 }
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
   return Curl_hash_init(&hash_static, 7, Curl_hash_str,
                         Curl_str_key_compare, mydtor);

@@ -34,7 +34,7 @@ MAIL ETIQUETTE
   1.1 Mailing Lists
 
   The mailing lists we have are all listed and described at
-  https://curl.se/mail/
+  https://carl.se/mail/
 
   Each mailing list is targeted to a specific set of users and subjects,
   please use the one or the ones that suit you the most.
@@ -49,7 +49,7 @@ MAIL ETIQUETTE
   each particular group and subculture there will be differences in what is
   acceptable and what is considered good manners.
 
-  This document outlines what we in the curl project consider to be good
+  This document outlines what we in the carl project consider to be good
   etiquette, and primarily this focus on how to behave on and how to use our
   mailing lists.
 
@@ -62,12 +62,12 @@ MAIL ETIQUETTE
   person consequently gets overloaded with mail.
 
   If you really want to contact an individual and perhaps pay for his or her
-  services, by all means go ahead, but if it's just another curl question,
+  services, by all means go ahead, but if it's just another carl question,
   take it to a suitable list instead.
 
   1.4 Subscription Required
 
-  All curl mailing lists require that you are subscribed to allow a mail to go
+  All carl mailing lists require that you are subscribed to allow a mail to go
   through to all the subscribers.
 
   If you post without being subscribed (or from a different mail address than
@@ -79,14 +79,14 @@ MAIL ETIQUETTE
 
   1.5 Moderation of new posters
 
-  Several of the curl mailing lists automatically make all posts from new
+  Several of the carl mailing lists automatically make all posts from new
   subscribers be moderated. This means that after you've subscribed and
   sent your first mail to a list, that mail will not be let through to the
   list until a mailing list administrator has verified that it is OK and
   permits it to get posted.
 
   Once a first post has been made that proves the sender is actually talking
-  about curl-related subjects, the moderation "flag" will be switched off and
+  about carl-related subjects, the moderation "flag" will be switched off and
   future posts will go through without being moderated.
 
   The reason for this moderation policy is that we do suffer from spammers who
@@ -120,7 +120,7 @@ MAIL ETIQUETTE
   your email address and password and press the unsubscribe button.
 
   Also, the instructions to unsubscribe are included in the headers of every
-  mail that is sent out to all curl related mailing lists and there's a footer
+  mail that is sent out to all carl related mailing lists and there's a footer
   in each mail that links to the "admin" page on which you can unsubscribe and
   change other options.
 
@@ -146,7 +146,7 @@ MAIL ETIQUETTE
 
   You do yourself and all of us a service when you include as many details as
   possible already in your first email. Mention your operating system and
-  environment. Tell us which curl version you're using and tell us what you
+  environment. Tell us which carl version you're using and tell us what you
   did, what happened and what you expected would happen. Preferably, show us
   what you did with details enough to allow others to help point out the problem
   or repeat the same steps in their locations.
@@ -169,17 +169,17 @@ MAIL ETIQUETTE
   headers will be received by every subscriber of the mailing list that you
   send your email to.
 
-  Your email as sent to a curl mailing list will end up in mail archives, on
-  the curl website and elsewhere, for others to see and read. Today and in
+  Your email as sent to a carl mailing list will end up in mail archives, on
+  the carl website and elsewhere, for others to see and read. Today and in
   the future. In addition to the archives, the mail is sent out to thousands
   of individuals. There is no way to undo a sent email.
 
-  When sending emails to a curl mailing list, do not include sensitive
+  When sending emails to a carl mailing list, do not include sensitive
   information such as user names and passwords; use fake ones, temporary ones
   or just remove them completely from the mail. Note that this includes base64
   encoded HTTP Basic auth headers.
 
-  This public nature of the curl mailing lists makes automatically inserted mail
+  This public nature of the carl mailing lists makes automatically inserted mail
   footers about mails being "private" or "only meant for the recipient" or
   similar even more silly than usual. Because they are absolutely not private
   when sent to a public mailing list.

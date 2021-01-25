@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,16 +19,16 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "urldata.h"
 #include "url.h"
 
 #include "memdebug.h" /* LAST include file */
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -48,29 +48,29 @@ UNITTEST_START
   rc = Curl_open(&empty);
   if(rc)
     goto unit_test_abort;
-  fail_unless(rc == CURLE_OK, "Curl_open() failed");
+  fail_unless(rc == CARLE_OK, "Curl_open() failed");
 
   rc = Curl_connect(empty, &async, &protocol_connect);
-  fail_unless(rc == CURLE_URL_MALFORMAT,
-              "Curl_connect() failed to return CURLE_URL_MALFORMAT");
+  fail_unless(rc == CARLE_URL_MALFORMAT,
+              "Curl_connect() failed to return CARLE_URL_MALFORMAT");
 
-  fail_unless(empty->magic == CURLEASY_MAGIC_NUMBER,
-              "empty->magic should be equal to CURLEASY_MAGIC_NUMBER");
+  fail_unless(empty->magic == CARLEASY_MAGIC_NUMBER,
+              "empty->magic should be equal to CARLEASY_MAGIC_NUMBER");
 
   /* double invoke to ensure no dependency on internal state */
   rc = Curl_connect(empty, &async, &protocol_connect);
-  fail_unless(rc == CURLE_URL_MALFORMAT,
-              "Curl_connect() failed to return CURLE_URL_MALFORMAT");
+  fail_unless(rc == CARLE_URL_MALFORMAT,
+              "Curl_connect() failed to return CARLE_URL_MALFORMAT");
 
   rc = Curl_init_userdefined(empty);
-  fail_unless(rc == CURLE_OK, "Curl_userdefined() failed");
+  fail_unless(rc == CARLE_OK, "Curl_userdefined() failed");
 
   rc = Curl_init_do(empty, empty->conn);
-  fail_unless(rc == CURLE_OK, "Curl_init_do() failed");
+  fail_unless(rc == CARLE_OK, "Curl_init_do() failed");
 
   rc = Curl_parse_login_details(
                           hostname, strlen(hostname), NULL, NULL, NULL);
-  fail_unless(rc == CURLE_OK,
+  fail_unless(rc == CARLE_OK,
               "Curl_parse_login_details() failed");
 
   Curl_freeset(empty);
@@ -82,7 +82,7 @@ UNITTEST_START
   Curl_free_request_state(empty);
 
   rc = Curl_close(&empty);
-  fail_unless(rc == CURLE_OK, "Curl_close() failed");
+  fail_unless(rc == CARLE_OK, "Curl_close() failed");
 
 }
 UNITTEST_STOP

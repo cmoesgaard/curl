@@ -75,7 +75,7 @@ moo
 <protocol>
 GET /20020001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 USER anonymous

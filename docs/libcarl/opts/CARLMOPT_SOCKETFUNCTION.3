@@ -1,0 +1,110 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_SOCKETFUNCTION 3 "3 Nov 2016" "libcarl 7.39.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_SOCKETFUNCTION \- callback informed about what to wait for
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+int socket_callback(CARL *easy,      /* easy handle */
+                    carl_socket_t s, /* socket */
+                    int what,        /* describes the socket */
+                    void *userp,     /* private callback pointer */
+                    void *socketp);  /* private socket pointer */
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_SOCKETFUNCTION, socket_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+When the \fIcarl_multi_socket_action(3)\fP function is called, it informs the
+application about updates in the socket (file descriptor) status by doing
+none, one, or multiple calls to the \fBsocket_callback\fP. The callback
+function gets status updates with changes since the previous time the callback
+was called. If the given callback pointer is set to NULL, no callback will be
+called.
+.SH "CALLBACK ARGUMENTS"
+\fIeasy\fP identifies the specific transfer for which this update is related.
+
+\fIs\fP is the specific socket this function invocation concerns. If the
+\fBwhat\fP argument is not CARL_POLL_REMOVE then it holds information about
+what activity on this socket the application is supposed to
+monitor. Subsequent calls to this callback might update the \fBwhat\fP bits
+for a socket that is already monitored.
+
+\fBuserp\fP is set with \fICARLMOPT_SOCKETDATA(3)\fP.
+
+\fBsocketp\fP is set with \fIcarl_multi_assign(3)\fP or will be NULL.
+
+The \fBwhat\fP parameter informs the callback on the status of the given
+socket. It can hold one of these values:
+.IP CARL_POLL_IN
+Wait for incoming data. For the socket to become readable.
+.IP CARL_POLL_OUT
+Wait for outgoing data. For the socket to become writable.
+.IP CARL_POLL_INOUT
+Wait for incoming and outgoing data. For the socket to become readable or
+writable.
+.IP CARL_POLL_REMOVE
+The specified socket/file descriptor is no longer used by libcarl.
+.SH DEFAULT
+NULL (no callback)
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+static int sock_cb(CARL *e, carl_socket_t s, int what, void *cbp, void *sockp)
+{
+  GlobalInfo *g = (GlobalInfo*) cbp;
+  SockInfo *fdp = (SockInfo*) sockp;
+
+  if(what == CARL_POLL_REMOVE) {
+    remsock(fdp);
+  }
+  else {
+    if(!fdp) {
+      addsock(s, e, what, g);
+    }
+    else {
+      setsock(fdp, s, e, what, g);
+    }
+  }
+  return 0;
+}
+
+main()
+{
+  GlobalInfo setup;
+  /* ... use socket callback and custom pointer */
+  carl_multi_setopt(multi, CARLMOPT_SOCKETFUNCTION, sock_cb);
+  carl_multi_setopt(multi, CARLMOPT_SOCKETDATA, &setup);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.15.4
+.SH RETURN VALUE
+Returns CARLM_OK.
+.SH "SEE ALSO"
+.BR CARLMOPT_SOCKETDATA "(3), " carl_multi_socket_action "(3), "
+.BR CARLMOPT_TIMERFUNCTION "(3) "

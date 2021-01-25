@@ -1,6 +1,6 @@
-# curl test suite file format
+# carl test suite file format
 
-The curl test suite's file format is very simple and extensible, closely
+The carl test suite's file format is very simple and extensible, closely
 resembling XML. All data for a single test case resides in a single ASCII
 file. Labels mark the beginning and the end of all sections, and each label
 must be written in its own line.  Comments are either XML-style (enclosed with
@@ -105,9 +105,9 @@ replaced by their content at that time.
 
 Available substitute variables include:
 
-- `%CLIENT6IP` - IPv6 address of the client running curl
-- `%CLIENTIP` - IPv4 address of the client running curl
-- `%CURL` - Path to the curl executable
+- `%CLIENT6IP` - IPv6 address of the client running carl
+- `%CLIENTIP` - IPv4 address of the client running carl
+- `%CARL` - Path to the carl executable
 - `%FILE_PWD` - Current directory, on windows prefixed with a slash
 - `%FTP6PORT` - IPv6 port number of the FTP server
 - `%FTPPORT` - Port number of the FTP server
@@ -152,7 +152,7 @@ Available substitute variables include:
 - `%TFTP6PORT` - IPv6 port number of the TFTP server
 - `%TFTPPORT` - Port number of the TFTP server
 - `%USER` - Login ID of the user running the test
-- `%VERSION` - the full version number of the tested curl
+- `%VERSION` - the full version number of the tested carl
 
 # `<testcase>`
 
@@ -162,7 +162,7 @@ is split up in four main sections: `info`, `reply`, `client` and `verify`.
 - **info** provides information about the test case
 
 - **reply** is used for the server to know what to send as a reply for the
-requests curl sends
+requests carl sends
 
 - **client** defines how the client should behave
 
@@ -200,7 +200,7 @@ part number and will then increase the part number with one. This is useful
 for auth tests and similar.
 
 `sendzero=yes` means that the (FTP) server will "send" the data even if the
-size is zero bytes. Used to verify curl's behavior on zero bytes transfers.
+size is zero bytes. Used to verify carl's behavior on zero bytes transfers.
 
 `base64=yes` means that the data provided in the test-file is a chunk of data
 encoded with base64. It is the only way a test case can contain binary
@@ -411,7 +411,7 @@ Features testable here are:
 - `wakeup`
 - `win32`
 
-as well as each protocol that curl supports.  A protocol only needs to be
+as well as each protocol that carl supports.  A protocol only needs to be
 specified if it is different from the server (useful when the server
 is `none`).
 
@@ -433,7 +433,7 @@ the command exists with a non-zero status code, the test will be considered
 to have failed.
 
 ### `<tool>`
-Name of tool to invoke instead of "curl". This tool must be built and exist
+Name of tool to invoke instead of "carl". This tool must be built and exist
 either in the libtest/ directory (if the tool name starts with 'lib') or in
 the unit/ directory (if the tool name starts with 'unit').
 
@@ -510,7 +510,7 @@ before comparing with the one actually received by the client
 
 ## `<verify>`
 ### `<errorcode>`
-numerical error code curl is supposed to return. Specify a list of accepted
+numerical error code carl is supposed to return. Specify a list of accepted
 error codes by separating multiple numbers with comma. See test 237 for an
 example.
 
@@ -525,14 +525,14 @@ advanced. Example: `s/^EPRT .*/EPRT stripped/`.
 
 ### `<protocol [nonewline="yes"]>`
 
-the protocol dump curl should transmit, if 'nonewline' is set, we will cut off
+the protocol dump carl should transmit, if 'nonewline' is set, we will cut off
 the trailing newline of this given data before comparing with the one actually
 sent by the client The `<strip>` and `<strippart>` rules are applied before
 comparisons are made.
 
 ### `<proxy [nonewline="yes"]>`
 
-The protocol dump curl should transmit to a HTTP proxy (when the http-proxy
+The protocol dump carl should transmit to a HTTP proxy (when the http-proxy
 server is used), if 'nonewline' is set, we will cut off the trailing newline
 of this given data before comparing with the one actually sent by the client
 The `<strip>` and `<strippart>` rules are applied before comparisons are made.
@@ -585,7 +585,7 @@ content
 ### `<stripfile4>`
 
 ### `<upload>`
-the contents of the upload data curl should have sent
+the contents of the upload data carl should have sent
 
 ### `<valgrind>`
 disable - disables the valgrind log check for this test

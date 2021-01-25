@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_convert.h"
@@ -77,8 +77,8 @@ char *add_file_name_to_url(char *url, const char *filename)
 {
   /* If no file name part is given in the URL, we add this file name */
   char *ptr = strstr(url, "://");
-  CURL *curl = curl_easy_init(); /* for url escaping */
-  if(!curl)
+  CARL *carl = carl_easy_init(); /* for url escaping */
+  if(!carl)
     return NULL; /* error! */
   if(ptr)
     ptr += 3;
@@ -104,7 +104,7 @@ char *add_file_name_to_url(char *url, const char *filename)
       filep = filename;
 
     /* URL encode the file name */
-    encfile = curl_easy_escape(curl, filep, 0 /* use strlen */);
+    encfile = carl_easy_escape(carl, filep, 0 /* use strlen */);
     if(encfile) {
       char *urlbuffer;
       if(ptr)
@@ -114,7 +114,7 @@ char *add_file_name_to_url(char *url, const char *filename)
         /* there is no trailing slash on the URL */
         urlbuffer = aprintf("%s/%s", url, encfile);
 
-      curl_free(encfile);
+      carl_free(encfile);
 
       if(!urlbuffer) {
         url = NULL;
@@ -126,7 +126,7 @@ char *add_file_name_to_url(char *url, const char *filename)
     }
   }
   end:
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
   return url;
 }
 
@@ -134,7 +134,7 @@ char *add_file_name_to_url(char *url, const char *filename)
  * Returns a pointer to a heap-allocated string or NULL if
  * no name part, at location indicated by first argument.
  */
-CURLcode get_url_file_name(char **filename, const char *url)
+CARLcode get_url_file_name(char **filename, const char *url)
 {
   const char *pc, *pc2;
 
@@ -161,7 +161,7 @@ CURLcode get_url_file_name(char **filename, const char *url)
 
   *filename = strdup(pc);
   if(!*filename)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
 #if defined(MSDOS) || defined(WIN32)
   {
@@ -169,29 +169,29 @@ CURLcode get_url_file_name(char **filename, const char *url)
     SANITIZEcode sc = sanitize_file_name(&sanitized, *filename, 0);
     Curl_safefree(*filename);
     if(sc)
-      return CURLE_URL_MALFORMAT;
+      return CARLE_URL_MALFORMAT;
     *filename = sanitized;
   }
 #endif /* MSDOS || WIN32 */
 
   /* in case we built debug enabled, we allow an environment variable
-   * named CURL_TESTDIR to prefix the given file name to put it into a
+   * named CARL_TESTDIR to prefix the given file name to put it into a
    * specific directory
    */
 #ifdef DEBUGBUILD
   {
-    char *tdir = curlx_getenv("CURL_TESTDIR");
+    char *tdir = carlx_getenv("CARL_TESTDIR");
     if(tdir) {
       char buffer[512]; /* suitably large */
       msnprintf(buffer, sizeof(buffer), "%s/%s", tdir, *filename);
       Curl_safefree(*filename);
       *filename = strdup(buffer); /* clone the buffer */
-      curl_free(tdir);
+      carl_free(tdir);
       if(!*filename)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
     }
   }
 #endif
 
-  return CURLE_OK;
+  return CARLE_OK;
 }

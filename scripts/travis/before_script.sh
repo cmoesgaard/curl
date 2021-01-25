@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -109,7 +109,7 @@ fi
 if [ "$TRAVIS_OS_NAME" = linux -a "$HYPER" ]; then
   cd $HOME
   git clone --depth=1 https://github.com/hyperium/hyper.git
-  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  carl https://sh.rustup.rs -sSf | sh -s -- -y
   source $HOME/.cargo/env
   cd $HOME/hyper
   RUSTFLAGS="--cfg hyper_unstable_ffi" cargo build --features client,http1,http2,ffi
@@ -118,7 +118,7 @@ fi
 if [ "$TRAVIS_OS_NAME" = linux -a "$QUICHE" ]; then
   cd $HOME
   git clone --depth=1 --recursive https://github.com/cloudflare/quiche.git
-  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  carl https://sh.rustup.rs -sSf | sh -s -- -y
   source $HOME/.cargo/env
   cd $HOME/quiche
   cargo build -v --release --features pkg-config-meta,qlog
@@ -133,7 +133,7 @@ fi
 if [ $TRAVIS_OS_NAME = linux ]; then
   if [ ! -e $HOME/wolfssl-4.4.0-stable/Makefile ]; then
     cd $HOME
-    curl -LO https://github.com/wolfSSL/wolfssl/archive/v4.4.0-stable.tar.gz
+    carl -LO https://github.com/wolfSSL/wolfssl/archive/v4.4.0-stable.tar.gz
     tar -xzf v4.4.0-stable.tar.gz
     cd wolfssl-4.4.0-stable
     ./autogen.sh
@@ -148,9 +148,9 @@ if [ $TRAVIS_OS_NAME = linux ]; then
   if [ "$MESALINK" = "yes" ]; then
     if [ ! -e $HOME/mesalink-1.0.0/Makefile ]; then
       cd $HOME
-      curl https://sh.rustup.rs -sSf | sh -s -- -y
+      carl https://sh.rustup.rs -sSf | sh -s -- -y
       source $HOME/.cargo/env
-      curl -LO https://github.com/mesalock-linux/mesalink/archive/v1.0.0.tar.gz
+      carl -LO https://github.com/mesalock-linux/mesalink/archive/v1.0.0.tar.gz
       tar -xzf v1.0.0.tar.gz
       cd mesalink-1.0.0
       ./autogen.sh
@@ -164,7 +164,7 @@ if [ $TRAVIS_OS_NAME = linux ]; then
 
   if [ ! -e $HOME/nghttp2-1.39.2/Makefile ]; then
     cd $HOME
-    curl -LO https://github.com/nghttp2/nghttp2/releases/download/v1.39.2/nghttp2-1.39.2.tar.gz
+    carl -LO https://github.com/nghttp2/nghttp2/releases/download/v1.39.2/nghttp2-1.39.2.tar.gz
     tar -xzf nghttp2-1.39.2.tar.gz
     cd nghttp2-1.39.2
     CXX="g++-8" CC="gcc-8" CFLAGS="" LDFLAGS="" LIBS="" ./configure --disable-threads --enable-app

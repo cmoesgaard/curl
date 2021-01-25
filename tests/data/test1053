@@ -58,7 +58,7 @@ http
 HTTP RFC1867-type formposting from file with Location: following
  </name>
  <command>
-http://%HOSTIP:%HTTPPORT/we/want/1053 -L -F name=daniel -F tool=curl -F file=@log/test1053.txt
+http://%HOSTIP:%HTTPPORT/we/want/1053 -L -F name=daniel -F tool=carl -F file=@log/test1053.txt
 </command>
 # We create this file before the command is invoked!
 <file name="log/test1053.txt">
@@ -76,7 +76,7 @@ bar
 <protocol>
 POST /we/want/1053 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 410
 Content-Type: multipart/form-data; boundary=----------------------------9ef8d6205763
@@ -88,7 +88,7 @@ daniel
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="file"; filename="test1053.txt"
 Content-Type: text/plain
@@ -100,7 +100,7 @@ bar
 ------------------------------9ef8d6205763--
 POST /we/want/data/10530002.txt?coolsite=yes HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 410
 Content-Type: multipart/form-data; boundary=----------------------------9ef8d6205763
@@ -112,7 +112,7 @@ daniel
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="file"; filename="test1053.txt"
 Content-Type: text/plain

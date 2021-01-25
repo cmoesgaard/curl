@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
  */
 /* Example source code to show how the callback function can be used to
  * download data into a chunk of memory instead of storing it in a file.
- * After successful download we use curl_easy_getinfo() calls to get the
+ * After successful download we use carl_easy_getinfo() calls to get the
  * amount of downloaded bytes, the time used for the whole download, and
  * the average download speed.
  * On Linux you can create the download test files with:
@@ -38,7 +38,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #define URL_BASE "http://speedtest.your.domain/"
 #define URL_1M   URL_BASE "file_1M.bin"
@@ -62,8 +62,8 @@ static size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *data)
 
 int main(int argc, char *argv[])
 {
-  CURL *curl_handle;
-  CURLcode res;
+  CARL *carl_handle;
+  CARLcode res;
   int prtall = 0, prtsep = 0, prttime = 0;
   const char *url = URL_1M;
   char *appname = argv[0];
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         }
         else if(strncasecmp(*argv, "-V", 2) == 0) {
           fprintf(stderr, "\r%s %s - %s\n",
-                  appname, CHKSPEED_VERSION, curl_version());
+                  appname, CHKSPEED_VERSION, carl_version());
           exit(1);
         }
         else if(strncasecmp(*argv, "-A", 2) == 0) {
@@ -144,70 +144,70 @@ int main(int argc, char *argv[])
     printf("Localtime: %s", ctime(&t));
   }
 
-  /* init libcurl */
-  curl_global_init(CURL_GLOBAL_ALL);
+  /* init libcarl */
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  /* init the curl session */
-  curl_handle = curl_easy_init();
+  /* init the carl session */
+  carl_handle = carl_easy_init();
 
   /* specify URL to get */
-  curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+  carl_easy_setopt(carl_handle, CARLOPT_URL, url);
 
   /* send all data to this function  */
-  curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteCallback);
+  carl_easy_setopt(carl_handle, CARLOPT_WRITEFUNCTION, WriteCallback);
 
   /* some servers don't like requests that are made without a user-agent
      field, so we provide one */
-  curl_easy_setopt(curl_handle, CURLOPT_USERAGENT,
-                   "libcurl-speedchecker/" CHKSPEED_VERSION);
+  carl_easy_setopt(carl_handle, CARLOPT_USERAGENT,
+                   "libcarl-speedchecker/" CHKSPEED_VERSION);
 
   /* get it! */
-  res = curl_easy_perform(curl_handle);
+  res = carl_easy_perform(carl_handle);
 
-  if(CURLE_OK == res) {
-    curl_off_t val;
+  if(CARLE_OK == res) {
+    carl_off_t val;
 
     /* check for bytes downloaded */
-    res = curl_easy_getinfo(curl_handle, CURLINFO_SIZE_DOWNLOAD_T, &val);
-    if((CURLE_OK == res) && (val>0))
-      printf("Data downloaded: %" CURL_FORMAT_CURL_OFF_T " bytes.\n", val);
+    res = carl_easy_getinfo(carl_handle, CARLINFO_SIZE_DOWNLOAD_T, &val);
+    if((CARLE_OK == res) && (val>0))
+      printf("Data downloaded: %" CARL_FORMAT_CARL_OFF_T " bytes.\n", val);
 
     /* check for total download time */
-    res = curl_easy_getinfo(curl_handle, CURLINFO_TOTAL_TIME_T, &val);
-    if((CURLE_OK == res) && (val>0))
-      printf("Total download time: %" CURL_FORMAT_CURL_OFF_T ".%06ld sec.\n",
+    res = carl_easy_getinfo(carl_handle, CARLINFO_TOTAL_TIME_T, &val);
+    if((CARLE_OK == res) && (val>0))
+      printf("Total download time: %" CARL_FORMAT_CARL_OFF_T ".%06ld sec.\n",
              (val / 1000000), (long)(val % 1000000));
 
     /* check for average download speed */
-    res = curl_easy_getinfo(curl_handle, CURLINFO_SPEED_DOWNLOAD_T, &val);
-    if((CURLE_OK == res) && (val>0))
-      printf("Average download speed: %" CURL_FORMAT_CURL_OFF_T
+    res = carl_easy_getinfo(carl_handle, CARLINFO_SPEED_DOWNLOAD_T, &val);
+    if((CARLE_OK == res) && (val>0))
+      printf("Average download speed: %" CARL_FORMAT_CARL_OFF_T
              " kbyte/sec.\n", val / 1024);
 
     if(prtall) {
       /* check for name resolution time */
-      res = curl_easy_getinfo(curl_handle, CURLINFO_NAMELOOKUP_TIME_T, &val);
-      if((CURLE_OK == res) && (val>0))
-        printf("Name lookup time: %" CURL_FORMAT_CURL_OFF_T ".%06ld sec.\n",
+      res = carl_easy_getinfo(carl_handle, CARLINFO_NAMELOOKUP_TIME_T, &val);
+      if((CARLE_OK == res) && (val>0))
+        printf("Name lookup time: %" CARL_FORMAT_CARL_OFF_T ".%06ld sec.\n",
                (val / 1000000), (long)(val % 1000000));
 
       /* check for connect time */
-      res = curl_easy_getinfo(curl_handle, CURLINFO_CONNECT_TIME_T, &val);
-      if((CURLE_OK == res) && (val>0))
-        printf("Connect time: %" CURL_FORMAT_CURL_OFF_T ".%06ld sec.\n",
+      res = carl_easy_getinfo(carl_handle, CARLINFO_CONNECT_TIME_T, &val);
+      if((CARLE_OK == res) && (val>0))
+        printf("Connect time: %" CARL_FORMAT_CARL_OFF_T ".%06ld sec.\n",
                (val / 1000000), (long)(val % 1000000));
     }
   }
   else {
     fprintf(stderr, "Error while fetching '%s' : %s\n",
-            url, curl_easy_strerror(res));
+            url, carl_easy_strerror(res));
   }
 
-  /* cleanup curl stuff */
-  curl_easy_cleanup(curl_handle);
+  /* cleanup carl stuff */
+  carl_easy_cleanup(carl_handle);
 
-  /* we're done with libcurl, so clean it up */
-  curl_global_cleanup();
+  /* we're done with libcarl, so clean it up */
+  carl_global_cleanup();
 
   return 0;
 }

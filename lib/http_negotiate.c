@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_SPNEGO)
+#if !defined(CARL_DISABLE_HTTP) && defined(USE_SPNEGO)
 
 #include "urldata.h"
 #include "sendf.h"
@@ -30,14 +30,14 @@
 #include "vauth/vauth.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
-CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
+CARLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
                               bool proxy, const char *header)
 {
-  CURLcode result;
+  CARLcode result;
   size_t len;
 
   /* Point to the username, password, service and host */
@@ -48,10 +48,10 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
 
   /* Point to the correct struct with this */
   struct negotiatedata *neg_ctx;
-  curlnegotiate state;
+  carlnegotiate state;
 
   if(proxy) {
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
     userp = conn->http_proxy.user;
     passwdp = conn->http_proxy.passwd;
     service = data->set.str[STRING_PROXY_SERVICE_NAME] ?
@@ -60,7 +60,7 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
     neg_ctx = &conn->proxyneg;
     state = conn->proxy_negotiate_state;
 #else
-    return CURLE_NOT_BUILT_IN;
+    return CARLE_NOT_BUILT_IN;
 #endif
   }
   else {
@@ -96,7 +96,7 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
       /* The server rejected our authentication and hasn't supplied any more
       negotiation mechanisms */
       Curl_http_auth_cleanup_negotiate(conn);
-      return CURLE_LOGIN_DENIED;
+      return CARLE_LOGIN_DENIED;
     }
   }
 
@@ -115,18 +115,18 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
   return result;
 }
 
-CURLcode Curl_output_negotiate(struct Curl_easy *data,
+CARLcode Curl_output_negotiate(struct Curl_easy *data,
                                struct connectdata *conn, bool proxy)
 {
   struct negotiatedata *neg_ctx = proxy ? &conn->proxyneg :
     &conn->negotiate;
   struct auth *authp = proxy ? &data->state.authproxy : &data->state.authhost;
-  curlnegotiate *state = proxy ? &conn->proxy_negotiate_state :
+  carlnegotiate *state = proxy ? &conn->proxy_negotiate_state :
     &conn->http_negotiate_state;
   char *base64 = NULL;
   size_t len = 0;
   char *userp;
-  CURLcode result;
+  CARLcode result;
 
   authp->done = FALSE;
 
@@ -151,11 +151,11 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
     }
     if(!neg_ctx->context) {
       result = Curl_input_negotiate(data, conn, proxy, "Negotiate");
-      if(result == CURLE_AUTH_ERROR) {
+      if(result == CARLE_AUTH_ERROR) {
         /* negotiate auth failed, let's continue unauthenticated to stay
-         * compatible with the behavior before curl-7_64_0-158-g6c6035532 */
+         * compatible with the behavior before carl-7_64_0-158-g6c6035532 */
         authp->done = TRUE;
-        return CURLE_OK;
+        return CARLE_OK;
       }
       else if(result)
         return result;
@@ -180,7 +180,7 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
     free(base64);
 
     if(userp == NULL) {
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
 
     *state = GSS_AUTHSENT;
@@ -207,7 +207,7 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
 
   neg_ctx->havenegdata = FALSE;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 void Curl_http_auth_cleanup_negotiate(struct connectdata *conn)
@@ -219,4 +219,4 @@ void Curl_http_auth_cleanup_negotiate(struct connectdata *conn)
   Curl_auth_cleanup_spnego(&conn->proxyneg);
 }
 
-#endif /* !CURL_DISABLE_HTTP && USE_SPNEGO */
+#endif /* !CARL_DISABLE_HTTP && USE_SPNEGO */

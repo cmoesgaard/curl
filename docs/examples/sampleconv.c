@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 /* <DESC>
  * This is a simple example showing how a program on a non-ASCII platform
  * would invoke callbacks to do its own codeset conversions instead of
- * using the built-in iconv functions in libcurl.
+ * using the built-in iconv functions in libcarl.
  * </DESC>
  */
 /*
@@ -40,9 +40,9 @@
  */
 
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-static CURLcode my_conv_from_ascii_to_ebcdic(char *buffer, size_t length)
+static CARLcode my_conv_from_ascii_to_ebcdic(char *buffer, size_t length)
 {
   char *tempptrin, *tempptrout;
   size_t bytes = length;
@@ -50,14 +50,14 @@ static CURLcode my_conv_from_ascii_to_ebcdic(char *buffer, size_t length)
   tempptrin = tempptrout = buffer;
   rc = platform_a2e(&tempptrin, &bytes, &tempptrout, &bytes);
   if(rc == PLATFORM_CONV_OK) {
-    return CURLE_OK;
+    return CARLE_OK;
   }
   else {
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
   }
 }
 
-static CURLcode my_conv_from_ebcdic_to_ascii(char *buffer, size_t length)
+static CARLcode my_conv_from_ebcdic_to_ascii(char *buffer, size_t length)
 {
   char *tempptrin, *tempptrout;
   size_t bytes = length;
@@ -65,14 +65,14 @@ static CURLcode my_conv_from_ebcdic_to_ascii(char *buffer, size_t length)
   tempptrin = tempptrout = buffer;
   rc = platform_e2a(&tempptrin, &bytes, &tempptrout, &bytes);
   if(rc == PLATFORM_CONV_OK) {
-    return CURLE_OK;
+    return CARLE_OK;
   }
   else {
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
   }
 }
 
-static CURLcode my_conv_from_utf8_to_ebcdic(char *buffer, size_t length)
+static CARLcode my_conv_from_utf8_to_ebcdic(char *buffer, size_t length)
 {
   char *tempptrin, *tempptrout;
   size_t bytes = length;
@@ -80,33 +80,33 @@ static CURLcode my_conv_from_utf8_to_ebcdic(char *buffer, size_t length)
   tempptrin = tempptrout = buffer;
   rc = platform_u2e(&tempptrin, &bytes, &tempptrout, &bytes);
   if(rc == PLATFORM_CONV_OK) {
-    return CURLE_OK;
+    return CARLE_OK;
   }
   else {
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
   }
 }
 
 int main(void)
 {
-  CURL *curl;
+  CARL *carl;
 
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com");
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
 
     /* use platform-specific functions for codeset conversions */
-    curl_easy_setopt(curl, CURLOPT_CONV_FROM_NETWORK_FUNCTION,
+    carl_easy_setopt(carl, CARLOPT_CONV_FROM_NETWORK_FUNCTION,
                      my_conv_from_ascii_to_ebcdic);
-    curl_easy_setopt(curl, CURLOPT_CONV_TO_NETWORK_FUNCTION,
+    carl_easy_setopt(carl, CARLOPT_CONV_TO_NETWORK_FUNCTION,
                      my_conv_from_ebcdic_to_ascii);
-    curl_easy_setopt(curl, CURLOPT_CONV_FROM_UTF8_FUNCTION,
+    carl_easy_setopt(carl, CARLOPT_CONV_FROM_UTF8_FUNCTION,
                      my_conv_from_utf8_to_ebcdic);
 
-    curl_easy_perform(curl);
+    carl_easy_perform(carl);
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   return 0;
 }

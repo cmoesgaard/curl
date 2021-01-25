@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,39 +27,39 @@
 
 int test(char *URL)
 {
-  CURLcode res = 0;
-  CURL *curl = NULL;
+  CARLcode res = 0;
+  CARL *carl = NULL;
   long protocol = 0;
 
-  global_init(CURL_GLOBAL_ALL);
-  easy_init(curl);
+  global_init(CARL_GLOBAL_ALL);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  res = curl_easy_perform(curl);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  res = carl_easy_perform(carl);
   if(res) {
-    fprintf(stderr, "curl_easy_perform() returned %d (%s)\n",
-            res, curl_easy_strerror(res));
+    fprintf(stderr, "carl_easy_perform() returned %d (%s)\n",
+            res, carl_easy_strerror(res));
     goto test_cleanup;
   }
 
-  res = curl_easy_getinfo(curl, CURLINFO_PROTOCOL, &protocol);
+  res = carl_easy_getinfo(carl, CARLINFO_PROTOCOL, &protocol);
   if(res) {
-    fprintf(stderr, "curl_easy_getinfo() returned %d (%s)\n",
-            res, curl_easy_strerror(res));
+    fprintf(stderr, "carl_easy_getinfo() returned %d (%s)\n",
+            res, carl_easy_strerror(res));
     goto test_cleanup;
   }
 
   printf("Protocol: %lx\n", protocol);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return 0;
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res; /* return the final return code */
 }

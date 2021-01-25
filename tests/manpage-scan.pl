@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -25,13 +25,13 @@
 # verify that each option mention in there that should have its own man page
 # actually does.
 #
-# In addition, make sure that every current option to curl_easy_setopt,
-# curl_easy_getinfo and curl_multi_setopt are also mentioned in their
+# In addition, make sure that every current option to carl_easy_setopt,
+# carl_easy_getinfo and carl_multi_setopt are also mentioned in their
 # corresponding main (index) man page.
 #
-# src/tool_getparam.c lists all options curl can parse
-# docs/curl.1 documents all command line options
-# src/tool_help.c outputs all options with curl -h
+# src/tool_getparam.c lists all options carl can parse
+# docs/carl.1 documents all command line options
+# src/tool_help.c outputs all options with carl -h
 # - make sure they're all in sync
 #
 # Output all deviances to stderr.
@@ -42,24 +42,24 @@ use warnings;
 # we may get the dir roots pointed out
 my $root=$ARGV[0] || ".";
 my $buildroot=$ARGV[1] || ".";
-my $syms = "$root/docs/libcurl/symbols-in-versions";
-my $curlh = "$root/include/curl/curl.h";
+my $syms = "$root/docs/libcarl/symbols-in-versions";
+my $carlh = "$root/include/carl/carl.h";
 my $errors=0;
 
-# the prepopulated alias list is the CURLINFO_* defines that are used for the
+# the prepopulated alias list is the CARLINFO_* defines that are used for the
 # debug function callback and the fact that they use the same prefix as the
-# curl_easy_getinfo options was a mistake.
+# carl_easy_getinfo options was a mistake.
 my %alias = (
-    'CURLINFO_DATA_IN' => 'none',
-    'CURLINFO_DATA_OUT' => 'none',
-    'CURLINFO_END' => 'none',
-    'CURLINFO_HEADER_IN' => 'none',
-    'CURLINFO_HEADER_OUT' => 'none',
-    'CURLINFO_LASTONE' => 'none',
-    'CURLINFO_NONE' => 'none',
-    'CURLINFO_SSL_DATA_IN' => 'none',
-    'CURLINFO_SSL_DATA_OUT' => 'none',
-    'CURLINFO_TEXT' => 'none'
+    'CARLINFO_DATA_IN' => 'none',
+    'CARLINFO_DATA_OUT' => 'none',
+    'CARLINFO_END' => 'none',
+    'CARLINFO_HEADER_IN' => 'none',
+    'CARLINFO_HEADER_OUT' => 'none',
+    'CARLINFO_LASTONE' => 'none',
+    'CARLINFO_NONE' => 'none',
+    'CARLINFO_SSL_DATA_IN' => 'none',
+    'CARLINFO_SSL_DATA_OUT' => 'none',
+    'CARLINFO_TEXT' => 'none'
     );
 
 sub scanmanpage {
@@ -80,24 +80,24 @@ sub scanmanpage {
 }
 
 # check for define alises
-open(R, "<$curlh") ||
-    die "no curl.h";
+open(R, "<$carlh") ||
+    die "no carl.h";
 while(<R>) {
-    if(/^\#define (CURL(OPT|INFO|MOPT)_\w+) (.*)/) {
+    if(/^\#define (CARL(OPT|INFO|MOPT)_\w+) (.*)/) {
         $alias{$1}=$3;
     }
 }
 close(R);
 
-my @curlopt;
-my @curlinfo;
-my @curlmopt;
+my @carlopt;
+my @carlinfo;
+my @carlmopt;
 open(R, "<$syms") ||
     die "no input file";
 while(<R>) {
     chomp;
     my $l= $_;
-    if($l =~ /(CURL(OPT|INFO|MOPT)_\w+) *([0-9.]*) *([0-9.-]*) *([0-9.]*)/) {
+    if($l =~ /(CARL(OPT|INFO|MOPT)_\w+) *([0-9.]*) *([0-9.-]*) *([0-9.]*)/) {
         my ($opt, $type, $add, $dep, $rem) = ($1, $2, $3, $4, $5);
 
         if($alias{$opt}) {
@@ -109,15 +109,15 @@ while(<R>) {
         }
         else {
             if($type eq "OPT") {
-                push @curlopt, $opt,
+                push @carlopt, $opt,
             }
             elsif($type eq "INFO") {
-                push @curlinfo, $opt,
+                push @carlinfo, $opt,
             }
             elsif($type eq "MOPT") {
-                push @curlmopt, $opt,
+                push @carlmopt, $opt,
             }
-            if(! -f "$root/docs/libcurl/opts/$opt.3") {
+            if(! -f "$root/docs/libcarl/opts/$opt.3") {
                 print STDERR "Missing $opt.3\n";
                 $errors++;
             }
@@ -126,9 +126,9 @@ while(<R>) {
 }
 close(R);
 
-scanmanpage("$root/docs/libcurl/curl_easy_setopt.3", @curlopt);
-scanmanpage("$root/docs/libcurl/curl_easy_getinfo.3", @curlinfo);
-scanmanpage("$root/docs/libcurl/curl_multi_setopt.3", @curlmopt);
+scanmanpage("$root/docs/libcarl/carl_easy_setopt.3", @carlopt);
+scanmanpage("$root/docs/libcarl/carl_easy_getinfo.3", @carlinfo);
+scanmanpage("$root/docs/libcarl/carl_multi_setopt.3", @carlmopt);
 
 # using this hash array, we can skip specific options
 my %opts = (
@@ -140,7 +140,7 @@ my %opts = (
     '--no-keepalive' => 1,
     '--no-progress-meter' => 1,
 
-    # pretend these options without -no exist in curl.1 and tool_help.c
+    # pretend these options without -no exist in carl.1 and tool_help.c
     '--alpn' => 6,
     '--npn' => 6,
     '--eprt' => 6,
@@ -150,7 +150,7 @@ my %opts = (
     '--sessionid' => 6,
     '--progress-meter' => 6,
 
-    # deprecated options do not need to be in tool_help.c nor curl.1
+    # deprecated options do not need to be in tool_help.c nor carl.1
     '--krb4' => 6,
     '--ftp-ssl' => 6,
     '--ftp-ssl-reqd' => 6,
@@ -162,7 +162,7 @@ my %opts = (
 
 
 #########################################################################
-# parse the curl code that parses the command line arguments!
+# parse the carl code that parses the command line arguments!
 open(R, "<$root/src/tool_getparam.c") ||
     die "no input file";
 my $list;
@@ -198,9 +198,9 @@ while(<R>) {
 close(R);
 
 #########################################################################
-# parse the curl.1 man page, extract all documented command line options
+# parse the carl.1 man page, extract all documented command line options
 # The man page may or may not be rebuilt, so check both possible locations
-open(R, "<$buildroot/docs/curl.1") || open(R, "<$root/docs/curl.1") ||
+open(R, "<$buildroot/docs/carl.1") || open(R, "<$root/docs/carl.1") ||
     die "no input file";
 my @manpage; # store all parsed parameters
 while(<R>) {
@@ -227,7 +227,7 @@ close(R);
 
 
 #########################################################################
-# parse the curl code that outputs the curl -h list
+# parse the carl code that outputs the carl -h list
 open(R, "<$root/src/tool_help.c") ||
     die "no input file";
 my @toolhelp; # store all parsed parameters
@@ -272,10 +272,10 @@ foreach my $o (keys %opts) {
             $missing=" tool_getparam.c";
         }
         if($where & 2) {
-            $exists.= " curl.1";
+            $exists.= " carl.1";
         }
         else {
-            $missing.= " curl.1";
+            $missing.= " carl.1";
         }
         if($where & 4) {
             $exists .= " tool_help.c";

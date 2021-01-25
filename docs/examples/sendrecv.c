@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,16 +20,16 @@
  *
  ***************************************************************************/
 /* <DESC>
- * An example of curl_easy_send() and curl_easy_recv() usage.
+ * An example of carl_easy_send() and carl_easy_recv() usage.
  * </DESC>
  */
 
 #include <stdio.h>
 #include <string.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /* Auxiliary function that waits on the socket. */
-static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
+static int wait_on_socket(carl_socket_t sockfd, int for_recv, long timeout_ms)
 {
   struct timeval tv;
   fd_set infd, outfd, errfd;
@@ -58,40 +58,40 @@ static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
 
 int main(void)
 {
-  CURL *curl;
+  CARL *carl;
   /* Minimalistic http request */
   const char *request = "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n";
   size_t request_len = strlen(request);
 
-  /* A general note of caution here: if you're using curl_easy_recv() or
-     curl_easy_send() to implement HTTP or _any_ other protocol libcurl
+  /* A general note of caution here: if you're using carl_easy_recv() or
+     carl_easy_send() to implement HTTP or _any_ other protocol libcarl
      supports "natively", you're doing it wrong and you should stop.
 
      This example uses HTTP only to show how to use this API, it does not
      suggest that writing an application doing this is sensible.
   */
 
-  curl = curl_easy_init();
-  if(curl) {
-    CURLcode res;
-    curl_socket_t sockfd;
+  carl = carl_easy_init();
+  if(carl) {
+    CARLcode res;
+    carl_socket_t sockfd;
     size_t nsent_total = 0;
 
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com");
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
     /* Do not do the transfer - only connect to host */
-    curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
-    res = curl_easy_perform(curl);
+    carl_easy_setopt(carl, CARLOPT_CONNECT_ONLY, 1L);
+    res = carl_easy_perform(carl);
 
-    if(res != CURLE_OK) {
-      printf("Error: %s\n", curl_easy_strerror(res));
+    if(res != CARLE_OK) {
+      printf("Error: %s\n", carl_easy_strerror(res));
       return 1;
     }
 
-    /* Extract the socket from the curl handle - we'll need it for waiting. */
-    res = curl_easy_getinfo(curl, CURLINFO_ACTIVESOCKET, &sockfd);
+    /* Extract the socket from the carl handle - we'll need it for waiting. */
+    res = carl_easy_getinfo(carl, CARLINFO_ACTIVESOCKET, &sockfd);
 
-    if(res != CURLE_OK) {
-      printf("Error: %s\n", curl_easy_strerror(res));
+    if(res != CARLE_OK) {
+      printf("Error: %s\n", carl_easy_strerror(res));
       return 1;
     }
 
@@ -104,23 +104,23 @@ int main(void)
       size_t nsent;
       do {
         nsent = 0;
-        res = curl_easy_send(curl, request + nsent_total,
+        res = carl_easy_send(carl, request + nsent_total,
             request_len - nsent_total, &nsent);
         nsent_total += nsent;
 
-        if(res == CURLE_AGAIN && !wait_on_socket(sockfd, 0, 60000L)) {
+        if(res == CARLE_AGAIN && !wait_on_socket(sockfd, 0, 60000L)) {
           printf("Error: timeout.\n");
           return 1;
         }
-      } while(res == CURLE_AGAIN);
+      } while(res == CARLE_AGAIN);
 
-      if(res != CURLE_OK) {
-        printf("Error: %s\n", curl_easy_strerror(res));
+      if(res != CARLE_OK) {
+        printf("Error: %s\n", carl_easy_strerror(res));
         return 1;
       }
 
-      printf("Sent %" CURL_FORMAT_CURL_OFF_T " bytes.\n",
-        (curl_off_t)nsent);
+      printf("Sent %" CARL_FORMAT_CARL_OFF_T " bytes.\n",
+        (carl_off_t)nsent);
 
     } while(nsent_total < request_len);
 
@@ -132,16 +132,16 @@ int main(void)
       size_t nread;
       do {
         nread = 0;
-        res = curl_easy_recv(curl, buf, sizeof(buf), &nread);
+        res = carl_easy_recv(carl, buf, sizeof(buf), &nread);
 
-        if(res == CURLE_AGAIN && !wait_on_socket(sockfd, 1, 60000L)) {
+        if(res == CARLE_AGAIN && !wait_on_socket(sockfd, 1, 60000L)) {
           printf("Error: timeout.\n");
           return 1;
         }
-      } while(res == CURLE_AGAIN);
+      } while(res == CARLE_AGAIN);
 
-      if(res != CURLE_OK) {
-        printf("Error: %s\n", curl_easy_strerror(res));
+      if(res != CARLE_OK) {
+        printf("Error: %s\n", carl_easy_strerror(res));
         break;
       }
 
@@ -150,12 +150,12 @@ int main(void)
         break;
       }
 
-      printf("Received %" CURL_FORMAT_CURL_OFF_T " bytes.\n",
-        (curl_off_t)nread);
+      printf("Received %" CARL_FORMAT_CARL_OFF_T " bytes.\n",
+        (carl_off_t)nread);
     }
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   return 0;
 }

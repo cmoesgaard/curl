@@ -49,7 +49,7 @@ http://%HOSTIP:%HTTPPORT/347 --etag-save log/etag347
 <protocol>
 GET /347 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

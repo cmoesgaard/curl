@@ -62,13 +62,13 @@ http://%HOSTIP:%HTTPPORT/want/1067 -L --referer "firstone.html;auto"
 <protocol>
 GET /want/1067 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Referer: firstone.html
 
 GET /want/data/10670002.txt?coolsite=yes HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Referer: http://%HOSTIP:%HTTPPORT/want/1067
 

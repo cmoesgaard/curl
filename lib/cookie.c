@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -80,9 +80,9 @@ Example set of cookies:
 ****/
 
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_COOKIES)
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_COOKIES)
 
 #include "urldata.h"
 #include "cookie.h"
@@ -93,16 +93,16 @@ Example set of cookies:
 #include "share.h"
 #include "strtoofft.h"
 #include "strcase.h"
-#include "curl_get_line.h"
-#include "curl_memrchr.h"
+#include "carl_get_line.h"
+#include "carl_memrchr.h"
 #include "inet_pton.h"
 #include "parsedate.h"
 #include "rand.h"
 #include "rename.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 static void freecookie(struct Cookie *co)
@@ -342,15 +342,15 @@ static char *sanitize_cookie_path(const char *cookie_path)
 }
 
 /*
- * Load cookies from all given cookie files (CURLOPT_COOKIEFILE).
+ * Load cookies from all given cookie files (CARLOPT_COOKIEFILE).
  *
  * NOTE: OOM or cookie parsing failures are ignored.
  */
 void Curl_cookie_loadfiles(struct Curl_easy *data)
 {
-  struct curl_slist *list = data->change.cookielist;
+  struct carl_slist *list = data->change.cookielist;
   if(list) {
-    Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+    Curl_share_lock(data, CARL_LOCK_DATA_COOKIE, CARL_LOCK_ACCESS_SINGLE);
     while(list) {
       struct CookieInfo *newcookies = Curl_cookie_init(data,
                                         list->data,
@@ -365,9 +365,9 @@ void Curl_cookie_loadfiles(struct Curl_easy *data)
         data->cookies = newcookies;
       list = list->next;
     }
-    curl_slist_free_all(data->change.cookielist); /* clean up list */
+    carl_slist_free_all(data->change.cookielist); /* clean up list */
     data->change.cookielist = NULL; /* don't do this again! */
-    Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
+    Curl_share_unlock(data, CARL_LOCK_DATA_COOKIE);
   }
 }
 
@@ -389,7 +389,7 @@ static void strstore(char **str, const char *newstr)
 static void remove_expired(struct CookieInfo *cookies)
 {
   struct Cookie *co, *nx;
-  curl_off_t now = (curl_off_t)time(NULL);
+  carl_off_t now = (carl_off_t)time(NULL);
   unsigned int i;
 
   for(i = 0; i < COOKIE_HASH_SIZE; i++) {
@@ -458,7 +458,7 @@ Curl_cookie_add(struct Curl_easy *data,
   bool badcookie = FALSE; /* cookies are good by default. mmmmm yummy */
   size_t myhash;
 
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
+#ifdef CARL_DISABLE_VERBOSE_STRINGS
   (void)data;
 #endif
 
@@ -705,20 +705,20 @@ Curl_cookie_add(struct Curl_easy *data,
     } while(semiptr);
 
     if(co->maxage) {
-      CURLofft offt;
-      offt = curlx_strtoofft((*co->maxage == '\"')?
+      CARLofft offt;
+      offt = carlx_strtoofft((*co->maxage == '\"')?
                              &co->maxage[1]:&co->maxage[0], NULL, 10,
                              &co->expires);
-      if(offt == CURL_OFFT_FLOW)
+      if(offt == CARL_OFFT_FLOW)
         /* overflow, used max value */
-        co->expires = CURL_OFF_T_MAX;
+        co->expires = CARL_OFF_T_MAX;
       else if(!offt) {
         if(!co->expires)
           /* already expired */
           co->expires = 1;
-        else if(CURL_OFF_T_MAX - now < co->expires)
+        else if(CARL_OFF_T_MAX - now < co->expires)
           /* would overflow */
-          co->expires = CURL_OFF_T_MAX;
+          co->expires = CARL_OFF_T_MAX;
         else
           co->expires += now;
       }
@@ -792,7 +792,7 @@ Curl_cookie_add(struct Curl_easy *data,
 
     /* IE introduced HTTP-only cookies to prevent XSS attacks. Cookies
        marked with httpOnly after the domain name are not accessible
-       from javascripts, but since curl does not operate at javascript
+       from javascripts, but since carl does not operate at javascript
        level, we include them anyway. In Firefox's cookie files, these
        lines are preceded with #HttpOnly_ and then everything is
        as usual, so we skip 10 characters of the line..
@@ -870,7 +870,7 @@ Curl_cookie_add(struct Curl_easy *data,
         }
         break;
       case 4:
-        if(curlx_strtoofft(ptr, NULL, 10, &co->expires))
+        if(carlx_strtoofft(ptr, NULL, 10, &co->expires))
           badcookie = TRUE;
         break;
       case 5:
@@ -1075,7 +1075,7 @@ Curl_cookie_add(struct Curl_easy *data,
   if(c->running)
     /* Only show this when NOT reading the cookies from a file */
     infof(data, "%s cookie %s=\"%s\" for domain %s, path %s, "
-          "expire %" CURL_FORMAT_CURL_OFF_T "\n",
+          "expire %" CARL_FORMAT_CARL_OFF_T "\n",
           replace_old?"Replaced":"Added", co->name, co->value,
           co->domain, co->path, co->expires);
 
@@ -1487,7 +1487,7 @@ static char *get_netscape_format(const struct Cookie *co)
     "%s\t"   /* tailmatch */
     "%s\t"   /* path */
     "%s\t"   /* secure */
-    "%" CURL_FORMAT_CURL_OFF_T "\t"   /* expires */
+    "%" CARL_FORMAT_CARL_OFF_T "\t"   /* expires */
     "%s\t"   /* name */
     "%s",    /* value */
     co->httponly?"#HttpOnly_":"",
@@ -1548,8 +1548,8 @@ static int cookie_output(struct Curl_easy *data,
   }
 
   fputs("# Netscape HTTP Cookie File\n"
-        "# https://curl.se/docs/http-cookies.html\n"
-        "# This file was generated by libcurl! Edit at your own risk.\n\n",
+        "# https://carl.se/docs/http-cookies.html\n"
+        "# This file was generated by libcarl! Edit at your own risk.\n\n",
         out);
 
   if(c->numcookies) {
@@ -1576,7 +1576,7 @@ static int cookie_output(struct Curl_easy *data,
     for(i = 0; i < nvalid; i++) {
       char *format_ptr = get_netscape_format(array[i]);
       if(format_ptr == NULL) {
-        fprintf(out, "#\n# Fatal libcurl error\n");
+        fprintf(out, "#\n# Fatal libcarl error\n");
         free(array);
         goto error;
       }
@@ -1606,10 +1606,10 @@ cleanup:
   return error ? 1 : 0;
 }
 
-static struct curl_slist *cookie_list(struct Curl_easy *data)
+static struct carl_slist *cookie_list(struct Curl_easy *data)
 {
-  struct curl_slist *list = NULL;
-  struct curl_slist *beg;
+  struct carl_slist *list = NULL;
+  struct carl_slist *beg;
   struct Cookie *c;
   char *line;
   unsigned int i;
@@ -1624,13 +1624,13 @@ static struct curl_slist *cookie_list(struct Curl_easy *data)
         continue;
       line = get_netscape_format(c);
       if(!line) {
-        curl_slist_free_all(list);
+        carl_slist_free_all(list);
         return NULL;
       }
       beg = Curl_slist_append_nodup(list, line);
       if(!beg) {
         free(line);
-        curl_slist_free_all(list);
+        carl_slist_free_all(list);
         return NULL;
       }
       list = beg;
@@ -1640,12 +1640,12 @@ static struct curl_slist *cookie_list(struct Curl_easy *data)
   return list;
 }
 
-struct curl_slist *Curl_cookie_list(struct Curl_easy *data)
+struct carl_slist *Curl_cookie_list(struct Curl_easy *data)
 {
-  struct curl_slist *list;
-  Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+  struct carl_slist *list;
+  Curl_share_lock(data, CARL_LOCK_DATA_COOKIE, CARL_LOCK_ACCESS_SINGLE);
   list = cookie_list(data);
-  Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
+  Curl_share_unlock(data, CARL_LOCK_DATA_COOKIE);
   return list;
 }
 
@@ -1659,7 +1659,7 @@ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup)
       Curl_cookie_loadfiles(data);
     }
 
-    Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+    Curl_share_lock(data, CARL_LOCK_DATA_COOKIE, CARL_LOCK_ACCESS_SINGLE);
 
     /* if we have a destination file for all the cookies to get dumped to */
     if(cookie_output(data, data->cookies, data->set.str[STRING_COOKIEJAR]))
@@ -1670,17 +1670,17 @@ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup)
     if(cleanup && data->change.cookielist) {
       /* since nothing is written, we can just free the list of cookie file
          names */
-      curl_slist_free_all(data->change.cookielist); /* clean up list */
+      carl_slist_free_all(data->change.cookielist); /* clean up list */
       data->change.cookielist = NULL;
     }
-    Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+    Curl_share_lock(data, CARL_LOCK_DATA_COOKIE, CARL_LOCK_ACCESS_SINGLE);
   }
 
   if(cleanup && (!data->share || (data->cookies != data->share->cookies))) {
     Curl_cookie_cleanup(data->cookies);
     data->cookies = NULL;
   }
-  Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
+  Curl_share_unlock(data, CARL_LOCK_DATA_COOKIE);
 }
 
-#endif /* CURL_DISABLE_HTTP || CURL_DISABLE_COOKIES */
+#endif /* CARL_DISABLE_HTTP || CARL_DISABLE_COOKIES */

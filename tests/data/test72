@@ -70,13 +70,13 @@ http://%HOSTIP:%HTTPPORT/72 -u testuser:testpass --anyauth
 <protocol>
 GET /72 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /72 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: Digest username="testuser", realm="testrealm", nonce="1053604199", uri="/72", response="9fcd1330377365a09bbcb33b2cbb25bd"
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,14 +22,14 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_CRYPTO_AUTH
+#ifndef CARL_DISABLE_CRYPTO_AUTH
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-#include "curl_hmac.h"
-#include "curl_memory.h"
+#include "carl_hmac.h"
+#include "carl_memory.h"
 #include "warnless.h"
 
 /* The last #include file should be: */
@@ -145,26 +145,26 @@ int Curl_HMAC_final(struct HMAC_context *ctxt, unsigned char *result)
  * datalen    [in]     - The length of the data.
  * output     [in/out] - The output buffer.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_hmacit(const struct HMAC_params *hashparams,
+CARLcode Curl_hmacit(const struct HMAC_params *hashparams,
                      const unsigned char *key, const size_t keylen,
                      const unsigned char *data, const size_t datalen,
                      unsigned char *output)
 {
   struct HMAC_context *ctxt =
-    Curl_HMAC_init(hashparams, key, curlx_uztoui(keylen));
+    Curl_HMAC_init(hashparams, key, carlx_uztoui(keylen));
 
   if(!ctxt)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Update the digest with the given challenge */
-  Curl_HMAC_update(ctxt, data, curlx_uztoui(datalen));
+  Curl_HMAC_update(ctxt, data, carlx_uztoui(datalen));
 
   /* Finalise the digest */
   Curl_HMAC_final(ctxt, output);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-#endif /* CURL_DISABLE_CRYPTO_AUTH */
+#endif /* CARL_DISABLE_CRYPTO_AUTH */

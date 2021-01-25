@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,14 +23,14 @@
  * FTP wildcard pattern matching
  * </DESC>
  */
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <stdio.h>
 
 struct callback_data {
   FILE *output;
 };
 
-static long file_is_coming(struct curl_fileinfo *finfo,
+static long file_is_coming(struct carl_fileinfo *finfo,
                            struct callback_data *data,
                            int remains);
 
@@ -41,57 +41,57 @@ static size_t write_it(char *buff, size_t size, size_t nmemb,
 
 int main(int argc, char **argv)
 {
-  /* curl easy handle */
-  CURL *handle;
+  /* carl easy handle */
+  CARL *handle;
 
   /* help data */
   struct callback_data data = { 0 };
 
   /* global initialization */
-  int rc = curl_global_init(CURL_GLOBAL_ALL);
+  int rc = carl_global_init(CARL_GLOBAL_ALL);
   if(rc)
     return rc;
 
   /* initialization of easy handle */
-  handle = curl_easy_init();
+  handle = carl_easy_init();
   if(!handle) {
-    curl_global_cleanup();
-    return CURLE_OUT_OF_MEMORY;
+    carl_global_cleanup();
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* turn on wildcard matching */
-  curl_easy_setopt(handle, CURLOPT_WILDCARDMATCH, 1L);
+  carl_easy_setopt(handle, CARLOPT_WILDCARDMATCH, 1L);
 
   /* callback is called before download of concrete file started */
-  curl_easy_setopt(handle, CURLOPT_CHUNK_BGN_FUNCTION, file_is_coming);
+  carl_easy_setopt(handle, CARLOPT_CHUNK_BGN_FUNCTION, file_is_coming);
 
   /* callback is called after data from the file have been transferred */
-  curl_easy_setopt(handle, CURLOPT_CHUNK_END_FUNCTION, file_is_downloaded);
+  carl_easy_setopt(handle, CARLOPT_CHUNK_END_FUNCTION, file_is_downloaded);
 
   /* this callback will write contents into files */
-  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_it);
+  carl_easy_setopt(handle, CARLOPT_WRITEFUNCTION, write_it);
 
   /* put transfer data into callbacks */
-  curl_easy_setopt(handle, CURLOPT_CHUNK_DATA, &data);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, &data);
+  carl_easy_setopt(handle, CARLOPT_CHUNK_DATA, &data);
+  carl_easy_setopt(handle, CARLOPT_WRITEDATA, &data);
 
-  /* curl_easy_setopt(handle, CURLOPT_VERBOSE, 1L); */
+  /* carl_easy_setopt(handle, CARLOPT_VERBOSE, 1L); */
 
   /* set an URL containing wildcard pattern (only in the last part) */
   if(argc == 2)
-    curl_easy_setopt(handle, CURLOPT_URL, argv[1]);
+    carl_easy_setopt(handle, CARLOPT_URL, argv[1]);
   else
-    curl_easy_setopt(handle, CURLOPT_URL, "ftp://example.com/test/*");
+    carl_easy_setopt(handle, CARLOPT_URL, "ftp://example.com/test/*");
 
   /* and start transfer! */
-  rc = curl_easy_perform(handle);
+  rc = carl_easy_perform(handle);
 
-  curl_easy_cleanup(handle);
-  curl_global_cleanup();
+  carl_easy_cleanup(handle);
+  carl_global_cleanup();
   return rc;
 }
 
-static long file_is_coming(struct curl_fileinfo *finfo,
+static long file_is_coming(struct carl_fileinfo *finfo,
                            struct callback_data *data,
                            int remains)
 {
@@ -99,10 +99,10 @@ static long file_is_coming(struct curl_fileinfo *finfo,
          (unsigned long)finfo->size);
 
   switch(finfo->filetype) {
-  case CURLFILETYPE_DIRECTORY:
+  case CARLFILETYPE_DIRECTORY:
     printf(" DIR\n");
     break;
-  case CURLFILETYPE_FILE:
+  case CARLFILETYPE_FILE:
     printf("FILE ");
     break;
   default:
@@ -110,20 +110,20 @@ static long file_is_coming(struct curl_fileinfo *finfo,
     break;
   }
 
-  if(finfo->filetype == CURLFILETYPE_FILE) {
+  if(finfo->filetype == CARLFILETYPE_FILE) {
     /* do not transfer files >= 50B */
     if(finfo->size > 50) {
       printf("SKIPPED\n");
-      return CURL_CHUNK_BGN_FUNC_SKIP;
+      return CARL_CHUNK_BGN_FUNC_SKIP;
     }
 
     data->output = fopen(finfo->filename, "wb");
     if(!data->output) {
-      return CURL_CHUNK_BGN_FUNC_FAIL;
+      return CARL_CHUNK_BGN_FUNC_FAIL;
     }
   }
 
-  return CURL_CHUNK_BGN_FUNC_OK;
+  return CARL_CHUNK_BGN_FUNC_OK;
 }
 
 static long file_is_downloaded(struct callback_data *data)
@@ -133,7 +133,7 @@ static long file_is_downloaded(struct callback_data *data)
     fclose(data->output);
     data->output = 0x0;
   }
-  return CURL_CHUNK_END_FUNC_OK;
+  return CARL_CHUNK_END_FUNC_OK;
 }
 
 static size_t write_it(char *buff, size_t size, size_t nmemb,

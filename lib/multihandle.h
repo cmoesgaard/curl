@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MULTIHANDLE_H
-#define HEADER_CURL_MULTIHANDLE_H
+#ifndef HEADER_CARL_MULTIHANDLE_H
+#define HEADER_CARL_MULTIHANDLE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,36 +32,36 @@ struct connectdata;
 
 struct Curl_message {
   struct Curl_llist_element list;
-  /* the 'CURLMsg' is the part that is visible to the external user */
-  struct CURLMsg extmsg;
+  /* the 'CARLMsg' is the part that is visible to the external user */
+  struct CARLMsg extmsg;
 };
 
 /* NOTE: if you add a state here, add the name to the statename[] array as
    well!
 */
 typedef enum {
-  CURLM_STATE_INIT,         /* 0 - start in this state */
-  CURLM_STATE_CONNECT_PEND, /* 1 - no connections, waiting for one */
-  CURLM_STATE_CONNECT,      /* 2 - resolve/connect has been sent off */
-  CURLM_STATE_WAITRESOLVE,  /* 3 - awaiting the resolve to finalize */
-  CURLM_STATE_WAITCONNECT,  /* 4 - awaiting the TCP connect to finalize */
-  CURLM_STATE_WAITPROXYCONNECT, /* 5 - awaiting HTTPS proxy SSL initialization
+  CARLM_STATE_INIT,         /* 0 - start in this state */
+  CARLM_STATE_CONNECT_PEND, /* 1 - no connections, waiting for one */
+  CARLM_STATE_CONNECT,      /* 2 - resolve/connect has been sent off */
+  CARLM_STATE_WAITRESOLVE,  /* 3 - awaiting the resolve to finalize */
+  CARLM_STATE_WAITCONNECT,  /* 4 - awaiting the TCP connect to finalize */
+  CARLM_STATE_WAITPROXYCONNECT, /* 5 - awaiting HTTPS proxy SSL initialization
                                    to complete and/or proxy CONNECT to
                                    finalize */
-  CURLM_STATE_SENDPROTOCONNECT, /* 6 - initiate protocol connect procedure */
-  CURLM_STATE_PROTOCONNECT, /* 7 - completing the protocol-specific connect
+  CARLM_STATE_SENDPROTOCONNECT, /* 6 - initiate protocol connect procedure */
+  CARLM_STATE_PROTOCONNECT, /* 7 - completing the protocol-specific connect
                                    phase */
-  CURLM_STATE_DO,           /* 8 - start send off the request (part 1) */
-  CURLM_STATE_DOING,        /* 9 - sending off the request (part 1) */
-  CURLM_STATE_DO_MORE,      /* 10 - send off the request (part 2) */
-  CURLM_STATE_DO_DONE,      /* 11 - done sending off request */
-  CURLM_STATE_PERFORM,      /* 12 - transfer data */
-  CURLM_STATE_TOOFAST,      /* 13 - wait because limit-rate exceeded */
-  CURLM_STATE_DONE,         /* 14 - post data transfer operation */
-  CURLM_STATE_COMPLETED,    /* 15 - operation complete */
-  CURLM_STATE_MSGSENT,      /* 16 - the operation complete message is sent */
-  CURLM_STATE_LAST          /* 17 - not a true state, never use this */
-} CURLMstate;
+  CARLM_STATE_DO,           /* 8 - start send off the request (part 1) */
+  CARLM_STATE_DOING,        /* 9 - sending off the request (part 1) */
+  CARLM_STATE_DO_MORE,      /* 10 - send off the request (part 2) */
+  CARLM_STATE_DO_DONE,      /* 11 - done sending off request */
+  CARLM_STATE_PERFORM,      /* 12 - transfer data */
+  CARLM_STATE_TOOFAST,      /* 13 - wait because limit-rate exceeded */
+  CARLM_STATE_DONE,         /* 14 - post data transfer operation */
+  CARLM_STATE_COMPLETED,    /* 15 - operation complete */
+  CARLM_STATE_MSGSENT,      /* 16 - the operation complete message is sent */
+  CARLM_STATE_LAST          /* 17 - not a true state, never use this */
+} CARLMstate;
 
 /* we support N sockets per easy handle. Set the corresponding bit to what
    action we should wait for */
@@ -69,20 +69,20 @@ typedef enum {
 #define GETSOCK_READABLE (0x00ff)
 #define GETSOCK_WRITABLE (0xff00)
 
-#define CURLPIPE_ANY (CURLPIPE_MULTIPLEX)
+#define CARLPIPE_ANY (CARLPIPE_MULTIPLEX)
 
 #if defined(USE_SOCKETPAIR) && !defined(USE_BLOCKING_SOCKETS) &&        \
-  !defined(CURL_DISABLE_SOCKETPAIR)
+  !defined(CARL_DISABLE_SOCKETPAIR)
 #define ENABLE_WAKEUP
 #endif
 
 /* value for MAXIMUM CONCURRENT STREAMS upper limit */
 #define INITIAL_MAX_CONCURRENT_STREAMS ((1U << 31) - 1)
 
-/* This is the struct known as CURLM on the outside */
+/* This is the struct known as CARLM on the outside */
 struct Curl_multi {
   /* First a simple identifier to easier detect if a user mix up
-     this multi handle with an easy handle. Set this to CURL_MULTI_HANDLE. */
+     this multi handle with an easy handle. Set this to CARL_MULTI_HANDLE. */
   unsigned int magic;
 
   /* We have a doubly-linked list with easy handles */
@@ -96,14 +96,14 @@ struct Curl_multi {
   struct Curl_llist msglist; /* a list of messages from completed transfers */
 
   struct Curl_llist pending; /* Curl_easys that are in the
-                                CURLM_STATE_CONNECT_PEND state */
+                                CARLM_STATE_CONNECT_PEND state */
 
   /* callback function and user data pointer for the *socket() API */
-  curl_socket_callback socket_cb;
+  carl_socket_callback socket_cb;
   void *socket_userp;
 
   /* callback function and user data pointer for server push */
-  curl_push_callback push_cb;
+  carl_push_callback push_cb;
   void *push_userp;
 
   /* Hostname cache */
@@ -136,14 +136,14 @@ struct Curl_multi {
                                  of connections in total */
 
   /* timer callback and user data pointer for the *socket() API */
-  curl_multi_timer_callback timer_cb;
+  carl_multi_timer_callback timer_cb;
   void *timer_userp;
-  struct curltime timer_lastcall; /* the fixed time for the timeout for the
+  struct carltime timer_lastcall; /* the fixed time for the timeout for the
                                     previous callback */
   unsigned int max_concurrent_streams;
 
 #ifdef ENABLE_WAKEUP
-  curl_socket_t wakeup_pair[2]; /* socketpair() used for wakeup
+  carl_socket_t wakeup_pair[2]; /* socketpair() used for wakeup
                                    0 is used for read, 1 is used for write */
 #endif
   /* multiplexing wanted */
@@ -153,4 +153,4 @@ struct Curl_multi {
   bool ipv6_works;
 };
 
-#endif /* HEADER_CURL_MULTIHANDLE_H */
+#endif /* HEADER_CARL_MULTIHANDLE_H */

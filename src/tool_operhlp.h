@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_OPERHLP_H
-#define HEADER_CURL_TOOL_OPERHLP_H
+#ifndef HEADER_CARL_TOOL_OPERHLP_H
+#define HEADER_CARL_TOOL_OPERHLP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -33,6 +33,6 @@ bool stdin_upload(const char *uploadfile);
 
 char *add_file_name_to_url(char *url, const char *filename);
 
-CURLcode get_url_file_name(char **filename, const char *url);
+CARLcode get_url_file_name(char **filename, const char *url);
 
-#endif /* HEADER_CURL_TOOL_OPERHLP_H */
+#endif /* HEADER_CARL_TOOL_OPERHLP_H */

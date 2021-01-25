@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,50 +30,50 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-/* curl stuff */
-#include <curl/curl.h>
+/* carl stuff */
+#include <carl/carl.h>
 
 /*
  * Simply download two HTTP files!
  */
 int main(void)
 {
-  CURL *http_handle;
-  CURL *http_handle2;
-  CURLM *multi_handle;
+  CARL *http_handle;
+  CARL *http_handle2;
+  CARLM *multi_handle;
 
   int still_running = 0; /* keep number of running handles */
 
-  http_handle = curl_easy_init();
-  http_handle2 = curl_easy_init();
+  http_handle = carl_easy_init();
+  http_handle2 = carl_easy_init();
 
   /* set options */
-  curl_easy_setopt(http_handle, CURLOPT_URL, "https://www.example.com/");
+  carl_easy_setopt(http_handle, CARLOPT_URL, "https://www.example.com/");
 
   /* set options */
-  curl_easy_setopt(http_handle2, CURLOPT_URL, "http://localhost/");
+  carl_easy_setopt(http_handle2, CARLOPT_URL, "http://localhost/");
 
   /* init a multi stack */
-  multi_handle = curl_multi_init();
+  multi_handle = carl_multi_init();
 
   /* add the individual transfers */
-  curl_multi_add_handle(multi_handle, http_handle);
-  curl_multi_add_handle(multi_handle, http_handle2);
+  carl_multi_add_handle(multi_handle, http_handle);
+  carl_multi_add_handle(multi_handle, http_handle2);
 
   /* we start some action by calling perform right away */
-  curl_multi_perform(multi_handle, &still_running);
+  carl_multi_perform(multi_handle, &still_running);
 
   while(still_running) {
     struct timeval timeout;
     int rc; /* select() return code */
-    CURLMcode mc; /* curl_multi_fdset() return code */
+    CARLMcode mc; /* carl_multi_fdset() return code */
 
     fd_set fdread;
     fd_set fdwrite;
     fd_set fdexcep;
     int maxfd = -1;
 
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     FD_ZERO(&fdread);
     FD_ZERO(&fdwrite);
@@ -83,20 +83,20 @@ int main(void)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(multi_handle, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(multi_handle, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -104,7 +104,7 @@ int main(void)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #ifdef _WIN32
@@ -129,15 +129,15 @@ int main(void)
     case 0:
     default:
       /* timeout or readable/writable sockets */
-      curl_multi_perform(multi_handle, &still_running);
+      carl_multi_perform(multi_handle, &still_running);
       break;
     }
   }
 
-  curl_multi_cleanup(multi_handle);
+  carl_multi_cleanup(multi_handle);
 
-  curl_easy_cleanup(http_handle);
-  curl_easy_cleanup(http_handle2);
+  carl_easy_cleanup(http_handle);
+  carl_easy_cleanup(http_handle2);
 
   return 0;
 }

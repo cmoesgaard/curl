@@ -9,7 +9,7 @@
 '*
 '* This software is licensed as described in the file COPYING, which
 '* you should have received as part of this distribution. The terms
-'* are also available at https://curl.se/docs/copyright.html.
+'* are also available at https://carl.se/docs/copyright.html.
 '*
 '* You may opt to use, copy, modify, merge, publish, distribute and/or sell
 '* copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 '*
 '***************************************************************************
 '* Script to fetch certdata.txt from Mozilla.org site and create a
-'* ca-bundle.crt for use with OpenSSL / libcurl / libcurl bindings
+'* ca-bundle.crt for use with OpenSSL / libcarl / libcarl bindings
 '* Requires WinHttp.WinHttpRequest.5.1 and ADODB.Stream which are part of
 '* W2000 SP3 or later, WXP SP1 or later, W2003 Server SP1 or later.
 '* Hacked by Guenter Knauf
@@ -170,7 +170,7 @@ myStream.WriteText "##" & vbLf & _
   "## " & myUrl & vbLf & _
   "##" & vbLf & _
   "## It contains the certificates in PEM format and therefore" & vbLf & _
-  "## can be directly used with curl / libcurl / php_curl, or with" & vbLf & _
+  "## can be directly used with carl / libcarl / php_carl, or with" & vbLf & _
   "## an Apache+mod_ssl webserver for SSL client authentication." & vbLf & _
   "## Just configure this file as the SSLCACertificateFile." & vbLf & _
   "##" & vbLf & _

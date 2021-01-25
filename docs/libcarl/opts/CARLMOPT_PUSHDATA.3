@@ -1,0 +1,79 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_PUSHDATA 3 "1 Jun 2015" "libcarl 7.44.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_PUSHDATA \- pointer to pass to push callback
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_PUSHDATA, void *pointer);
+.fi
+.SH DESCRIPTION
+Set \fIpointer\fP to pass as the last argument to the
+\fICARLMOPT_PUSHFUNCTION(3)\fP callback. The pointer will not be touched or
+used by libcarl itself, only passed on to the callback function.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+HTTP(S)
+.SH EXAMPLE
+.nf
+/* only allow pushes for file names starting with "push-" */
+int push_callback(CARL *parent,
+                  CARL *easy,
+                  size_t num_headers,
+                  struct carl_pushheaders *headers,
+                  void *userp)
+{
+  char *headp;
+  int *transfers = (int *)userp;
+  FILE *out;
+  headp = carl_pushheader_byname(headers, ":path");
+  if(headp && !strncmp(headp, "/push-", 6)) {
+    fprintf(stderr, "The PATH is %s\\n", headp);
+
+    /* save the push here */
+    out = fopen("pushed-stream", "wb");
+
+    /* write to this file */
+    carl_easy_setopt(easy, CARLOPT_WRITEDATA, out);
+
+    (*transfers)++; /* one more */
+
+    return CARL_PUSH_OK;
+  }
+  return CARL_PUSH_DENY;
+}
+
+carl_multi_setopt(multi, CARLMOPT_PUSHFUNCTION, push_callback);
+carl_multi_setopt(multi, CARLMOPT_PUSHDATA, &counter);
+.fi
+.SH AVAILABILITY
+Added in 7.44.0
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLMOPT_PUSHFUNCTION "(3), " CARLMOPT_PIPELINING "(3), "
+.BR CARLOPT_PIPEWAIT "(3), "
+.BR RFC 7540

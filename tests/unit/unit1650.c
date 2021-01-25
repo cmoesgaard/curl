@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,14 +19,14 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "doh.h"
 #include "dynbuf.h"
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -34,7 +34,7 @@ static void unit_stop(void)
 
 }
 
-#ifndef CURL_DISABLE_DOH
+#ifndef CARL_DISABLE_DOH
 #define DNS_PREAMBLE "\x00\x00\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00"
 #define LABEL_TEST "\x04\x74\x65\x73\x74"
 #define LABEL_HOST "\x04\x68\x6f\x73\x74"
@@ -284,7 +284,7 @@ UNITTEST_START
 }
 UNITTEST_STOP
 
-#else /* CURL_DISABLE_DOH */
+#else /* CARL_DISABLE_DOH */
 UNITTEST_START
 {
   return 1; /* nothing to do, just fail */

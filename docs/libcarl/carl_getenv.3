@@ -1,0 +1,49 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_getenv 3 "30 April 2004" "libcarl 7.12" "libcarl Manual"
+.SH NAME
+carl_getenv - return value for environment name
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "char *carl_getenv(const char *" name ");"
+.ad
+.SH DESCRIPTION
+carl_getenv() is a portable wrapper for the getenv() function, meant to
+emulate its behavior and provide an identical interface for all operating
+systems libcarl builds on (including win32).
+
+You must \fIcarl_free(3)\fP the returned string when you're done with it.
+.SH AVAILABILITY
+This function will be removed from the public libcarl API in a near future. It
+will instead be made "available" by source code access only, and then as
+carlx_getenv().
+.SH RETURN VALUE
+A pointer to a null-terminated string or NULL if it failed to find the
+specified name.
+.SH NOTE
+Under unix operating systems, there isn't any point in returning an allocated
+memory, although other systems won't work properly if this isn't done. The
+unix implementation thus has to suffer slightly from the drawbacks of other
+systems.
+.SH "SEE ALSO"
+.BR getenv "(3C), "

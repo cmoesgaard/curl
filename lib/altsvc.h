@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_ALTSVC_H
-#define HEADER_CURL_ALTSVC_H
+#ifndef HEADER_CARL_ALTSVC_H
+#define HEADER_CARL_ALTSVC_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,17 +21,17 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_ALTSVC)
-#include <curl/curl.h>
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_ALTSVC)
+#include <carl/carl.h>
 #include "llist.h"
 
 enum alpnid {
   ALPN_none = 0,
-  ALPN_h1 = CURLALTSVC_H1,
-  ALPN_h2 = CURLALTSVC_H2,
-  ALPN_h3 = CURLALTSVC_H3
+  ALPN_h1 = CARLALTSVC_H1,
+  ALPN_h2 = CARLALTSVC_H2,
+  ALPN_h3 = CARLALTSVC_H3
 };
 
 struct althost {
@@ -57,12 +57,12 @@ struct altsvcinfo {
 
 const char *Curl_alpnid2str(enum alpnid id);
 struct altsvcinfo *Curl_altsvc_init(void);
-CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file);
-CURLcode Curl_altsvc_save(struct Curl_easy *data,
+CARLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file);
+CARLcode Curl_altsvc_save(struct Curl_easy *data,
                           struct altsvcinfo *asi, const char *file);
-CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl);
+CARLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl);
 void Curl_altsvc_cleanup(struct altsvcinfo **altsvc);
-CURLcode Curl_altsvc_parse(struct Curl_easy *data,
+CARLcode Curl_altsvc_parse(struct Curl_easy *data,
                            struct altsvcinfo *altsvc, const char *value,
                            enum alpnid srcalpn, const char *srchost,
                            unsigned short srcport);
@@ -70,10 +70,10 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
                         enum alpnid srcalpnid, const char *srchost,
                         int srcport,
                         struct altsvc **dstentry,
-                        const int versions); /* CURLALTSVC_H* bits */
+                        const int versions); /* CARLALTSVC_H* bits */
 #else
 /* disabled */
 #define Curl_altsvc_save(a,b,c)
 #define Curl_altsvc_cleanup(x)
-#endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_ALTSVC */
-#endif /* HEADER_CURL_ALTSVC_H */
+#endif /* !CARL_DISABLE_HTTP && !CARL_DISABLE_ALTSVC */
+#endif /* HEADER_CARL_ALTSVC_H */

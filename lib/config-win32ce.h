@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_WIN32CE_H
-#define HEADER_CURL_CONFIG_WIN32CE_H
+#ifndef HEADER_CARL_CONFIG_WIN32CE_H
+#define HEADER_CARL_CONFIG_WIN32CE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -421,7 +421,7 @@
 #define OS "i386-pc-win32ce"
 
 /* Name of package */
-#define PACKAGE "curl"
+#define PACKAGE "carl"
 
 /* ---------------------------------------------------------------- */
 /*                       WinCE                                      */
@@ -435,9 +435,9 @@
 #  define _UNICODE
 #endif
 
-#define CURL_DISABLE_FILE 1
-#define CURL_DISABLE_TELNET 1
-#define CURL_DISABLE_LDAP 1
+#define CARL_DISABLE_FILE 1
+#define CARL_DISABLE_TELNET 1
+#define CARL_DISABLE_LDAP 1
 
 #define ENOSPC 1
 #define ENOMEM 2
@@ -445,4 +445,4 @@
 
 extern int stat(const char *path, struct stat *buffer);
 
-#endif /* HEADER_CURL_CONFIG_WIN32CE_H */
+#endif /* HEADER_CARL_CONFIG_WIN32CE_H */

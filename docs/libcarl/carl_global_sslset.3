@@ -1,0 +1,102 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_global_sslset 3 "15 July 2017" "libcarl 7.56" "libcarl Manual"
+.SH NAME
+carl_global_sslset - Select SSL backend to use with libcarl
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.nf
+
+typedef struct {
+  carl_sslbackend id;
+  const char *name;
+} carl_ssl_backend;
+
+typedef enum {
+  CARLSSLBACKEND_NONE = 0,
+  CARLSSLBACKEND_OPENSSL = 1,
+  CARLSSLBACKEND_GNUTLS = 2,
+  CARLSSLBACKEND_NSS = 3,
+  CARLSSLBACKEND_GSKIT = 5,
+  CARLSSLBACKEND_POLARSSL = 6, /* deprecated */
+  CARLSSLBACKEND_WOLFSSL = 7,
+  CARLSSLBACKEND_SCHANNEL = 8,
+  CARLSSLBACKEND_SECURETRANSPORT = 9,
+  CARLSSLBACKEND_AXTLS = 10, /* deprecated */
+  CARLSSLBACKEND_MBEDTLS = 11,
+  CARLSSLBACKEND_MESALINK = 12,
+  CARLSSLBACKEND_BEARSSL = 13
+} carl_sslbackend;
+
+.B "CARLsslset carl_global_sslset(carl_sslbackend " id,
+.B "                              const char *" name,
+.B "                              carl_ssl_backend ***" avail ");"
+.fi
+.SH DESCRIPTION
+This function configures at runtime which SSL backend to use with
+libcarl. This function can only be used to select an SSL backend once, and it
+must be called \fBbefore\fP \fIcarl_global_init(3)\fP.
+
+The backend can be identified by the \fIid\fP
+(e.g. \fBCARLSSLBACKEND_OPENSSL\fP). The backend can also be specified via the
+\fIname\fP parameter for a case insensitive match (passing -1 as \fIid\fP). If
+both \fIid\fP and \fIname\fP are specified, the \fIname\fP will be ignored.
+
+If neither \fIid\fP nor \fPname\fP are specified, the function will fail with
+CARLSSLSET_UNKNOWN_BACKEND and set the \fIavail\fP pointer to the
+NULL-terminated list of available backends. The available backends are those
+that this particular build of libcarl supports.
+
+Since libcarl 7.60.0, the \fIavail\fP pointer will always be set to the list
+of alternatives if non-NULL.
+
+Upon success, the function returns CARLSSLSET_OK.
+
+If the specified SSL backend is not available, the function returns
+CARLSSLSET_UNKNOWN_BACKEND and sets the \fIavail\fP pointer to a
+NULL-terminated list of available SSL backends. In this case, you may call the
+function again to try to select a different backend.
+
+The SSL backend can be set only once. If it has already been set, a subsequent
+attempt to change it will result in a \fBCARLSSLSET_TOO_LATE\fP.
+
+\fBThis function is not thread safe.\fP You must not call it when any other
+thread in the program (i.e. a thread sharing the same memory) is running.
+This doesn't just mean no other thread that is using libcarl.
+
+.SH AVAILABILITY
+This function was added in libcarl 7.56.0. Before this version, there was no
+support for choosing SSL backends at runtime.
+.SH RETURN VALUE
+If this function returns CARLSSLSET_OK, the backend was successfully selected.
+
+If the chosen backend is unknown (or support for the chosen backend has not
+been compiled into libcarl), the function returns \fICARLSSLSET_UNKNOWN_BACKEND\fP.
+
+If the backend had been configured previously, or if \fIcarl_global_init(3)\fP
+has already been called, the function returns \fICARLSSLSET_TOO_LATE\fP.
+
+If this libcarl was built completely without SSL support, with no backends at
+all, this function returns \fICARLSSLSET_NO_BACKENDS\fP.
+.SH "SEE ALSO"
+.BR carl_global_init "(3), "
+.BR libcarl "(3) "

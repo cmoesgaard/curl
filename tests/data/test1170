@@ -58,7 +58,7 @@ http://%HOSTIP:%HTTPPORT/1170 --tr-encoding -H "Connection:"
 <protocol>
 GET /1170 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Connection: TE
 TE: gzip

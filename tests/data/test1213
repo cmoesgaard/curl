@@ -45,7 +45,7 @@ proxy
 <protocol>
 GET http://we.want.that.site.com.1213/ HTTP/1.1
 Host: we.want.that.site.com.1213
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

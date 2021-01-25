@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 #
 ###########################################################################
 #
-# Verify that curl_version_info.3 documents all the CURL_VERSION_ bits
+# Verify that carl_version_info.3 documents all the CARL_VERSION_ bits
 # from the header.
 #
 
@@ -36,7 +36,7 @@ my $error;
 
 open(M, "<$manpage");
 while(<M>) {
-    if($_ =~ /^.ip (CURL_VERSION_[A-Z0-9_]+)/i) {
+    if($_ =~ /^.ip (CARL_VERSION_[A-Z0-9_]+)/i) {
         $manversion{$1}++;
     }
 }
@@ -44,7 +44,7 @@ close(M);
 
 open(H, "<$header");
 while(<H>) {
-    if($_ =~ /^\#define (CURL_VERSION_[A-Z0-9_]+)/i) {
+    if($_ =~ /^\#define (CARL_VERSION_[A-Z0-9_]+)/i) {
         $headerversion{$1}++;
     }
 }

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,18 +20,18 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "urldata.h"
 #include "vtls/vtls.h"
 #include "http2.h"
 #include "vssh/ssh.h"
 #include "quic.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 #ifdef USE_ARES
-#  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
+#  if defined(CARL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
   defined(WIN32)
 #    define CARES_STATICLIB
 #  endif
@@ -46,7 +46,7 @@
 #include <libpsl.h>
 #endif
 
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
+#if defined(HAVE_ICONV) && defined(CARL_DOES_CONVERSIONS)
 #include <iconv.h>
 #endif
 
@@ -93,7 +93,7 @@ static size_t zstd_version(char *buf, size_t bufsz)
 #endif
 
 /*
- * curl_version() returns a pointer to a static buffer.
+ * carl_version() returns a pointer to a static buffer.
  *
  * It is implemented to work multi-threaded by making sure repeated invokes
  * generate the exact same string and never write any temporary data like
@@ -102,7 +102,7 @@ static size_t zstd_version(char *buf, size_t bufsz)
 
 #define VERSION_PARTS 15 /* number of substrings we can concatenate */
 
-char *curl_version(void)
+char *carl_version(void)
 {
   static char out[300];
   char *outp;
@@ -129,7 +129,7 @@ char *curl_version(void)
 #ifdef USE_LIBPSL
   char psl_version[40];
 #endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
+#if defined(HAVE_ICONV) && defined(CARL_DOES_CONVERSIONS)
   char iconv_version[40]="iconv";
 #endif
 #ifdef USE_SSH
@@ -151,8 +151,8 @@ char *curl_version(void)
   int j;
 
 #ifdef DEBUGBUILD
-  /* Override version string when environment variable CURL_VERSION is set */
-  const char *debugversion = getenv("CURL_VERSION");
+  /* Override version string when environment variable CARL_VERSION is set */
+  const char *debugversion = getenv("CARL_VERSION");
   if(debugversion) {
     strncpy(out, debugversion, sizeof(out)-1);
     out[sizeof(out)-1] = '\0';
@@ -160,7 +160,7 @@ char *curl_version(void)
   }
 #endif
 
-  src[i++] = LIBCURL_NAME "/" LIBCURL_VERSION;
+  src[i++] = LIBCARL_NAME "/" LIBCARL_VERSION;
 #ifdef USE_SSL
   Curl_ssl_version(ssl_version, sizeof(ssl_version));
   src[i++] = ssl_version;
@@ -194,7 +194,7 @@ char *curl_version(void)
   msnprintf(psl_version, sizeof(psl_version), "libpsl/%s", psl_get_version());
   src[i++] = psl_version;
 #endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
+#if defined(HAVE_ICONV) && defined(CARL_DOES_CONVERSIONS)
 #ifdef _LIBICONV_VERSION
   msnprintf(iconv_version, sizeof(iconv_version), "iconv/%d.%d",
             _LIBICONV_VERSION >> 8, _LIBICONV_VERSION & 255);
@@ -259,64 +259,64 @@ char *curl_version(void)
   return out;
 }
 
-/* data for curl_version_info
+/* data for carl_version_info
 
    Keep the list sorted alphabetically. It is also written so that each
    protocol line has its own #if line to make things easier on the eye.
  */
 
 static const char * const protocols[] = {
-#ifndef CURL_DISABLE_DICT
+#ifndef CARL_DISABLE_DICT
   "dict",
 #endif
-#ifndef CURL_DISABLE_FILE
+#ifndef CARL_DISABLE_FILE
   "file",
 #endif
-#ifndef CURL_DISABLE_FTP
+#ifndef CARL_DISABLE_FTP
   "ftp",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_FTP)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_FTP)
   "ftps",
 #endif
-#ifndef CURL_DISABLE_GOPHER
+#ifndef CARL_DISABLE_GOPHER
   "gopher",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_GOPHER)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_GOPHER)
   "gophers",
 #endif
-#ifndef CURL_DISABLE_HTTP
+#ifndef CARL_DISABLE_HTTP
   "http",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_HTTP)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_HTTP)
   "https",
 #endif
-#ifndef CURL_DISABLE_IMAP
+#ifndef CARL_DISABLE_IMAP
   "imap",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_IMAP)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_IMAP)
   "imaps",
 #endif
-#ifndef CURL_DISABLE_LDAP
+#ifndef CARL_DISABLE_LDAP
   "ldap",
-#if !defined(CURL_DISABLE_LDAPS) && \
+#if !defined(CARL_DISABLE_LDAPS) && \
     ((defined(USE_OPENLDAP) && defined(USE_SSL)) || \
      (!defined(USE_OPENLDAP) && defined(HAVE_LDAP_SSL)))
   "ldaps",
 #endif
 #endif
-#ifndef CURL_DISABLE_MQTT
+#ifndef CARL_DISABLE_MQTT
   "mqtt",
 #endif
-#ifndef CURL_DISABLE_POP3
+#ifndef CARL_DISABLE_POP3
   "pop3",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_POP3)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_POP3)
   "pop3s",
 #endif
 #ifdef USE_LIBRTMP
   "rtmp",
 #endif
-#ifndef CURL_DISABLE_RTSP
+#ifndef CARL_DISABLE_RTSP
   "rtsp",
 #endif
 #if defined(USE_SSH) && !defined(USE_WOLFSSH)
@@ -325,111 +325,111 @@ static const char * const protocols[] = {
 #ifdef USE_SSH
   "sftp",
 #endif
-#if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE) && \
-   (CURL_SIZEOF_CURL_OFF_T > 4)
+#if !defined(CARL_DISABLE_SMB) && defined(USE_CARL_NTLM_CORE) && \
+   (CARL_SIZEOF_CARL_OFF_T > 4)
   "smb",
 #  ifdef USE_SSL
   "smbs",
 #  endif
 #endif
-#ifndef CURL_DISABLE_SMTP
+#ifndef CARL_DISABLE_SMTP
   "smtp",
 #endif
-#if defined(USE_SSL) && !defined(CURL_DISABLE_SMTP)
+#if defined(USE_SSL) && !defined(CARL_DISABLE_SMTP)
   "smtps",
 #endif
-#ifndef CURL_DISABLE_TELNET
+#ifndef CARL_DISABLE_TELNET
   "telnet",
 #endif
-#ifndef CURL_DISABLE_TFTP
+#ifndef CARL_DISABLE_TFTP
   "tftp",
 #endif
 
   NULL
 };
 
-static curl_version_info_data version_info = {
-  CURLVERSION_NOW,
-  LIBCURL_VERSION,
-  LIBCURL_VERSION_NUM,
+static carl_version_info_data version_info = {
+  CARLVERSION_NOW,
+  LIBCARL_VERSION,
+  LIBCARL_VERSION_NUM,
   OS, /* as found by configure or set by hand at build-time */
   0 /* features is 0 by default */
 #ifdef ENABLE_IPV6
-  | CURL_VERSION_IPV6
+  | CARL_VERSION_IPV6
 #endif
 #ifdef USE_SSL
-  | CURL_VERSION_SSL
+  | CARL_VERSION_SSL
 #endif
 #ifdef USE_NTLM
-  | CURL_VERSION_NTLM
+  | CARL_VERSION_NTLM
 #endif
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM) && \
+#if !defined(CARL_DISABLE_HTTP) && defined(USE_NTLM) && \
   defined(NTLM_WB_ENABLED)
-  | CURL_VERSION_NTLM_WB
+  | CARL_VERSION_NTLM_WB
 #endif
 #ifdef USE_SPNEGO
-  | CURL_VERSION_SPNEGO
+  | CARL_VERSION_SPNEGO
 #endif
 #ifdef USE_KERBEROS5
-  | CURL_VERSION_KERBEROS5
+  | CARL_VERSION_KERBEROS5
 #endif
 #ifdef HAVE_GSSAPI
-  | CURL_VERSION_GSSAPI
+  | CARL_VERSION_GSSAPI
 #endif
 #ifdef USE_WINDOWS_SSPI
-  | CURL_VERSION_SSPI
+  | CARL_VERSION_SSPI
 #endif
 #ifdef HAVE_LIBZ
-  | CURL_VERSION_LIBZ
+  | CARL_VERSION_LIBZ
 #endif
 #ifdef DEBUGBUILD
-  | CURL_VERSION_DEBUG
+  | CARL_VERSION_DEBUG
 #endif
-#ifdef CURLDEBUG
-  | CURL_VERSION_CURLDEBUG
+#ifdef CARLDEBUG
+  | CARL_VERSION_CARLDEBUG
 #endif
-#ifdef CURLRES_ASYNCH
-  | CURL_VERSION_ASYNCHDNS
+#ifdef CARLRES_ASYNCH
+  | CARL_VERSION_ASYNCHDNS
 #endif
-#if (CURL_SIZEOF_CURL_OFF_T > 4) && \
+#if (CARL_SIZEOF_CARL_OFF_T > 4) && \
     ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
-  | CURL_VERSION_LARGEFILE
+  | CARL_VERSION_LARGEFILE
 #endif
 #if defined(WIN32) && defined(UNICODE) && defined(_UNICODE)
-  | CURL_VERSION_UNICODE
+  | CARL_VERSION_UNICODE
 #endif
-#if defined(CURL_DOES_CONVERSIONS)
-  | CURL_VERSION_CONV
+#if defined(CARL_DOES_CONVERSIONS)
+  | CARL_VERSION_CONV
 #endif
 #if defined(USE_TLS_SRP)
-  | CURL_VERSION_TLSAUTH_SRP
+  | CARL_VERSION_TLSAUTH_SRP
 #endif
 #if defined(USE_NGHTTP2) || defined(USE_HYPER)
-  | CURL_VERSION_HTTP2
+  | CARL_VERSION_HTTP2
 #endif
 #if defined(ENABLE_QUIC)
-  | CURL_VERSION_HTTP3
+  | CARL_VERSION_HTTP3
 #endif
 #if defined(USE_UNIX_SOCKETS)
-  | CURL_VERSION_UNIX_SOCKETS
+  | CARL_VERSION_UNIX_SOCKETS
 #endif
 #if defined(USE_LIBPSL)
-  | CURL_VERSION_PSL
+  | CARL_VERSION_PSL
 #endif
-#if defined(CURL_WITH_MULTI_SSL)
-  | CURL_VERSION_MULTI_SSL
+#if defined(CARL_WITH_MULTI_SSL)
+  | CARL_VERSION_MULTI_SSL
 #endif
 #if defined(HAVE_BROTLI)
-  | CURL_VERSION_BROTLI
+  | CARL_VERSION_BROTLI
 #endif
 #if defined(HAVE_ZSTD)
-  | CURL_VERSION_ZSTD
+  | CARL_VERSION_ZSTD
 #endif
-#ifndef CURL_DISABLE_ALTSVC
-  | CURL_VERSION_ALTSVC
+#ifndef CARL_DISABLE_ALTSVC
+  | CARL_VERSION_ALTSVC
 #endif
 #if defined(USE_HSTS)
-  | CURL_VERSION_HSTS
+  | CARL_VERSION_HSTS
 #endif
   ,
   NULL, /* ssl_version */
@@ -446,13 +446,13 @@ static curl_version_info_data version_info = {
   0,    /* nghttp2 version number */
   NULL, /* nghttp2 version string */
   NULL, /* quic library string */
-#ifdef CURL_CA_BUNDLE
-  CURL_CA_BUNDLE, /* cainfo */
+#ifdef CARL_CA_BUNDLE
+  CARL_CA_BUNDLE, /* cainfo */
 #else
   NULL,
 #endif
-#ifdef CURL_CA_PATH
-  CURL_CA_PATH,  /* capath */
+#ifdef CARL_CA_PATH
+  CARL_CA_PATH,  /* capath */
 #else
   NULL,
 #endif
@@ -461,13 +461,13 @@ static curl_version_info_data version_info = {
   NULL  /* Hyper version */
 };
 
-curl_version_info_data *curl_version_info(CURLversion stamp)
+carl_version_info_data *carl_version_info(CARLversion stamp)
 {
 #if defined(USE_SSH)
   static char ssh_buffer[80];
 #endif
 #ifdef USE_SSL
-#ifdef CURL_WITH_MULTI_SSL
+#ifdef CARL_WITH_MULTI_SSL
   static char ssl_buffer[200];
 #else
   static char ssl_buffer[80];
@@ -483,11 +483,11 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
 #ifdef USE_SSL
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
   version_info.ssl_version = ssl_buffer;
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   if(Curl_ssl->supports & SSLSUPP_HTTPS_PROXY)
-    version_info.features |= CURL_VERSION_HTTPS_PROXY;
+    version_info.features |= CARL_VERSION_HTTPS_PROXY;
   else
-    version_info.features &= ~CURL_VERSION_HTTPS_PROXY;
+    version_info.features &= ~CARL_VERSION_HTTPS_PROXY;
 #endif
 #endif
 
@@ -507,12 +507,12 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
      otherwise it returns NULL */
   version_info.libidn = idn2_check_version(IDN2_VERSION);
   if(version_info.libidn)
-    version_info.features |= CURL_VERSION_IDN;
+    version_info.features |= CARL_VERSION_IDN;
 #elif defined(USE_WIN32_IDN)
-  version_info.features |= CURL_VERSION_IDN;
+  version_info.features |= CARL_VERSION_IDN;
 #endif
 
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
+#if defined(HAVE_ICONV) && defined(CARL_DOES_CONVERSIONS)
 #ifdef _LIBICONV_VERSION
   version_info.iconv_ver_num = _LIBICONV_VERSION;
 #else

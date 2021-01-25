@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,8 +28,8 @@
 #define TEST_HANG_TIMEOUT 60 * 1000
 
 static int xferinfo(void *p,
-                    curl_off_t dltotal, curl_off_t dlnow,
-                    curl_off_t ultotal, curl_off_t ulnow)
+                    carl_off_t dltotal, carl_off_t dlnow,
+                    carl_off_t ultotal, carl_off_t ulnow)
 {
   (void)p;
   (void)dlnow;
@@ -42,37 +42,37 @@ static int xferinfo(void *p,
 
 int test(char *URL)
 {
-  CURL *curls = NULL;
-  CURLM *multi = NULL;
+  CARL *carls = NULL;
+  CARLM *multi = NULL;
   int still_running;
   int i = 0;
   int res = 0;
-  curl_mimepart *field = NULL;
-  curl_mime *mime = NULL;
+  carl_mimepart *field = NULL;
+  carl_mime *mime = NULL;
   int counter = 1;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(multi);
 
-  easy_init(curls);
+  easy_init(carls);
 
-  mime = curl_mime_init(curls);
-  field = curl_mime_addpart(mime);
-  curl_mime_name(field, "name");
-  curl_mime_data(field, "value", CURL_ZERO_TERMINATED);
+  mime = carl_mime_init(carls);
+  field = carl_mime_addpart(mime);
+  carl_mime_name(field, "name");
+  carl_mime_data(field, "value", CARL_ZERO_TERMINATED);
 
-  easy_setopt(curls, CURLOPT_URL, URL);
-  easy_setopt(curls, CURLOPT_HEADER, 1L);
-  easy_setopt(curls, CURLOPT_VERBOSE, 1L);
-  easy_setopt(curls, CURLOPT_MIMEPOST, mime);
-  easy_setopt(curls, CURLOPT_USERPWD, "u:s");
-  easy_setopt(curls, CURLOPT_XFERINFOFUNCTION, xferinfo);
-  easy_setopt(curls, CURLOPT_NOPROGRESS, 1L);
+  easy_setopt(carls, CARLOPT_URL, URL);
+  easy_setopt(carls, CARLOPT_HEADER, 1L);
+  easy_setopt(carls, CARLOPT_VERBOSE, 1L);
+  easy_setopt(carls, CARLOPT_MIMEPOST, mime);
+  easy_setopt(carls, CARLOPT_USERPWD, "u:s");
+  easy_setopt(carls, CARLOPT_XFERINFOFUNCTION, xferinfo);
+  easy_setopt(carls, CARLOPT_NOPROGRESS, 1L);
 
-  multi_add_handle(multi, curls);
+  multi_add_handle(multi, carls);
 
   multi_perform(multi, &still_running);
 
@@ -80,9 +80,9 @@ int test(char *URL)
 
   while(still_running && counter--) {
     int num;
-    res = curl_multi_wait(multi, NULL, 0, TEST_HANG_TIMEOUT, &num);
-    if(res != CURLM_OK) {
-      printf("curl_multi_wait() returned %d\n", res);
+    res = carl_multi_wait(multi, NULL, 0, TEST_HANG_TIMEOUT, &num);
+    if(res != CARLM_OK) {
+      printf("carl_multi_wait() returned %d\n", res);
       res = TEST_ERR_MAJOR_BAD;
       goto test_cleanup;
     }
@@ -96,11 +96,11 @@ int test(char *URL)
 
 test_cleanup:
 
-  curl_mime_free(mime);
-  curl_multi_remove_handle(multi, curls);
-  curl_multi_cleanup(multi);
-  curl_easy_cleanup(curls);
-  curl_global_cleanup();
+  carl_mime_free(mime);
+  carl_multi_remove_handle(multi, carls);
+  carl_multi_cleanup(multi);
+  carl_easy_cleanup(carls);
+  carl_global_cleanup();
 
   if(res)
     i = res;

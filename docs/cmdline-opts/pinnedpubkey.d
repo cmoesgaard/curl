@@ -4,14 +4,14 @@ Help: FILE/HASHES Public key to verify peer against
 Protocols: TLS
 Category: tls
 ---
-Tells curl to use the specified public key file (or hashes) to verify the
+Tells carl to use the specified public key file (or hashes) to verify the
 peer. This can be a path to a file which contains a single public key in PEM
 or DER format, or any number of base64 encoded sha256 hashes preceded by
 \'sha256//\' and separated by \';\'
 
 When negotiating a TLS or SSL connection, the server sends a certificate
 indicating its identity. A public key is extracted from this certificate and
-if it does not exactly match the public key provided to this option, curl will
+if it does not exactly match the public key provided to this option, carl will
 abort the connection before sending or receiving any data.
 
 PEM/DER support:

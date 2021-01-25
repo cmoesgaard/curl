@@ -1,0 +1,79 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_HSTSWRITEFUNCTION 3 "14 Sep 2020" "libcarl 7.74.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_HSTSWRITEFUNCTION \- write callback for HSTS hosts
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLSTScode hstswrite(CARL *easy, struct carl_hstsentry *sts,
+                      struct carl_index *count, void *userp);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_HSTSWRITEFUNCTION, hstswrite);
+.SH EXPERIMENTAL
+Warning: this feature is early code and is marked as experimental. It can only
+be enabled by explicitly telling configure with \fB--enable-hsts\fP. You are
+advised to not ship this in production before the experimental label is
+removed.
+.SH DESCRIPTION
+Pass a pointer to your callback function, as the prototype shows above.
+
+This callback function gets called by libcarl repeatedly to allow the
+application to store the in-memory HSTS cache when libcarl is about to discard
+it.
+
+Set the \fIuserp\fP argument with the \fICARLOPT_HSTSWRITEDATA(3)\fP option or
+it will be NULL.
+
+When the callback is invoked, the \fIsts\fP pointer points to a populated
+struct: Read the host name to 'name' (it is 'namelen' bytes long and null
+terminated. The 'includeSubDomains' field is non-zero if the entry matches
+subdomains. The 'expire' string is a date stamp null-terminated string using
+the syntax YYYYMMDD HH:MM:SS.
+
+The callback should return \fICARLSTS_OK\fP if it succeeded and is prepared to
+be called again (for another host) or \fICARLSTS_DONE\fP if there's nothing
+more to do. It can also return \fICARLSTS_FAIL\fP to signal error.
+.SH DEFAULT
+NULL - no callback.
+.SH PROTOCOLS
+This feature is only used for HTTP(S) transfer.
+.SH EXAMPLE
+.nf
+{
+  /* set HSTS read callback */
+  carl_easy_setopt(carl, CARLOPT_HSTSWRITEFUNCTION, hstswrite);
+
+  /* pass in suitable argument to the callback */
+  carl_easy_setopt(carl, CARLOPT_HSTSWRITEDATA, &hstspreload[0]);
+
+  result = carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.74.0
+.SH RETURN VALUE
+This will return CARLE_OK.
+.SH "SEE ALSO"
+.BR CARLOPT_HSTSWRITEDATA "(3), " CARLOPT_HSTSWRITEFUNCTION "(3), "
+.BR CARLOPT_HSTS "(3), " CARLOPT_HSTS_CTRL "(3), "

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #define NUMT 4
 
@@ -36,11 +36,11 @@
   If you intend to use a SSL-based protocol here you might need to setup TLS
   library mutex callbacks as described here:
 
-  https://curl.se/libcurl/c/threadsafe.html
+  https://carl.se/libcarl/c/threadsafe.html
 
 */
 const char * const urls[NUMT]= {
-  "https://curl.se/",
+  "https://carl.se/",
   "ftp://cool.haxx.se/",
   "https://www.cag.se/",
   "www.haxx.se"
@@ -48,12 +48,12 @@ const char * const urls[NUMT]= {
 
 static void *pull_one_url(void *url)
 {
-  CURL *curl;
+  CARL *carl;
 
-  curl = curl_easy_init();
-  curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_perform(curl); /* ignores error */
-  curl_easy_cleanup(curl);
+  carl = carl_easy_init();
+  carl_easy_setopt(carl, CARLOPT_URL, url);
+  carl_easy_perform(carl); /* ignores error */
+  carl_easy_cleanup(carl);
 
   return NULL;
 }
@@ -70,8 +70,8 @@ int main(int argc, char **argv)
   pthread_t tid[NUMT];
   int i;
 
-  /* Must initialize libcurl before any threads are started */
-  curl_global_init(CURL_GLOBAL_ALL);
+  /* Must initialize libcarl before any threads are started */
+  carl_global_init(CARL_GLOBAL_ALL);
 
   for(i = 0; i< NUMT; i++) {
     int error = pthread_create(&tid[i],
@@ -89,6 +89,6 @@ int main(int argc, char **argv)
     pthread_join(tid[i], NULL);
     fprintf(stderr, "Thread %d terminated\n", i);
   }
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

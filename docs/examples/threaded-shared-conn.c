@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /*
   URL to fetch. If you select HTTPS, you need to use a TLS backend with mutex
@@ -59,8 +59,8 @@ static size_t write_db(void *ptr, size_t size, size_t nmemb, void *data)
   return (size_t)(size * nmemb);
 }
 
-static void lock_cb(CURL *handle, curl_lock_data data,
-                    curl_lock_access access, void *userptr)
+static void lock_cb(CARL *handle, carl_lock_data data,
+                    carl_lock_access access, void *userptr)
 {
   (void)access; /* unused */
   (void)userptr; /* unused */
@@ -69,7 +69,7 @@ static void lock_cb(CURL *handle, curl_lock_data data,
   pthread_mutex_lock(&connlock);
 }
 
-static void unlock_cb(CURL *handle, curl_lock_data data,
+static void unlock_cb(CARL *handle, carl_lock_data data,
                       void *userptr)
 {
   (void)userptr; /* unused */
@@ -90,7 +90,7 @@ static void kill_locks(void)
 
 struct initurl {
   const char *url;
-  CURLSH *share;
+  CARLSH *share;
   int threadno;
 };
 
@@ -100,13 +100,13 @@ static void *run_thread(void *ptr)
   int i;
 
   for(i = 0; i < URL_ITERATIONS; i++) {
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, u->url);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
-    curl_easy_setopt(curl, CURLOPT_SHARE, u->share);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_db);
-    curl_easy_perform(curl); /* ignores error */
-    curl_easy_cleanup(curl);
+    CARL *carl = carl_easy_init();
+    carl_easy_setopt(carl, CARLOPT_URL, u->url);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 0L);
+    carl_easy_setopt(carl, CARLOPT_SHARE, u->share);
+    carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, write_db);
+    carl_easy_perform(carl); /* ignores error */
+    carl_easy_cleanup(carl);
     fprintf(stderr, "Thread %d transfer %d\n", u->threadno, i);
   }
 
@@ -117,16 +117,16 @@ int main(void)
 {
   pthread_t tid[NUM_THREADS];
   int i;
-  CURLSH *share;
+  CARLSH *share;
   struct initurl url[NUM_THREADS];
 
-  /* Must initialize libcurl before any threads are started */
-  curl_global_init(CURL_GLOBAL_ALL);
+  /* Must initialize libcarl before any threads are started */
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  share = curl_share_init();
-  curl_share_setopt(share, CURLSHOPT_LOCKFUNC, lock_cb);
-  curl_share_setopt(share, CURLSHOPT_UNLOCKFUNC, unlock_cb);
-  curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
+  share = carl_share_init();
+  carl_share_setopt(share, CARLSHOPT_LOCKFUNC, lock_cb);
+  carl_share_setopt(share, CARLSHOPT_UNLOCKFUNC, unlock_cb);
+  carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_CONNECT);
 
   init_locks();
 
@@ -150,7 +150,7 @@ int main(void)
 
   kill_locks();
 
-  curl_share_cleanup(share);
-  curl_global_cleanup();
+  carl_share_cleanup(share);
+  carl_global_cleanup();
   return 0;
 }

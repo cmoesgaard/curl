@@ -1,0 +1,136 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_PUSHFUNCTION 3 "1 Jun 2015" "libcarl 7.44.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_PUSHFUNCTION \- callback that approves or denies server pushes
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+char *carl_pushheader_bynum(struct carl_pushheaders *h, size_t num);
+char *carl_pushheader_byname(struct carl_pushheaders *h, const char *name);
+
+int carl_push_callback(CARL *parent,
+                       CARL *easy,
+                       size_t num_headers,
+                       struct carl_pushheaders *headers,
+                       void *userp);
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_PUSHFUNCTION,
+                            carl_push_callback func);
+.fi
+.SH DESCRIPTION
+This callback gets called when a new HTTP/2 stream is being pushed by the
+server (using the PUSH_PROMISE frame). If no push callback is set, all offered
+pushes will be denied automatically.
+.SH CALLBACK DESCRIPTION
+The callback gets its arguments like this:
+
+\fIparent\fP is the handle of the stream on which this push arrives. The new
+handle has been duphandle()d from the parent, meaning that it has gotten all
+its options inherited. It is then up to the application to alter any options
+if desired.
+
+\fIeasy\fP is a newly created handle that represents this upcoming transfer.
+
+\fInum_headers\fP is the number of name+value pairs that was received and can
+be accessed
+
+\fIheaders\fP is a handle used to access push headers using the accessor
+functions described below. This only accesses and provides the PUSH_PROMISE
+headers, the normal response headers will be provided in the header callback
+as usual.
+
+\fIuserp\fP is the pointer set with \fICARLMOPT_PUSHDATA(3)\fP
+
+If the callback returns CARL_PUSH_OK, the 'easy' handle will be added to the
+multi handle, the callback must not do that by itself.
+
+The callback can access PUSH_PROMISE headers with two accessor
+functions. These functions can only be used from within this callback and they
+can only access the PUSH_PROMISE headers. The normal response headers will be
+passed to the header callback for pushed streams just as for normal streams.
+.IP carl_pushheader_bynum
+Returns the header at index 'num' (or NULL). The returned pointer points to a
+"name:value" string that will be freed when this callback returns.
+.IP carl_pushheader_byname
+Returns the value for the given header name (or NULL). This is a shortcut so
+that the application doesn't have to loop through all headers to find the one
+it is interested in. The data pointed will be freed when this callback
+returns. If more than one header field use the same name, this returns only
+the first one.
+.SH CALLBACK RETURN VALUE
+.IP "CARL_PUSH_OK (0)"
+The application has accepted the stream and it can now start receiving data,
+the ownership of the CARL handle has been taken over by the application.
+.IP "CARL_PUSH_DENY (1)"
+The callback denies the stream and no data for this will reach the
+application, the easy handle will be destroyed by libcarl.
+.IP "CARL_PUSH_ERROROUT (2)"
+Returning this will reject the pushed stream and return an error back on the
+parent stream making it get closed with an error. (Added in carl 7.72.0)
+.IP *
+All other return codes are reserved for future use.
+.SH DEFAULT
+NULL, no callback
+.SH PROTOCOLS
+HTTP(S) (HTTP/2 only)
+.SH EXAMPLE
+.nf
+/* only allow pushes for file names starting with "push-" */
+int push_callback(CARL *parent,
+                  CARL *easy,
+                  size_t num_headers,
+                  struct carl_pushheaders *headers,
+                  void *userp)
+{
+  char *headp;
+  int *transfers = (int *)userp;
+  FILE *out;
+  headp = carl_pushheader_byname(headers, ":path");
+  if(headp && !strncmp(headp, "/push-", 6)) {
+    fprintf(stderr, "The PATH is %s\\n", headp);
+
+    /* save the push here */
+    out = fopen("pushed-stream", "wb");
+
+    /* write to this file */
+    carl_easy_setopt(easy, CARLOPT_WRITEDATA, out);
+
+    (*transfers)++; /* one more */
+
+    return CARL_PUSH_OK;
+  }
+  return CARL_PUSH_DENY;
+}
+
+carl_multi_setopt(multi, CARLMOPT_PUSHFUNCTION, push_callback);
+carl_multi_setopt(multi, CARLMOPT_PUSHDATA, &counter);
+.fi
+.SH AVAILABILITY
+Added in 7.44.0
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLMOPT_PUSHDATA "(3), " CARLMOPT_PIPELINING "(3), " CARLOPT_PIPEWAIT "(3), "
+.BR RFC 7540

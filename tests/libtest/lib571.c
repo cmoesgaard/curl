@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -60,7 +60,7 @@ static size_t rtp_write(void *ptr, size_t size, size_t nmemb, void *stream)
   int i;
   (void)stream;
 
-  message_size = curlx_uztosi(size * nmemb) - 4;
+  message_size = carlx_uztosi(size * nmemb) - 4;
 
   printf("RTP: message size %d, channel %d\n", message_size, channel);
   if(message_size != coded_size) {
@@ -95,13 +95,13 @@ static size_t rtp_write(void *ptr, size_t size, size_t nmemb, void *stream)
 /* build request url */
 static char *suburl(const char *base, int i)
 {
-  return curl_maprintf("%s%.4d", base, i);
+  return carl_maprintf("%s%.4d", base, i);
 }
 
 int test(char *URL)
 {
   int res;
-  CURL *curl;
+  CARL *carl;
   char *stream_uri = NULL;
   int request = 1;
 
@@ -111,39 +111,39 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     fclose(protofile);
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
     fclose(protofile);
-    curl_global_cleanup();
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
   stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
 
-  test_setopt(curl, CURLOPT_INTERLEAVEFUNCTION, rtp_write);
-  test_setopt(curl, CURLOPT_TIMEOUT, 3L);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_WRITEDATA, protofile);
+  test_setopt(carl, CARLOPT_INTERLEAVEFUNCTION, rtp_write);
+  test_setopt(carl, CARLOPT_TIMEOUT, 3L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_WRITEDATA, protofile);
 
-  test_setopt(curl, CURLOPT_RTSP_TRANSPORT, "RTP/AVP/TCP;interleaved=0-1");
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_SETUP);
+  test_setopt(carl, CARLOPT_RTSP_TRANSPORT, "RTP/AVP/TCP;interleaved=0-1");
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_SETUP);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
@@ -153,12 +153,12 @@ int test(char *URL)
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_PLAY);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_PLAY);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
@@ -168,12 +168,12 @@ int test(char *URL)
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_DESCRIBE);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_DESCRIBE);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
@@ -182,12 +182,12 @@ int test(char *URL)
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_PLAY);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_PLAY);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
@@ -196,8 +196,8 @@ int test(char *URL)
   /* Use Receive to get the rest of the data */
   while(!res && rtp_packet_count < 13) {
     fprintf(stderr, "LOOPY LOOP!\n");
-    test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_RECEIVE);
-    res = curl_easy_perform(curl);
+    test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_RECEIVE);
+    res = carl_easy_perform(carl);
   }
 
 test_cleanup:
@@ -206,8 +206,8 @@ test_cleanup:
   if(protofile)
     fclose(protofile);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

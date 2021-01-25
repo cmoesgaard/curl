@@ -1,0 +1,71 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_multi_add_handle 3 "4 March 2002" "libcarl 7.9.5" "libcarl Manual"
+.SH NAME
+carl_multi_add_handle - add an easy handle to a multi session
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLMcode carl_multi_add_handle(CARLM *multi_handle, CARL *easy_handle);
+.ad
+.SH DESCRIPTION
+Adds a standard easy handle to the multi stack. This function call will make
+this \fImulti_handle\fP control the specified \fIeasy_handle\fP.
+
+While an easy handle is added to a multi stack, you cannot and you must not
+use \fIcarl_easy_perform(3)\fP on that handle. After having removed the easy
+handle from the multi stack again, it is perfectly fine to use it with the
+easy interface again.
+
+If the easy handle is not set to use a shared (\fICARLOPT_SHARE(3)\fP) or
+global DNS cache (\fICARLOPT_DNS_USE_GLOBAL_CACHE(3)\fP), it will be made to
+use the DNS cache that is shared between all easy handles within the multi
+handle when \fIcarl_multi_add_handle(3)\fP is called.
+
+When an easy interface is added to a multi handle, it will use a shared
+connection cache owned by the multi handle. Removing and adding new easy
+handles will not affect the pool of connections or the ability to do
+connection re-use.
+
+If you have \fICARLMOPT_TIMERFUNCTION(3)\fP set in the multi handle (and you
+really should if you're working event-based with
+\fIcarl_multi_socket_action(3)\fP and friends), that callback will be called
+from within this function to ask for an updated timer so that your main event
+loop will get the activity on this handle to get started.
+
+The easy handle will remain added to the multi handle until you remove it
+again with \fIcarl_multi_remove_handle(3)\fP - even when a transfer with that
+specific easy handle is completed.
+
+You should remove the easy handle from the multi stack before you terminate
+first the easy handle and then the multi handle:
+
+1 - \fIcarl_multi_remove_handle(3)\fP
+
+2 - \fIcarl_easy_cleanup(3)\fP
+
+3 - \fIcarl_multi_cleanup(3)\fP
+.SH RETURN VALUE
+CARLMcode type, general libcarl multi interface error code.
+.SH "SEE ALSO"
+.BR carl_multi_cleanup "(3)," carl_multi_init "(3), "
+.BR carl_multi_setopt "(3), " carl_multi_socket_action "(3) "

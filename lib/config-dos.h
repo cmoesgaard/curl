@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_DOS_H
-#define HEADER_CURL_CONFIG_DOS_H
+#ifndef HEADER_CARL_CONFIG_DOS_H
+#define HEADER_CARL_CONFIG_DOS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,7 +37,7 @@
   #define OS  "MSDOS/?"
 #endif
 
-#define PACKAGE  "curl"
+#define PACKAGE  "carl"
 
 #define HAVE_ARPA_INET_H       1
 #define HAVE_ASSERT_H          1
@@ -90,7 +90,7 @@
 #define SIZEOF_LONG_DOUBLE     16
 #define SIZEOF_SHORT           2
 #define SIZEOF_SIZE_T          4
-#define SIZEOF_CURL_OFF_T      4
+#define SIZEOF_CARL_OFF_T      4
 #define STDC_HEADERS           1
 #define TIME_WITH_SYS_TIME     1
 
@@ -126,8 +126,8 @@
 
 #define BSD
 
-/* CURLDEBUG definition enables memory tracking */
-/* #define CURLDEBUG */
+/* CARLDEBUG definition enables memory tracking */
+/* #define CARLDEBUG */
 
 /* USE_ZLIB on cmd-line */
 #ifdef USE_ZLIB
@@ -142,7 +142,7 @@
 #endif
 
 /* to disable LDAP */
-#define CURL_DISABLE_LDAP        1
+#define CARL_DISABLE_LDAP        1
 
 #define in_addr_t  u_long
 
@@ -177,4 +177,4 @@
 #undef word
 #undef byte
 
-#endif /* HEADER_CURL_CONFIG_DOS_H */
+#endif /* HEADER_CARL_CONFIG_DOS_H */

@@ -75,7 +75,7 @@ HTTP POST with NTLM authorization and following a 302 redirect
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -83,7 +83,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://%HOSTIP:%HTTPPORT/1100 -u testuser:testpass --ntlm -L -d "stuff to send away" 
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 
@@ -92,7 +92,7 @@ chkhostname curlhost
 POST /1100 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 0
 Content-Type: application/x-www-form-urlencoded
@@ -100,14 +100,14 @@ Content-Type: application/x-www-form-urlencoded
 POST /1100 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: NTLM TlRMTVNTUAADAAAAGAAYAEAAAAAYABgAWAAAAAAAAABwAAAACAAIAHAAAAAIAAgAeAAAAAAAAAAAAAAAhoIBADQzMjE1MzIxAAAAAAAAAAAAAAAAAAAAADj3hs3u3j0kgJqCrLM+74BmaoNHDfIJjHRlc3R1c2VyY3VybGhvc3Q=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 18
 Content-Type: application/x-www-form-urlencoded
 
 stuff to send awayGET /1100 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

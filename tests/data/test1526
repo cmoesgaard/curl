@@ -6,7 +6,7 @@ HTTP GET
 HTTP CONNECT
 HTTP proxy
 proxytunnel
-CURLOPT_PROXYHEADER
+CARLOPT_PROXYHEADER
 </keywords>
 </info>
 
@@ -46,7 +46,7 @@ http-proxy
 lib1526
 </tool>
  <name>
-CURLOPT_PROXYHEADER: separate host/proxy headers
+CARLOPT_PROXYHEADER: separate host/proxy headers
  </name>
  <command>
  http://the.old.moo.1526:%HTTPPORT/1526 %HOSTIP:%PROXYPORT

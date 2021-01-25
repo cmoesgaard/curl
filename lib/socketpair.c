@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,10 +20,10 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 #include "socketpair.h"
 
-#if !defined(HAVE_SOCKETPAIR) && !defined(CURL_DISABLE_SOCKETPAIR)
+#if !defined(HAVE_SOCKETPAIR) && !defined(CARL_DISABLE_SOCKETPAIR)
 #ifdef WIN32
 /*
  * This is a socketpair() implementation for Windows.
@@ -49,19 +49,19 @@
 #endif /* !WIN32 */
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 int Curl_socketpair(int domain, int type, int protocol,
-                    curl_socket_t socks[2])
+                    carl_socket_t socks[2])
 {
   union {
     struct sockaddr_in inaddr;
     struct sockaddr addr;
   } a;
-  curl_socket_t listener;
-  curl_socklen_t addrlen = sizeof(a.inaddr);
+  carl_socket_t listener;
+  carl_socklen_t addrlen = sizeof(a.inaddr);
   int reuse = 1;
   char data[2][12];
   ssize_t dlen;
@@ -70,7 +70,7 @@ int Curl_socketpair(int domain, int type, int protocol,
   (void)protocol;
 
   listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if(listener == CURL_SOCKET_BAD)
+  if(listener == CARL_SOCKET_BAD)
     return -1;
 
   memset(&a, 0, sizeof(a));
@@ -78,10 +78,10 @@ int Curl_socketpair(int domain, int type, int protocol,
   a.inaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   a.inaddr.sin_port = 0;
 
-  socks[0] = socks[1] = CURL_SOCKET_BAD;
+  socks[0] = socks[1] = CARL_SOCKET_BAD;
 
   if(setsockopt(listener, SOL_SOCKET, SO_REUSEADDR,
-                (char *)&reuse, (curl_socklen_t)sizeof(reuse)) == -1)
+                (char *)&reuse, (carl_socklen_t)sizeof(reuse)) == -1)
     goto error;
   if(bind(listener, &a.addr, sizeof(a.inaddr)) == -1)
     goto error;
@@ -90,12 +90,12 @@ int Curl_socketpair(int domain, int type, int protocol,
   if(listen(listener, 1) == -1)
     goto error;
   socks[0] = socket(AF_INET, SOCK_STREAM, 0);
-  if(socks[0] == CURL_SOCKET_BAD)
+  if(socks[0] == CARL_SOCKET_BAD)
     goto error;
   if(connect(socks[0], &a.addr, sizeof(a.inaddr)) == -1)
     goto error;
   socks[1] = accept(listener, NULL, NULL);
-  if(socks[1] == CURL_SOCKET_BAD)
+  if(socks[1] == CARL_SOCKET_BAD)
     goto error;
 
   /* verify that nothing else connected */

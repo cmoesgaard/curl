@@ -5,4 +5,4 @@ Protocols: HTTP
 Category: http
 ---
 Request a compressed Transfer-Encoding response using one of the algorithms
-curl supports, and uncompress the data while receiving it.
+carl supports, and uncompress the data while receiving it.

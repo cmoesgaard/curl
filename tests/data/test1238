@@ -52,7 +52,7 @@ blksize: 512
 timeout: 6
 filename: /1238
 </protocol>
-# 28 = CURLE_OPERATION_TIMEDOUT
+# 28 = CARLE_OPERATION_TIMEDOUT
 <errorcode>
 28
 </errorcode>

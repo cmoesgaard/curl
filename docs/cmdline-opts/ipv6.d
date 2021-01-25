@@ -9,5 +9,5 @@ See-also: http1.1 http2
 Help: Resolve names to IPv6 addresses
 Category: connection dns
 ---
-This option tells curl to resolve names to IPv6 addresses only, and not for
+This option tells carl to resolve names to IPv6 addresses only, and not for
 example try IPv4.

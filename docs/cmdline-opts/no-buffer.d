@@ -1,9 +1,9 @@
 Long: no-buffer
 Short: N
 Help: Disable buffering of the output stream
-Category: curl
+Category: carl
 ---
-Disables the buffering of the output stream. In normal work situations, curl
+Disables the buffering of the output stream. In normal work situations, carl
 will use a standard buffered output stream that will have the effect that it
 will output the data in chunks, not necessarily exactly when the data arrives.
 Using this option will disable that buffering.

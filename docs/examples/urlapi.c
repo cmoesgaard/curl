@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,53 +20,53 @@
  *
  ***************************************************************************/
 /* <DESC>
- * Set working URL with CURLU *.
+ * Set working URL with CARLU *.
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-#if !CURL_AT_LEAST_VERSION(7, 62, 0)
-#error "this example requires curl 7.62.0 or later"
+#if !CARL_AT_LEAST_VERSION(7, 62, 0)
+#error "this example requires carl 7.62.0 or later"
 #endif
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
-  CURLU *urlp;
-  CURLUcode uc;
+  CARLU *urlp;
+  CARLUcode uc;
 
-  /* get a curl handle */
-  curl = curl_easy_init();
+  /* get a carl handle */
+  carl = carl_easy_init();
 
   /* init Curl URL */
-  urlp = curl_url();
-  uc = curl_url_set(urlp, CURLUPART_URL,
+  urlp = carl_url();
+  uc = carl_url_set(urlp, CARLUPART_URL,
                     "http://example.com/path/index.html", 0);
 
   if(uc) {
-    fprintf(stderr, "curl_url_set() failed: %in", uc);
+    fprintf(stderr, "carl_url_set() failed: %in", uc);
     goto cleanup;
   }
 
-  if(curl) {
+  if(carl) {
     /* set urlp to use as working URL */
-    curl_easy_setopt(curl, CURLOPT_CURLU, urlp);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_CARLU, urlp);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     goto cleanup;
   }
 
   cleanup:
-  curl_url_cleanup(urlp);
-  curl_easy_cleanup(curl);
+  carl_url_cleanup(urlp);
+  carl_easy_cleanup(carl);
   return 0;
 }

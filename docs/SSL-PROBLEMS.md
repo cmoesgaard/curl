@@ -44,10 +44,10 @@
   include any ciphers the server wants/can use, the connection handshake
   fails.
 
-  curl has recently disabled the user of a whole bunch of seriously insecure
+  carl has recently disabled the user of a whole bunch of seriously insecure
   ciphers from its default set (slightly depending on SSL backend in use).
 
-  You may have to explicitly provide an alternative list of ciphers for curl
+  You may have to explicitly provide an alternative list of ciphers for carl
   to use to allow the server to use a WEAK cipher for you.
 
   Note that these weak ciphers are identified as flawed. For example, this
@@ -55,7 +55,7 @@
 
   Schannel in Windows XP is not able to connect to servers that no longer
   support the legacy handshakes and algorithms used by those versions, so we
-  advice against building curl to use Schannel on really old Windows versions.
+  advice against building carl to use Schannel on really old Windows versions.
 
   References:
 
@@ -69,7 +69,7 @@
 
   To make such broken servers work, the --ssl-allow-beast option was
   introduced. Exactly as it sounds, it re-introduces the BEAST vulnerability
-  but on the other hand it allows curl to connect to that kind of strange
+  but on the other hand it allows carl to connect to that kind of strange
   servers.
 
 ## Disabling certificate revocation checks
@@ -84,4 +84,4 @@
 
   References:
 
-  https://curl.se/docs/ssl-compared.html
+  https://carl.se/docs/ssl-compared.html

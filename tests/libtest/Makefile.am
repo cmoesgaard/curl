@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,9 +26,9 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_srcdir)/include is for libcurl's external include files
-# $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
-# $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "borrowed" files
+# $(top_srcdir)/include is for libcarl's external include files
+# $(top_builddir)/lib is for libcarl's generated lib/carl_config.h file
+# $(top_srcdir)/lib for libcarl's lib/carl_setup.h and other "borrowed" files
 # $(top_builddir)/ares is for in-tree c-ares's generated ares_build.h file
 # $(top_srcdir)/ares is for in-tree c-ares's external include files
 
@@ -47,9 +47,9 @@ endif
 EXTRA_DIST = test307.pl test610.pl test613.pl test1013.pl test1022.pl   \
   Makefile.inc notexists.pl CMakeLists.txt mk-lib1521.pl .checksrc
 
-CFLAG_CURL_SYMBOL_HIDING = @CFLAG_CURL_SYMBOL_HIDING@
+CFLAG_CARL_SYMBOL_HIDING = @CFLAG_CARL_SYMBOL_HIDING@
 
-CFLAGS += @CURL_CFLAG_EXTRAS@
+CFLAGS += @CARL_CFLAG_EXTRAS@
 
 CLEANFILES = lib1521.c
 
@@ -57,11 +57,11 @@ CLEANFILES = lib1521.c
 LIBS = $(BLANK_AT_MAKETIME)
 
 if USE_EXPLICIT_LIB_DEPS
-SUPPORTFILES_LIBS = $(top_builddir)/lib/libcurl.la @LIBCURL_LIBS@
-TESTUTIL_LIBS = $(top_builddir)/lib/libcurl.la @LIBCURL_LIBS@
+SUPPORTFILES_LIBS = $(top_builddir)/lib/libcarl.la @LIBCARL_LIBS@
+TESTUTIL_LIBS = $(top_builddir)/lib/libcarl.la @LIBCARL_LIBS@
 else
-SUPPORTFILES_LIBS = $(top_builddir)/lib/libcurl.la @CURL_NETWORK_LIBS@ @NSS_LIBS@
-TESTUTIL_LIBS = $(top_builddir)/lib/libcurl.la @CURL_NETWORK_AND_TIME_LIBS@ @NSS_LIBS@
+SUPPORTFILES_LIBS = $(top_builddir)/lib/libcarl.la @CARL_NETWORK_LIBS@ @NSS_LIBS@
+TESTUTIL_LIBS = $(top_builddir)/lib/libcarl.la @CARL_NETWORK_AND_TIME_LIBS@ @NSS_LIBS@
 endif
 
 # Dependencies (may need to be overridden)
@@ -80,8 +80,8 @@ else
 noinst_LTLIBRARIES =
 endif
 
-if USE_CPPFLAG_CURL_STATICLIB
-AM_CPPFLAGS += -DCURL_STATICLIB
+if USE_CPPFLAG_CARL_STATICLIB
+AM_CPPFLAGS += -DCARL_STATICLIB
 endif
 
 AM_LDFLAGS =
@@ -93,18 +93,18 @@ libhostname_la_CFLAGS_EXTRA =
 
 libstubgss_la_LDFLAGS_EXTRA =
 
-if CURL_LT_SHLIB_USE_NO_UNDEFINED
+if CARL_LT_SHLIB_USE_NO_UNDEFINED
 libhostname_la_LDFLAGS_EXTRA += -no-undefined
 libstubgss_la_LDFLAGS_EXTRA += -no-undefined
 endif
 
-if CURL_LT_SHLIB_USE_MIMPURE_TEXT
+if CARL_LT_SHLIB_USE_MIMPURE_TEXT
 libhostname_la_LDFLAGS_EXTRA += -mimpure-text
 endif
 
-if DOING_CURL_SYMBOL_HIDING
-libhostname_la_CPPFLAGS_EXTRA += -DCURL_HIDDEN_SYMBOLS
-libhostname_la_CFLAGS_EXTRA += $(CFLAG_CURL_SYMBOL_HIDING)
+if DOING_CARL_SYMBOL_HIDING
+libhostname_la_CPPFLAGS_EXTRA += -DCARL_HIDDEN_SYMBOLS
+libhostname_la_CFLAGS_EXTRA += $(CFLAG_CARL_SYMBOL_HIDING)
 endif
 
 libhostname_la_CPPFLAGS = $(AM_CPPFLAGS) $(libhostname_la_CPPFLAGS_EXTRA)
@@ -131,8 +131,8 @@ libstubgss_la_DEPENDENCIES =
 endif
 
 
-lib1521.c: $(top_srcdir)/tests/libtest/mk-lib1521.pl $(top_srcdir)/include/curl/curl.h
-	@PERL@ $(top_srcdir)/tests/libtest/mk-lib1521.pl < $(top_srcdir)/include/curl/curl.h > lib1521.c
+lib1521.c: $(top_srcdir)/tests/libtest/mk-lib1521.pl $(top_srcdir)/include/carl/carl.h
+	@PERL@ $(top_srcdir)/tests/libtest/mk-lib1521.pl < $(top_srcdir)/include/carl/carl.h > lib1521.c
 
 CHECKSRC = $(CS_$(V))
 CS_0 = @echo "  RUN     " $@;
@@ -142,7 +142,7 @@ CS_ = $(CS_0)
 checksrc:
 	$(CHECKSRC)@PERL@ $(top_srcdir)/lib/checksrc.pl -D$(srcdir) $(srcdir)/*.[ch]
 
-if CURLDEBUG
+if CARLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif

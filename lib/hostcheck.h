@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HOSTCHECK_H
-#define HEADER_CURL_HOSTCHECK_H
+#ifndef HEADER_CARL_HOSTCHECK_H
+#define HEADER_CARL_HOSTCHECK_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,10 +22,10 @@
  *
  ***************************************************************************/
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-#define CURL_HOST_NOMATCH 0
-#define CURL_HOST_MATCH   1
+#define CARL_HOST_NOMATCH 0
+#define CARL_HOST_MATCH   1
 int Curl_cert_hostcheck(const char *match_pattern, const char *hostname);
 
-#endif /* HEADER_CURL_HOSTCHECK_H */
+#endif /* HEADER_CARL_HOSTCHECK_H */

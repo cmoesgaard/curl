@@ -210,7 +210,7 @@ HTTP authorization retry (Basic switching to NTLM)
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -218,7 +218,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://%HOSTIP:%HTTPPORT/2025 basic ntlm
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 

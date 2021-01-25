@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,21 +22,21 @@
 #***************************************************************************
 
 #=======================================================================
-# Read a test definition which exercises curl's --libcurl option.
+# Read a test definition which exercises carl's --libcarl option.
 # Generate either compilable source code for a new test tool,
 # or a new test definition which runs the tool and expects the
 # same output.
-# This should verify that the --libcurl code really does perform
-# the same actions as the original curl invocation.
+# This should verify that the --libcarl code really does perform
+# the same actions as the original carl invocation.
 #-----------------------------------------------------------------------
-# The output of curl's --libcurl option differs in several ways from
+# The output of carl's --libcarl option differs in several ways from
 # the code needed to integrate with the test tool environment:
 # - #include "test.h"
-# - no call of curl_global_init & curl_global_cleanup
+# - no call of carl_global_init & carl_global_cleanup
 # - main() function vs. test() function
-# - no checking of curl_easy_setopt calls vs. test_setopt wrapper
+# - no checking of carl_easy_setopt calls vs. test_setopt wrapper
 # - handling of stdout
-# - variable names ret & hnd vs. res & curl
+# - variable names ret & hnd vs. res & carl
 # - URL as literal string vs. passed as argument
 #=======================================================================
 use strict;
@@ -49,27 +49,27 @@ my $head =
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
 ';
-# Other declarations from --libcurl come here
-# e.g. curl_slist
+# Other declarations from --libcarl come here
+# e.g. carl_slist
 my $init =
 '
-  if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if (carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  if ((curl = curl_easy_init()) == NULL) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  if ((carl = carl_easy_init()) == NULL) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 ';
 # Option setting, perform and cleanup come here
 my $exit =
-'  curl_global_cleanup();
+'  carl_global_cleanup();
 
   return (int)res;
 }
@@ -104,26 +104,26 @@ sub generate_c {
     my($comment) = @_;
     # Fetch the generated code, which is the output file checked by
     # the old test.
-    my @libcurl = getpart("verify", "file")
+    my @libcarl = getpart("verify", "file")
         or die "$myname: no <verify><file> section found\n";
 
     # Mangle the code into a suitable form for a test tool.
     # We want to extract the important parts (declarations,
-    # URL, setopt calls, cleanup code) from the --libcurl
+    # URL, setopt calls, cleanup code) from the --libcarl
     # boilerplate and insert them into a new boilerplate.
     my(@decl,@code);
     # First URL passed in as argument, others as global
     my @urlvars = ('URL', 'libtest_arg2', 'libtest_arg3');
     my($seen_main,$seen_setopt,$seen_return);
-    foreach (@libcurl) {
+    foreach (@libcarl) {
         # Check state changes first (even though it
         # duplicates some matches) so that the other tests
         # are in a logical order).
         if(/^int main/) {
             $seen_main = 1;
         }
-        if($seen_main and /curl_easy_setopt/) {
-            # Don't match 'curl_easy_setopt' in comment!
+        if($seen_main and /carl_easy_setopt/) {
+            # Don't match 'carl_easy_setopt' in comment!
             $seen_setopt = 1;
         }
         if(/^\s*return/) {
@@ -135,7 +135,7 @@ sub generate_c {
             next;
         }
         elsif(! $seen_setopt) {
-            if(/^\s*(int main|\{|CURLcode |CURL |hnd = curl_easy_init)/) {
+            if(/^\s*(int main|\{|CARLcode |CARL |hnd = carl_easy_init)/) {
                 # Initialisations handled by boilerplate
                 next;
             }
@@ -144,15 +144,15 @@ sub generate_c {
             }
         }
         elsif(! $seen_return) {
-            if(/CURLOPT_URL/) {
+            if(/CARLOPT_URL/) {
                 # URL is passed in as argument or by global
 		my $var = shift @urlvars;
                 s/\"[^\"]*\"/$var/;
             }
-	    s/\bhnd\b/curl/;
+	    s/\bhnd\b/carl/;
             # Convert to macro wrapper
-            s/curl_easy_setopt/test_setopt/;
-	    if(/curl_easy_perform/) {
+            s/carl_easy_setopt/test_setopt/;
+	    if(/carl_easy_perform/) {
 		s/\bret\b/res/;
 		push @code, $_;
 		push @code, "test_cleanup:\n";
@@ -173,22 +173,22 @@ sub generate_c {
 
 # Read the original test data file and transform it
 # - add a "DO NOT EDIT comment"
-# - replace CURLOPT_URL string with URL variable
-# - remove <verify><file> section (was the --libcurl output)
+# - replace CARLOPT_URL string with URL variable
+# - remove <verify><file> section (was the --libcarl output)
 # - insert a <client><tool> section with our new C program name
 # - replace <client><command> section with the URL
 sub generate_test {
     my($comment,$newnumber) = @_;
-    my @libcurl = getpart("verify", "file")
+    my @libcarl = getpart("verify", "file")
         or die "$myname: no <verify><file> section found\n";
-    # Scan the --libcurl code to find the URL used.
+    # Scan the --libcarl code to find the URL used.
     my $url;
-    foreach (@libcurl) {
-        if(my($u) = /CURLOPT_URL, \"([^\"]*)\"/) {
+    foreach (@libcarl) {
+        if(my($u) = /CARLOPT_URL, \"([^\"]*)\"/) {
             $url = $u;
         }
     }
-    die "$myname: CURLOPT_URL not found\n"
+    die "$myname: CARLOPT_URL not found\n"
         unless defined $url;
 
     # Traverse the pseudo-XML transforming as required

@@ -12,7 +12,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,7 +23,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_LIBSSH
 
@@ -58,7 +58,7 @@
 #define in_addr_t unsigned long
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "urldata.h"
 #include "sendf.h"
 #include "hostip.h"
@@ -90,10 +90,10 @@
 #include <fcntl.h>
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
-#include "curl_path.h"
+#include "carl_path.h"
 
 /* A recent macro provided by libssh. Or make our own. */
 #ifndef SSH_STRING_FREE_CHAR
@@ -107,36 +107,36 @@
 #endif
 
 /* Local functions: */
-static CURLcode myssh_connect(struct Curl_easy *data, bool *done);
-static CURLcode myssh_multi_statemach(struct Curl_easy *data,
+static CARLcode myssh_connect(struct Curl_easy *data, bool *done);
+static CARLcode myssh_multi_statemach(struct Curl_easy *data,
                                       bool *done);
-static CURLcode myssh_do_it(struct Curl_easy *data, bool *done);
+static CARLcode myssh_do_it(struct Curl_easy *data, bool *done);
 
-static CURLcode scp_done(struct Curl_easy *data,
-                         CURLcode, bool premature);
-static CURLcode scp_doing(struct Curl_easy *data, bool *dophase_done);
-static CURLcode scp_disconnect(struct Curl_easy *data,
+static CARLcode scp_done(struct Curl_easy *data,
+                         CARLcode, bool premature);
+static CARLcode scp_doing(struct Curl_easy *data, bool *dophase_done);
+static CARLcode scp_disconnect(struct Curl_easy *data,
                                struct connectdata *conn,
                                bool dead_connection);
 
-static CURLcode sftp_done(struct Curl_easy *data,
-                          CURLcode, bool premature);
-static CURLcode sftp_doing(struct Curl_easy *data,
+static CARLcode sftp_done(struct Curl_easy *data,
+                          CARLcode, bool premature);
+static CARLcode sftp_doing(struct Curl_easy *data,
                            bool *dophase_done);
-static CURLcode sftp_disconnect(struct Curl_easy *data,
+static CARLcode sftp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 bool dead);
 static
-CURLcode sftp_perform(struct Curl_easy *data,
+CARLcode sftp_perform(struct Curl_easy *data,
                       bool *connected,
                       bool *dophase_done);
 
 static void sftp_quote(struct Curl_easy *data);
 static void sftp_quote_stat(struct Curl_easy *data);
 static int myssh_getsock(struct Curl_easy *data,
-                         struct connectdata *conn, curl_socket_t *sock);
+                         struct connectdata *conn, carl_socket_t *sock);
 
-static CURLcode myssh_setup_connection(struct Curl_easy *data,
+static CARLcode myssh_setup_connection(struct Curl_easy *data,
                                        struct connectdata *conn);
 
 /*
@@ -160,8 +160,8 @@ const struct Curl_handler Curl_handler_scp = {
   ZERO_NULL,                    /* readwrite */
   ZERO_NULL,                    /* connection_check */
   PORT_SSH,                     /* defport */
-  CURLPROTO_SCP,                /* protocol */
-  CURLPROTO_SCP,                /* family */
+  CARLPROTO_SCP,                /* protocol */
+  CARLPROTO_SCP,                /* family */
   PROTOPT_DIRLOCK | PROTOPT_CLOSEACTION | PROTOPT_NOURLQUERY    /* flags */
 };
 
@@ -186,34 +186,34 @@ const struct Curl_handler Curl_handler_sftp = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_SSH,                             /* defport */
-  CURLPROTO_SFTP,                       /* protocol */
-  CURLPROTO_SFTP,                       /* family */
+  CARLPROTO_SFTP,                       /* protocol */
+  CARLPROTO_SFTP,                       /* family */
   PROTOPT_DIRLOCK | PROTOPT_CLOSEACTION
   | PROTOPT_NOURLQUERY                  /* flags */
 };
 
-static CURLcode sftp_error_to_CURLE(int err)
+static CARLcode sftp_error_to_CARLE(int err)
 {
   switch(err) {
     case SSH_FX_OK:
-      return CURLE_OK;
+      return CARLE_OK;
 
     case SSH_FX_NO_SUCH_FILE:
     case SSH_FX_NO_SUCH_PATH:
-      return CURLE_REMOTE_FILE_NOT_FOUND;
+      return CARLE_REMOTE_FILE_NOT_FOUND;
 
     case SSH_FX_PERMISSION_DENIED:
     case SSH_FX_WRITE_PROTECT:
-      return CURLE_REMOTE_ACCESS_DENIED;
+      return CARLE_REMOTE_ACCESS_DENIED;
 
     case SSH_FX_FILE_ALREADY_EXISTS:
-      return CURLE_REMOTE_FILE_EXISTS;
+      return CARLE_REMOTE_FILE_EXISTS;
 
     default:
       break;
   }
 
-  return CURLE_SSH;
+  return CARLE_SSH;
 }
 
 #ifndef DEBUGBUILD
@@ -234,7 +234,7 @@ static void mystate(struct Curl_easy *data, sshstate nowstate
 {
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
-#if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
+#if defined(DEBUGBUILD) && !defined(CARL_DISABLE_VERBOSE_STRINGS)
   /* for debug purposes */
   static const char *const names[] = {
     "SSH_STOP",
@@ -314,7 +314,7 @@ static void mystate(struct Curl_easy *data, sshstate nowstate
  * 1. data->set.str[STRING_SSH_HOST_PUBLIC_KEY_MD5] is set with an MD5
  *    hash (90s style auth, not sure we should have it here)
  * 2. data->set.ssh_keyfunc callback is set. Then we do trust on first
- *    use. We even save on knownhosts if CURLKHSTAT_FINE_ADD_TO_FILE
+ *    use. We even save on knownhosts if CARLKHSTAT_FINE_ADD_TO_FILE
  *    is returned by it.
  * 3. none of the above. We only accept if it is present on known hosts.
  *
@@ -331,15 +331,15 @@ static int myssh_is_known(struct Curl_easy *data)
   char *found_base64 = NULL;
   char *known_base64 = NULL;
   int vstate;
-  enum curl_khmatch keymatch;
-  struct curl_khkey foundkey;
-  struct curl_khkey *knownkeyp = NULL;
-  curl_sshkeycallback func =
+  enum carl_khmatch keymatch;
+  struct carl_khkey foundkey;
+  struct carl_khkey *knownkeyp = NULL;
+  carl_sshkeycallback func =
     data->set.ssh_keyfunc;
 
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,9,0)
   struct ssh_knownhosts_entry *knownhostsentry = NULL;
-  struct curl_khkey knownkey;
+  struct carl_khkey knownkey;
 #endif
 
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,8,0)
@@ -403,22 +403,22 @@ static int myssh_is_known(struct Curl_easy *data)
 
       switch(ssh_key_type(knownhostsentry->publickey)) {
         case SSH_KEYTYPE_RSA:
-          knownkey.keytype = CURLKHTYPE_RSA;
+          knownkey.keytype = CARLKHTYPE_RSA;
           break;
         case SSH_KEYTYPE_RSA1:
-          knownkey.keytype = CURLKHTYPE_RSA1;
+          knownkey.keytype = CARLKHTYPE_RSA1;
           break;
         case SSH_KEYTYPE_ECDSA:
         case SSH_KEYTYPE_ECDSA_P256:
         case SSH_KEYTYPE_ECDSA_P384:
         case SSH_KEYTYPE_ECDSA_P521:
-          knownkey.keytype = CURLKHTYPE_ECDSA;
+          knownkey.keytype = CARLKHTYPE_ECDSA;
           break;
         case SSH_KEYTYPE_ED25519:
-          knownkey.keytype = CURLKHTYPE_ED25519;
+          knownkey.keytype = CARLKHTYPE_ED25519;
           break;
         case SSH_KEYTYPE_DSS:
-          knownkey.keytype = CURLKHTYPE_DSS;
+          knownkey.keytype = CARLKHTYPE_DSS;
           break;
         default:
           rc = SSH_ERROR;
@@ -430,7 +430,7 @@ static int myssh_is_known(struct Curl_easy *data)
 
   switch(vstate) {
     case SSH_KNOWN_HOSTS_OK:
-      keymatch = CURLKHMATCH_OK;
+      keymatch = CARLKHMATCH_OK;
       break;
     case SSH_KNOWN_HOSTS_OTHER:
       /* fallthrough */
@@ -439,10 +439,10 @@ static int myssh_is_known(struct Curl_easy *data)
     case SSH_KNOWN_HOSTS_UNKNOWN:
       /* fallthrough */
     case SSH_KNOWN_HOSTS_ERROR:
-      keymatch = CURLKHMATCH_MISSING;
+      keymatch = CARLKHMATCH_MISSING;
       break;
   default:
-      keymatch = CURLKHMATCH_MISMATCH;
+      keymatch = CARLKHMATCH_MISMATCH;
       break;
   }
 
@@ -450,15 +450,15 @@ static int myssh_is_known(struct Curl_easy *data)
   vstate = ssh_is_server_known(sshc->ssh_session);
   switch(vstate) {
     case SSH_SERVER_KNOWN_OK:
-      keymatch = CURLKHMATCH_OK;
+      keymatch = CARLKHMATCH_OK;
       break;
     case SSH_SERVER_FILE_NOT_FOUND:
       /* fallthrough */
     case SSH_SERVER_NOT_KNOWN:
-      keymatch = CURLKHMATCH_MISSING;
+      keymatch = CARLKHMATCH_MISSING;
       break;
   default:
-      keymatch = CURLKHMATCH_MISMATCH;
+      keymatch = CARLKHMATCH_MISMATCH;
       break;
   }
 #endif
@@ -473,10 +473,10 @@ static int myssh_is_known(struct Curl_easy *data)
 
     switch(ssh_key_type(pubkey)) {
       case SSH_KEYTYPE_RSA:
-        foundkey.keytype = CURLKHTYPE_RSA;
+        foundkey.keytype = CARLKHTYPE_RSA;
         break;
       case SSH_KEYTYPE_RSA1:
-        foundkey.keytype = CURLKHTYPE_RSA1;
+        foundkey.keytype = CARLKHTYPE_RSA1;
         break;
       case SSH_KEYTYPE_ECDSA:
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,9,0)
@@ -484,15 +484,15 @@ static int myssh_is_known(struct Curl_easy *data)
       case SSH_KEYTYPE_ECDSA_P384:
       case SSH_KEYTYPE_ECDSA_P521:
 #endif
-        foundkey.keytype = CURLKHTYPE_ECDSA;
+        foundkey.keytype = CARLKHTYPE_ECDSA;
         break;
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,7,0)
       case SSH_KEYTYPE_ED25519:
-        foundkey.keytype = CURLKHTYPE_ED25519;
+        foundkey.keytype = CARLKHTYPE_ED25519;
         break;
 #endif
       case SSH_KEYTYPE_DSS:
-        foundkey.keytype = CURLKHTYPE_DSS;
+        foundkey.keytype = CARLKHTYPE_DSS;
         break;
       default:
         rc = SSH_ERROR;
@@ -506,7 +506,7 @@ static int myssh_is_known(struct Curl_easy *data)
     Curl_set_in_callback(data, false);
 
     switch(rc) {
-      case CURLKHSTAT_FINE_ADD_TO_FILE:
+      case CARLKHSTAT_FINE_ADD_TO_FILE:
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,8,0)
         rc = ssh_session_update_known_hosts(sshc->ssh_session);
 #else
@@ -516,7 +516,7 @@ static int myssh_is_known(struct Curl_easy *data)
           goto cleanup;
         }
         break;
-      case CURLKHSTAT_FINE:
+      case CARLKHSTAT_FINE:
         break;
       default: /* REJECT/DEFER */
         rc = SSH_ERROR;
@@ -524,7 +524,7 @@ static int myssh_is_known(struct Curl_easy *data)
     }
   }
   else {
-    if(keymatch != CURLKHMATCH_OK) {
+    if(keymatch != CARLKHMATCH_OK) {
       rc = SSH_ERROR;
       goto cleanup;
     }
@@ -558,7 +558,7 @@ cleanup:
 
 #define MOVE_TO_SFTP_CLOSE_STATE() { \
   state(data, SSH_SFTP_CLOSE); \
-  sshc->actualcode = sftp_error_to_CURLE(sftp_get_error(sshc->sftp_session)); \
+  sshc->actualcode = sftp_error_to_CARLE(sftp_get_error(sshc->sftp_session)); \
   rc = SSH_ERROR; \
   break; \
 }
@@ -570,7 +570,7 @@ cleanup:
     break; \
   } \
   else { \
-    MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED); \
+    MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED); \
   }
 
 #define MOVE_TO_TERTIARY_AUTH \
@@ -664,16 +664,16 @@ restart:
  * to will be set to TRUE if the libssh function returns SSH_AGAIN
  * meaning it wants to be called again when the socket is ready
  */
-static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
+static CARLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
   struct SSHPROTO *protop = data->req.p.ssh;
   struct ssh_conn *sshc = &conn->proto.sshc;
-  curl_socket_t sock = conn->sock[FIRSTSOCKET];
+  carl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc = SSH_NO_ERROR, err;
   char *new_readdir_line;
-  int seekerr = CURL_SEEKFUNC_OK;
+  int seekerr = CARL_SEEKFUNC_OK;
   const char *err_msg;
   *block = 0;                   /* we're not blocking by default */
 
@@ -683,7 +683,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
     case SSH_INIT:
       sshc->secondCreateDirs = 0;
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_OK;
+      sshc->actualcode = CARLE_OK;
 
 #if 0
       ssh_set_log_level(SSH_LOG_PROTOCOL);
@@ -703,7 +703,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
 
       if(rc != SSH_OK) {
         failf(data, "Failure establishing ssh session");
-        MOVE_TO_ERROR_STATE(CURLE_FAILED_INIT);
+        MOVE_TO_ERROR_STATE(CARLE_FAILED_INIT);
       }
 
       state(data, SSH_HOSTKEY);
@@ -713,7 +713,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
 
       rc = myssh_is_known(data);
       if(rc != SSH_OK) {
-        MOVE_TO_ERROR_STATE(CURLE_PEER_FAILED_VERIFICATION);
+        MOVE_TO_ERROR_STATE(CARLE_PEER_FAILED_VERIFICATION);
       }
 
       state(data, SSH_AUTHLIST);
@@ -734,7 +734,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           break;
         }
         else if(rc == SSH_AUTH_ERROR) {
-          MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+          MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
         }
 
         sshc->auth_methods = ssh_userauth_list(sshc->ssh_session, NULL);
@@ -752,13 +752,13 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           state(data, SSH_AUTH_PASS_INIT);
         }
         else {                  /* unsupported authentication method */
-          MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+          MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
         }
 
         break;
       }
     case SSH_AUTH_PKEY_INIT:
-      if(!(data->set.ssh_auth_types & CURLSSH_AUTH_PUBLICKEY)) {
+      if(!(data->set.ssh_auth_types & CARLSSH_AUTH_PUBLICKEY)) {
         MOVE_TO_SECONDARY_AUTH;
       }
 
@@ -785,7 +785,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         if(rc != SSH_OK) {
           failf(data, "Could not load private key file %s",
                 data->set.str[STRING_SSH_PRIVATE_KEY]);
-          MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+          MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
           break;
         }
 
@@ -831,7 +831,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       break;
 
     case SSH_AUTH_GSSAPI:
-      if(!(data->set.ssh_auth_types & CURLSSH_AUTH_GSSAPI)) {
+      if(!(data->set.ssh_auth_types & CARLSSH_AUTH_GSSAPI)) {
         MOVE_TO_TERTIARY_AUTH;
       }
 
@@ -853,7 +853,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       break;
 
     case SSH_AUTH_KEY_INIT:
-      if(data->set.ssh_auth_types & CURLSSH_AUTH_KEYBOARD) {
+      if(data->set.ssh_auth_types & CARLSSH_AUTH_KEYBOARD) {
         state(data, SSH_AUTH_KEY);
       }
       else {
@@ -876,9 +876,9 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       break;
 
     case SSH_AUTH_PASS_INIT:
-      if(!(data->set.ssh_auth_types & CURLSSH_AUTH_PASSWORD)) {
+      if(!(data->set.ssh_auth_types & CARLSSH_AUTH_PASSWORD)) {
         /* Host key authentication is intentionally not implemented */
-        MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+        MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
       }
       state(data, SSH_AUTH_PASS);
       /* FALLTHROUGH */
@@ -896,14 +896,14 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         state(data, SSH_AUTH_DONE);
       }
       else {
-        MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+        MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
       }
       break;
 
     case SSH_AUTH_DONE:
       if(!sshc->authed) {
         failf(data, "Authentication failure");
-        MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
+        MOVE_TO_ERROR_STATE(CARLE_LOGIN_DENIED);
         break;
       }
 
@@ -915,9 +915,9 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       Curl_pgrsTime(data, TIMER_APPCONNECT);      /* SSH is connected */
 
       conn->sockfd = sock;
-      conn->writesockfd = CURL_SOCKET_BAD;
+      conn->writesockfd = CARL_SOCKET_BAD;
 
-      if(conn->handler->protocol == CURLPROTO_SFTP) {
+      if(conn->handler->protocol == CARLPROTO_SFTP) {
         state(data, SSH_SFTP_INIT);
         break;
       }
@@ -932,7 +932,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(!sshc->sftp_session) {
         failf(data, "Failure initializing sftp session: %s",
               ssh_get_error(sshc->ssh_session));
-        MOVE_TO_ERROR_STATE(CURLE_COULDNT_CONNECT);
+        MOVE_TO_ERROR_STATE(CARLE_COULDNT_CONNECT);
         break;
       }
 
@@ -941,7 +941,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         rc = sftp_get_error(sshc->sftp_session);
         failf(data, "Failure initializing sftp session: %s",
               ssh_get_error(sshc->ssh_session));
-        MOVE_TO_ERROR_STATE(sftp_error_to_CURLE(rc));
+        MOVE_TO_ERROR_STATE(sftp_error_to_CARLE(rc));
         break;
       }
       state(data, SSH_SFTP_REALPATH);
@@ -952,7 +952,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
        */
       sshc->homedir = sftp_canonicalize_path(sshc->sftp_session, ".");
       if(sshc->homedir == NULL) {
-        MOVE_TO_ERROR_STATE(CURLE_COULDNT_CONNECT);
+        MOVE_TO_ERROR_STATE(CARLE_COULDNT_CONNECT);
       }
       data->state.most_recent_ftp_entrypath = sshc->homedir;
 
@@ -1032,8 +1032,8 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
-        /* sshc->actualcode = sftp_error_to_CURLE(err);
+        sshc->actualcode = CARLE_QUOTE_ERROR;
+        /* sshc->actualcode = sftp_error_to_CARLE(err);
          * we do not send the actual error; we return
          * the error the libssh2 backend is returning */
         break;
@@ -1051,7 +1051,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       state(data, SSH_SFTP_NEXT_QUOTE);
@@ -1066,7 +1066,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       state(data, SSH_SFTP_NEXT_QUOTE);
@@ -1082,7 +1082,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       state(data, SSH_SFTP_NEXT_QUOTE);
@@ -1096,7 +1096,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       state(data, SSH_SFTP_NEXT_QUOTE);
@@ -1110,7 +1110,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       state(data, SSH_SFTP_NEXT_QUOTE);
@@ -1127,7 +1127,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
               ssh_get_error(sshc->ssh_session));
         state(data, SSH_SFTP_CLOSE);
         sshc->nextstate = SSH_NO_STATE;
-        sshc->actualcode = CURLE_QUOTE_ERROR;
+        sshc->actualcode = CARLE_QUOTE_ERROR;
         break;
       }
       else if(statvfs) {
@@ -1147,7 +1147,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         sftp_statvfs_free(statvfs);
 
         if(!tmp) {
-          result = CURLE_OUT_OF_MEMORY;
+          result = CARLE_OUT_OF_MEMORY;
           state(data, SSH_SFTP_CLOSE);
           sshc->nextstate = SSH_NO_STATE;
           break;
@@ -1209,10 +1209,10 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         if(data->state.resume_from < 0) {
           attrs = sftp_stat(sshc->sftp_session, protop->path);
           if(attrs != 0) {
-            curl_off_t size = attrs->size;
+            carl_off_t size = attrs->size;
             if(size < 0) {
-              failf(data, "Bad file size (%" CURL_FORMAT_CURL_OFF_T ")", size);
-              MOVE_TO_ERROR_STATE(CURLE_BAD_DOWNLOAD_RESUME);
+              failf(data, "Bad file size (%" CARL_FORMAT_CARL_OFF_T ")", size);
+              MOVE_TO_ERROR_STATE(CARLE_BAD_DOWNLOAD_RESUME);
             }
             data->state.resume_from = attrs->size;
 
@@ -1268,19 +1268,19 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           Curl_set_in_callback(data, false);
         }
 
-        if(seekerr != CURL_SEEKFUNC_OK) {
-          curl_off_t passed = 0;
+        if(seekerr != CARL_SEEKFUNC_OK) {
+          carl_off_t passed = 0;
 
-          if(seekerr != CURL_SEEKFUNC_CANTSEEK) {
+          if(seekerr != CARL_SEEKFUNC_CANTSEEK) {
             failf(data, "Could not seek stream");
-            return CURLE_FTP_COULDNT_USE_REST;
+            return CARLE_FTP_COULDNT_USE_REST;
           }
-          /* seekerr == CURL_SEEKFUNC_CANTSEEK (can't seek to offset) */
+          /* seekerr == CARL_SEEKFUNC_CANTSEEK (can't seek to offset) */
           do {
             size_t readthisamountnow =
               (data->state.resume_from - passed > data->set.buffer_size) ?
               (size_t)data->set.buffer_size :
-              curlx_sotouz(data->state.resume_from - passed);
+              carlx_sotouz(data->state.resume_from - passed);
 
             size_t actuallyread =
               data->state.fread_func(data->state.buffer, 1,
@@ -1289,9 +1289,9 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
             passed += actuallyread;
             if((actuallyread == 0) || (actuallyread > readthisamountnow)) {
               /* this checks for greater-than only to make sure that the
-                 CURL_READFUNC_ABORT return code still aborts */
+                 CARL_READFUNC_ABORT return code still aborts */
               failf(data, "Failed to read data");
-              MOVE_TO_ERROR_STATE(CURLE_FTP_COULDNT_USE_REST);
+              MOVE_TO_ERROR_STATE(CARLE_FTP_COULDNT_USE_REST);
             }
           } while(passed < data->state.resume_from);
         }
@@ -1325,7 +1325,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       /* we want to use the _sending_ function even when the socket turns
          out readable as the underlying libssh sftp send function will deal
          with both accordingly */
-      conn->cselect_bits = CURL_CSELECT_OUT;
+      conn->cselect_bits = CARL_CSELECT_OUT;
 
       /* since we don't really wait for anything at this point, we want the
          state machine to move on as soon as possible so we set a very short
@@ -1419,7 +1419,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           tmpLine = aprintf("%s\n", sshc->readdir_filename);
           if(tmpLine == NULL) {
             state(data, SSH_SFTP_CLOSE);
-            sshc->actualcode = CURLE_OUT_OF_MEMORY;
+            sshc->actualcode = CARLE_OUT_OF_MEMORY;
             break;
           }
           result = Curl_client_write(data, CLIENTWRITE_BODY,
@@ -1435,7 +1435,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           data->req.bytecount += sshc->readdir_len + 1;
 
           /* output debug output if that is requested */
-          Curl_debug(data, CURLINFO_DATA_OUT, (char *)sshc->readdir_filename,
+          Curl_debug(data, CARLINFO_DATA_OUT, (char *)sshc->readdir_filename,
                      sshc->readdir_len);
         }
         else {
@@ -1444,7 +1444,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           sshc->readdir_line = calloc(sshc->readdir_totalLen, 1);
           if(!sshc->readdir_line) {
             state(data, SSH_SFTP_CLOSE);
-            sshc->actualcode = CURLE_OUT_OF_MEMORY;
+            sshc->actualcode = CARLE_OUT_OF_MEMORY;
             break;
           }
 
@@ -1456,7 +1456,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
             sshc->readdir_linkPath = malloc(PATH_MAX + 1);
             if(sshc->readdir_linkPath == NULL) {
               state(data, SSH_SFTP_CLOSE);
-              sshc->actualcode = CURLE_OUT_OF_MEMORY;
+              sshc->actualcode = CARLE_OUT_OF_MEMORY;
               break;
             }
 
@@ -1519,7 +1519,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(!new_readdir_line) {
         sshc->readdir_line = NULL;
         state(data, SSH_SFTP_CLOSE);
-        sshc->actualcode = CURLE_OUT_OF_MEMORY;
+        sshc->actualcode = CARLE_OUT_OF_MEMORY;
         break;
       }
       sshc->readdir_line = new_readdir_line;
@@ -1549,7 +1549,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
 
       if(!result) {
         /* output debug output if that is requested */
-        Curl_debug(data, CURLINFO_DATA_OUT, sshc->readdir_line,
+        Curl_debug(data, CARLINFO_DATA_OUT, sshc->readdir_line,
                    sshc->readdir_currLen);
         data->req.bytecount += sshc->readdir_currLen;
       }
@@ -1595,7 +1595,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
     case SSH_SFTP_DOWNLOAD_STAT:
     {
       sftp_attributes attrs;
-      curl_off_t size;
+      carl_off_t size;
 
       attrs = sftp_fstat(sshc->sftp_file);
       if(!attrs ||
@@ -1618,27 +1618,27 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         sftp_attributes_free(attrs);
 
         if(size < 0) {
-          failf(data, "Bad file size (%" CURL_FORMAT_CURL_OFF_T ")", size);
-          return CURLE_BAD_DOWNLOAD_RESUME;
+          failf(data, "Bad file size (%" CARL_FORMAT_CARL_OFF_T ")", size);
+          return CARLE_BAD_DOWNLOAD_RESUME;
         }
         if(data->state.use_range) {
-          curl_off_t from, to;
+          carl_off_t from, to;
           char *ptr;
           char *ptr2;
-          CURLofft to_t;
-          CURLofft from_t;
+          CARLofft to_t;
+          CARLofft from_t;
 
-          from_t = curlx_strtoofft(data->state.range, &ptr, 0, &from);
-          if(from_t == CURL_OFFT_FLOW) {
-            return CURLE_RANGE_ERROR;
+          from_t = carlx_strtoofft(data->state.range, &ptr, 0, &from);
+          if(from_t == CARL_OFFT_FLOW) {
+            return CARLE_RANGE_ERROR;
           }
           while(*ptr && (ISSPACE(*ptr) || (*ptr == '-')))
             ptr++;
-          to_t = curlx_strtoofft(ptr, &ptr2, 0, &to);
-          if(to_t == CURL_OFFT_FLOW) {
-            return CURLE_RANGE_ERROR;
+          to_t = carlx_strtoofft(ptr, &ptr2, 0, &to);
+          if(to_t == CARL_OFFT_FLOW) {
+            return CARLE_RANGE_ERROR;
           }
-          if((to_t == CURL_OFFT_INVAL) /* no "to" value given */
+          if((to_t == CARL_OFFT_INVAL) /* no "to" value given */
              || (to >= size)) {
             to = size - 1;
           }
@@ -1649,9 +1649,9 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           }
           if(from > size) {
             failf(data, "Offset (%"
-                  CURL_FORMAT_CURL_OFF_T ") was beyond file size (%"
-                  CURL_FORMAT_CURL_OFF_T ")", from, size);
-            return CURLE_BAD_DOWNLOAD_RESUME;
+                  CARL_FORMAT_CARL_OFF_T ") was beyond file size (%"
+                  CARL_FORMAT_CARL_OFF_T ")", from, size);
+            return CARLE_BAD_DOWNLOAD_RESUME;
           }
           if(from > to) {
             from = to;
@@ -1675,22 +1675,22 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(data->state.resume_from) {
         if(data->state.resume_from < 0) {
           /* We're supposed to download the last abs(from) bytes */
-          if((curl_off_t)size < -data->state.resume_from) {
+          if((carl_off_t)size < -data->state.resume_from) {
             failf(data, "Offset (%"
-                  CURL_FORMAT_CURL_OFF_T ") was beyond file size (%"
-                  CURL_FORMAT_CURL_OFF_T ")",
+                  CARL_FORMAT_CARL_OFF_T ") was beyond file size (%"
+                  CARL_FORMAT_CARL_OFF_T ")",
                   data->state.resume_from, size);
-            return CURLE_BAD_DOWNLOAD_RESUME;
+            return CARLE_BAD_DOWNLOAD_RESUME;
           }
           /* download from where? */
           data->state.resume_from += size;
         }
         else {
-          if((curl_off_t)size < data->state.resume_from) {
-            failf(data, "Offset (%" CURL_FORMAT_CURL_OFF_T
-                  ") was beyond file size (%" CURL_FORMAT_CURL_OFF_T ")",
+          if((carl_off_t)size < data->state.resume_from) {
+            failf(data, "Offset (%" CARL_FORMAT_CARL_OFF_T
+                  ") was beyond file size (%" CARL_FORMAT_CARL_OFF_T ")",
                   data->state.resume_from, size);
-            return CURLE_BAD_DOWNLOAD_RESUME;
+            return CARLE_BAD_DOWNLOAD_RESUME;
           }
         }
         /* Now store the number of bytes we are expected to download */
@@ -1722,7 +1722,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
     /* we want to use the _receiving_ function even when the socket turns
        out writableable as the underlying libssh recv function will deal
        with both accordingly */
-    conn->cselect_bits = CURL_CSELECT_IN;
+    conn->cselect_bits = CARL_CSELECT_IN;
 
     if(result) {
       /* this should never occur; the close state should be entered
@@ -1794,8 +1794,8 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(data->set.upload) {
         if(data->state.infilesize < 0) {
           failf(data, "SCP requires a known file size for upload");
-          sshc->actualcode = CURLE_UPLOAD_FAILED;
-          MOVE_TO_ERROR_STATE(CURLE_UPLOAD_FAILED);
+          sshc->actualcode = CARLE_UPLOAD_FAILED;
+          MOVE_TO_ERROR_STATE(CARLE_UPLOAD_FAILED);
         }
 
         sshc->scp_session =
@@ -1811,7 +1811,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(!sshc->scp_session) {
         err_msg = ssh_get_error(sshc->ssh_session);
         failf(data, "%s", err_msg);
-        MOVE_TO_ERROR_STATE(CURLE_UPLOAD_FAILED);
+        MOVE_TO_ERROR_STATE(CARLE_UPLOAD_FAILED);
       }
 
       break;
@@ -1822,7 +1822,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(rc != SSH_OK) {
         err_msg = ssh_get_error(sshc->ssh_session);
         failf(data, "%s", err_msg);
-        MOVE_TO_ERROR_STATE(CURLE_UPLOAD_FAILED);
+        MOVE_TO_ERROR_STATE(CARLE_UPLOAD_FAILED);
       }
 
       rc = ssh_scp_push_file(sshc->scp_session, protop->path,
@@ -1831,7 +1831,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(rc != SSH_OK) {
         err_msg = ssh_get_error(sshc->ssh_session);
         failf(data, "%s", err_msg);
-        MOVE_TO_ERROR_STATE(CURLE_UPLOAD_FAILED);
+        MOVE_TO_ERROR_STATE(CARLE_UPLOAD_FAILED);
       }
 
       /* upload data */
@@ -1847,7 +1847,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       /* we want to use the _sending_ function even when the socket turns
          out readable as the underlying libssh scp send function will deal
          with both accordingly */
-      conn->cselect_bits = CURL_CSELECT_OUT;
+      conn->cselect_bits = CARL_CSELECT_OUT;
 
       state(data, SSH_STOP);
 
@@ -1859,25 +1859,25 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       if(rc != SSH_OK) {
         err_msg = ssh_get_error(sshc->ssh_session);
         failf(data, "%s", err_msg);
-        MOVE_TO_ERROR_STATE(CURLE_COULDNT_CONNECT);
+        MOVE_TO_ERROR_STATE(CARLE_COULDNT_CONNECT);
       }
       state(data, SSH_SCP_DOWNLOAD);
       /* FALLTHROUGH */
 
     case SSH_SCP_DOWNLOAD:{
-        curl_off_t bytecount;
+        carl_off_t bytecount;
 
         rc = ssh_scp_pull_request(sshc->scp_session);
         if(rc != SSH_SCP_REQUEST_NEWFILE) {
           err_msg = ssh_get_error(sshc->ssh_session);
           failf(data, "%s", err_msg);
-          MOVE_TO_ERROR_STATE(CURLE_REMOTE_FILE_NOT_FOUND);
+          MOVE_TO_ERROR_STATE(CARLE_REMOTE_FILE_NOT_FOUND);
           break;
         }
 
         /* download data */
         bytecount = ssh_scp_request_get_size(sshc->scp_session);
-        data->req.maxdownload = (curl_off_t) bytecount;
+        data->req.maxdownload = (carl_off_t) bytecount;
         Curl_setup_transfer(data, FIRSTSOCKET, bytecount, FALSE, -1);
 
         /* not set by Curl_setup_transfer to preserve keepon bits */
@@ -1886,7 +1886,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
         /* we want to use the _receiving_ function even when the socket turns
            out writableable as the underlying libssh recv function will deal
            with both accordingly */
-        conn->cselect_bits = CURL_CSELECT_IN;
+        conn->cselect_bits = CARL_CSELECT_IN;
 
         state(data, SSH_STOP);
         break;
@@ -2019,7 +2019,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
    for what actions in the DO_DONE, PERFORM and WAITPERFORM states */
 static int myssh_getsock(struct Curl_easy *data,
                          struct connectdata *conn,
-                         curl_socket_t *sock)
+                         carl_socket_t *sock)
 {
   int bitmap = GETSOCK_BLANK;
   (void)data;
@@ -2055,14 +2055,14 @@ static void myssh_block2waitfor(struct connectdata *conn, bool block)
 }
 
 /* called repeatedly until done from multi.c */
-static CURLcode myssh_multi_statemach(struct Curl_easy *data,
+static CARLcode myssh_multi_statemach(struct Curl_easy *data,
                                       bool *done)
 {
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
   bool block;    /* we store the status and use that to provide a ssh_getsock()
                     implementation */
-  CURLcode result = myssh_statemach_act(data, &block);
+  CARLcode result = myssh_statemach_act(data, &block);
 
   *done = (sshc->state == SSH_STOP) ? TRUE : FALSE;
   myssh_block2waitfor(conn, block);
@@ -2070,17 +2070,17 @@ static CURLcode myssh_multi_statemach(struct Curl_easy *data,
   return result;
 }
 
-static CURLcode myssh_block_statemach(struct Curl_easy *data,
+static CARLcode myssh_block_statemach(struct Curl_easy *data,
                                       bool disconnect)
 {
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   while((sshc->state != SSH_STOP) && !result) {
     bool block;
     timediff_t left = 1000;
-    struct curltime now = Curl_now();
+    struct carltime now = Curl_now();
 
     result = myssh_statemach_act(data, &block);
     if(result)
@@ -2088,7 +2088,7 @@ static CURLcode myssh_block_statemach(struct Curl_easy *data,
 
     if(!disconnect) {
       if(Curl_pgrsUpdate(data))
-        return CURLE_ABORTED_BY_CALLBACK;
+        return CARLE_ABORTED_BY_CALLBACK;
 
       result = Curl_speedcheck(data, now);
       if(result)
@@ -2097,15 +2097,15 @@ static CURLcode myssh_block_statemach(struct Curl_easy *data,
       left = Curl_timeleft(data, NULL, FALSE);
       if(left < 0) {
         failf(data, "Operation timed out");
-        return CURLE_OPERATION_TIMEDOUT;
+        return CARLE_OPERATION_TIMEDOUT;
       }
     }
 
     if(block) {
-      curl_socket_t fd_read = conn->sock[FIRSTSOCKET];
+      carl_socket_t fd_read = conn->sock[FIRSTSOCKET];
       /* wait for the socket to become ready */
-      (void) Curl_socket_check(fd_read, CURL_SOCKET_BAD,
-                               CURL_SOCKET_BAD, left > 1000 ? 1000 : left);
+      (void) Curl_socket_check(fd_read, CARL_SOCKET_BAD,
+                               CARL_SOCKET_BAD, left > 1000 ? 1000 : left);
     }
 
   }
@@ -2116,7 +2116,7 @@ static CURLcode myssh_block_statemach(struct Curl_easy *data,
 /*
  * SSH setup connection
  */
-static CURLcode myssh_setup_connection(struct Curl_easy *data,
+static CARLcode myssh_setup_connection(struct Curl_easy *data,
                                        struct connectdata *conn)
 {
   struct SSHPROTO *ssh;
@@ -2124,9 +2124,9 @@ static CURLcode myssh_setup_connection(struct Curl_easy *data,
 
   data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
   if(!ssh)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static Curl_recv scp_recv, sftp_recv;
@@ -2136,12 +2136,12 @@ static Curl_send scp_send, sftp_send;
  * Curl_ssh_connect() gets called from Curl_protocol_connect() to allow us to
  * do protocol-specific actions at connect-time.
  */
-static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
+static CARLcode myssh_connect(struct Curl_easy *data, bool *done)
 {
   struct ssh_conn *ssh;
-  CURLcode result;
+  CARLcode result;
   struct connectdata *conn = data->conn;
-  curl_socket_t sock = conn->sock[FIRSTSOCKET];
+  carl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc;
 
   /* initialize per-handle data if not already */
@@ -2152,7 +2152,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
      function to make the re-use checks properly be able to check this bit. */
   connkeep(conn, "SSH default");
 
-  if(conn->handler->protocol & CURLPROTO_SCP) {
+  if(conn->handler->protocol & CARLPROTO_SCP) {
     conn->recv[FIRSTSOCKET] = scp_recv;
     conn->send[FIRSTSOCKET] = scp_send;
   }
@@ -2166,13 +2166,13 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
   ssh->ssh_session = ssh_new();
   if(ssh->ssh_session == NULL) {
     failf(data, "Failure initialising ssh session");
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 
   rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_HOST, conn->host.name);
   if(rc != SSH_OK) {
     failf(data, "Could not set remote host");
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 
   rc = ssh_options_parse_config(ssh->ssh_session, NULL);
@@ -2184,7 +2184,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
   rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_FD, &sock);
   if(rc != SSH_OK) {
     failf(data, "Could not set socket");
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 
   if(conn->user && conn->user[0] != '\0') {
@@ -2192,7 +2192,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
     rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_USER, conn->user);
     if(rc != SSH_OK) {
       failf(data, "Could not set user");
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     }
   }
 
@@ -2202,7 +2202,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
                          data->set.str[STRING_SSH_KNOWNHOSTS]);
     if(rc != SSH_OK) {
       failf(data, "Could not set known hosts file path");
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     }
   }
 
@@ -2211,7 +2211,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
                          &conn->remote_port);
     if(rc != SSH_OK) {
       failf(data, "Could not set remote port");
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     }
   }
 
@@ -2220,7 +2220,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
                          "zlib,zlib@openssh.com,none");
     if(rc != SSH_OK) {
       failf(data, "Could not set compression");
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     }
   }
 
@@ -2232,7 +2232,7 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
                                     &ssh->pubkey);
     if(rc != SSH_OK) {
       failf(data, "Could not load public key file");
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     }
   }
 
@@ -2247,9 +2247,9 @@ static CURLcode myssh_connect(struct Curl_easy *data, bool *done)
 }
 
 /* called from multi.c while DOing */
-static CURLcode scp_doing(struct Curl_easy *data, bool *dophase_done)
+static CARLcode scp_doing(struct Curl_easy *data, bool *dophase_done)
 {
-  CURLcode result;
+  CARLcode result;
 
   result = myssh_multi_statemach(data, dophase_done);
 
@@ -2269,10 +2269,10 @@ static CURLcode scp_doing(struct Curl_easy *data, bool *dophase_done)
  */
 
 static
-CURLcode scp_perform(struct Curl_easy *data,
+CARLcode scp_perform(struct Curl_easy *data,
                      bool *connected, bool *dophase_done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
 
   DEBUGF(infof(data, "DO phase starts\n"));
@@ -2293,9 +2293,9 @@ CURLcode scp_perform(struct Curl_easy *data,
   return result;
 }
 
-static CURLcode myssh_do_it(struct Curl_easy *data, bool *done)
+static CARLcode myssh_do_it(struct Curl_easy *data, bool *done)
 {
-  CURLcode result;
+  CARLcode result;
   bool connected = 0;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
@@ -2304,7 +2304,7 @@ static CURLcode myssh_do_it(struct Curl_easy *data, bool *done)
 
   data->req.size = -1;          /* make sure this is unknown at this point */
 
-  sshc->actualcode = CURLE_OK;  /* reset error code */
+  sshc->actualcode = CARLE_OK;  /* reset error code */
   sshc->secondCreateDirs = 0;   /* reset the create dir attempt state
                                    variable */
 
@@ -2313,7 +2313,7 @@ static CURLcode myssh_do_it(struct Curl_easy *data, bool *done)
   Curl_pgrsSetUploadSize(data, -1);
   Curl_pgrsSetDownloadSize(data, -1);
 
-  if(conn->handler->protocol & CURLPROTO_SCP)
+  if(conn->handler->protocol & CARLPROTO_SCP)
     result = scp_perform(data, &connected, done);
   else
     result = sftp_perform(data, &connected, done);
@@ -2324,11 +2324,11 @@ static CURLcode myssh_do_it(struct Curl_easy *data, bool *done)
 /* BLOCKING, but the function is using the state machine so the only reason
    this is still blocking is that the multi interface code has no support for
    disconnecting operations that takes a while */
-static CURLcode scp_disconnect(struct Curl_easy *data,
+static CARLcode scp_disconnect(struct Curl_easy *data,
                                struct connectdata *conn,
                                bool dead_connection)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct ssh_conn *ssh = &conn->proto.sshc;
   (void) dead_connection;
 
@@ -2345,9 +2345,9 @@ static CURLcode scp_disconnect(struct Curl_easy *data,
 
 /* generic done function for both SCP and SFTP called from their specific
    done functions */
-static CURLcode myssh_done(struct Curl_easy *data, CURLcode status)
+static CARLcode myssh_done(struct Curl_easy *data, CARLcode status)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct SSHPROTO *protop = data->req.p.ssh;
 
   if(!status) {
@@ -2360,14 +2360,14 @@ static CURLcode myssh_done(struct Curl_easy *data, CURLcode status)
   if(protop)
     Curl_safefree(protop->path);
   if(Curl_pgrsDone(data))
-    return CURLE_ABORTED_BY_CALLBACK;
+    return CARLE_ABORTED_BY_CALLBACK;
 
   data->req.keepon = 0;   /* clear all bits */
   return result;
 }
 
 
-static CURLcode scp_done(struct Curl_easy *data, CURLcode status,
+static CARLcode scp_done(struct Curl_easy *data, CARLcode status,
                          bool premature)
 {
   (void) premature;             /* not used */
@@ -2380,7 +2380,7 @@ static CURLcode scp_done(struct Curl_easy *data, CURLcode status,
 }
 
 static ssize_t scp_send(struct Curl_easy *data, int sockindex,
-                        const void *mem, size_t len, CURLcode *err)
+                        const void *mem, size_t len, CARLcode *err)
 {
   int rc;
   struct connectdata *conn = data->conn;
@@ -2396,13 +2396,13 @@ static ssize_t scp_send(struct Curl_easy *data, int sockindex,
   myssh_block2waitfor(conn, (rc == SSH_AGAIN) ? TRUE : FALSE);
 
   if(rc == SSH_AGAIN) {
-    *err = CURLE_AGAIN;
+    *err = CARLE_AGAIN;
     return 0;
   }
   else
 #endif
   if(rc != SSH_OK) {
-    *err = CURLE_SSH;
+    *err = CARLE_SSH;
     return -1;
   }
 
@@ -2410,7 +2410,7 @@ static ssize_t scp_send(struct Curl_easy *data, int sockindex,
 }
 
 static ssize_t scp_recv(struct Curl_easy *data, int sockindex,
-                        char *mem, size_t len, CURLcode *err)
+                        char *mem, size_t len, CARLcode *err)
 {
   ssize_t nread;
   struct connectdata *conn = data->conn;
@@ -2427,7 +2427,7 @@ static ssize_t scp_recv(struct Curl_easy *data, int sockindex,
 
   myssh_block2waitfor(conn, (nread == SSH_AGAIN) ? TRUE : FALSE);
   if(nread == SSH_AGAIN) {
-    *err = CURLE_AGAIN;
+    *err = CARLE_AGAIN;
     nread = -1;
   }
 #endif
@@ -2449,11 +2449,11 @@ static ssize_t scp_recv(struct Curl_easy *data, int sockindex,
  */
 
 static
-CURLcode sftp_perform(struct Curl_easy *data,
+CARLcode sftp_perform(struct Curl_easy *data,
                       bool *connected,
                       bool *dophase_done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
 
   DEBUGF(infof(data, "DO phase starts\n"));
@@ -2476,10 +2476,10 @@ CURLcode sftp_perform(struct Curl_easy *data,
 }
 
 /* called from multi.c while DOing */
-static CURLcode sftp_doing(struct Curl_easy *data,
+static CARLcode sftp_doing(struct Curl_easy *data,
                            bool *dophase_done)
 {
-  CURLcode result = myssh_multi_statemach(data, dophase_done);
+  CARLcode result = myssh_multi_statemach(data, dophase_done);
   if(*dophase_done) {
     DEBUGF(infof(data, "DO phase is complete\n"));
   }
@@ -2489,11 +2489,11 @@ static CURLcode sftp_doing(struct Curl_easy *data,
 /* BLOCKING, but the function is using the state machine so the only reason
    this is still blocking is that the multi interface code has no support for
    disconnecting operations that takes a while */
-static CURLcode sftp_disconnect(struct Curl_easy *data,
+static CARLcode sftp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 bool dead_connection)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   (void) dead_connection;
 
   DEBUGF(infof(data, "SSH DISCONNECT starts now\n"));
@@ -2510,7 +2510,7 @@ static CURLcode sftp_disconnect(struct Curl_easy *data,
 
 }
 
-static CURLcode sftp_done(struct Curl_easy *data, CURLcode status,
+static CARLcode sftp_done(struct Curl_easy *data, CARLcode status,
                           bool premature)
 {
   struct connectdata *conn = data->conn;
@@ -2529,7 +2529,7 @@ static CURLcode sftp_done(struct Curl_easy *data, CURLcode status,
 
 /* return number of sent bytes */
 static ssize_t sftp_send(struct Curl_easy *data, int sockindex,
-                         const void *mem, size_t len, CURLcode *err)
+                         const void *mem, size_t len, CARLcode *err)
 {
   ssize_t nwrite;
   struct connectdata *conn = data->conn;
@@ -2541,13 +2541,13 @@ static ssize_t sftp_send(struct Curl_easy *data, int sockindex,
 
 #if 0 /* not returned by libssh on write */
   if(nwrite == SSH_AGAIN) {
-    *err = CURLE_AGAIN;
+    *err = CARLE_AGAIN;
     nwrite = 0;
   }
   else
 #endif
   if(nwrite < 0) {
-    *err = CURLE_SSH;
+    *err = CARLE_SSH;
     nwrite = -1;
   }
 
@@ -2559,13 +2559,13 @@ static ssize_t sftp_send(struct Curl_easy *data, int sockindex,
  * or <0 on error
  */
 static ssize_t sftp_recv(struct Curl_easy *data, int sockindex,
-                         char *mem, size_t len, CURLcode *err)
+                         char *mem, size_t len, CARLcode *err)
 {
   ssize_t nread;
   struct connectdata *conn = data->conn;
   (void)sockindex;
 
-  DEBUGASSERT(len < CURL_MAX_READ_SIZE);
+  DEBUGASSERT(len < CARL_MAX_READ_SIZE);
 
   switch(conn->proto.sshc.sftp_recv_state) {
     case 0:
@@ -2573,7 +2573,7 @@ static ssize_t sftp_recv(struct Curl_easy *data, int sockindex,
         sftp_async_read_begin(conn->proto.sshc.sftp_file,
                               (uint32_t)len);
       if(conn->proto.sshc.sftp_file_index < 0) {
-        *err = CURLE_RECV_ERROR;
+        *err = CARLE_RECV_ERROR;
         return -1;
       }
 
@@ -2588,11 +2588,11 @@ static ssize_t sftp_recv(struct Curl_easy *data, int sockindex,
       myssh_block2waitfor(conn, (nread == SSH_AGAIN)?TRUE:FALSE);
 
       if(nread == SSH_AGAIN) {
-        *err = CURLE_AGAIN;
+        *err = CARLE_AGAIN;
         return -1;
       }
       else if(nread < 0) {
-        *err = CURLE_RECV_ERROR;
+        *err = CARLE_RECV_ERROR;
         return -1;
       }
 
@@ -2611,7 +2611,7 @@ static void sftp_quote(struct Curl_easy *data)
   struct connectdata *conn = data->conn;
   struct SSHPROTO *protop = data->req.p.ssh;
   struct ssh_conn *sshc = &conn->proto.sshc;
-  CURLcode result;
+  CARLcode result;
 
   /*
    * Support some of the "FTP" commands
@@ -2621,7 +2621,7 @@ static void sftp_quote(struct Curl_easy *data)
 
   /* if a command starts with an asterisk, which a legal SFTP command never
      can, the command will be allowed to fail without it causing any
-     aborts or cancels etc. It will cause libcurl to act as if the command
+     aborts or cancels etc. It will cause libcarl to act as if the command
      is successful, whatever the server reponds. */
 
   if(cmd[0] == '*') {
@@ -2634,13 +2634,13 @@ static void sftp_quote(struct Curl_easy *data)
     char *tmp = aprintf("257 \"%s\" is current directory.\n",
                         protop->path);
     if(!tmp) {
-      sshc->actualcode = CURLE_OUT_OF_MEMORY;
+      sshc->actualcode = CARLE_OUT_OF_MEMORY;
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
       return;
     }
-    Curl_debug(data, CURLINFO_HEADER_OUT, (char *) "PWD\n", 4);
-    Curl_debug(data, CURLINFO_HEADER_IN, tmp, strlen(tmp));
+    Curl_debug(data, CARLINFO_HEADER_OUT, (char *) "PWD\n", 4);
+    Curl_debug(data, CARLINFO_HEADER_IN, tmp, strlen(tmp));
 
     /* this sends an FTP-like "header" to the header callback so that the
        current directory can be read very similar to how it is read when
@@ -2666,7 +2666,7 @@ static void sftp_quote(struct Curl_easy *data)
     failf(data, "Syntax error in SFTP command. Supply parameter(s)!");
     state(data, SSH_SFTP_CLOSE);
     sshc->nextstate = SSH_NO_STATE;
-    sshc->actualcode = CURLE_QUOTE_ERROR;
+    sshc->actualcode = CARLE_QUOTE_ERROR;
     return;
   }
 
@@ -2676,7 +2676,7 @@ static void sftp_quote(struct Curl_easy *data)
    */
   result = Curl_get_pathname(&cp, &sshc->quote_path1, sshc->homedir);
   if(result) {
-    if(result == CURLE_OUT_OF_MEMORY)
+    if(result == CARLE_OUT_OF_MEMORY)
       failf(data, "Out of memory");
     else
       failf(data, "Syntax error: Bad first parameter");
@@ -2703,7 +2703,7 @@ static void sftp_quote(struct Curl_easy *data)
     /* get the destination */
     result = Curl_get_pathname(&cp, &sshc->quote_path2, sshc->homedir);
     if(result) {
-      if(result == CURLE_OUT_OF_MEMORY)
+      if(result == CARLE_OUT_OF_MEMORY)
         failf(data, "Out of memory");
       else
         failf(data, "Syntax error in chgrp/chmod/chown/atime/mtime: "
@@ -2725,7 +2725,7 @@ static void sftp_quote(struct Curl_easy *data)
     /* get the destination */
     result = Curl_get_pathname(&cp, &sshc->quote_path2, sshc->homedir);
     if(result) {
-      if(result == CURLE_OUT_OF_MEMORY)
+      if(result == CARLE_OUT_OF_MEMORY)
         failf(data, "Out of memory");
       else
         failf(data, "Syntax error in ln/symlink: Bad second parameter");
@@ -2749,7 +2749,7 @@ static void sftp_quote(struct Curl_easy *data)
     /* second param is the dest. path */
     result = Curl_get_pathname(&cp, &sshc->quote_path2, sshc->homedir);
     if(result) {
-      if(result == CURLE_OUT_OF_MEMORY)
+      if(result == CARLE_OUT_OF_MEMORY)
         failf(data, "Out of memory");
       else
         failf(data, "Syntax error in rename: Bad second parameter");
@@ -2783,7 +2783,7 @@ static void sftp_quote(struct Curl_easy *data)
   Curl_safefree(sshc->quote_path2);
   state(data, SSH_SFTP_CLOSE);
   sshc->nextstate = SSH_NO_STATE;
-  sshc->actualcode = CURLE_QUOTE_ERROR;
+  sshc->actualcode = CARLE_QUOTE_ERROR;
 }
 
 static void sftp_quote_stat(struct Curl_easy *data)
@@ -2795,7 +2795,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
 
   /* if a command starts with an asterisk, which a legal SFTP command never
      can, the command will be allowed to fail without it causing any
-     aborts or cancels etc. It will cause libcurl to act as if the command
+     aborts or cancels etc. It will cause libcarl to act as if the command
      is successful, whatever the server reponds. */
 
   if(cmd[0] == '*') {
@@ -2818,7 +2818,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
           sftp_get_error(sshc->sftp_session));
     state(data, SSH_SFTP_CLOSE);
     sshc->nextstate = SSH_NO_STATE;
-    sshc->actualcode = CURLE_QUOTE_ERROR;
+    sshc->actualcode = CARLE_QUOTE_ERROR;
     return;
   }
 
@@ -2832,7 +2832,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
       failf(data, "Syntax error: chgrp gid not a number");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
+      sshc->actualcode = CARLE_QUOTE_ERROR;
       return;
     }
     sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_UIDGID;
@@ -2847,7 +2847,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
       failf(data, "Syntax error: chmod permissions not a number");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
+      sshc->actualcode = CARLE_QUOTE_ERROR;
       return;
     }
     sshc->quote_attrs->permissions = perms;
@@ -2862,7 +2862,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
       failf(data, "Syntax error: chown uid not a number");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
+      sshc->actualcode = CARLE_QUOTE_ERROR;
       return;
     }
     sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_UIDGID;
@@ -2875,7 +2875,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
       failf(data, "Syntax error: incorrect access date format");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
+      sshc->actualcode = CARLE_QUOTE_ERROR;
       return;
     }
     sshc->quote_attrs->atime = (uint32_t)date;
@@ -2889,7 +2889,7 @@ static void sftp_quote_stat(struct Curl_easy *data)
       failf(data, "Syntax error: incorrect modification date format");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
+      sshc->actualcode = CARLE_QUOTE_ERROR;
       return;
     }
     sshc->quote_attrs->mtime = (uint32_t)date;
@@ -2901,13 +2901,13 @@ static void sftp_quote_stat(struct Curl_easy *data)
   return;
 }
 
-CURLcode Curl_ssh_init(void)
+CARLcode Curl_ssh_init(void)
 {
   if(ssh_init()) {
     DEBUGF(fprintf(stderr, "Error: libssh_init failed\n"));
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 void Curl_ssh_cleanup(void)
@@ -2917,7 +2917,7 @@ void Curl_ssh_cleanup(void)
 
 size_t Curl_ssh_version(char *buffer, size_t buflen)
 {
-  return msnprintf(buffer, buflen, "libssh/%s", CURL_LIBSSH_VERSION);
+  return msnprintf(buffer, buflen, "libssh/%s", CARL_LIBSSH_VERSION);
 }
 
 #endif                          /* USE_LIBSSH */

@@ -4,7 +4,7 @@ Protocols: HTTP
 See-also: proxy-anyauth basic digest
 Category: http proxy auth
 ---
-Tells curl to figure out authentication method by itself, and use the most
+Tells carl to figure out authentication method by itself, and use the most
 secure one the remote site claims to support. This is done by first doing a
 request and checking the response-headers, thus possibly inducing an extra
 network round-trip. This is used instead of setting a specific authentication

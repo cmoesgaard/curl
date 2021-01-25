@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -114,19 +114,19 @@ $sftpsrvexe      = 'sftp-server' .exe_ext('SSH'); # base name and ext of sftp-se
 $sftpexe         = 'sftp'        .exe_ext('SSH'); # base name and ext of sftp client
 $sshkeygenexe    = 'ssh-keygen'  .exe_ext('SSH'); # base name and ext of ssh-keygen
 $httptlssrvexe   = 'gnutls-serv' .exe_ext('SSH'); # base name and ext of gnutls-serv
-$sshdconfig      = 'curl_sshd_config';       # ssh daemon config file
-$sshconfig       = 'curl_ssh_config';        # ssh client config file
-$sftpconfig      = 'curl_sftp_config';       # sftp client config file
+$sshdconfig      = 'carl_sshd_config';       # ssh daemon config file
+$sshconfig       = 'carl_ssh_config';        # ssh client config file
+$sftpconfig      = 'carl_sftp_config';       # sftp client config file
 $sshdlog         = undef;                    # ssh daemon log file
 $sshlog          = undef;                    # ssh client log file
 $sftplog         = undef;                    # sftp client log file
-$sftpcmds        = 'curl_sftp_cmds';         # sftp client commands batch file
-$knownhosts      = 'curl_client_knownhosts'; # ssh knownhosts file
-$hstprvkeyf      = 'curl_host_rsa_key';      # host private key file
-$hstpubkeyf      = 'curl_host_rsa_key.pub';  # host public key file
-$hstpubmd5f      = 'curl_host_rsa_key.pub_md5';  # md5 hash of host public key
-$cliprvkeyf      = 'curl_client_key';        # client private key file
-$clipubkeyf      = 'curl_client_key.pub';    # client public key file
+$sftpcmds        = 'carl_sftp_cmds';         # sftp client commands batch file
+$knownhosts      = 'carl_client_knownhosts'; # ssh knownhosts file
+$hstprvkeyf      = 'carl_host_rsa_key';      # host private key file
+$hstpubkeyf      = 'carl_host_rsa_key.pub';  # host public key file
+$hstpubmd5f      = 'carl_host_rsa_key.pub_md5';  # md5 hash of host public key
+$cliprvkeyf      = 'carl_client_key';        # client private key file
+$clipubkeyf      = 'carl_client_key.pub';    # client public key file
 
 
 #***************************************************************************
@@ -184,11 +184,11 @@ $clipubkeyf      = 'curl_client_key.pub';    # client public key file
 #
 sub exe_ext {
     my ($component, @arr) = @_;
-    if ($ENV{'CURL_TEST_EXE_EXT'}) {
-        return $ENV{'CURL_TEST_EXE_EXT'};
+    if ($ENV{'CARL_TEST_EXE_EXT'}) {
+        return $ENV{'CARL_TEST_EXE_EXT'};
     }
-    if ($ENV{'CURL_TEST_EXE_EXT_'.$component}) {
-        return $ENV{'CURL_TEST_EXE_EXT_'.$component};
+    if ($ENV{'CARL_TEST_EXE_EXT_'.$component}) {
+        return $ENV{'CARL_TEST_EXE_EXT_'.$component};
     }
     if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys' ||
         $^O eq 'dos' || $^O eq 'os2') {

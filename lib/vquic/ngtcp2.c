@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_NGTCP2
 #include <ngtcp2/ngtcp2.h>
@@ -43,12 +43,12 @@
 #include "vtls/keylog.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* #define DEBUG_NGTCP2 */
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
 #define DEBUG_HTTP3
 #endif
 #ifdef DEBUG_HTTP3
@@ -87,10 +87,10 @@ struct h3out {
   "+GROUP-X25519:+GROUP-SECP384R1:+GROUP-SECP521R1"
 #endif
 
-static CURLcode ng_process_ingress(struct Curl_easy *data,
-                                   curl_socket_t sockfd,
+static CARLcode ng_process_ingress(struct Curl_easy *data,
+                                   carl_socket_t sockfd,
                                    struct quicsocket *qs);
-static CURLcode ng_flush_egress(struct Curl_easy *data, int sockfd,
+static CARLcode ng_flush_egress(struct Curl_easy *data, int sockfd,
                                 struct quicsocket *qs);
 static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
                                    size_t datalen, void *user_data,
@@ -98,7 +98,7 @@ static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
 
 static ngtcp2_tstamp timestamp(void)
 {
-  struct curltime ct = Curl_now();
+  struct carltime ct = Curl_now();
   return ct.tv_sec * NGTCP2_SECONDS + ct.tv_usec * NGTCP2_MICROSECONDS;
 }
 
@@ -266,7 +266,7 @@ static int quic_set_encryption_secrets(SSL *ssl,
     return 0;
 
   if(level == NGTCP2_CRYPTO_LEVEL_APPLICATION) {
-    if(init_ngh3_conn(qs) != CURLE_OK)
+    if(init_ngh3_conn(qs) != CARLE_OK)
       return 0;
   }
 
@@ -377,7 +377,7 @@ static int secret_func(gnutls_session_t ssl,
     return 0;
 
   if(level == NGTCP2_CRYPTO_LEVEL_APPLICATION) {
-    if(init_ngh3_conn(qs) != CURLE_OK)
+    if(init_ngh3_conn(qs) != CARLE_OK)
       return -1;
   }
 
@@ -689,7 +689,7 @@ static int cb_get_new_connection_id(ngtcp2_conn *tconn, ngtcp2_cid *cid,
                                     uint8_t *token, size_t cidlen,
                                     void *user_data)
 {
-  CURLcode result;
+  CARLcode result;
   (void)tconn;
   (void)user_data;
 
@@ -743,16 +743,16 @@ static ngtcp2_callbacks ng_callbacks = {
 /*
  * Might be called twice for happy eyeballs.
  */
-CURLcode Curl_quic_connect(struct Curl_easy *data,
+CARLcode Curl_quic_connect(struct Curl_easy *data,
                            struct connectdata *conn,
-                           curl_socket_t sockfd,
+                           carl_socket_t sockfd,
                            int sockindex,
                            const struct sockaddr *addr,
                            socklen_t addrlen)
 {
   int rc;
   int rv;
-  CURLcode result;
+  CARLcode result;
   ngtcp2_path path; /* TODO: this must be initialized properly */
   struct quicsocket *qs = &conn->hequic[sockindex];
   char ipbuf[40];
@@ -768,7 +768,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     char buffer[STRERROR_LEN];
     failf(data, "ssrem inet_ntop() failed with errno %d: %s",
           SOCKERRNO, Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
   infof(data, "Connect socket %d over QUIC to %s:%ld\n",
@@ -778,11 +778,11 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
 #ifdef USE_OPENSSL
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)
-    return CURLE_QUIC_CONNECT_ERROR;
+    return CARLE_QUIC_CONNECT_ERROR;
 #endif
 
   if(quic_init_ssl(qs))
-    return CURLE_QUIC_CONNECT_ERROR;
+    return CARLE_QUIC_CONNECT_ERROR;
 
   qs->dcid.datalen = NGTCP2_MAX_CIDLEN;
   result = Curl_rand(data, qs->dcid.data, NGTCP2_MAX_CIDLEN);
@@ -802,7 +802,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   rv = getsockname(sockfd, (struct sockaddr *)&qs->local_addr,
                    &qs->local_addrlen);
   if(rv == -1)
-    return CURLE_QUIC_CONNECT_ERROR;
+    return CARLE_QUIC_CONNECT_ERROR;
 
   ngtcp2_addr_init(&path.local, (struct sockaddr *)&qs->local_addr,
                    qs->local_addrlen, NULL);
@@ -812,11 +812,11 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                               NGTCP2_PROTO_VER_MIN, &ng_callbacks,
                               &qs->settings, NULL, qs);
   if(rc)
-    return CURLE_QUIC_CONNECT_ERROR;
+    return CARLE_QUIC_CONNECT_ERROR;
 
   ngtcp2_conn_set_tls_native_handle(qs->qconn, qs->ssl);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -832,7 +832,7 @@ int Curl_quic_ver(char *p, size_t len)
 }
 
 static int ng_getsock(struct Curl_easy *data, struct connectdata *conn,
-                      curl_socket_t *socks)
+                      carl_socket_t *socks)
 {
   struct SingleRequest *k = &data->req;
   int bitmap = GETSOCK_BLANK;
@@ -889,14 +889,14 @@ void Curl_quic_disconnect(struct Curl_easy *data,
     qs_disconnect(&conn->hequic[tempindex]);
 }
 
-static CURLcode ng_disconnect(struct Curl_easy *data,
+static CARLcode ng_disconnect(struct Curl_easy *data,
                               struct connectdata *conn,
                               bool dead_connection)
 {
   (void)dead_connection;
   Curl_quic_disconnect(data, conn, 0);
   Curl_quic_disconnect(data, conn, 1);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static unsigned int ng_conncheck(struct Curl_easy *data,
@@ -926,8 +926,8 @@ static const struct Curl_handler Curl_handler_http3 = {
   ZERO_NULL,                            /* readwrite */
   ng_conncheck,                         /* connection_check */
   PORT_HTTP,                            /* defport */
-  CURLPROTO_HTTPS,                      /* protocol */
-  CURLPROTO_HTTP,                       /* family */
+  CARLPROTO_HTTPS,                      /* protocol */
+  CARLPROTO_HTTP,                       /* family */
   PROTOPT_SSL | PROTOPT_STREAM          /* flags */
 };
 
@@ -956,14 +956,14 @@ static int cb_h3_stream_close(nghttp3_conn *conn, int64_t stream_id,
  * space is available in the receive buffer, it copies the rest to the
  * stream's overflow buffer.
  */
-static CURLcode write_data(struct HTTP *stream, const void *mem, size_t memlen)
+static CARLcode write_data(struct HTTP *stream, const void *mem, size_t memlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   const char *buf = mem;
   size_t ncopy = memlen;
   /* copy as much as possible to the receive buffer */
   if(stream->len) {
-    size_t len = CURLMIN(ncopy, stream->len);
+    size_t len = CARLMIN(ncopy, stream->len);
     memcpy(stream->mem, buf, len);
     stream->len -= len;
     stream->memlen += len;
@@ -983,7 +983,7 @@ static int cb_h3_recv_data(nghttp3_conn *conn, int64_t stream_id,
 {
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.p.http;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   (void)conn;
 
   result = write_data(stream, buf, buflen);
@@ -1042,7 +1042,7 @@ static int cb_h3_end_headers(nghttp3_conn *conn, int64_t stream_id,
 {
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.p.http;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   (void)conn;
   (void)stream_id;
   (void)user_data;
@@ -1066,7 +1066,7 @@ static int cb_h3_recv_header(nghttp3_conn *conn, int64_t stream_id,
   nghttp3_vec h3val = nghttp3_rcbuf_get_buf(value);
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.p.http;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   (void)conn;
   (void)stream_id;
   (void)token;
@@ -1145,12 +1145,12 @@ static nghttp3_callbacks ngh3_callbacks = {
 
 static int init_ngh3_conn(struct quicsocket *qs)
 {
-  CURLcode result;
+  CARLcode result;
   int rc;
   int64_t ctrl_stream_id, qpack_enc_stream_id, qpack_dec_stream_id;
 
   if(ngtcp2_conn_get_max_local_streams_uni(qs->qconn) < 3) {
-    return CURLE_QUIC_CONNECT_ERROR;
+    return CARLE_QUIC_CONNECT_ERROR;
   }
 
   nghttp3_settings_default(&qs->h3settings);
@@ -1161,42 +1161,42 @@ static int init_ngh3_conn(struct quicsocket *qs)
                                nghttp3_mem_default(),
                                qs);
   if(rc) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &ctrl_stream_id, NULL);
   if(rc) {
-    result = CURLE_QUIC_CONNECT_ERROR;
+    result = CARLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = nghttp3_conn_bind_control_stream(qs->h3conn, ctrl_stream_id);
   if(rc) {
-    result = CURLE_QUIC_CONNECT_ERROR;
+    result = CARLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &qpack_enc_stream_id, NULL);
   if(rc) {
-    result = CURLE_QUIC_CONNECT_ERROR;
+    result = CARLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &qpack_dec_stream_id, NULL);
   if(rc) {
-    result = CURLE_QUIC_CONNECT_ERROR;
+    result = CARLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = nghttp3_conn_bind_qpack_streams(qs->h3conn, qpack_enc_stream_id,
                                        qpack_dec_stream_id);
   if(rc) {
-    result = CURLE_QUIC_CONNECT_ERROR;
+    result = CARLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
   fail:
 
   return result;
@@ -1208,7 +1208,7 @@ static Curl_send ngh3_stream_send;
 static size_t drain_overflow_buffer(struct HTTP *stream)
 {
   size_t overlen = Curl_dyn_len(&stream->overflow);
-  size_t ncopy = CURLMIN(overlen, stream->len);
+  size_t ncopy = CARLMIN(overlen, stream->len);
   if(ncopy > 0) {
     memcpy(stream->mem, Curl_dyn_ptr(&stream->overflow), ncopy);
     stream->len -= ncopy;
@@ -1226,10 +1226,10 @@ static ssize_t ngh3_stream_recv(struct Curl_easy *data,
                                 int sockindex,
                                 char *buf,
                                 size_t buffersize,
-                                CURLcode *curlcode)
+                                CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   struct HTTP *stream = data->req.p.http;
   struct quicsocket *qs = conn->quic;
 
@@ -1246,18 +1246,18 @@ static ssize_t ngh3_stream_recv(struct Curl_easy *data,
   drain_overflow_buffer(stream);
 
   if(ng_process_ingress(data, sockfd, qs)) {
-    *curlcode = CURLE_RECV_ERROR;
+    *carlcode = CARLE_RECV_ERROR;
     return -1;
   }
   if(ng_flush_egress(data, sockfd, qs)) {
-    *curlcode = CURLE_SEND_ERROR;
+    *carlcode = CARLE_SEND_ERROR;
     return -1;
   }
 
   if(stream->memlen) {
     ssize_t memlen = stream->memlen;
     /* data arrived */
-    *curlcode = CURLE_OK;
+    *carlcode = CARLE_OK;
     /* reset to allow more data to come */
     stream->memlen = 0;
     stream->mem = buf;
@@ -1266,19 +1266,19 @@ static ssize_t ngh3_stream_recv(struct Curl_easy *data,
        any additional packets to tell the server that we can receive more */
     extend_stream_window(qs->qconn, stream);
     if(ng_flush_egress(data, sockfd, qs)) {
-      *curlcode = CURLE_SEND_ERROR;
+      *carlcode = CARLE_SEND_ERROR;
       return -1;
     }
     return memlen;
   }
 
   if(stream->closed) {
-    *curlcode = CURLE_OK;
+    *carlcode = CARLE_OK;
     return 0;
   }
 
   infof(data, "ngh3_stream_recv returns 0 bytes and EAGAIN\n");
-  *curlcode = CURLE_AGAIN;
+  *carlcode = CARLE_AGAIN;
   return -1;
 }
 
@@ -1323,7 +1323,7 @@ static ssize_t cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
     return 1;
   }
 
-  nread = CURLMIN(stream->upload_len, H3_SEND_SIZE - stream->h3out->used);
+  nread = CARLMIN(stream->upload_len, H3_SEND_SIZE - stream->h3out->used);
   if(nread > 0) {
     /* nghttp3 wants us to hold on to the data until it tells us it is okay to
        delete it. Append the data at the end of the h3out buffer. Since we can
@@ -1370,7 +1370,7 @@ static ssize_t cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
    field list. */
 #define AUTHORITY_DST_IDX 3
 
-static CURLcode http_request(struct Curl_easy *data, const void *mem,
+static CARLcode http_request(struct Curl_easy *data, const void *mem,
                              size_t len)
 {
   struct connectdata *conn = data->conn;
@@ -1381,7 +1381,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   char *hdbuf = (char *)mem;
   char *end, *line_end;
   struct quicsocket *qs = conn->quic;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   nghttp3_nv *nva = NULL;
   int64_t stream3_id;
   int rc;
@@ -1390,13 +1390,13 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   rc = ngtcp2_conn_open_bidi_stream(qs->qconn, &stream3_id, NULL);
   if(rc) {
     failf(data, "can get bidi streams");
-    result = CURLE_SEND_ERROR;
+    result = CARLE_SEND_ERROR;
     goto fail;
   }
 
   stream->stream3_id = stream3_id;
   stream->h3req = TRUE; /* senf off! */
-  Curl_dyn_init(&stream->overflow, CURL_MAX_READ_SIZE);
+  Curl_dyn_init(&stream->overflow, CARL_MAX_READ_SIZE);
 
   /* Calculate number of headers contained in [mem, mem + len). Assumes a
      correctly generated HTTP header field block. */
@@ -1416,7 +1416,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   nheader += 1;
   nva = malloc(sizeof(nghttp3_nv) * nheader);
   if(!nva) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
 
@@ -1424,7 +1424,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
      We do line endings with CRLF so checking for CR is enough */
   line_end = memchr(hdbuf, '\r', len);
   if(!line_end) {
-    result = CURLE_BAD_FUNCTION_ARGUMENT; /* internal error */
+    result = CARLE_BAD_FUNCTION_ARGUMENT; /* internal error */
     goto fail;
   }
 
@@ -1569,7 +1569,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
 
     h3out = calloc(sizeof(struct h3out), 1);
     if(!h3out) {
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
       goto fail;
     }
     stream->h3out = h3out;
@@ -1577,7 +1577,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
     rc = nghttp3_conn_submit_request(qs->h3conn, stream->stream3_id,
                                      nva, nheader, &data_reader, data);
     if(rc) {
-      result = CURLE_SEND_ERROR;
+      result = CARLE_SEND_ERROR;
       goto fail;
     }
     break;
@@ -1587,7 +1587,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
     rc = nghttp3_conn_submit_request(qs->h3conn, stream->stream3_id,
                                      nva, nheader, NULL, data);
     if(rc) {
-      result = CURLE_SEND_ERROR;
+      result = CARLE_SEND_ERROR;
       goto fail;
     }
     break;
@@ -1598,7 +1598,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   infof(data, "Using HTTP/3 Stream ID: %x (easy handle %p)\n",
         stream3_id, (void *)data);
 
-  return CURLE_OK;
+  return CARLE_OK;
 
 fail:
   free(nva);
@@ -1608,18 +1608,18 @@ static ssize_t ngh3_stream_send(struct Curl_easy *data,
                                 int sockindex,
                                 const void *mem,
                                 size_t len,
-                                CURLcode *curlcode)
+                                CARLcode *carlcode)
 {
   ssize_t sent;
   struct connectdata *conn = data->conn;
   struct quicsocket *qs = conn->quic;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   struct HTTP *stream = data->req.p.http;
 
   if(!stream->h3req) {
-    CURLcode result = http_request(data, mem, len);
+    CARLcode result = http_request(data, mem, len);
     if(result) {
-      *curlcode = CURLE_SEND_ERROR;
+      *carlcode = CARLE_SEND_ERROR;
       return -1;
     }
     sent = len;
@@ -1634,17 +1634,17 @@ static ssize_t ngh3_stream_send(struct Curl_easy *data,
       sent = len;
     }
     else {
-      *curlcode = CURLE_AGAIN;
+      *carlcode = CARLE_AGAIN;
       return -1;
     }
   }
 
   if(ng_flush_egress(data, sockfd, qs)) {
-    *curlcode = CURLE_SEND_ERROR;
+    *carlcode = CARLE_SEND_ERROR;
     return -1;
   }
 
-  *curlcode = CURLE_OK;
+  *carlcode = CARLE_OK;
   return sent;
 }
 
@@ -1662,14 +1662,14 @@ static void ng_has_connected(struct connectdata *conn, int tempindex)
 /*
  * There can be multiple connection attempts going on in parallel.
  */
-CURLcode Curl_quic_is_connected(struct Curl_easy *data,
+CARLcode Curl_quic_is_connected(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 int sockindex,
                                 bool *done)
 {
-  CURLcode result;
+  CARLcode result;
   struct quicsocket *qs = &conn->hequic[sockindex];
-  curl_socket_t sockfd = conn->tempsock[sockindex];
+  carl_socket_t sockfd = conn->tempsock[sockindex];
 
   result = ng_process_ingress(data, sockfd, qs);
   if(result)
@@ -1691,8 +1691,8 @@ CURLcode Curl_quic_is_connected(struct Curl_easy *data,
 
 }
 
-static CURLcode ng_process_ingress(struct Curl_easy *data,
-                                   curl_socket_t sockfd,
+static CARLcode ng_process_ingress(struct Curl_easy *data,
+                                   carl_socket_t sockfd,
                                    struct quicsocket *qs)
 {
   ssize_t recvd;
@@ -1717,7 +1717,7 @@ static CURLcode ng_process_ingress(struct Curl_easy *data,
         break;
 
       failf(data, "ngtcp2: recvfrom() unexpectedly returned %zd", recvd);
-      return CURLE_RECV_ERROR;
+      return CARLE_RECV_ERROR;
     }
 
     ngtcp2_addr_init(&path.local, (struct sockaddr *)&qs->local_addr,
@@ -1728,14 +1728,14 @@ static CURLcode ng_process_ingress(struct Curl_easy *data,
     rv = ngtcp2_conn_read_pkt(qs->qconn, &path, &pi, buf, recvd, ts);
     if(rv != 0) {
       /* TODO Send CONNECTION_CLOSE if possible */
-      return CURLE_RECV_ERROR;
+      return CARLE_RECV_ERROR;
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode ng_flush_egress(struct Curl_easy *data,
+static CARLcode ng_flush_egress(struct Curl_easy *data,
                                 int sockfd,
                                 struct quicsocket *qs)
 {
@@ -1772,7 +1772,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
   if(rv != 0) {
     failf(data, "ngtcp2_conn_handle_expiry returned error: %s",
           ngtcp2_strerror(rv));
-    return CURLE_SEND_ERROR;
+    return CARLE_SEND_ERROR;
   }
 
   ngtcp2_path_storage_zero(&ps);
@@ -1785,7 +1785,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
       if(veccnt < 0) {
         failf(data, "nghttp3_conn_writev_stream returned error: %s",
               nghttp3_strerror((int)veccnt));
-        return CURLE_SEND_ERROR;
+        return CARLE_SEND_ERROR;
       }
       else if(veccnt > 0) {
         uint32_t flags = NGTCP2_WRITE_STREAM_FLAG_MORE |
@@ -1807,7 +1807,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
               failf(data,
                     "nghttp3_conn_block_stream returned error: %s\n",
                     nghttp3_strerror(rv));
-              return CURLE_SEND_ERROR;
+              return CARLE_SEND_ERROR;
             }
             continue;
           }
@@ -1819,7 +1819,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
               failf(data,
                     "nghttp3_conn_add_write_offset returned error: %s\n",
                     nghttp3_strerror(rv));
-              return CURLE_SEND_ERROR;
+              return CARLE_SEND_ERROR;
             }
             continue;
           }
@@ -1827,7 +1827,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
             assert(ndatalen == -1);
             failf(data, "ngtcp2_conn_writev_stream returned error: %s",
                   ngtcp2_strerror((int)outlen));
-            return CURLE_SEND_ERROR;
+            return CARLE_SEND_ERROR;
           }
         }
         else {
@@ -1841,7 +1841,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
       if(outlen < 0) {
         failf(data, "ngtcp2_conn_write_pkt returned error: %s",
               ngtcp2_strerror((int)outlen));
-        return CURLE_SEND_ERROR;
+        return CARLE_SEND_ERROR;
       }
       if(outlen == 0)
         break;
@@ -1860,7 +1860,7 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
       else {
         failf(data, "send() returned %zd (errno %d)", sent,
               SOCKERRNO);
-        return CURLE_SEND_ERROR;
+        return CARLE_SEND_ERROR;
       }
     }
   }
@@ -1876,13 +1876,13 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
     Curl_expire(data, timeout / NGTCP2_MILLISECONDS, EXPIRE_QUIC);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Called from transfer.c:done_sending when we stop HTTP/3 uploading.
  */
-CURLcode Curl_quic_done_sending(struct Curl_easy *data)
+CARLcode Curl_quic_done_sending(struct Curl_easy *data)
 {
   struct connectdata *conn = data->conn;
   DEBUGASSERT(conn);
@@ -1894,7 +1894,7 @@ CURLcode Curl_quic_done_sending(struct Curl_easy *data)
     (void)nghttp3_conn_resume_stream(qs->h3conn, stream->stream3_id);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*

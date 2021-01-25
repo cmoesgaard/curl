@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,36 +19,36 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "strcase.h"
 
-static CURLcode unit_setup(void) {return CURLE_OK;}
+static CARLcode unit_setup(void) {return CARLE_OK;}
 static void unit_stop(void) {}
 
 UNITTEST_START
 
 int rc;
 
-rc = curl_strequal("iii", "III");
+rc = carl_strequal("iii", "III");
 fail_unless(rc != 0, "return code should be non-zero");
 
-rc = curl_strequal("iiia", "III");
+rc = carl_strequal("iiia", "III");
 fail_unless(rc == 0, "return code should be zero");
 
-rc = curl_strequal("iii", "IIIa");
+rc = carl_strequal("iii", "IIIa");
 fail_unless(rc == 0, "return code should be zero");
 
-rc = curl_strequal("iiiA", "IIIa");
+rc = carl_strequal("iiiA", "IIIa");
 fail_unless(rc != 0, "return code should be non-zero");
 
-rc = curl_strnequal("iii", "III", 3);
+rc = carl_strnequal("iii", "III", 3);
 fail_unless(rc != 0, "return code should be non-zero");
 
-rc = curl_strnequal("iiiABC", "IIIcba", 3);
+rc = carl_strnequal("iiiABC", "IIIcba", 3);
 fail_unless(rc != 0, "return code should be non-zero");
 
-rc = curl_strnequal("ii", "II", 3);
+rc = carl_strnequal("ii", "II", 3);
 fail_unless(rc != 0, "return code should be non-zero");
 
 UNITTEST_STOP

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 /* Escape and unescape URL encoding in strings. The functions return a new
  * allocated string or NULL if an error occurred.  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "urldata.h"
 #include "warnless.h"
@@ -33,8 +33,8 @@
 #include "escape.h"
 #include "strdup.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* Portable character check (remember EBCDIC). Do not use isalnum() because
@@ -65,28 +65,28 @@ bool Curl_isunreserved(unsigned char in)
 }
 
 /* for ABI-compatibility with previous versions */
-char *curl_escape(const char *string, int inlength)
+char *carl_escape(const char *string, int inlength)
 {
-  return curl_easy_escape(NULL, string, inlength);
+  return carl_easy_escape(NULL, string, inlength);
 }
 
 /* for ABI-compatibility with previous versions */
-char *curl_unescape(const char *string, int length)
+char *carl_unescape(const char *string, int length)
 {
-  return curl_easy_unescape(NULL, string, length, NULL);
+  return carl_easy_unescape(NULL, string, length, NULL);
 }
 
-char *curl_easy_escape(struct Curl_easy *data, const char *string,
+char *carl_easy_escape(struct Curl_easy *data, const char *string,
                        int inlength)
 {
   size_t length;
-  CURLcode result;
+  CARLcode result;
   struct dynbuf d;
 
   if(inlength < 0)
     return NULL;
 
-  Curl_dyn_init(&d, CURL_MAX_INPUT_LENGTH * 3);
+  Curl_dyn_init(&d, CARL_MAX_INPUT_LENGTH * 3);
 
   length = (inlength?(size_t)inlength:strlen(string));
   if(!length)
@@ -139,7 +139,7 @@ char *curl_easy_escape(struct Curl_easy *data, const char *string,
  * invokes that used TRUE/FALSE (0 and 1).
  */
 
-CURLcode Curl_urldecode(struct Curl_easy *data,
+CARLcode Curl_urldecode(struct Curl_easy *data,
                         const char *string, size_t length,
                         char **ostring, size_t *olen,
                         enum urlreject ctrl)
@@ -148,7 +148,7 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
   char *ns;
   size_t strindex = 0;
   unsigned long hex;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   DEBUGASSERT(string);
   DEBUGASSERT(ctrl >= REJECT_NADA); /* crash on TRUE/FALSE */
@@ -157,7 +157,7 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
   ns = malloc(alloc);
 
   if(!ns)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   while(--alloc > 0) {
     unsigned char in = *string;
@@ -172,7 +172,7 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
 
       hex = strtoul(hexstr, &ptr, 16);
 
-      in = curlx_ultouc(hex); /* this long is never bigger than 255 anyway */
+      in = carlx_ultouc(hex); /* this long is never bigger than 255 anyway */
 
       if(data) {
         result = Curl_convert_from_network(data, (char *)&in, 1);
@@ -190,7 +190,7 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
     if(((ctrl == REJECT_CTRL) && (in < 0x20)) ||
        ((ctrl == REJECT_ZERO) && (in == 0))) {
       free(ns);
-      return CURLE_URL_MALFORMAT;
+      return CARLE_URL_MALFORMAT;
     }
 
     ns[strindex++] = in;
@@ -205,7 +205,7 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
   /* store output string */
   *ostring = ns;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -214,21 +214,21 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
  * If length == 0, the length is assumed to be strlen(string).
  * If olen == NULL, no output length is stored.
  */
-char *curl_easy_unescape(struct Curl_easy *data, const char *string,
+char *carl_easy_unescape(struct Curl_easy *data, const char *string,
                          int length, int *olen)
 {
   char *str = NULL;
   if(length >= 0) {
     size_t inputlen = length;
     size_t outputlen;
-    CURLcode res = Curl_urldecode(data, string, inputlen, &str, &outputlen,
+    CARLcode res = Curl_urldecode(data, string, inputlen, &str, &outputlen,
                                   REJECT_NADA);
     if(res)
       return NULL;
 
     if(olen) {
       if(outputlen <= (size_t) INT_MAX)
-        *olen = curlx_uztosi(outputlen);
+        *olen = carlx_uztosi(outputlen);
       else
         /* too large to return in an int, fail! */
         Curl_safefree(str);
@@ -240,7 +240,7 @@ char *curl_easy_unescape(struct Curl_easy *data, const char *string,
 /* For operating systems/environments that use different malloc/free
    systems for the app and for this library, we provide a free that uses
    the library's memory system */
-void curl_free(void *p)
+void carl_free(void *p)
 {
   free(p);
 }

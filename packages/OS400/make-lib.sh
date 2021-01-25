@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 #
 ###########################################################################
 #
-#       libcurl compilation script for the OS/400.
+#       libcarl compilation script for the OS/400.
 #
 
 SCRIPTDIR=`dirname "${0}"`
@@ -38,7 +38,7 @@ fi
 
 #      Create and compile the identification source file.
 
-echo '#pragma comment(user, "libcurl version '"${LIBCURL_VERSION}"'")' > os400.c
+echo '#pragma comment(user, "libcarl version '"${LIBCARL_VERSION}"'")' > os400.c
 echo '#pragma comment(user, __DATE__)' >> os400.c
 echo '#pragma comment(user, __TIME__)' >> os400.c
 echo '#pragma comment(copyright, "Copyright (C) 1998-2016 Daniel Stenberg et al. OS/400 version by P. Monnerat")' >> os400.c
@@ -67,11 +67,11 @@ sed -e ':begin'                                                         \
 
 INCLUDES="'`pwd`'"
 
-# Create a small C program to check ccsidcurl.c is up to date
+# Create a small C program to check ccsidcarl.c is up to date
 if action_needed "${LIBIFSNAME}/CHKSTRINGS.PGM"
 then
   CMD="CRTBNDC PGM(${TARGETLIB}/CHKSTRINGS) SRCSTMF('${SCRIPTDIR}/chkstrings.c')"
-  CMD="${CMD} INCDIR('${TOPDIR}/include/curl' '${TOPDIR}/include' '${SRCDIR}' ${INCLUDES})"
+  CMD="${CMD} INCDIR('${TOPDIR}/include/carl' '${TOPDIR}/include' '${SRCDIR}' ${INCLUDES})"
   system -i "${CMD}"
   if [ $? -ne 0 ]
   then
@@ -88,7 +88,7 @@ then
 fi
 
 make_module     OS400SYS        "${SCRIPTDIR}/os400sys.c"
-make_module     CCSIDCURL       "${SCRIPTDIR}/ccsidcurl.c"
+make_module     CCSIDCARL       "${SCRIPTDIR}/ccsidcarl.c"
 
 for SRC in ${CSOURCES}
 do      MODULE=`db2_name "${SRC}"`
@@ -121,17 +121,17 @@ fi
 
 if action_needed "${LIBIFSNAME}/TOOLS.FILE"
 then    CMD="CRTSRCPF FILE(${TARGETLIB}/TOOLS) RCDLEN(112)"
-        CMD="${CMD} TEXT('curl: build tools')"
+        CMD="${CMD} TEXT('carl: build tools')"
         system "${CMD}"
 fi
 
 
 #       Gather the list of symbols to export.
 
-EXPORTS=`grep '^CURL_EXTERN[[:space:]]'                                 \
-              "${TOPDIR}"/include/curl/*.h                              \
-              "${SCRIPTDIR}/ccsidcurl.h"                                |
-         sed -e 's/^.*CURL_EXTERN[[:space:]]\(.*\)(.*$/\1/'             \
+EXPORTS=`grep '^CARL_EXTERN[[:space:]]'                                 \
+              "${TOPDIR}"/include/carl/*.h                              \
+              "${SCRIPTDIR}/ccsidcarl.h"                                |
+         sed -e 's/^.*CARL_EXTERN[[:space:]]\(.*\)(.*$/\1/'             \
              -e 's/[[:space:]]*$//'                                     \
              -e 's/^.*[[:space:]][[:space:]]*//'                        \
              -e 's/^\*//'                                               \
@@ -146,7 +146,7 @@ then    LINK=YES
 fi
 
 if [ "${LINK}" ]
-then    echo " STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('LIBCURL_${SONAME}')" \
+then    echo " STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('LIBCARL_${SONAME}')" \
             > "${BSF}"
         for EXPORT in ${EXPORTS}
         do      echo ' EXPORT    SYMBOL("'"${EXPORT}"'")' >> "${BSF}"
@@ -177,7 +177,7 @@ then    CMD="CRTSRVPGM SRVPGM(${TARGETLIB}/${SRVPGM})"
         fi
         CMD="${CMD})"
         CMD="${CMD} BNDSRVPGM(QADRTTS QGLDCLNT QGLDBRDR)"
-        CMD="${CMD} TEXT('curl API library')"
+        CMD="${CMD} TEXT('carl API library')"
         CMD="${CMD} TGTRLS(${TGTRLS})"
         system "${CMD}"
         LINK=YES
@@ -205,11 +205,11 @@ fi
 
 if [ "${TEST_FORMDATA}" ]
 then    MODULES=
-        make_module TFORMDATA   formdata.c      "'_FORM_DEBUG' 'CURLDEBUG'"
-        make_module TSTREQUAL   strequal.c      "'_FORM_DEBUG' 'CURLDEBUG'"
-        make_module TMEMDEBUG   memdebug.c      "'_FORM_DEBUG' 'CURLDEBUG'"
-        make_module TMPRINTF    mprintf.c       "'_FORM_DEBUG' 'CURLDEBUG'"
-        make_module TSTRERROR   strerror.c      "'_FORM_DEBUG' 'CURLDEBUG'"
+        make_module TFORMDATA   formdata.c      "'_FORM_DEBUG' 'CARLDEBUG'"
+        make_module TSTREQUAL   strequal.c      "'_FORM_DEBUG' 'CARLDEBUG'"
+        make_module TMEMDEBUG   memdebug.c      "'_FORM_DEBUG' 'CARLDEBUG'"
+        make_module TMPRINTF    mprintf.c       "'_FORM_DEBUG' 'CARLDEBUG'"
+        make_module TSTRERROR   strerror.c      "'_FORM_DEBUG' 'CARLDEBUG'"
         #       The following modules should not be needed (see comment in
         #               formdata.c. However, there are some unsatisfied
         #               external references leading in the following

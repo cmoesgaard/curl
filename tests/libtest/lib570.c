@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,83 +25,83 @@
 /* build request url */
 static char *suburl(const char *base, int i)
 {
-  return curl_maprintf("%s%.4d", base, i);
+  return carl_maprintf("%s%.4d", base, i);
 }
 
 int test(char *URL)
 {
   int res;
-  CURL *curl;
+  CARL *carl;
   int request = 1;
   char *stream_uri = NULL;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_HEADERDATA, stdout);
-  test_setopt(curl, CURLOPT_WRITEDATA, stdout);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_HEADERDATA, stdout);
+  test_setopt(carl, CARLOPT_WRITEDATA, stdout);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_OPTIONS);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_OPTIONS);
 
   stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
 
-  res = curl_easy_perform(curl);
-  if(res != (int)CURLE_RTSP_CSEQ_ERROR) {
+  res = carl_easy_perform(carl);
+  if(res != (int)CARLE_RTSP_CSEQ_ERROR) {
     fprintf(stderr, "Failed to detect CSeq mismatch");
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
 
-  test_setopt(curl, CURLOPT_RTSP_CLIENT_CSEQ, 999L);
-  test_setopt(curl, CURLOPT_RTSP_TRANSPORT,
+  test_setopt(carl, CARLOPT_RTSP_CLIENT_CSEQ, 999L);
+  test_setopt(carl, CARLOPT_RTSP_TRANSPORT,
                     "RAW/RAW/UDP;unicast;client_port=3056-3057");
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_SETUP);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_SETUP);
 
   stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_PLAY);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_PLAY);
 
   stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, stream_uri);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, stream_uri);
   free(stream_uri);
   stream_uri = NULL;
 
-  res = curl_easy_perform(curl);
-  if(res == CURLE_RTSP_SESSION_ERROR) {
+  res = carl_easy_perform(carl);
+  if(res == CARLE_RTSP_SESSION_ERROR) {
     res = 0;
   }
   else {
@@ -112,8 +112,8 @@ int test(char *URL)
 test_cleanup:
   free(stream_uri);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

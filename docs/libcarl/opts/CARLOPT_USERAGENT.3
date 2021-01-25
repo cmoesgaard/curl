@@ -1,0 +1,59 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_USERAGENT 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_USERAGENT \- set HTTP user-agent header
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_USERAGENT, char *ua);
+.SH DESCRIPTION
+Pass a pointer to a null-terminated string as parameter. It will be used to
+set the User-Agent: header in the HTTP request sent to the remote server. This
+can be used to fool servers or scripts. You can also set any custom header
+with \fICARLOPT_HTTPHEADER(3)\fP.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL, no User-Agent: header is used by default.
+.SH PROTOCOLS
+HTTP, HTTPS
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  carl_easy_setopt(carl, CARLOPT_USERAGENT, "Dark Secret Ninja/1.0");
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+As long as HTTP is supported
+.SH RETURN VALUE
+Returns CARLE_OK if HTTP is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_REFERER "(3), " CARLOPT_HTTPHEADER "(3), "

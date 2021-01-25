@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 static const char data[]=
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
@@ -66,8 +66,8 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
   struct WriteThis upload;
 
@@ -75,50 +75,50 @@ int main(void)
   upload.sizeleft = strlen(data);
 
   /* In windows, this will init the winsock stuff */
-  res = curl_global_init(CURL_GLOBAL_DEFAULT);
+  res = carl_global_init(CARL_GLOBAL_DEFAULT);
   /* Check for errors */
-  if(res != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed: %s\n",
-            curl_easy_strerror(res));
+  if(res != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed: %s\n",
+            carl_easy_strerror(res));
     return 1;
   }
 
-  /* get a curl handle */
-  curl = curl_easy_init();
-  if(curl) {
+  /* get a carl handle */
+  carl = carl_easy_init();
+  if(carl) {
     /* First set the URL, the target file */
-    curl_easy_setopt(curl, CURLOPT_URL,
+    carl_easy_setopt(carl, CARLOPT_URL,
                      "ftp://example.com/path/to/upload/file");
 
     /* User and password for the FTP login */
-    curl_easy_setopt(curl, CURLOPT_USERPWD, "login:secret");
+    carl_easy_setopt(carl, CARLOPT_USERPWD, "login:secret");
 
     /* Now specify we want to UPLOAD data */
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
 
     /* we want to use our own read function */
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+    carl_easy_setopt(carl, CARLOPT_READFUNCTION, read_callback);
 
     /* pointer to pass to our read function */
-    curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
+    carl_easy_setopt(carl, CARLOPT_READDATA, &upload);
 
     /* get verbose debug output please */
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
     /* Set the expected upload size. */
-    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,
-                     (curl_off_t)upload.sizeleft);
+    carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE,
+                     (carl_off_t)upload.sizeleft);
 
     /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

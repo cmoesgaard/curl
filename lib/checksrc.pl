@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -622,7 +622,7 @@ sub scanfile {
                       "use of $2 is banned");
         }
 
-        # scan for use of snprintf for curl-internals reasons
+        # scan for use of snprintf for carl-internals reasons
         if($l =~ /^(.*\W)(v?snprintf)\s*\(/x) {
             checkwarn("SNPRINTF",
                       $line, length($1), $file, $ol,
@@ -667,13 +667,13 @@ sub scanfile {
         }
 
         # check for 'char * name'
-        if(($l =~ /(^.*(char|int|long|void|CURL|CURLM|CURLMsg|[cC]url_[A-Za-z_]+|struct [a-zA-Z_]+) *(\*+)) (\w+)/) && ($4 !~ /^(const|volatile)$/)) {
+        if(($l =~ /(^.*(char|int|long|void|CARL|CARLM|CARLMsg|[cC]url_[A-Za-z_]+|struct [a-zA-Z_]+) *(\*+)) (\w+)/) && ($4 !~ /^(const|volatile)$/)) {
             checkwarn("ASTERISKSPACE",
                       $line, length($1), $file, $ol,
                       "space after declarative asterisk");
         }
         # check for 'char*'
-        if(($l =~ /(^.*(char|int|long|void|curl_slist|CURL|CURLM|CURLMsg|curl_httppost|sockaddr_in|FILE)\*)/)) {
+        if(($l =~ /(^.*(char|int|long|void|carl_slist|CARL|CARLM|CARLMsg|carl_httppost|sockaddr_in|FILE)\*)/)) {
             checkwarn("ASTERISKNOSPACE",
                       $line, length($1)-1, $file, $ol,
                       "no space before asterisk");

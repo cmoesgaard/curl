@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_QUICHE
 #include <quiche.h>
@@ -37,8 +37,8 @@
 #include "vquic.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define DEBUG_HTTP3
@@ -53,20 +53,20 @@
 #define QUIC_MAX_DATA (1*1024*1024)
 #define QUIC_IDLE_TIMEOUT (60 * 1000) /* milliseconds */
 
-static CURLcode process_ingress(struct Curl_easy *data,
-                                curl_socket_t sockfd,
+static CARLcode process_ingress(struct Curl_easy *data,
+                                carl_socket_t sockfd,
                                 struct quicsocket *qs);
 
-static CURLcode flush_egress(struct Curl_easy *data, curl_socket_t sockfd,
+static CARLcode flush_egress(struct Curl_easy *data, carl_socket_t sockfd,
                              struct quicsocket *qs);
 
-static CURLcode http_request(struct Curl_easy *data, const void *mem,
+static CARLcode http_request(struct Curl_easy *data, const void *mem,
                              size_t len);
 static Curl_recv h3_stream_recv;
 static Curl_send h3_stream_send;
 
 static int quiche_getsock(struct Curl_easy *data,
-                          struct connectdata *conn, curl_socket_t *socks)
+                          struct connectdata *conn, carl_socket_t *socks)
 {
   struct SingleRequest *k = &data->req;
   int bitmap = GETSOCK_BLANK;
@@ -84,7 +84,7 @@ static int quiche_getsock(struct Curl_easy *data,
   return bitmap;
 }
 
-static CURLcode qs_disconnect(struct Curl_easy *data,
+static CARLcode qs_disconnect(struct Curl_easy *data,
                               struct quicsocket *qs)
 {
   DEBUGASSERT(qs);
@@ -104,10 +104,10 @@ static CURLcode qs_disconnect(struct Curl_easy *data,
     quiche_config_free(qs->cfg);
     qs->cfg = NULL;
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode quiche_disconnect(struct Curl_easy *data,
+static CARLcode quiche_disconnect(struct Curl_easy *data,
                                   struct connectdata *conn,
                                   bool dead_connection)
 {
@@ -134,7 +134,7 @@ static unsigned int quiche_conncheck(struct Curl_easy *data,
   return CONNRESULT_NONE;
 }
 
-static CURLcode quiche_do(struct Curl_easy *data, bool *done)
+static CARLcode quiche_do(struct Curl_easy *data, bool *done)
 {
   struct HTTP *stream = data->req.p.http;
   stream->h3req = FALSE; /* not sent */
@@ -158,8 +158,8 @@ static const struct Curl_handler Curl_handler_http3 = {
   ZERO_NULL,                            /* readwrite */
   quiche_conncheck,                     /* connection_check */
   PORT_HTTP,                            /* defport */
-  CURLPROTO_HTTPS,                      /* protocol */
-  CURLPROTO_HTTP,                       /* family */
+  CARLPROTO_HTTPS,                      /* protocol */
+  CARLPROTO_HTTP,                       /* family */
   PROTOPT_SSL | PROTOPT_STREAM          /* flags */
 };
 
@@ -171,12 +171,12 @@ static void quiche_debug_log(const char *line, void *argp)
 }
 #endif
 
-CURLcode Curl_quic_connect(struct Curl_easy *data,
-                           struct connectdata *conn, curl_socket_t sockfd,
+CARLcode Curl_quic_connect(struct Curl_easy *data,
+                           struct connectdata *conn, carl_socket_t sockfd,
                            int sockindex,
                            const struct sockaddr *addr, socklen_t addrlen)
 {
-  CURLcode result;
+  CARLcode result;
   struct quicsocket *qs = &conn->hequic[sockindex];
   char *keylog_file = NULL;
 
@@ -196,7 +196,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   qs->cfg = quiche_config_new(QUICHE_PROTOCOL_VERSION);
   if(!qs->cfg) {
     failf(data, "can't create quiche config");
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 
   quiche_config_set_max_idle_timeout(qs->cfg, QUIC_IDLE_TIMEOUT);
@@ -226,7 +226,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                             sizeof(qs->scid), qs->cfg);
   if(!qs->conn) {
     failf(data, "can't create quiche connection");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   if(keylog_file)
@@ -239,7 +239,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     (void)Curl_qlogdir(data, qs->scid, sizeof(qs->scid), &qfd);
     if(qfd != -1)
       quiche_conn_set_qlog_fd(qs->conn, qfd,
-                              "qlog title", "curl qlog");
+                              "qlog title", "carl qlog");
   }
 #endif
 
@@ -253,7 +253,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     char buffer[STRERROR_LEN];
     failf(data, "ssrem inet_ntop() failed with errno %d: %s",
           SOCKERRNO, Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
   memcpy(conn->ip_addr_str, conn->primary_ip, MAX_IPADR_LEN);
   Curl_persistconninfo(data, conn);
@@ -276,14 +276,14 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
           alpn_protocols + 1);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode quiche_has_connected(struct connectdata *conn,
+static CARLcode quiche_has_connected(struct connectdata *conn,
                                      int sockindex,
                                      int tempindex)
 {
-  CURLcode result;
+  CARLcode result;
   struct quicsocket *qs = conn->quic = &conn->hequic[tempindex];
 
   conn->recv[sockindex] = h3_stream_recv;
@@ -295,12 +295,12 @@ static CURLcode quiche_has_connected(struct connectdata *conn,
 
   qs->h3config = quiche_h3_config_new();
   if(!qs->h3config)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Create a new HTTP/3 connection on the QUIC connection. */
   qs->h3c = quiche_h3_conn_new_with_transport(qs->conn, qs->h3config);
   if(!qs->h3c) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
   if(conn->hequic[1-tempindex].cfg) {
@@ -310,7 +310,7 @@ static CURLcode quiche_has_connected(struct connectdata *conn,
     qs->cfg = NULL;
     qs->conn = NULL;
   }
-  return CURLE_OK;
+  return CARLE_OK;
   fail:
   quiche_h3_config_free(qs->h3config);
   quiche_h3_conn_free(qs->h3c);
@@ -320,14 +320,14 @@ static CURLcode quiche_has_connected(struct connectdata *conn,
 /*
  * This function gets polled to check if this QUIC connection has connected.
  */
-CURLcode Curl_quic_is_connected(struct Curl_easy *data,
+CARLcode Curl_quic_is_connected(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 int sockindex,
                                 bool *done)
 {
-  CURLcode result;
+  CARLcode result;
   struct quicsocket *qs = &conn->hequic[sockindex];
-  curl_socket_t sockfd = conn->tempsock[sockindex];
+  carl_socket_t sockfd = conn->tempsock[sockindex];
 
   result = process_ingress(data, sockfd, qs);
   if(result)
@@ -349,7 +349,7 @@ CURLcode Curl_quic_is_connected(struct Curl_easy *data,
   return result;
 }
 
-static CURLcode process_ingress(struct Curl_easy *data, int sockfd,
+static CARLcode process_ingress(struct Curl_easy *data, int sockfd,
                                 struct quicsocket *qs)
 {
   ssize_t recvd;
@@ -367,7 +367,7 @@ static CURLcode process_ingress(struct Curl_easy *data, int sockfd,
     if(recvd < 0) {
       failf(data, "quiche: recv() unexpectedly returned %zd "
             "(errno: %d, socket %d)", recvd, SOCKERRNO, sockfd);
-      return CURLE_RECV_ERROR;
+      return CARLE_RECV_ERROR;
     }
 
     recvd = quiche_conn_recv(qs->conn, buf, recvd);
@@ -376,18 +376,18 @@ static CURLcode process_ingress(struct Curl_easy *data, int sockfd,
 
     if(recvd < 0) {
       failf(data, "quiche_conn_recv() == %zd", recvd);
-      return CURLE_RECV_ERROR;
+      return CARLE_RECV_ERROR;
     }
   } while(1);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * flush_egress drains the buffers and sends off data.
  * Calls failf() on errors.
  */
-static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
+static CARLcode flush_egress(struct Curl_easy *data, int sockfd,
                              struct quicsocket *qs)
 {
   ssize_t sent;
@@ -401,13 +401,13 @@ static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
 
     if(sent < 0) {
       failf(data, "quiche_conn_send returned %zd", sent);
-      return CURLE_SEND_ERROR;
+      return CARLE_SEND_ERROR;
     }
 
     sent = send(sockfd, out, sent, 0);
     if(sent < 0) {
       failf(data, "send() returned %zd", sent);
-      return CURLE_SEND_ERROR;
+      return CARLE_SEND_ERROR;
     }
   } while(1);
 
@@ -417,7 +417,7 @@ static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
     /* expire uses milliseconds */
     Curl_expire(data, (timeout_ns + 999999) / 1000000, EXPIRE_QUIC);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 struct h3h1header {
@@ -439,7 +439,7 @@ static int cb_each_header(uint8_t *name, size_t name_len,
               (int) value_len, value);
   }
   else if(!headers->nlen) {
-    return CURLE_HTTP3;
+    return CARLE_HTTP3;
   }
   else {
     msnprintf(headers->dest,
@@ -457,13 +457,13 @@ static ssize_t h3_stream_recv(struct Curl_easy *data,
                               int sockindex,
                               char *buf,
                               size_t buffersize,
-                              CURLcode *curlcode)
+                              CARLcode *carlcode)
 {
   ssize_t recvd = -1;
   ssize_t rcode;
   struct connectdata *conn = data->conn;
   struct quicsocket *qs = conn->quic;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   quiche_h3_event *ev;
   int rc;
   struct h3h1header headers;
@@ -474,7 +474,7 @@ static ssize_t h3_stream_recv(struct Curl_easy *data,
 
   if(process_ingress(data, sockfd, qs)) {
     infof(data, "h3_stream_recv returns on ingress\n");
-    *curlcode = CURLE_RECV_ERROR;
+    *carlcode = CARLE_RECV_ERROR;
     return -1;
   }
 
@@ -495,7 +495,7 @@ static ssize_t h3_stream_recv(struct Curl_easy *data,
     case QUICHE_H3_EVENT_HEADERS:
       rc = quiche_h3_event_for_each_header(ev, cb_each_header, &headers);
       if(rc) {
-        *curlcode = rc;
+        *carlcode = rc;
         failf(data, "Error in HTTP/3 response header");
         break;
       }
@@ -533,11 +533,11 @@ static ssize_t h3_stream_recv(struct Curl_easy *data,
     quiche_h3_event_free(ev);
   }
   if(flush_egress(data, sockfd, qs)) {
-    *curlcode = CURLE_SEND_ERROR;
+    *carlcode = CARLE_SEND_ERROR;
     return -1;
   }
 
-  *curlcode = (-1 == recvd)? CURLE_AGAIN : CURLE_OK;
+  *carlcode = (-1 == recvd)? CARLE_AGAIN : CARLE_OK;
   if(recvd >= 0)
     /* Get this called again to drain the event queue */
     Curl_expire(data, 0, EXPIRE_QUIC);
@@ -550,18 +550,18 @@ static ssize_t h3_stream_send(struct Curl_easy *data,
                               int sockindex,
                               const void *mem,
                               size_t len,
-                              CURLcode *curlcode)
+                              CARLcode *carlcode)
 {
   ssize_t sent;
   struct connectdata *conn = data->conn;
   struct quicsocket *qs = conn->quic;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   struct HTTP *stream = data->req.p.http;
 
   if(!stream->h3req) {
-    CURLcode result = http_request(data, mem, len);
+    CARLcode result = http_request(data, mem, len);
     if(result) {
-      *curlcode = CURLE_SEND_ERROR;
+      *carlcode = CARLE_SEND_ERROR;
       return -1;
     }
     sent = len;
@@ -571,17 +571,17 @@ static ssize_t h3_stream_send(struct Curl_easy *data,
     sent = quiche_h3_send_body(qs->h3c, qs->conn, stream->stream3_id,
                                (uint8_t *)mem, len, FALSE);
     if(sent < 0) {
-      *curlcode = CURLE_SEND_ERROR;
+      *carlcode = CARLE_SEND_ERROR;
       return -1;
     }
   }
 
   if(flush_egress(data, sockfd, qs)) {
-    *curlcode = CURLE_SEND_ERROR;
+    *carlcode = CARLE_SEND_ERROR;
     return -1;
   }
 
-  *curlcode = CURLE_OK;
+  *carlcode = CARLE_OK;
   return sent;
 }
 
@@ -598,7 +598,7 @@ int Curl_quic_ver(char *p, size_t len)
    field list. */
 #define AUTHORITY_DST_IDX 3
 
-static CURLcode http_request(struct Curl_easy *data, const void *mem,
+static CARLcode http_request(struct Curl_easy *data, const void *mem,
                              size_t len)
 {
   /*
@@ -613,7 +613,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   int64_t stream3_id;
   quiche_h3_header *nva = NULL;
   struct quicsocket *qs = conn->quic;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   stream->h3req = TRUE; /* senf off! */
 
@@ -635,7 +635,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   nheader += 1;
   nva = malloc(sizeof(quiche_h3_header) * nheader);
   if(!nva) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     goto fail;
   }
 
@@ -643,7 +643,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
      We do line endings with CRLF so checking for CR is enough */
   line_end = memchr(hdbuf, '\r', len);
   if(!line_end) {
-    result = CURLE_BAD_FUNCTION_ARGUMENT; /* internal error */
+    result = CARLE_BAD_FUNCTION_ARGUMENT; /* internal error */
     goto fail;
   }
 
@@ -792,7 +792,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
                                          stream->upload_left, TRUE);
       if(sent <= 0) {
         failf(data, "quiche_h3_send_body failed!");
-        result = CURLE_SEND_ERROR;
+        result = CARLE_SEND_ERROR;
       }
       stream->upload_left = 0; /* nothing left to send */
     }
@@ -808,7 +808,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
   if(stream3_id < 0) {
     H3BUGF(infof(data, "quiche_h3_send_request returned %d\n",
                  stream3_id));
-    result = CURLE_SEND_ERROR;
+    result = CARLE_SEND_ERROR;
     goto fail;
   }
 
@@ -816,7 +816,7 @@ static CURLcode http_request(struct Curl_easy *data, const void *mem,
         stream3_id, (void *)data);
   stream->stream3_id = stream3_id;
 
-  return CURLE_OK;
+  return CARLE_OK;
 
 fail:
   free(nva);
@@ -826,7 +826,7 @@ fail:
 /*
  * Called from transfer.c:done_sending when we stop HTTP/3 uploading.
  */
-CURLcode Curl_quic_done_sending(struct Curl_easy *data)
+CARLcode Curl_quic_done_sending(struct Curl_easy *data)
 {
   struct connectdata *conn = data->conn;
   DEBUGASSERT(conn);
@@ -839,10 +839,10 @@ CURLcode Curl_quic_done_sending(struct Curl_easy *data)
     sent = quiche_h3_send_body(qs->h3c, qs->conn, stream->stream3_id,
                                NULL, 0, TRUE);
     if(sent < 0)
-      return CURLE_SEND_ERROR;
+      return CARLE_SEND_ERROR;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*

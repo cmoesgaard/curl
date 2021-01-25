@@ -1,0 +1,71 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH carl_easy_cleanup 3 "22 Aug 2007" "libcarl 7.17.0" "libcarl Manual"
+.SH NAME
+carl_easy_cleanup - End a libcarl easy handle
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+
+.BI "void carl_easy_cleanup(CARL *" handle ");"
+.SH DESCRIPTION
+This function must be the last function to call for an easy session. It is the
+opposite of the \fIcarl_easy_init(3)\fP function and must be called with the
+same \fIhandle\fP as input that a \fIcarl_easy_init(3)\fP call returned.
+
+This might close all connections this handle has used and possibly has kept
+open until now - unless it was attached to a multi handle while doing the
+transfers. Don't call this function if you intend to transfer more files,
+re-using handles is a key to good performance with libcarl.
+
+Occasionally you may get your progress callback or header callback called from
+within \fIcarl_easy_cleanup(3)\fP (if previously set for the handle using
+\fIcarl_easy_setopt(3)\fP). Like if libcarl decides to shut down the
+connection and the protocol is of a kind that requires a command/response
+sequence before disconnect. Examples of such protocols are FTP, POP3 and IMAP.
+
+Any use of the \fBhandle\fP after this function has been called and have
+returned, is illegal. \fIcarl_easy_cleanup(3)\fP kills the handle and all
+memory associated with it!
+
+Passing in a NULL pointer in \fIhandle\fP will make this function return
+immediately with no action.
+.SH "OLD TIMES"
+For libcarl versions before 7.17,: after you've called this function, you can
+safely remove all the strings you've previously told libcarl to use, as it
+won't use them anymore now.
+.SH RETURN VALUE
+None
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode res;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+  res = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH "SEE ALSO"
+.BR carl_easy_init "(3), " carl_easy_duphandle "(3), "
+.BR carl_easy_reset "(3), "
+.BR carl_multi_cleanup "(3), " carl_multi_remove_handle "(3) "

@@ -1,0 +1,56 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_NEW_FILE_PERMS 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_NEW_FILE_PERMS \- permissions for remotely created files
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_NEW_FILE_PERMS,
+                          long mode);
+.SH DESCRIPTION
+Pass a long as a parameter, containing the value of the permissions that will
+be assigned to newly created files on the remote server.  The default value is
+\fI0644\fP, but any valid value can be used.  The only protocols that can use
+this are \fIsftp://\fP, \fIscp://\fP, and \fIfile://\fP.
+.SH DEFAULT
+0644
+.SH PROTOCOLS
+SFTP, SCP and FILE
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "sftp://upload.example.com/file.txt");
+  carl_easy_setopt(carl, CARLOPT_NEW_FILE_PERMS, 0664L);
+  ret = carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.16.4
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_NEW_DIRECTORY_PERMS "(3), " CARLOPT_UPLOAD "(3), "

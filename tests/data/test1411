@@ -49,7 +49,7 @@ http://%HOSTIP:%HTTPPORT/1411 -T log/empty1411
 <protocol>
 PUT /1411 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 0
 

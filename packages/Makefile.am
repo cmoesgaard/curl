@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -25,10 +25,10 @@ EXTRA_DIST = README \
   DOS/README \
   DOS/common.dj \
   OS400/README.OS400 \
-  OS400/ccsidcurl.c \
-  OS400/ccsidcurl.h \
+  OS400/ccsidcarl.c \
+  OS400/ccsidcarl.h \
   OS400/chkstrings.c \
-  OS400/curl.inc.in \
+  OS400/carl.inc.in \
   OS400/initscript.sh \
   OS400/make-include.sh \
   OS400/make-lib.sh \
@@ -37,9 +37,9 @@ EXTRA_DIST = README \
   OS400/makefile.sh \
   OS400/os400sys.c \
   OS400/os400sys.h \
-  TPF/curl.mak \
-  TPF/maketpf.env_curl \
-  TPF/maketpf.env_curllib \
+  TPF/carl.mak \
+  TPF/maketpf.env_carl \
+  TPF/maketpf.env_carllib \
   Android/Android.mk
 
 CHECKSRC = $(CS_$(V))

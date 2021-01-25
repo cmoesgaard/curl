@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,12 +30,12 @@ struct chunk_data {
 };
 
 static
-long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains);
+long chunk_bgn(const struct carl_fileinfo *finfo, void *ptr, int remains);
 static
 long chunk_end(void *ptr);
 
 static
-long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
+long chunk_bgn(const struct carl_fileinfo *finfo, void *ptr, int remains)
 {
   struct chunk_data *ch_d = ptr;
   ch_d->remains = remains;
@@ -45,7 +45,7 @@ long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
   printf("Filename:     %s\n", finfo->filename);
   if(finfo->strings.perm) {
     printf("Permissions:  %s", finfo->strings.perm);
-    if(finfo->flags & CURLFINFOFLAG_KNOWN_PERM)
+    if(finfo->flags & CARLFINFOFLAG_KNOWN_PERM)
       printf(" (parsed => %o)", finfo->perm);
     printf("\n");
   }
@@ -58,13 +58,13 @@ long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
     printf("Time:         %s\n", finfo->strings.time);
   printf("Filetype:     ");
   switch(finfo->filetype) {
-  case CURLFILETYPE_FILE:
+  case CARLFILETYPE_FILE:
     printf("regular file\n");
     break;
-  case CURLFILETYPE_DIRECTORY:
+  case CARLFILETYPE_DIRECTORY:
     printf("directory\n");
     break;
-  case CURLFILETYPE_SYMLINK:
+  case CARLFILETYPE_SYMLINK:
     printf("symlink\n");
     printf("Target:       %s\n", finfo->strings.target);
     break;
@@ -72,16 +72,16 @@ long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
     printf("other type\n");
     break;
   }
-  if(finfo->filetype == CURLFILETYPE_FILE) {
+  if(finfo->filetype == CARLFILETYPE_FILE) {
     ch_d->print_content = 1;
     printf("Content:\n-----------------------"
            "--------------------------------------\n");
   }
   if(strcmp(finfo->filename, "someothertext.txt") == 0) {
     printf("# THIS CONTENT WAS SKIPPED IN CHUNK_BGN CALLBACK #\n");
-    return CURL_CHUNK_BGN_FUNC_SKIP;
+    return CARL_CHUNK_BGN_FUNC_SKIP;
   }
-  return CURL_CHUNK_BGN_FUNC_OK;
+  return CARL_CHUNK_BGN_FUNC_OK;
 }
 
 static
@@ -94,32 +94,32 @@ long chunk_end(void *ptr)
   }
   if(ch_d->remains == 1)
     printf("=============================================================\n");
-  return CURL_CHUNK_END_FUNC_OK;
+  return CARL_CHUNK_END_FUNC_OK;
 }
 
 int test(char *URL)
 {
-  CURL *handle = NULL;
-  CURLcode res = CURLE_OK;
+  CARL *handle = NULL;
+  CARLcode res = CARLE_OK;
   struct chunk_data chunk_data = {0, 0};
-  curl_global_init(CURL_GLOBAL_ALL);
-  handle = curl_easy_init();
+  carl_global_init(CARL_GLOBAL_ALL);
+  handle = carl_easy_init();
   if(!handle) {
-    res = CURLE_OUT_OF_MEMORY;
+    res = CARLE_OUT_OF_MEMORY;
     goto test_cleanup;
   }
 
-  test_setopt(handle, CURLOPT_URL, URL);
-  test_setopt(handle, CURLOPT_WILDCARDMATCH, 1L);
-  test_setopt(handle, CURLOPT_CHUNK_BGN_FUNCTION, chunk_bgn);
-  test_setopt(handle, CURLOPT_CHUNK_END_FUNCTION, chunk_end);
-  test_setopt(handle, CURLOPT_CHUNK_DATA, &chunk_data);
+  test_setopt(handle, CARLOPT_URL, URL);
+  test_setopt(handle, CARLOPT_WILDCARDMATCH, 1L);
+  test_setopt(handle, CARLOPT_CHUNK_BGN_FUNCTION, chunk_bgn);
+  test_setopt(handle, CARLOPT_CHUNK_END_FUNCTION, chunk_end);
+  test_setopt(handle, CARLOPT_CHUNK_DATA, &chunk_data);
 
-  res = curl_easy_perform(handle);
+  res = carl_easy_perform(handle);
 
 test_cleanup:
   if(handle)
-    curl_easy_cleanup(handle);
-  curl_global_cleanup();
+    carl_easy_cleanup(handle);
+  carl_global_cleanup();
   return res;
 }

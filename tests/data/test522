@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLOPT_PORT
+CARLOPT_PORT
 </keywords>
 </info>
 
@@ -33,7 +33,7 @@ http
 lib521
 </tool>
  <name>
-HTTP GET with CURLOPT_PORT
+HTTP GET with CARLOPT_PORT
  </name>
  <command>
 http://%HOSTIP/522 %HTTPPORT

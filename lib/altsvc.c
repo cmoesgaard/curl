@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,13 +23,13 @@
  * The Alt-Svc: header is defined in RFC 7838:
  * https://tools.ietf.org/html/rfc7838
  */
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_ALTSVC)
-#include <curl/curl.h>
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_ALTSVC)
+#include <carl/carl.h>
 #include "urldata.h"
 #include "altsvc.h"
-#include "curl_get_line.h"
+#include "carl_get_line.h"
 #include "strcase.h"
 #include "parsedate.h"
 #include "sendf.h"
@@ -38,8 +38,8 @@
 #include "rename.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define MAX_ALTSVC_LINE 4095
@@ -112,8 +112,8 @@ static struct altsvc *altsvc_createid(const char *srchost,
 
   as->src.alpnid = srcalpnid;
   as->dst.alpnid = dstalpnid;
-  as->src.port = curlx_ultous(srcport);
-  as->dst.port = curlx_ultous(dstport);
+  as->src.port = carlx_ultous(srcport);
+  as->dst.port = carlx_ultous(dstport);
 
   return as;
   error:
@@ -137,7 +137,7 @@ static struct altsvc *altsvc_create(char *srchost,
 }
 
 /* only returns SERIOUS errors */
-static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
+static CARLcode altsvc_add(struct altsvcinfo *asi, char *line)
 {
   /* Example line:
      h2 example.com 443 h3 shiny.example.com 8443 "20191231 10:00:00" 1
@@ -172,21 +172,21 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Load alt-svc entries from the given file. The text based line-oriented file
  * format is documented here:
- * https://github.com/curl/curl/wiki/QUIC-implementation
+ * https://github.com/carl/carl/wiki/QUIC-implementation
  *
  * This function only returns error on major problems that prevents alt-svc
  * handling to work completely. It will ignore individual syntactical errors
  * etc.
  */
-static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
+static CARLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *line = NULL;
   FILE *fp;
 
@@ -195,7 +195,7 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
   free(asi->filename);
   asi->filename = strdup(file);
   if(!asi->filename)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   fp = fopen(file, FOPEN_READTEXT);
   if(fp) {
@@ -221,17 +221,17 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
   Curl_safefree(asi->filename);
   free(line);
   fclose(fp);
-  return CURLE_OUT_OF_MEMORY;
+  return CARLE_OUT_OF_MEMORY;
 }
 
 /*
  * Write this single altsvc entry to a single output line
  */
 
-static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
+static CARLcode altsvc_out(struct altsvc *as, FILE *fp)
 {
   struct tm stamp;
-  CURLcode result = Curl_gmtime(as->expires, &stamp);
+  CARLcode result = Curl_gmtime(as->expires, &stamp);
   if(result)
     return result;
 
@@ -246,7 +246,7 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
           stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
           stamp.tm_hour, stamp.tm_min, stamp.tm_sec,
           as->persist, as->prio);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /* ---- library-wide functions below ---- */
@@ -263,12 +263,12 @@ struct altsvcinfo *Curl_altsvc_init(void)
   Curl_llist_init(&asi->list, NULL);
 
   /* set default behavior */
-  asi->flags = CURLALTSVC_H1
+  asi->flags = CARLALTSVC_H1
 #ifdef USE_NGHTTP2
-    | CURLALTSVC_H2
+    | CARLALTSVC_H2
 #endif
 #ifdef ENABLE_QUIC
-    | CURLALTSVC_H3
+    | CARLALTSVC_H3
 #endif
     ;
   return asi;
@@ -277,9 +277,9 @@ struct altsvcinfo *Curl_altsvc_init(void)
 /*
  * Curl_altsvc_load() loads alt-svc from file.
  */
-CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
+CARLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
 {
-  CURLcode result;
+  CARLcode result;
   DEBUGASSERT(asi);
   result = altsvc_load(asi, file);
   return result;
@@ -288,14 +288,14 @@ CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
 /*
  * Curl_altsvc_ctrl() passes on the external bitmask.
  */
-CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl)
+CARLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl)
 {
   DEBUGASSERT(asi);
   if(!ctrl)
     /* unexpected */
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   asi->flags = ctrl;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -322,41 +322,41 @@ void Curl_altsvc_cleanup(struct altsvcinfo **altsvcp)
 /*
  * Curl_altsvc_save() writes the altsvc cache to a file.
  */
-CURLcode Curl_altsvc_save(struct Curl_easy *data,
+CARLcode Curl_altsvc_save(struct Curl_easy *data,
                           struct altsvcinfo *altsvc, const char *file)
 {
   struct Curl_llist_element *e;
   struct Curl_llist_element *n;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   FILE *out;
   char *tempstore;
   unsigned char randsuffix[9];
 
   if(!altsvc)
     /* no cache activated */
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* if not new name is given, use the one we stored from the load */
   if(!file && altsvc->filename)
     file = altsvc->filename;
 
-  if((altsvc->flags & CURLALTSVC_READONLYFILE) || !file || !file[0])
+  if((altsvc->flags & CARLALTSVC_READONLYFILE) || !file || !file[0])
     /* marked as read-only, no file or zero length file name */
-    return CURLE_OK;
+    return CARLE_OK;
 
   if(Curl_rand_hex(data, randsuffix, sizeof(randsuffix)))
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
 
   tempstore = aprintf("%s.%s.tmp", file, randsuffix);
   if(!tempstore)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   out = fopen(tempstore, FOPEN_WRITETEXT);
   if(!out)
-    result = CURLE_WRITE_ERROR;
+    result = CARLE_WRITE_ERROR;
   else {
-    fputs("# Your alt-svc cache. https://curl.se/docs/alt-svc.html\n"
-          "# This file was generated by libcurl! Edit at your own risk.\n",
+    fputs("# Your alt-svc cache. https://carl.se/docs/alt-svc.html\n"
+          "# This file was generated by libcarl! Edit at your own risk.\n",
           out);
     for(e = altsvc->list.head; e; e = n) {
       struct altsvc *as = e->ptr;
@@ -367,7 +367,7 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
     }
     fclose(out);
     if(!result && Curl_rename(tempstore, file))
-      result = CURLE_WRITE_ERROR;
+      result = CARLE_WRITE_ERROR;
 
     if(result)
       unlink(tempstore);
@@ -376,7 +376,7 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
   return result;
 }
 
-static CURLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
+static CARLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
 {
   size_t len;
   const char *protop;
@@ -390,10 +390,10 @@ static CURLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
   *ptr = p;
 
   if(!len || (len >= buflen))
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   memcpy(alpnbuf, protop, len);
   alpnbuf[len] = 0;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /* altsvc_flush() removes all alternatives for this source origin from the
@@ -420,7 +420,7 @@ static void altsvc_flush(struct altsvcinfo *asi, enum alpnid srcalpnid,
    return */
 static time_t debugtime(void *unused)
 {
-  char *timestr = getenv("CURL_TIME");
+  char *timestr = getenv("CARL_TIME");
   (void)unused;
   if(timestr) {
     unsigned long val = strtol(timestr, NULL, 10);
@@ -444,7 +444,7 @@ static time_t debugtime(void *unused)
  * Invalid host name, port number will result in the specific alternative
  * being rejected. Unknown protocols are skipped.
  */
-CURLcode Curl_altsvc_parse(struct Curl_easy *data,
+CARLcode Curl_altsvc_parse(struct Curl_easy *data,
                            struct altsvcinfo *asi, const char *value,
                            enum alpnid srcalpnid, const char *srchost,
                            unsigned short srcport)
@@ -455,13 +455,13 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
   char alpnbuf[MAX_ALTSVC_ALPNLEN] = "";
   struct altsvc *as;
   unsigned short dstport = srcport; /* the same by default */
-  CURLcode result = getalnum(&p, alpnbuf, sizeof(alpnbuf));
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
+  CARLcode result = getalnum(&p, alpnbuf, sizeof(alpnbuf));
+#ifdef CARL_DISABLE_VERBOSE_STRINGS
   (void)data;
 #endif
   if(result) {
     infof(data, "Excessive alt-svc header, ignoring...\n");
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   DEBUGASSERT(asi);
@@ -471,7 +471,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
 
   /* "clear" is a magic keyword */
   if(strcasecompare(alpnbuf, "clear")) {
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   do {
@@ -517,7 +517,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             dstalpnid = ALPN_none;
           }
           p = end_ptr;
-          dstport = curlx_ultous(port);
+          dstport = carlx_ultous(port);
         }
         if(*p++ != '\"')
           break;
@@ -539,12 +539,12 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
           while(*p && ISBLANK(*p))
             p++;
           if(*p != '=')
-            return CURLE_OK;
+            return CARLE_OK;
           p++;
           while(*p && ISBLANK(*p))
             p++;
           if(!*p)
-            return CURLE_OK;
+            return CARLE_OK;
           if(*p == '\"') {
             /* quoted value */
             p++;
@@ -555,7 +555,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             while(*p && *p != '\"')
               p++;
             if(!*p++)
-              return CURLE_OK;
+              return CARLE_OK;
           }
           else {
             while(*p && !ISBLANK(*p) && *p!= ';' && *p != ',')
@@ -604,7 +604,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
       break;
   } while(*p && (*p != ';') && (*p != '\n') && (*p != '\r'));
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -644,4 +644,4 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
   return FALSE;
 }
 
-#endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_ALTSVC */
+#endif /* !CARL_DISABLE_HTTP && !CARL_DISABLE_ALTSVC */

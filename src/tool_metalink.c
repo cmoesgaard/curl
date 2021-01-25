@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -89,9 +89,9 @@ struct win32_crypto_hash {
 #  error "Can't compile METALINK support without a crypto library."
 #endif
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_getparam.h"
 #include "tool_paramhlp.h"
@@ -401,9 +401,9 @@ static void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx)
 
 const struct digest_params MD5_DIGEST_PARAMS[] = {
   {
-    CURLX_FUNCTION_CAST(digest_init_func, MD5_Init),
-    CURLX_FUNCTION_CAST(digest_update_func, MD5_Update),
-    CURLX_FUNCTION_CAST(digest_final_func, MD5_Final),
+    CARLX_FUNCTION_CAST(digest_init_func, MD5_Init),
+    CARLX_FUNCTION_CAST(digest_update_func, MD5_Update),
+    CARLX_FUNCTION_CAST(digest_final_func, MD5_Final),
     sizeof(MD5_CTX),
     16
   }
@@ -411,9 +411,9 @@ const struct digest_params MD5_DIGEST_PARAMS[] = {
 
 const struct digest_params SHA1_DIGEST_PARAMS[] = {
   {
-    CURLX_FUNCTION_CAST(digest_init_func, SHA1_Init),
-    CURLX_FUNCTION_CAST(digest_update_func, SHA1_Update),
-    CURLX_FUNCTION_CAST(digest_final_func, SHA1_Final),
+    CARLX_FUNCTION_CAST(digest_init_func, SHA1_Init),
+    CARLX_FUNCTION_CAST(digest_update_func, SHA1_Update),
+    CARLX_FUNCTION_CAST(digest_final_func, SHA1_Final),
     sizeof(SHA_CTX),
     20
   }
@@ -421,9 +421,9 @@ const struct digest_params SHA1_DIGEST_PARAMS[] = {
 
 const struct digest_params SHA256_DIGEST_PARAMS[] = {
   {
-    CURLX_FUNCTION_CAST(digest_init_func, SHA256_Init),
-    CURLX_FUNCTION_CAST(digest_update_func, SHA256_Update),
-    CURLX_FUNCTION_CAST(digest_final_func, SHA256_Final),
+    CARLX_FUNCTION_CAST(digest_init_func, SHA256_Init),
+    CARLX_FUNCTION_CAST(digest_update_func, SHA256_Update),
+    CARLX_FUNCTION_CAST(digest_final_func, SHA256_Final),
     sizeof(SHA256_CTX),
     32
   }
@@ -684,7 +684,7 @@ static struct metalinkfile *new_metalinkfile(metalink_file_t *fileinfo)
         ++digest_alias) {
       metalink_checksum_t **p;
       for(p = fileinfo->checksums; *p; ++p) {
-        if(curl_strequal(digest_alias->alias_name, (*p)->type) &&
+        if(carl_strequal(digest_alias->alias_name, (*p)->type) &&
            check_hex_digest((*p)->hash, digest_alias->digest_def)) {
           f->checksum =
             checksum_from_hex_digest(digest_alias->digest_def,
@@ -705,7 +705,7 @@ static struct metalinkfile *new_metalinkfile(metalink_file_t *fileinfo)
     for(p = fileinfo->resources; *p; ++p) {
       struct metalink_resource *res;
       /* Filter by type if it is non-NULL. In Metalink v3, type
-         includes the type of the resource. In curl, we are only
+         includes the type of the resource. In carl, we are only
          interested in HTTP, HTTPS and FTP. In addition to them,
          Metalink v3 file may contain bittorrent type URL, which
          points to the BitTorrent metainfo file. We ignore it here.
@@ -714,10 +714,10 @@ static struct metalinkfile *new_metalinkfile(metalink_file_t *fileinfo)
          metainfo file URL may be appeared in fileinfo->metaurls.
       */
       if((*p)->type == NULL ||
-         curl_strequal((*p)->type, "http") ||
-         curl_strequal((*p)->type, "https") ||
-         curl_strequal((*p)->type, "ftp") ||
-         curl_strequal((*p)->type, "ftps")) {
+         carl_strequal((*p)->type, "http") ||
+         carl_strequal((*p)->type, "https") ||
+         carl_strequal((*p)->type, "ftp") ||
+         carl_strequal((*p)->type, "ftps")) {
         res = new_metalink_resource((*p)->url);
         if(res) {
           tail->next = res;
@@ -830,9 +830,9 @@ size_t metalink_write_cb(void *buffer, size_t sz, size_t nmemb,
   int rv;
 
   /*
-   * Once that libcurl has called back tool_write_cb() the returned value
+   * Once that libcarl has called back tool_write_cb() the returned value
    * is checked against the amount that was intended to be written, if
-   * it does not match then it fails with CURLE_WRITE_ERROR. So at this
+   * it does not match then it fails with CARLE_WRITE_ERROR. So at this
    * point returning a value different from sz*nmemb indicates failure.
    */
   const size_t failure = (sz && nmemb) ? 0 : 1;
@@ -860,7 +860,7 @@ static int check_content_type(const char *content_type, const char *media_type)
   if(!*ptr) {
     return 0;
   }
-  return curl_strnequal(ptr, media_type, media_type_len) &&
+  return carl_strnequal(ptr, media_type, media_type_len) &&
     (*(ptr + media_type_len) == '\0' || *(ptr + media_type_len) == ' ' ||
      *(ptr + media_type_len) == '\t' || *(ptr + media_type_len) == ';');
 }

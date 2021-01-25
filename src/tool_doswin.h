@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_DOSWIN_H
-#define HEADER_CURL_TOOL_DOSWIN_H
+#ifndef HEADER_CARL_TOOL_DOSWIN_H
+#define HEADER_CARL_TOOL_DOSWIN_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -57,14 +57,14 @@ char **__crt0_glob_function(char *arg);
 
 #ifdef WIN32
 
-CURLcode FindWin32CACert(struct OperationConfig *config,
-                         curl_sslbackend backend,
+CARLcode FindWin32CACert(struct OperationConfig *config,
+                         carl_sslbackend backend,
                          const TCHAR *bundle_file);
-struct curl_slist *GetLoadedModulePaths(void);
-CURLcode win32_init(void);
+struct carl_slist *GetLoadedModulePaths(void);
+CARLcode win32_init(void);
 
 #endif /* WIN32 */
 
 #endif /* MSDOS || WIN32 */
 
-#endif /* HEADER_CURL_TOOL_DOSWIN_H */
+#endif /* HEADER_CARL_TOOL_DOSWIN_H */

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,15 +19,15 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "splay.h"
 #include "warnless.h"
 
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -76,12 +76,12 @@ UNITTEST_START
   size_t storage[NUM_NODES*3];
   int rc;
   int i, j;
-  struct curltime tv_now = {0, 0};
+  struct carltime tv_now = {0, 0};
   root = NULL;              /* the empty tree */
 
   /* add nodes */
   for(i = 0; i < NUM_NODES; i++) {
-    struct curltime key;
+    struct carltime key;
 
     key.tv_sec = 0;
     key.tv_usec = (541*i)%1023;
@@ -111,7 +111,7 @@ UNITTEST_START
 
   /* rebuild tree */
   for(i = 0; i < NUM_NODES; i++) {
-    struct curltime key;
+    struct carltime key;
 
     key.tv_sec = 0;
     key.tv_usec = (541*i)%1023;

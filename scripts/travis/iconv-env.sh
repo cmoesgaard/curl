@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,4 +19,4 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-export CPPFLAGS="-DCURL_DOES_CONVERSIONS -DHAVE_ICONV -DCURL_ICONV_CODESET_OF_HOST='\"ISO8859-1\"'"
+export CPPFLAGS="-DCARL_DOES_CONVERSIONS -DHAVE_ICONV -DCARL_ICONV_CODESET_OF_HOST='\"ISO8859-1\"'"

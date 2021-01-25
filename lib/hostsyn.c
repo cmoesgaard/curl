@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,12 +20,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 /***********************************************************************
  * Only for builds using synchronous name resolves
  **********************************************************************/
-#ifdef CURLRES_SYNCH
+#ifdef CARLRES_SYNCH
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -52,19 +52,19 @@
 #include "share.h"
 #include "strerror.h"
 #include "url.h"
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
 /*
  * Function provided by the resolver backend to set DNS servers to use.
  */
-CURLcode Curl_set_dns_servers(struct Curl_easy *data,
+CARLcode Curl_set_dns_servers(struct Curl_easy *data,
                               char *servers)
 {
   (void)data;
   (void)servers;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 
 }
 
@@ -72,36 +72,36 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
  * Function provided by the resolver backend to set
  * outgoing interface to use for DNS requests
  */
-CURLcode Curl_set_dns_interface(struct Curl_easy *data,
+CARLcode Curl_set_dns_interface(struct Curl_easy *data,
                                 const char *interf)
 {
   (void)data;
   (void)interf;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 }
 
 /*
  * Function provided by the resolver backend to set
  * local IPv4 address to use as source address for DNS requests
  */
-CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
                                 const char *local_ip4)
 {
   (void)data;
   (void)local_ip4;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 }
 
 /*
  * Function provided by the resolver backend to set
  * local IPv6 address to use as source address for DNS requests
  */
-CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
                                 const char *local_ip6)
 {
   (void)data;
   (void)local_ip6;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 }
 
 #endif /* truly sync */

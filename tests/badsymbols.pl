@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 ###########################################################################
 #
 # This script grew out of help from Przemyslaw Iskra and Balint Szilakszi
-# a late evening in the #curl IRC channel on freenode.
+# a late evening in the #carl IRC channel on freenode.
 #
 
 use strict;
@@ -59,7 +59,7 @@ my $root=$ARGV[0] || ".";
 # need an include directory when building out-of-tree
 my $i = ($ARGV[1]) ? "-I$ARGV[1] " : '';
 
-my $incdir = "$root/include/curl";
+my $incdir = "$root/include/carl";
 
 my $summary=0;
 my $misses=0;
@@ -142,7 +142,7 @@ for(@hfiles) {
 
 my $errors = 0;
 for my $s (@syms) {
-    if($s !~ /^(lib|)curl/i) {
+    if($s !~ /^(lib|)carl/i) {
         print "Bad symbols in public header files:\n" if(!$errors);
         $errors++;
         print "  $s\n";

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,45 +28,45 @@
 int test(char *URL)
 {
   char *url_after;
-  CURLU *curlu = curl_url();
-  CURL *curl = curl_easy_init();
-  CURLcode curl_code;
-  char error_buffer[CURL_ERROR_SIZE] = "";
+  CARLU *carlu = carl_url();
+  CARL *carl = carl_easy_init();
+  CARLcode carl_code;
+  char error_buffer[CARL_ERROR_SIZE] = "";
 
-  curl_url_set(curlu, CURLUPART_URL, URL, CURLU_DEFAULT_SCHEME);
-  curl_easy_setopt(curl, CURLOPT_CURLU, curlu);
-  curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error_buffer);
-  curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+  carl_url_set(carlu, CARLUPART_URL, URL, CARLU_DEFAULT_SCHEME);
+  carl_easy_setopt(carl, CARLOPT_CARLU, carlu);
+  carl_easy_setopt(carl, CARLOPT_ERRORBUFFER, error_buffer);
+  carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
   /* set a port number that makes this reqeuest fail */
-  curl_easy_setopt(curl, CURLOPT_PORT, 1L);
-  curl_code = curl_easy_perform(curl);
-  if(!curl_code)
+  carl_easy_setopt(carl, CARLOPT_PORT, 1L);
+  carl_code = carl_easy_perform(carl);
+  if(!carl_code)
     fprintf(stderr, "failure expected, "
-            "curl_easy_perform returned %ld: <%s>, <%s>\n",
-            (long) curl_code, curl_easy_strerror(curl_code), error_buffer);
+            "carl_easy_perform returned %ld: <%s>, <%s>\n",
+            (long) carl_code, carl_easy_strerror(carl_code), error_buffer);
 
   /* print the used url */
-  curl_url_get(curlu, CURLUPART_URL, &url_after, 0);
-  fprintf(stderr, "curlu now: <%s>\n", url_after);
-  curl_free(url_after);
+  carl_url_get(carlu, CARLUPART_URL, &url_after, 0);
+  fprintf(stderr, "carlu now: <%s>\n", url_after);
+  carl_free(url_after);
 
-  /* now reset CURLOP_PORT to go back to originally set port number */
-  curl_easy_setopt(curl, CURLOPT_PORT, 0L);
+  /* now reset CARLOP_PORT to go back to originally set port number */
+  carl_easy_setopt(carl, CARLOPT_PORT, 0L);
 
-  curl_code = curl_easy_perform(curl);
-  if(curl_code)
+  carl_code = carl_easy_perform(carl);
+  if(carl_code)
     fprintf(stderr, "success expected, "
-            "curl_easy_perform returned %ld: <%s>, <%s>\n",
-            (long) curl_code, curl_easy_strerror(curl_code), error_buffer);
+            "carl_easy_perform returned %ld: <%s>, <%s>\n",
+            (long) carl_code, carl_easy_strerror(carl_code), error_buffer);
 
   /* print url */
-  curl_url_get(curlu, CURLUPART_URL, &url_after, 0);
-  fprintf(stderr, "curlu now: <%s>\n", url_after);
-  curl_free(url_after);
+  carl_url_get(carlu, CARLUPART_URL, &url_after, 0);
+  fprintf(stderr, "carlu now: <%s>\n", url_after);
+  carl_free(url_after);
 
-  curl_easy_cleanup(curl);
-  curl_url_cleanup(curlu);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_url_cleanup(carlu);
+  carl_global_cleanup();
 
   return 0;
 }

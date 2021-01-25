@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -60,7 +60,7 @@ eval "`sed -e ': begin'                                                 \
 #       Special case: redefine chkhostname compilation parameters.
 
 chkhostname_SOURCES=chkhostname.c
-chkhostname_LDADD=curl_gethostname.o
+chkhostname_LDADD=carl_gethostname.o
 
 #       Compile all programs.
 #       The list is found in variable "noinst_PROGRAMS"

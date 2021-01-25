@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -29,25 +29,25 @@
 
 int test(char *URL)
 {
-  CURL *curls = NULL;
-  CURLM *multi = NULL;
+  CARL *carls = NULL;
+  CARLM *multi = NULL;
   int still_running;
   int i = -1;
   int res = 0;
-  CURLMsg *msg;
+  CARLMsg *msg;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(multi);
 
-  easy_init(curls);
+  easy_init(carls);
 
-  easy_setopt(curls, CURLOPT_URL, URL);
-  easy_setopt(curls, CURLOPT_HEADER, 1L);
+  easy_setopt(carls, CARLOPT_URL, URL);
+  easy_setopt(carls, CARLOPT_HEADER, 1L);
 
-  multi_add_handle(multi, curls);
+  multi_add_handle(multi, carls);
 
   multi_perform(multi, &still_running);
 
@@ -79,7 +79,7 @@ int test(char *URL)
     abort_on_test_timeout();
   }
 
-  msg = curl_multi_info_read(multi, &still_running);
+  msg = carl_multi_info_read(multi, &still_running);
   if(msg)
     /* this should now contain a result code from the easy handle,
        get it */
@@ -89,9 +89,9 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UA */
 
-  curl_multi_cleanup(multi);
-  curl_easy_cleanup(curls);
-  curl_global_cleanup();
+  carl_multi_cleanup(multi);
+  carl_easy_cleanup(carls);
+  carl_global_cleanup();
 
   if(res)
     i = res;

@@ -48,7 +48,7 @@ perl -e "print 'Test requires default test server host' if ( '%HOSTIP' ne '127.0
 <protocol>
 GET /2034 HTTP/1.1
 Host: localhost:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

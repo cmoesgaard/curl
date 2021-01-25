@@ -21,7 +21,7 @@ none
 file
 </features>
  <name>
-curl file category --help with lower/upper mix
+carl file category --help with lower/upper mix
  </name>
  <command>
 --help fIlE
@@ -35,7 +35,7 @@ curl file category --help with lower/upper mix
 0
 </errorcode>
 <stdout mode="text">
-Usage: curl [options...] <url>
+Usage: carl [options...] <url>
 file: FILE protocol options
      --create-file-mode File mode for created files
  -I, --head          Show document info only

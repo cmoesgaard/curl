@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -47,10 +47,10 @@
 #include <netinet/tcp.h> /* for TCP_NODELAY */
 #endif
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "inet_pton.h"
 #include "util.h"
@@ -130,7 +130,7 @@ struct httprequest {
 
 #define MAX_SOCKETS 1024
 
-static curl_socket_t all_sockets[MAX_SOCKETS];
+static carl_socket_t all_sockets[MAX_SOCKETS];
 static size_t num_sockets = 0;
 
 static int ProcessRequest(struct httprequest *req);
@@ -144,7 +144,7 @@ static void storerequest(const char *reqbuf, size_t totalsize);
 
 const char *serverlogfile = DEFAULT_LOGFILE;
 
-#define SWSVERSION "curl test suite HTTP server/0.1"
+#define SWSVERSION "carl test suite HTTP server/0.1"
 
 #define REQUEST_DUMP  "log/server.input"
 #define RESPONSE_DUMP "log/server.response"
@@ -492,7 +492,7 @@ static int ProcessRequest(struct httprequest *req)
           if(!ulnum || (ulnum > 65535UL))
             logmsg("Invalid CONNECT port received");
           else
-            req->connect_port = curlx_ultous(ulnum);
+            req->connect_port = carlx_ultous(ulnum);
 
         }
         logmsg("Port number: %d, test case number: %ld",
@@ -865,7 +865,7 @@ static void init_httprequest(struct httprequest *req)
 
 /* returns 1 if the connection should be serviced again immediately, 0 if there
    is no data waiting, or < 0 if it should be closed */
-static int get_request(curl_socket_t sock, struct httprequest *req)
+static int get_request(carl_socket_t sock, struct httprequest *req)
 {
   int fail = 0;
   char *reqbuf = req->reqbuf;
@@ -942,7 +942,7 @@ static int get_request(curl_socket_t sock, struct httprequest *req)
 }
 
 /* returns -1 on failure */
-static int send_doc(curl_socket_t sock, struct httprequest *req)
+static int send_doc(carl_socket_t sock, struct httprequest *req)
 {
   ssize_t written;
   size_t count;
@@ -1207,10 +1207,10 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
   return 0;
 }
 
-static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
+static carl_socket_t connect_to(const char *ipaddr, unsigned short port)
 {
   srvr_sockaddr_union_t serveraddr;
-  curl_socket_t serverfd;
+  carl_socket_t serverfd;
   int error;
   int rc = 0;
   const char *op_br = "";
@@ -1224,24 +1224,24 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
 #endif
 
   if(!ipaddr)
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
 
   logmsg("about to connect to %s%s%s:%hu",
          op_br, ipaddr, cl_br, port);
 
 
   serverfd = socket(socket_domain, SOCK_STREAM, 0);
-  if(CURL_SOCKET_BAD == serverfd) {
+  if(CARL_SOCKET_BAD == serverfd) {
     error = SOCKERRNO;
     logmsg("Error creating socket for server connection: (%d) %s",
            error, strerror(error));
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
 #ifdef TCP_NODELAY
   if(socket_domain_is_ip()) {
     /* Disable the Nagle algorithm */
-    curl_socklen_t flag = 1;
+    carl_socklen_t flag = 1;
     if(0 != setsockopt(serverfd, IPPROTO_TCP, TCP_NODELAY,
                        (void *)&flag, sizeof(flag)))
       logmsg("====> TCP_NODELAY for server connection failed");
@@ -1256,7 +1256,7 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
     if(Curl_inet_pton(AF_INET, ipaddr, &serveraddr.sa4.sin_addr) < 1) {
       logmsg("Error inet_pton failed AF_INET conversion of '%s'", ipaddr);
       sclose(serverfd);
-      return CURL_SOCKET_BAD;
+      return CARL_SOCKET_BAD;
     }
 
     rc = connect(serverfd, &serveraddr.sa, sizeof(serveraddr.sa4));
@@ -1269,7 +1269,7 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
     if(Curl_inet_pton(AF_INET6, ipaddr, &serveraddr.sa6.sin6_addr) < 1) {
       logmsg("Error inet_pton failed AF_INET6 conversion of '%s'", ipaddr);
       sclose(serverfd);
-      return CURL_SOCKET_BAD;
+      return CARL_SOCKET_BAD;
     }
 
     rc = connect(serverfd, &serveraddr.sa, sizeof(serveraddr.sa6));
@@ -1278,13 +1278,13 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
 #ifdef USE_UNIX_SOCKETS
   case AF_UNIX:
     logmsg("Proxying through Unix socket is not (yet?) supported.");
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
 #endif /* USE_UNIX_SOCKETS */
   }
 
   if(got_exit_signal) {
     sclose(serverfd);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   if(rc) {
@@ -1292,7 +1292,7 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
     logmsg("Error connecting to server port %hu: (%d) %s",
            port, error, strerror(error));
     sclose(serverfd);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   logmsg("connected fine to %s%s%s:%hu, now tunnel",
@@ -1318,13 +1318,13 @@ static curl_socket_t connect_to(const char *ipaddr, unsigned short port)
 #define CTRL  0
 #define DATA  1
 
-static void http_connect(curl_socket_t *infdp,
-                         curl_socket_t rootfd,
+static void http_connect(carl_socket_t *infdp,
+                         carl_socket_t rootfd,
                          const char *ipaddr,
                          unsigned short ipport)
 {
-  curl_socket_t serverfd[2] = {CURL_SOCKET_BAD, CURL_SOCKET_BAD};
-  curl_socket_t clientfd[2] = {CURL_SOCKET_BAD, CURL_SOCKET_BAD};
+  carl_socket_t serverfd[2] = {CARL_SOCKET_BAD, CARL_SOCKET_BAD};
+  carl_socket_t clientfd[2] = {CARL_SOCKET_BAD, CARL_SOCKET_BAD};
   ssize_t toc[2] = {0, 0}; /* number of bytes to client */
   ssize_t tos[2] = {0, 0}; /* number of bytes to server */
   char readclient[2][256];
@@ -1345,14 +1345,14 @@ static void http_connect(curl_socket_t *infdp,
 
   /* Sleep here to make sure the client reads CONNECT response's
      'end of headers' separate from the server data that follows.
-     This is done to prevent triggering libcurl known bug #39. */
+     This is done to prevent triggering libcarl known bug #39. */
   for(loop = 2; (loop > 0) && !got_exit_signal; loop--)
     wait_ms(250);
   if(got_exit_signal)
     goto http_connect_cleanup;
 
   serverfd[CTRL] = connect_to(ipaddr, ipport);
-  if(serverfd[CTRL] == CURL_SOCKET_BAD)
+  if(serverfd[CTRL] == CARL_SOCKET_BAD)
     goto http_connect_cleanup;
 
   /* Primary tunnel socket endpoints are now connected. Tunnel data back and
@@ -1369,13 +1369,13 @@ static void http_connect(curl_socket_t *infdp,
     fd_set output;
     struct timeval timeout = {1, 0}; /* 1000 ms */
     ssize_t rc;
-    curl_socket_t maxfd = (curl_socket_t)-1;
+    carl_socket_t maxfd = (carl_socket_t)-1;
 
     FD_ZERO(&input);
     FD_ZERO(&output);
 
-    if((clientfd[DATA] == CURL_SOCKET_BAD) &&
-       (serverfd[DATA] == CURL_SOCKET_BAD) &&
+    if((clientfd[DATA] == CARL_SOCKET_BAD) &&
+       (serverfd[DATA] == CARL_SOCKET_BAD) &&
        poll_client_rd[CTRL] && poll_client_wr[CTRL] &&
        poll_server_rd[CTRL] && poll_server_wr[CTRL]) {
       /* listener socket is monitored to allow client to establish
@@ -1388,7 +1388,7 @@ static void http_connect(curl_socket_t *infdp,
     /* set tunnel sockets to wait for */
     for(i = 0; i <= max_tunnel_idx; i++) {
       /* client side socket monitoring */
-      if(clientfd[i] != CURL_SOCKET_BAD) {
+      if(clientfd[i] != CARL_SOCKET_BAD) {
         if(poll_client_rd[i]) {
           /* unless told not to do so, monitor readability */
           FD_SET(clientfd[i], &input);
@@ -1404,7 +1404,7 @@ static void http_connect(curl_socket_t *infdp,
         }
       }
       /* server side socket monitoring */
-      if(serverfd[i] != CURL_SOCKET_BAD) {
+      if(serverfd[i] != CARL_SOCKET_BAD) {
         if(poll_server_rd[i]) {
           /* unless told not to do so, monitor readability */
           FD_SET(serverfd[i], &input);
@@ -1438,11 +1438,11 @@ static void http_connect(curl_socket_t *infdp,
       /* ---------------------------------------------------------- */
 
       /* passive mode FTP may establish a secondary tunnel */
-      if((clientfd[DATA] == CURL_SOCKET_BAD) &&
-         (serverfd[DATA] == CURL_SOCKET_BAD) && FD_ISSET(rootfd, &input)) {
+      if((clientfd[DATA] == CARL_SOCKET_BAD) &&
+         (serverfd[DATA] == CARL_SOCKET_BAD) && FD_ISSET(rootfd, &input)) {
         /* a new connection on listener socket (most likely from client) */
-        curl_socket_t datafd = accept(rootfd, NULL, NULL);
-        if(datafd != CURL_SOCKET_BAD) {
+        carl_socket_t datafd = accept(rootfd, NULL, NULL);
+        if(datafd != CARL_SOCKET_BAD) {
           struct httprequest req2;
           int err = 0;
           memset(&req2, 0, sizeof(req2));
@@ -1450,7 +1450,7 @@ static void http_connect(curl_socket_t *infdp,
 #ifdef TCP_NODELAY
           if(socket_domain_is_ip()) {
             /* Disable the Nagle algorithm */
-            curl_socklen_t flag = 1;
+            carl_socklen_t flag = 1;
             if(0 != setsockopt(datafd, IPPROTO_TCP, TCP_NODELAY,
                                (void *)&flag, sizeof(flag)))
               logmsg("====> TCP_NODELAY for client DATA connection failed");
@@ -1469,13 +1469,13 @@ static void http_connect(curl_socket_t *infdp,
           if(err >= 0) {
             err = send_doc(datafd, &req2);
             if(!err && req2.connect_request) {
-              /* sleep to prevent triggering libcurl known bug #39. */
+              /* sleep to prevent triggering libcarl known bug #39. */
               for(loop = 2; (loop > 0) && !got_exit_signal; loop--)
                 wait_ms(250);
               if(!got_exit_signal) {
                 /* connect to the server */
                 serverfd[DATA] = connect_to(ipaddr, req2.connect_port);
-                if(serverfd[DATA] != CURL_SOCKET_BAD) {
+                if(serverfd[DATA] != CARL_SOCKET_BAD) {
                   /* secondary tunnel established, now we have two
                      connections */
                   poll_client_rd[DATA] = TRUE;
@@ -1487,12 +1487,12 @@ static void http_connect(curl_socket_t *infdp,
                   toc[DATA] = 0;
                   tos[DATA] = 0;
                   clientfd[DATA] = datafd;
-                  datafd = CURL_SOCKET_BAD;
+                  datafd = CARL_SOCKET_BAD;
                 }
               }
             }
           }
-          if(datafd != CURL_SOCKET_BAD) {
+          if(datafd != CARL_SOCKET_BAD) {
             /* secondary tunnel not established */
             shutdown(datafd, SHUT_RDWR);
             sclose(datafd);
@@ -1507,7 +1507,7 @@ static void http_connect(curl_socket_t *infdp,
       /* react to tunnel endpoint readable/writable notifications */
       for(i = 0; i <= max_tunnel_idx; i++) {
         size_t len;
-        if(clientfd[i] != CURL_SOCKET_BAD) {
+        if(clientfd[i] != CARL_SOCKET_BAD) {
           len = sizeof(readclient[i]) - tos[i];
           if(len && FD_ISSET(clientfd[i], &input)) {
             /* read from client */
@@ -1525,7 +1525,7 @@ static void http_connect(curl_socket_t *infdp,
             }
           }
         }
-        if(serverfd[i] != CURL_SOCKET_BAD) {
+        if(serverfd[i] != CARL_SOCKET_BAD) {
           len = sizeof(readserver[i])-toc[i];
           if(len && FD_ISSET(serverfd[i], &input)) {
             /* read from server */
@@ -1543,7 +1543,7 @@ static void http_connect(curl_socket_t *infdp,
             }
           }
         }
-        if(clientfd[i] != CURL_SOCKET_BAD) {
+        if(clientfd[i] != CARL_SOCKET_BAD) {
           if(toc[i] && FD_ISSET(clientfd[i], &output)) {
             /* write to client */
             rc = swrite(clientfd[i], readserver[i], toc[i]);
@@ -1563,7 +1563,7 @@ static void http_connect(curl_socket_t *infdp,
             }
           }
         }
-        if(serverfd[i] != CURL_SOCKET_BAD) {
+        if(serverfd[i] != CARL_SOCKET_BAD) {
           if(tos[i] && FD_ISSET(serverfd[i], &output)) {
             /* write to server */
             rc = swrite(serverfd[i], readclient[i], tos[i]);
@@ -1594,7 +1594,7 @@ static void http_connect(curl_socket_t *infdp,
         for(loop = 2; loop > 0; loop--) {
           /* loop twice to satisfy condition interdependencies without
              having to await select timeout or another socket event */
-          if(clientfd[i] != CURL_SOCKET_BAD) {
+          if(clientfd[i] != CARL_SOCKET_BAD) {
             if(poll_client_rd[i] && !poll_server_wr[i]) {
               logmsg("[%s] DISABLED READING client", data_or_ctrl(i));
               shutdown(clientfd[i], SHUT_RD);
@@ -1607,7 +1607,7 @@ static void http_connect(curl_socket_t *infdp,
               tcp_fin_wr = TRUE;
             }
           }
-          if(serverfd[i] != CURL_SOCKET_BAD) {
+          if(serverfd[i] != CARL_SOCKET_BAD) {
             if(poll_server_rd[i] && !poll_client_wr[i]) {
               logmsg("[%s] DISABLED READING server", data_or_ctrl(i));
               shutdown(serverfd[i], SHUT_RD);
@@ -1630,12 +1630,12 @@ static void http_connect(curl_socket_t *infdp,
       /* socket clearing */
       for(i = 0; i <= max_tunnel_idx; i++) {
         for(loop = 2; loop > 0; loop--) {
-          if(clientfd[i] != CURL_SOCKET_BAD) {
+          if(clientfd[i] != CARL_SOCKET_BAD) {
             if(!poll_client_wr[i] && !poll_client_rd[i]) {
               logmsg("[%s] CLOSING client socket", data_or_ctrl(i));
               sclose(clientfd[i]);
-              clientfd[i] = CURL_SOCKET_BAD;
-              if(serverfd[i] == CURL_SOCKET_BAD) {
+              clientfd[i] = CARL_SOCKET_BAD;
+              if(serverfd[i] == CARL_SOCKET_BAD) {
                 logmsg("[%s] ENDING", data_or_ctrl(i));
                 if(i == DATA)
                   secondary = FALSE;
@@ -1644,12 +1644,12 @@ static void http_connect(curl_socket_t *infdp,
               }
             }
           }
-          if(serverfd[i] != CURL_SOCKET_BAD) {
+          if(serverfd[i] != CARL_SOCKET_BAD) {
             if(!poll_server_wr[i] && !poll_server_rd[i]) {
               logmsg("[%s] CLOSING server socket", data_or_ctrl(i));
               sclose(serverfd[i]);
-              serverfd[i] = CURL_SOCKET_BAD;
-              if(clientfd[i] == CURL_SOCKET_BAD) {
+              serverfd[i] = CARL_SOCKET_BAD;
+              if(clientfd[i] == CARL_SOCKET_BAD) {
                 logmsg("[%s] ENDING", data_or_ctrl(i));
                 if(i == DATA)
                   secondary = FALSE;
@@ -1682,23 +1682,23 @@ static void http_connect(curl_socket_t *infdp,
 http_connect_cleanup:
 
   for(i = DATA; i >= CTRL; i--) {
-    if(serverfd[i] != CURL_SOCKET_BAD) {
+    if(serverfd[i] != CARL_SOCKET_BAD) {
       logmsg("[%s] CLOSING server socket (cleanup)", data_or_ctrl(i));
       shutdown(serverfd[i], SHUT_RDWR);
       sclose(serverfd[i]);
     }
-    if(clientfd[i] != CURL_SOCKET_BAD) {
+    if(clientfd[i] != CARL_SOCKET_BAD) {
       logmsg("[%s] CLOSING client socket (cleanup)", data_or_ctrl(i));
       shutdown(clientfd[i], SHUT_RDWR);
       sclose(clientfd[i]);
     }
-    if((serverfd[i] != CURL_SOCKET_BAD) ||
-       (clientfd[i] != CURL_SOCKET_BAD)) {
+    if((serverfd[i] != CARL_SOCKET_BAD) ||
+       (clientfd[i] != CARL_SOCKET_BAD)) {
       logmsg("[%s] ABORTING", data_or_ctrl(i));
     }
   }
 
-  *infdp = CURL_SOCKET_BAD;
+  *infdp = CARL_SOCKET_BAD;
 }
 
 static void http2(struct httprequest *req)
@@ -1711,26 +1711,26 @@ static void http2(struct httprequest *req)
 
 /* returns a socket handle, or 0 if there are no more waiting sockets,
    or < 0 if there was an error */
-static curl_socket_t accept_connection(curl_socket_t sock)
+static carl_socket_t accept_connection(carl_socket_t sock)
 {
-  curl_socket_t msgsock = CURL_SOCKET_BAD;
+  carl_socket_t msgsock = CARL_SOCKET_BAD;
   int error;
   int flag = 1;
 
   if(MAX_SOCKETS == num_sockets) {
     logmsg("Too many open sockets!");
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   msgsock = accept(sock, NULL, NULL);
 
   if(got_exit_signal) {
-    if(CURL_SOCKET_BAD != msgsock)
+    if(CARL_SOCKET_BAD != msgsock)
       sclose(msgsock);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
-  if(CURL_SOCKET_BAD == msgsock) {
+  if(CARL_SOCKET_BAD == msgsock) {
     error = SOCKERRNO;
     if(EAGAIN == error || EWOULDBLOCK == error) {
       /* nothing to accept */
@@ -1738,15 +1738,15 @@ static curl_socket_t accept_connection(curl_socket_t sock)
     }
     logmsg("MAJOR ERROR: accept() failed with error: (%d) %s",
            error, strerror(error));
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
-  if(0 != curlx_nonblock(msgsock, TRUE)) {
+  if(0 != carlx_nonblock(msgsock, TRUE)) {
     error = SOCKERRNO;
-    logmsg("curlx_nonblock failed with error: (%d) %s",
+    logmsg("carlx_nonblock failed with error: (%d) %s",
            error, strerror(error));
     sclose(msgsock);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   if(0 != setsockopt(msgsock, SOL_SOCKET, SO_KEEPALIVE,
@@ -1755,7 +1755,7 @@ static curl_socket_t accept_connection(curl_socket_t sock)
     logmsg("setsockopt(SO_KEEPALIVE) failed with error: (%d) %s",
            error, strerror(error));
     sclose(msgsock);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   /*
@@ -1790,8 +1790,8 @@ static curl_socket_t accept_connection(curl_socket_t sock)
 
 /* returns 1 if the connection should be serviced again immediately, 0 if there
    is no data waiting, or < 0 if it should be closed */
-static int service_connection(curl_socket_t msgsock, struct httprequest *req,
-                              curl_socket_t listensock,
+static int service_connection(carl_socket_t msgsock, struct httprequest *req,
+                              carl_socket_t listensock,
                               const char *connecthost)
 {
   if(got_exit_signal)
@@ -1863,7 +1863,7 @@ static int service_connection(curl_socket_t msgsock, struct httprequest *req,
 int main(int argc, char *argv[])
 {
   srvr_sockaddr_union_t me;
-  curl_socket_t sock = CURL_SOCKET_BAD;
+  carl_socket_t sock = CARL_SOCKET_BAD;
   int wrotepidfile = 0;
   int flag;
   unsigned short port = DEFAULT_PORT;
@@ -1967,7 +1967,7 @@ int main(int argc, char *argv[])
                   argv[arg]);
           return 0;
         }
-        port = curlx_ultous(ulnum);
+        port = carlx_ultous(ulnum);
         arg++;
       }
     }
@@ -2021,7 +2021,7 @@ int main(int argc, char *argv[])
   all_sockets[0] = sock;
   num_sockets = 1;
 
-  if(CURL_SOCKET_BAD == sock) {
+  if(CARL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
            error, strerror(error));
@@ -2036,9 +2036,9 @@ int main(int argc, char *argv[])
            error, strerror(error));
     goto sws_cleanup;
   }
-  if(0 != curlx_nonblock(sock, TRUE)) {
+  if(0 != carlx_nonblock(sock, TRUE)) {
     error = SOCKERRNO;
-    logmsg("curlx_nonblock failed with error: (%d) %s",
+    logmsg("carlx_nonblock failed with error: (%d) %s",
            error, strerror(error));
     goto sws_cleanup;
   }
@@ -2070,7 +2070,7 @@ int main(int argc, char *argv[])
       struct stat statbuf;
       /* socket already exists. Perhaps it is stale? */
       int unixfd = socket(AF_UNIX, SOCK_STREAM, 0);
-      if(CURL_SOCKET_BAD == unixfd) {
+      if(CARL_SOCKET_BAD == unixfd) {
         error = SOCKERRNO;
         logmsg("Error binding socket, failed to create socket at %s: (%d) %s",
                unix_socket, error, strerror(error));
@@ -2120,7 +2120,7 @@ int main(int argc, char *argv[])
   if(!port) {
     /* The system was supposed to choose a port number, figure out which
        port we actually got and update the listener port value with it. */
-    curl_socklen_t la_size;
+    carl_socklen_t la_size;
     srvr_sockaddr_union_t localaddr;
 #ifdef ENABLE_IPV6
     if(socket_domain != AF_INET6)
@@ -2205,12 +2205,12 @@ int main(int argc, char *argv[])
     fd_set input;
     fd_set output;
     struct timeval timeout = {0, 250000L}; /* 250 ms */
-    curl_socket_t maxfd = (curl_socket_t)-1;
+    carl_socket_t maxfd = (carl_socket_t)-1;
     int active;
 
     /* Clear out closed sockets */
     for(socket_idx = num_sockets - 1; socket_idx >= 1; --socket_idx) {
-      if(CURL_SOCKET_BAD == all_sockets[socket_idx]) {
+      if(CARL_SOCKET_BAD == all_sockets[socket_idx]) {
         char *dst = (char *) (all_sockets + socket_idx);
         char *src = (char *) (all_sockets + socket_idx + 1);
         char *end = (char *) (all_sockets + num_sockets);
@@ -2259,11 +2259,11 @@ int main(int argc, char *argv[])
     /* Check if the listening socket is ready to accept */
     if(FD_ISSET(all_sockets[0], &input)) {
       /* Service all queued connections */
-      curl_socket_t msgsock;
+      carl_socket_t msgsock;
       do {
         msgsock = accept_connection(sock);
         logmsg("accept_connection %d returned %d", sock, msgsock);
-        if(CURL_SOCKET_BAD == msgsock)
+        if(CARL_SOCKET_BAD == msgsock)
           goto sws_cleanup;
       } while(msgsock > 0);
       active--;
@@ -2298,9 +2298,9 @@ int main(int argc, char *argv[])
                  a single byte of server-reply. */
               wait_ms(50);
 
-            if(all_sockets[socket_idx] != CURL_SOCKET_BAD) {
+            if(all_sockets[socket_idx] != CARL_SOCKET_BAD) {
               sclose(all_sockets[socket_idx]);
-              all_sockets[socket_idx] = CURL_SOCKET_BAD;
+              all_sockets[socket_idx] = CARL_SOCKET_BAD;
             }
 
             serverlogslocked -= 1;
@@ -2326,10 +2326,10 @@ sws_cleanup:
 
   for(socket_idx = 1; socket_idx < num_sockets; ++socket_idx)
     if((all_sockets[socket_idx] != sock) &&
-     (all_sockets[socket_idx] != CURL_SOCKET_BAD))
+     (all_sockets[socket_idx] != CARL_SOCKET_BAD))
       sclose(all_sockets[socket_idx]);
 
-  if(sock != CURL_SOCKET_BAD)
+  if(sock != CARL_SOCKET_BAD)
     sclose(sock);
 
 #ifdef USE_UNIX_SOCKETS

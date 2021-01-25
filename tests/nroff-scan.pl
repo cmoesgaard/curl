@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 ###########################################################################
 #
 # scan nroff pages to find basic syntactic problems such as unbalanced \f
-# codes or references to non-existing curl man pages.
+# codes or references to non-existing carl man pages.
 
 my $docsroot = $ARGV[0];
 
@@ -44,8 +44,8 @@ sub manpresent {
         return 1;
     }
     elsif(-r "$docsroot/$man" ||
-          -r "$docsroot/libcurl/$man" ||
-          -r "$docsroot/libcurl/opts/$man") {
+          -r "$docsroot/libcarl/$man" ||
+          -r "$docsroot/libcarl/opts/$man") {
         $manp{$man}=1;
         return 1;
     }
@@ -66,7 +66,7 @@ sub file {
                 print "error: $f:$line: missing \\fP after $str\n";
                 $errors++;
             }
-            if($str =~ /((libcurl|curl)([^ ]*))\(3\)/i) {
+            if($str =~ /((libcarl|carl)([^ ]*))\(3\)/i) {
                 my $man = "$1.3";
                 if(!manpresent($man)) {
                     print "error: $f:$line: referring to non-existing man page $man\n";
@@ -78,13 +78,13 @@ sub file {
                 }
             }
         }
-        if($l =~ /(curl([^ ]*)\(3\))/i) {
+        if($l =~ /(carl([^ ]*)\(3\))/i) {
             print "error: $f:$line: non-referencing $1\n";
             $errors++;
         }
         if($l =~ /^\.BR (.*)/) {
             my $i= $1;
-            while($i =~ s/((lib|)curl([^ ]*)) *\"\(3\)(,|) *\" *//i ) {
+            while($i =~ s/((lib|)carl([^ ]*)) *\"\(3\)(,|) *\" *//i ) {
                 my $man = "$1.3";
                 if(!manpresent($man)) {
                     print "error: $f:$line: referring to non-existing man page $man\n";

@@ -62,7 +62,7 @@ HTTP proxy-auth NTLM and then POST
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -70,7 +70,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://%HOSTIP:%HTTPPORT/239 --proxy http://%HOSTIP:%HTTPPORT --proxy-user testuser:testpass --proxy-ntlm -d "postit"
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 
@@ -80,7 +80,7 @@ chkhostname curlhost
 POST http://%HOSTIP:%HTTPPORT/239 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Content-Length: 0
@@ -89,7 +89,7 @@ Content-Type: application/x-www-form-urlencoded
 POST http://%HOSTIP:%HTTPPORT/239 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAADAAAAGAAYAEAAAAAYABgAWAAAAAAAAABwAAAACAAIAHAAAAAIAAgAeAAAAAAAAAAAAAAAhoIBADQzMjE1MzIxAAAAAAAAAAAAAAAAAAAAADj3hs3u3j0kgJqCrLM+74BmaoNHDfIJjHRlc3R1c2VyY3VybGhvc3Q=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Content-Length: 6

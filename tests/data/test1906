@@ -1,8 +1,8 @@
 <testcase>
 <info>
 <keywords>
-CURLOPT_CURLU
-CURLOPT_PORT
+CARLOPT_CARLU
+CARLOPT_PORT
 </keywords>
 </info>
 
@@ -24,13 +24,13 @@ Funny-head: yesyes swsclose
 http
 </server>
  <name>
-CURLOPT_CURLU and CURLOPT_PORT
+CARLOPT_CARLU and CARLOPT_PORT
  </name>
 <tool>
 lib1906
 </tool>
 
-# The tool does two requesets, the first sets CURLOPT_PORT to 1
+# The tool does two requesets, the first sets CARLOPT_PORT to 1
 # the second resets the port again and expects that request to work.
 <command>
 http://%HOSTIP:%HTTPPORT/1906

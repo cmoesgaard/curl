@@ -44,7 +44,7 @@ smtp://%HOSTIP:%SMTPPORT/960 --mail-rcpt recipient@åäö.se --mail-from sender@
 #
 # Verify data after the test has been "shot"
 <verify>
-# 55 - CURLE_SEND_ERROR
+# 55 - CARLE_SEND_ERROR
 <errorcode>
 55
 </errorcode>

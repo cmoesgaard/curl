@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,14 +19,14 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "doh.h" /* from the lib dir */
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
   /* whatever you want done first */
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -34,7 +34,7 @@ static void unit_stop(void)
     /* done before shutting down and exiting */
 }
 
-#ifndef CURL_DISABLE_DOH
+#ifndef CARL_DISABLE_DOH
 
 UNITTEST_START
 
@@ -179,7 +179,7 @@ do {
 } while(0);
 UNITTEST_STOP
 
-#else /* CURL_DISABLE_DOH */
+#else /* CARL_DISABLE_DOH */
 
 UNITTEST_START
 {

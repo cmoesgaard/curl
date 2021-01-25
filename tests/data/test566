@@ -28,13 +28,13 @@ Funny-head: yesyes
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib566
 </tool>
 
  <name>
-HTTP GET with CURLINFO_CONTENT_LENGTH_DOWNLOAD and 0 bytes transfer
+HTTP GET with CARLINFO_CONTENT_LENGTH_DOWNLOAD and 0 bytes transfer
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT/566 log/ip566

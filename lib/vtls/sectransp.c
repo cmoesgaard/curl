@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,10 +26,10 @@
  * TLS/SSL layer. No code but vtls.c should ever call or use these functions.
  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include "urldata.h" /* for the Curl_easy definition */
-#include "curl_base64.h"
+#include "carl_base64.h"
 #include "strtok.h"
 #include "multiif.h"
 
@@ -54,7 +54,7 @@
    Leopard and iOS 5) by using macros and weak-linking.
 
    In general, you want to build this using the most recent OS SDK, since some
-   features require curl to be built against the latest SDK. TLS 1.1 and 1.2
+   features require carl to be built against the latest SDK. TLS 1.1 and 1.2
    support, for instance, require the macOS 10.8 SDK or later. TLS 1.3
    requires the macOS 10.13 or iOS 11 SDK or later. */
 #if (TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE))
@@ -63,55 +63,55 @@
 #error "The Secure Transport back-end requires Leopard or later."
 #endif /* MAC_OS_X_VERSION_MAX_ALLOWED < 1050 */
 
-#define CURL_BUILD_IOS 0
-#define CURL_BUILD_IOS_7 0
-#define CURL_BUILD_IOS_9 0
-#define CURL_BUILD_IOS_11 0
-#define CURL_BUILD_MAC 1
+#define CARL_BUILD_IOS 0
+#define CARL_BUILD_IOS_7 0
+#define CARL_BUILD_IOS_9 0
+#define CARL_BUILD_IOS_11 0
+#define CARL_BUILD_MAC 1
 /* This is the maximum API level we are allowed to use when building: */
-#define CURL_BUILD_MAC_10_5 MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
-#define CURL_BUILD_MAC_10_6 MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
-#define CURL_BUILD_MAC_10_7 MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
-#define CURL_BUILD_MAC_10_8 MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
-#define CURL_BUILD_MAC_10_9 MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
-#define CURL_BUILD_MAC_10_11 MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
-#define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
+#define CARL_BUILD_MAC_10_5 MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
+#define CARL_BUILD_MAC_10_6 MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
+#define CARL_BUILD_MAC_10_7 MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+#define CARL_BUILD_MAC_10_8 MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+#define CARL_BUILD_MAC_10_9 MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
+#define CARL_BUILD_MAC_10_11 MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
+#define CARL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
 /* These macros mean "the following code is present to allow runtime backward
    compatibility with at least this cat or earlier":
    (You set this at build-time using the compiler command line option
    "-mmacosx-version-min.") */
-#define CURL_SUPPORT_MAC_10_5 MAC_OS_X_VERSION_MIN_REQUIRED <= 1050
-#define CURL_SUPPORT_MAC_10_6 MAC_OS_X_VERSION_MIN_REQUIRED <= 1060
-#define CURL_SUPPORT_MAC_10_7 MAC_OS_X_VERSION_MIN_REQUIRED <= 1070
-#define CURL_SUPPORT_MAC_10_8 MAC_OS_X_VERSION_MIN_REQUIRED <= 1080
-#define CURL_SUPPORT_MAC_10_9 MAC_OS_X_VERSION_MIN_REQUIRED <= 1090
+#define CARL_SUPPORT_MAC_10_5 MAC_OS_X_VERSION_MIN_REQUIRED <= 1050
+#define CARL_SUPPORT_MAC_10_6 MAC_OS_X_VERSION_MIN_REQUIRED <= 1060
+#define CARL_SUPPORT_MAC_10_7 MAC_OS_X_VERSION_MIN_REQUIRED <= 1070
+#define CARL_SUPPORT_MAC_10_8 MAC_OS_X_VERSION_MIN_REQUIRED <= 1080
+#define CARL_SUPPORT_MAC_10_9 MAC_OS_X_VERSION_MIN_REQUIRED <= 1090
 
 #elif TARGET_OS_EMBEDDED || TARGET_OS_IPHONE
-#define CURL_BUILD_IOS 1
-#define CURL_BUILD_IOS_7 __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000
-#define CURL_BUILD_IOS_9 __IPHONE_OS_VERSION_MAX_ALLOWED >= 90000
-#define CURL_BUILD_IOS_11 __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-#define CURL_BUILD_MAC 0
-#define CURL_BUILD_MAC_10_5 0
-#define CURL_BUILD_MAC_10_6 0
-#define CURL_BUILD_MAC_10_7 0
-#define CURL_BUILD_MAC_10_8 0
-#define CURL_BUILD_MAC_10_9 0
-#define CURL_BUILD_MAC_10_11 0
-#define CURL_BUILD_MAC_10_13 0
-#define CURL_SUPPORT_MAC_10_5 0
-#define CURL_SUPPORT_MAC_10_6 0
-#define CURL_SUPPORT_MAC_10_7 0
-#define CURL_SUPPORT_MAC_10_8 0
-#define CURL_SUPPORT_MAC_10_9 0
+#define CARL_BUILD_IOS 1
+#define CARL_BUILD_IOS_7 __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000
+#define CARL_BUILD_IOS_9 __IPHONE_OS_VERSION_MAX_ALLOWED >= 90000
+#define CARL_BUILD_IOS_11 __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+#define CARL_BUILD_MAC 0
+#define CARL_BUILD_MAC_10_5 0
+#define CARL_BUILD_MAC_10_6 0
+#define CARL_BUILD_MAC_10_7 0
+#define CARL_BUILD_MAC_10_8 0
+#define CARL_BUILD_MAC_10_9 0
+#define CARL_BUILD_MAC_10_11 0
+#define CARL_BUILD_MAC_10_13 0
+#define CARL_SUPPORT_MAC_10_5 0
+#define CARL_SUPPORT_MAC_10_6 0
+#define CARL_SUPPORT_MAC_10_7 0
+#define CARL_SUPPORT_MAC_10_8 0
+#define CARL_SUPPORT_MAC_10_9 0
 
 #else
 #error "The Secure Transport back-end requires iOS or macOS."
 #endif /* (TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) */
 
-#if CURL_BUILD_MAC
+#if CARL_BUILD_MAC
 #include <sys/sysctl.h>
-#endif /* CURL_BUILD_MAC */
+#endif /* CARL_BUILD_MAC */
 
 #include "urldata.h"
 #include "sendf.h"
@@ -120,10 +120,10 @@
 #include "select.h"
 #include "vtls.h"
 #include "sectransp.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 #include "strdup.h"
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -133,7 +133,7 @@
 
 struct ssl_backend_data {
   SSLContextRef ssl_ctx;
-  curl_socket_t ssl_sockfd;
+  carl_socket_t ssl_sockfd;
   bool ssl_direction; /* true if writing, false if reading */
   size_t ssl_write_buffered_length;
 };
@@ -152,7 +152,7 @@ struct ssl_backend_data {
 #endif
 
 #if defined(SECTRANSP_PINNEDPUBKEY_V1) || defined(SECTRANSP_PINNEDPUBKEY_V2)
-/* this backend supports CURLOPT_PINNEDPUBLICKEY */
+/* this backend supports CARLOPT_PINNEDPUBLICKEY */
 #define SECTRANSP_PINNEDPUBKEY 1
 #endif /* SECTRANSP_PINNEDPUBKEY */
 
@@ -294,7 +294,7 @@ static OSStatus SocketWrite(SSLConnectionRef connection,
   return ortn;
 }
 
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
 CF_INLINE const char *SSLCipherNameForNumber(SSLCipherSuite cipher)
 {
   switch(cipher) {
@@ -481,7 +481,7 @@ CF_INLINE const char *TLSCipherNameForNumber(SSLCipherSuite cipher)
     case TLS_DH_anon_WITH_AES_256_CBC_SHA:
       return "TLS_DH_anon_WITH_AES_256_CBC_SHA";
       break;
-#if CURL_BUILD_MAC_10_6 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_6 || CARL_BUILD_IOS
     /* TLS 1.0 with ECDSA (RFC 4492) */
     case TLS_ECDH_ECDSA_WITH_NULL_SHA:
       return "TLS_ECDH_ECDSA_WITH_NULL_SHA";
@@ -558,8 +558,8 @@ CF_INLINE const char *TLSCipherNameForNumber(SSLCipherSuite cipher)
     case TLS_ECDH_anon_WITH_AES_256_CBC_SHA:
       return "TLS_ECDH_anon_WITH_AES_256_CBC_SHA";
       break;
-#endif /* CURL_BUILD_MAC_10_6 || CURL_BUILD_IOS */
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#endif /* CARL_BUILD_MAC_10_6 || CARL_BUILD_IOS */
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
     /* TLS 1.2 (RFC 5246) */
     case TLS_RSA_WITH_NULL_MD5:
       return "TLS_RSA_WITH_NULL_MD5";
@@ -744,8 +744,8 @@ CF_INLINE const char *TLSCipherNameForNumber(SSLCipherSuite cipher)
     case SSL_DH_anon_WITH_3DES_EDE_CBC_SHA:
       return "TLS_DH_anon_WITH_3DES_EDE_CBC_SHA";
       break;
-#endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
-#if CURL_BUILD_MAC_10_9 || CURL_BUILD_IOS_7
+#endif /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
+#if CARL_BUILD_MAC_10_9 || CARL_BUILD_IOS_7
     /* TLS PSK (RFC 4279): */
     case TLS_PSK_WITH_RC4_128_SHA:
       return "TLS_PSK_WITH_RC4_128_SHA";
@@ -848,8 +848,8 @@ CF_INLINE const char *TLSCipherNameForNumber(SSLCipherSuite cipher)
     case TLS_RSA_PSK_WITH_NULL_SHA384:
       return "TLS_RSA_PSK_WITH_NULL_SHA384";
       break;
-#endif /* CURL_BUILD_MAC_10_9 || CURL_BUILD_IOS_7 */
-#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#endif /* CARL_BUILD_MAC_10_9 || CARL_BUILD_IOS_7 */
+#if CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11
     /* New ChaCha20+Poly1305 cipher-suites used by TLS 1.3: */
     case TLS_AES_128_GCM_SHA256:
       return "TLS_AES_128_GCM_SHA256";
@@ -872,13 +872,13 @@ CF_INLINE const char *TLSCipherNameForNumber(SSLCipherSuite cipher)
     case TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
       return "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256";
       break;
-#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
+#endif /* CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11 */
   }
   return "TLS_NULL_WITH_NULL_NULL";
 }
-#endif /* !CURL_DISABLE_VERBOSE_STRINGS */
+#endif /* !CARL_DISABLE_VERBOSE_STRINGS */
 
-#if CURL_BUILD_MAC
+#if CARL_BUILD_MAC
 CF_INLINE void GetDarwinVersionNumber(int *major, int *minor)
 {
   int mib[2];
@@ -907,7 +907,7 @@ CF_INLINE void GetDarwinVersionNumber(int *major, int *minor)
   *minor = atoi(os_version_minor);
   free(os_version);
 }
-#endif /* CURL_BUILD_MAC */
+#endif /* CARL_BUILD_MAC */
 
 /* Apple provides a myriad of ways of getting information about a certificate
    into a string. Some aren't available under iOS or newer cats. So here's
@@ -917,41 +917,41 @@ CF_INLINE CFStringRef getsubject(SecCertificateRef cert)
 {
   CFStringRef server_cert_summary = CFSTR("(null)");
 
-#if CURL_BUILD_IOS
+#if CARL_BUILD_IOS
   /* iOS: There's only one way to do this. */
   server_cert_summary = SecCertificateCopySubjectSummary(cert);
 #else
-#if CURL_BUILD_MAC_10_7
+#if CARL_BUILD_MAC_10_7
   /* Lion & later: Get the long description if we can. */
   if(SecCertificateCopyLongDescription != NULL)
     server_cert_summary =
       SecCertificateCopyLongDescription(NULL, cert, NULL);
   else
-#endif /* CURL_BUILD_MAC_10_7 */
-#if CURL_BUILD_MAC_10_6
+#endif /* CARL_BUILD_MAC_10_7 */
+#if CARL_BUILD_MAC_10_6
   /* Snow Leopard: Get the certificate summary. */
   if(SecCertificateCopySubjectSummary != NULL)
     server_cert_summary = SecCertificateCopySubjectSummary(cert);
   else
-#endif /* CURL_BUILD_MAC_10_6 */
+#endif /* CARL_BUILD_MAC_10_6 */
   /* Leopard is as far back as we go... */
   (void)SecCertificateCopyCommonName(cert, &server_cert_summary);
-#endif /* CURL_BUILD_IOS */
+#endif /* CARL_BUILD_IOS */
   return server_cert_summary;
 }
 
-static CURLcode CopyCertSubject(struct Curl_easy *data,
+static CARLcode CopyCertSubject(struct Curl_easy *data,
                                 SecCertificateRef cert, char **certp)
 {
   CFStringRef c = getsubject(cert);
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   const char *direct;
   char *cbuf = NULL;
   *certp = NULL;
 
   if(!c) {
     failf(data, "SSL: invalid CA certificate subject");
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
 
   /* If the subject is already available as UTF-8 encoded (ie 'direct') then
@@ -961,7 +961,7 @@ static CURLcode CopyCertSubject(struct Curl_easy *data,
     *certp = strdup(direct);
     if(!*certp) {
       failf(data, "SSL: out of memory");
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
     }
   }
   else {
@@ -971,7 +971,7 @@ static CURLcode CopyCertSubject(struct Curl_easy *data,
       if(!CFStringGetCString(c, cbuf, cbuf_size,
                              kCFStringEncodingUTF8)) {
         failf(data, "SSL: invalid CA certificate subject");
-        result = CURLE_PEER_FAILED_VERIFICATION;
+        result = CARLE_PEER_FAILED_VERIFICATION;
       }
       else
         /* pass back the buffer */
@@ -979,7 +979,7 @@ static CURLcode CopyCertSubject(struct Curl_easy *data,
     }
     else {
       failf(data, "SSL: couldn't allocate %zu bytes of memory", cbuf_size);
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
     }
   }
   if(result)
@@ -988,7 +988,7 @@ static CURLcode CopyCertSubject(struct Curl_easy *data,
   return result;
 }
 
-#if CURL_SUPPORT_MAC_10_6
+#if CARL_SUPPORT_MAC_10_6
 /* The SecKeychainSearch API was deprecated in Lion, and using it will raise
    deprecation warnings, so let's not compile this unless it's necessary: */
 static OSStatus CopyIdentityWithLabelOldSchool(char *label,
@@ -1028,14 +1028,14 @@ static OSStatus CopyIdentityWithLabelOldSchool(char *label,
     CFRelease(search);
   return status;
 }
-#endif /* CURL_SUPPORT_MAC_10_6 */
+#endif /* CARL_SUPPORT_MAC_10_6 */
 
 static OSStatus CopyIdentityWithLabel(char *label,
                                       SecIdentityRef *out_cert_and_key)
 {
   OSStatus status = errSecItemNotFound;
 
-#if CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS
   CFArrayRef keys_list;
   CFIndex keys_list_count;
   CFIndex i;
@@ -1087,9 +1087,9 @@ static OSStatus CopyIdentityWithLabel(char *label,
           (SecIdentityRef) CFArrayGetValueAtIndex(keys_list, i);
         err = SecIdentityCopyCertificate(identity, &cert);
         if(err == noErr) {
-#if CURL_BUILD_IOS
+#if CARL_BUILD_IOS
           common_name = SecCertificateCopySubjectSummary(cert);
-#elif CURL_BUILD_MAC_10_7
+#elif CARL_BUILD_MAC_10_7
           SecCertificateCopyCommonName(cert, &common_name);
 #endif
           if(CFStringCompare(common_name, label_cf, 0) == kCFCompareEqualTo) {
@@ -1112,21 +1112,21 @@ static OSStatus CopyIdentityWithLabel(char *label,
     CFRelease(label_cf);
   }
   else {
-#if CURL_SUPPORT_MAC_10_6
+#if CARL_SUPPORT_MAC_10_6
     /* On Leopard and Snow Leopard, fall back to SecKeychainSearch. */
     status = CopyIdentityWithLabelOldSchool(label, out_cert_and_key);
-#endif /* CURL_SUPPORT_MAC_10_6 */
+#endif /* CARL_SUPPORT_MAC_10_6 */
   }
-#elif CURL_SUPPORT_MAC_10_6
+#elif CARL_SUPPORT_MAC_10_6
   /* For developers building on older cats, we have no choice but to fall back
      to SecKeychainSearch. */
   status = CopyIdentityWithLabelOldSchool(label, out_cert_and_key);
-#endif /* CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS */
   return status;
 }
 
 static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
-                                           const struct curl_blob *blob,
+                                           const struct carl_blob *blob,
                                            const char *cPassword,
                                            SecIdentityRef *out_cert_and_key)
 {
@@ -1139,7 +1139,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
   /* We can import P12 files on iOS or OS X 10.7 or later: */
   /* These constants are documented as having first appeared in 10.6 but they
      raise linker errors when used on that cat for some reason. */
-#if CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS
   bool resource_imported;
 
   if(blob) {
@@ -1166,7 +1166,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
    * Keychain.
    *
    * It gives us back a SecIdentityRef that we can use directly. */
-#if CURL_BUILD_IOS
+#if CARL_BUILD_IOS
     const void *cKeys[] = {kSecImportExportPassphrase};
     const void *cValues[] = {password};
     CFDictionaryRef options = CFDictionaryCreate(NULL, cKeys, cValues,
@@ -1188,7 +1188,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
    * This returns a SecCertificateRef from which we can construct a
    * SecIdentityRef.
    */
-#elif CURL_BUILD_MAC_10_7
+#elif CARL_BUILD_MAC_10_7
     SecItemImportExportKeyParameters keyParams;
     SecExternalFormat inputFormat = kSecFormatPKCS12;
     SecExternalItemType inputType = kSecItemTypeCertificate;
@@ -1219,7 +1219,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
           *out_cert_and_key = (SecIdentityRef) identity;
           break;
         }
-#if CURL_BUILD_MAC_10_7
+#if CARL_BUILD_MAC_10_7
         else if(itemID == SecCertificateGetTypeID()) {
           status = SecIdentityCreateWithCertificate(NULL,
                                                  (SecCertificateRef) item,
@@ -1234,7 +1234,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
       CFRelease(items);
     CFRelease(pkcs_data);
   }
-#endif /* CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS */
   if(password)
     CFRelease(password);
   if(pkcs_url)
@@ -1261,36 +1261,36 @@ CF_INLINE bool is_file(const char *filename)
   return false;
 }
 
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
-static CURLcode sectransp_version_from_curl(SSLProtocol *darwinver,
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
+static CARLcode sectransp_version_from_carl(SSLProtocol *darwinver,
                                             long ssl_version)
 {
   switch(ssl_version) {
-    case CURL_SSLVERSION_TLSv1_0:
+    case CARL_SSLVERSION_TLSv1_0:
       *darwinver = kTLSProtocol1;
-      return CURLE_OK;
-    case CURL_SSLVERSION_TLSv1_1:
+      return CARLE_OK;
+    case CARL_SSLVERSION_TLSv1_1:
       *darwinver = kTLSProtocol11;
-      return CURLE_OK;
-    case CURL_SSLVERSION_TLSv1_2:
+      return CARLE_OK;
+    case CARL_SSLVERSION_TLSv1_2:
       *darwinver = kTLSProtocol12;
-      return CURLE_OK;
-    case CURL_SSLVERSION_TLSv1_3:
+      return CARLE_OK;
+    case CARL_SSLVERSION_TLSv1_3:
       /* TLS 1.3 support first appeared in iOS 11 and macOS 10.13 */
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+#if (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
       if(__builtin_available(macOS 10.13, iOS 11.0, *)) {
         *darwinver = kTLSProtocol13;
-        return CURLE_OK;
+        return CARLE_OK;
       }
-#endif /* (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) &&
+#endif /* (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) &&
           HAVE_BUILTIN_AVAILABLE == 1 */
       break;
   }
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 #endif
 
-static CURLcode
+static CARLcode
 set_ssl_version_min_max(struct Curl_easy *data, struct connectdata *conn,
                         int sockindex)
 {
@@ -1303,46 +1303,46 @@ set_ssl_version_min_max(struct Curl_easy *data, struct connectdata *conn,
   /* macOS 10.5-10.7 supported TLS 1.0 only.
      macOS 10.8 and later, and iOS 5 and later, added TLS 1.1 and 1.2.
      macOS 10.13 and later, and iOS 11 and later, added TLS 1.3. */
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+#if (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
   if(__builtin_available(macOS 10.13, iOS 11.0, *)) {
-    max_supported_version_by_os = CURL_SSLVERSION_MAX_TLSv1_3;
+    max_supported_version_by_os = CARL_SSLVERSION_MAX_TLSv1_3;
   }
   else {
-    max_supported_version_by_os = CURL_SSLVERSION_MAX_TLSv1_2;
+    max_supported_version_by_os = CARL_SSLVERSION_MAX_TLSv1_2;
   }
 #else
-  max_supported_version_by_os = CURL_SSLVERSION_MAX_TLSv1_2;
-#endif /* (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) &&
+  max_supported_version_by_os = CARL_SSLVERSION_MAX_TLSv1_2;
+#endif /* (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) &&
           HAVE_BUILTIN_AVAILABLE == 1 */
 
   switch(ssl_version) {
-    case CURL_SSLVERSION_DEFAULT:
-    case CURL_SSLVERSION_TLSv1:
-      ssl_version = CURL_SSLVERSION_TLSv1_0;
+    case CARL_SSLVERSION_DEFAULT:
+    case CARL_SSLVERSION_TLSv1:
+      ssl_version = CARL_SSLVERSION_TLSv1_0;
       break;
   }
 
   switch(ssl_version_max) {
-    case CURL_SSLVERSION_MAX_NONE:
-    case CURL_SSLVERSION_MAX_DEFAULT:
+    case CARL_SSLVERSION_MAX_NONE:
+    case CARL_SSLVERSION_MAX_DEFAULT:
       ssl_version_max = max_supported_version_by_os;
       break;
   }
 
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
   if(SSLSetProtocolVersionMax != NULL) {
     SSLProtocol darwin_ver_min = kTLSProtocol1;
     SSLProtocol darwin_ver_max = kTLSProtocol1;
-    CURLcode result = sectransp_version_from_curl(&darwin_ver_min,
+    CARLcode result = sectransp_version_from_carl(&darwin_ver_min,
                                                   ssl_version);
     if(result) {
-      failf(data, "unsupported min version passed via CURLOPT_SSLVERSION");
+      failf(data, "unsupported min version passed via CARLOPT_SSLVERSION");
       return result;
     }
-    result = sectransp_version_from_curl(&darwin_ver_max,
+    result = sectransp_version_from_carl(&darwin_ver_max,
                                          ssl_version_max >> 16);
     if(result) {
-      failf(data, "unsupported max version passed via CURLOPT_SSLVERSION");
+      failf(data, "unsupported max version passed via CARLOPT_SSLVERSION");
       return result;
     }
 
@@ -1351,55 +1351,55 @@ set_ssl_version_min_max(struct Curl_easy *data, struct connectdata *conn,
     return result;
   }
   else {
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     long i = ssl_version;
     (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                        kSSLProtocolAll,
                                        false);
     for(; i <= (ssl_version_max >> 16); i++) {
       switch(i) {
-        case CURL_SSLVERSION_TLSv1_0:
+        case CARL_SSLVERSION_TLSv1_0:
           (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                             kTLSProtocol1,
                                             true);
           break;
-        case CURL_SSLVERSION_TLSv1_1:
+        case CARL_SSLVERSION_TLSv1_1:
           (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                             kTLSProtocol11,
                                             true);
           break;
-        case CURL_SSLVERSION_TLSv1_2:
+        case CARL_SSLVERSION_TLSv1_2:
           (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                             kTLSProtocol12,
                                             true);
           break;
-        case CURL_SSLVERSION_TLSv1_3:
+        case CARL_SSLVERSION_TLSv1_3:
           failf(data, "Your version of the OS does not support TLSv1.3");
-          return CURLE_SSL_CONNECT_ERROR;
+          return CARLE_SSL_CONNECT_ERROR;
       }
     }
-    return CURLE_OK;
-#endif  /* CURL_SUPPORT_MAC_10_8 */
+    return CARLE_OK;
+#endif  /* CARL_SUPPORT_MAC_10_8 */
   }
-#endif  /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
+#endif  /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
   failf(data, "Secure Transport: cannot set SSL protocol");
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 
 
-static CURLcode sectransp_connect_step1(struct Curl_easy *data,
+static CARLcode sectransp_connect_step1(struct Curl_easy *data,
                                         struct connectdata *conn,
                                         int sockindex)
 {
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
   const char * const ssl_cafile = SSL_CONN_CONFIG(CAfile);
-  const struct curl_blob *ssl_cablob = NULL;
+  const struct carl_blob *ssl_cablob = NULL;
   const bool verifypeer = SSL_CONN_CONFIG(verifypeer);
   char * const ssl_cert = SSL_SET_OPTION(primary.clientcert);
-  const struct curl_blob *ssl_cert_blob = SSL_SET_OPTION(primary.cert_blob);
-#ifndef CURL_DISABLE_PROXY
+  const struct carl_blob *ssl_cert_blob = SSL_SET_OPTION(primary.cert_blob);
+#ifndef CARL_DISABLE_PROXY
   const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
     conn->host.name;
   const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
@@ -1415,33 +1415,33 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   size_t all_ciphers_count = 0UL, allowed_ciphers_count = 0UL, i;
   SSLCipherSuite *all_ciphers = NULL, *allowed_ciphers = NULL;
   OSStatus err = noErr;
-#if CURL_BUILD_MAC
+#if CARL_BUILD_MAC
   int darwinver_maj = 0, darwinver_min = 0;
 
   GetDarwinVersionNumber(&darwinver_maj, &darwinver_min);
-#endif /* CURL_BUILD_MAC */
+#endif /* CARL_BUILD_MAC */
 
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
   if(SSLCreateContext != NULL) {  /* use the newer API if available */
     if(backend->ssl_ctx)
       CFRelease(backend->ssl_ctx);
     backend->ssl_ctx = SSLCreateContext(NULL, kSSLClientSide, kSSLStreamType);
     if(!backend->ssl_ctx) {
       failf(data, "SSL: couldn't create a context!");
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
   }
   else {
   /* The old ST API does not exist under iOS, so don't compile it: */
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     if(backend->ssl_ctx)
       (void)SSLDisposeContext(backend->ssl_ctx);
     err = SSLNewContext(false, &(backend->ssl_ctx));
     if(err != noErr) {
       failf(data, "SSL: couldn't create a context: OSStatus %d", err);
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
-#endif /* CURL_SUPPORT_MAC_10_8 */
+#endif /* CARL_SUPPORT_MAC_10_8 */
   }
 #else
   if(backend->ssl_ctx)
@@ -1449,18 +1449,18 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   err = SSLNewContext(false, &(backend->ssl_ctx));
   if(err != noErr) {
     failf(data, "SSL: couldn't create a context: OSStatus %d", err);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
-#endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
   backend->ssl_write_buffered_length = 0UL; /* reset buffered write length */
 
   /* check to see if we've been told to use an explicit SSL/TLS version */
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
   if(SSLSetProtocolVersionMax != NULL) {
     switch(conn->ssl_config.version) {
-    case CURL_SSLVERSION_TLSv1:
+    case CARL_SSLVERSION_TLSv1:
       (void)SSLSetProtocolVersionMin(backend->ssl_ctx, kTLSProtocol1);
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+#if (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
       if(__builtin_available(macOS 10.13, iOS 11.0, *)) {
         (void)SSLSetProtocolVersionMax(backend->ssl_ctx, kTLSProtocol13);
       }
@@ -1469,49 +1469,49 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
       }
 #else
       (void)SSLSetProtocolVersionMax(backend->ssl_ctx, kTLSProtocol12);
-#endif /* (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) &&
+#endif /* (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) &&
           HAVE_BUILTIN_AVAILABLE == 1 */
       break;
-    case CURL_SSLVERSION_DEFAULT:
-    case CURL_SSLVERSION_TLSv1_0:
-    case CURL_SSLVERSION_TLSv1_1:
-    case CURL_SSLVERSION_TLSv1_2:
-    case CURL_SSLVERSION_TLSv1_3:
+    case CARL_SSLVERSION_DEFAULT:
+    case CARL_SSLVERSION_TLSv1_0:
+    case CARL_SSLVERSION_TLSv1_1:
+    case CARL_SSLVERSION_TLSv1_2:
+    case CARL_SSLVERSION_TLSv1_3:
       {
-        CURLcode result = set_ssl_version_min_max(data, conn, sockindex);
-        if(result != CURLE_OK)
+        CARLcode result = set_ssl_version_min_max(data, conn, sockindex);
+        if(result != CARLE_OK)
           return result;
         break;
       }
-    case CURL_SSLVERSION_SSLv3:
+    case CARL_SSLVERSION_SSLv3:
       err = SSLSetProtocolVersionMin(backend->ssl_ctx, kSSLProtocol3);
       if(err != noErr) {
         failf(data, "Your version of the OS does not support SSLv3");
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       (void)SSLSetProtocolVersionMax(backend->ssl_ctx, kSSLProtocol3);
       break;
-    case CURL_SSLVERSION_SSLv2:
+    case CARL_SSLVERSION_SSLv2:
       err = SSLSetProtocolVersionMin(backend->ssl_ctx, kSSLProtocol2);
       if(err != noErr) {
         failf(data, "Your version of the OS does not support SSLv2");
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       (void)SSLSetProtocolVersionMax(backend->ssl_ctx, kSSLProtocol2);
       break;
     default:
-      failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
-      return CURLE_SSL_CONNECT_ERROR;
+      failf(data, "Unrecognized parameter passed via CARLOPT_SSLVERSION");
+      return CARLE_SSL_CONNECT_ERROR;
     }
   }
   else {
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                        kSSLProtocolAll,
                                        false);
     switch(conn->ssl_config.version) {
-    case CURL_SSLVERSION_DEFAULT:
-    case CURL_SSLVERSION_TLSv1:
+    case CARL_SSLVERSION_DEFAULT:
+    case CARL_SSLVERSION_TLSv1:
       (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                          kTLSProtocol1,
                                          true);
@@ -1522,97 +1522,97 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
                                          kTLSProtocol12,
                                          true);
       break;
-    case CURL_SSLVERSION_TLSv1_0:
-    case CURL_SSLVERSION_TLSv1_1:
-    case CURL_SSLVERSION_TLSv1_2:
-    case CURL_SSLVERSION_TLSv1_3:
+    case CARL_SSLVERSION_TLSv1_0:
+    case CARL_SSLVERSION_TLSv1_1:
+    case CARL_SSLVERSION_TLSv1_2:
+    case CARL_SSLVERSION_TLSv1_3:
       {
-        CURLcode result = set_ssl_version_min_max(data, conn, sockindex);
-        if(result != CURLE_OK)
+        CARLcode result = set_ssl_version_min_max(data, conn, sockindex);
+        if(result != CARLE_OK)
           return result;
         break;
       }
-    case CURL_SSLVERSION_SSLv3:
+    case CARL_SSLVERSION_SSLv3:
       err = SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                          kSSLProtocol3,
                                          true);
       if(err != noErr) {
         failf(data, "Your version of the OS does not support SSLv3");
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       break;
-    case CURL_SSLVERSION_SSLv2:
+    case CARL_SSLVERSION_SSLv2:
       err = SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                          kSSLProtocol2,
                                          true);
       if(err != noErr) {
         failf(data, "Your version of the OS does not support SSLv2");
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       break;
     default:
-      failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
-      return CURLE_SSL_CONNECT_ERROR;
+      failf(data, "Unrecognized parameter passed via CARLOPT_SSLVERSION");
+      return CARLE_SSL_CONNECT_ERROR;
     }
-#endif  /* CURL_SUPPORT_MAC_10_8 */
+#endif  /* CARL_SUPPORT_MAC_10_8 */
   }
 #else
-  if(conn->ssl_config.version_max != CURL_SSLVERSION_MAX_NONE) {
+  if(conn->ssl_config.version_max != CARL_SSLVERSION_MAX_NONE) {
     failf(data, "Your version of the OS does not support to set maximum"
                 " SSL/TLS version");
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
   (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx, kSSLProtocolAll, false);
   switch(conn->ssl_config.version) {
-  case CURL_SSLVERSION_DEFAULT:
-  case CURL_SSLVERSION_TLSv1:
-  case CURL_SSLVERSION_TLSv1_0:
+  case CARL_SSLVERSION_DEFAULT:
+  case CARL_SSLVERSION_TLSv1:
+  case CARL_SSLVERSION_TLSv1_0:
     (void)SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                        kTLSProtocol1,
                                        true);
     break;
-  case CURL_SSLVERSION_TLSv1_1:
+  case CARL_SSLVERSION_TLSv1_1:
     failf(data, "Your version of the OS does not support TLSv1.1");
-    return CURLE_SSL_CONNECT_ERROR;
-  case CURL_SSLVERSION_TLSv1_2:
+    return CARLE_SSL_CONNECT_ERROR;
+  case CARL_SSLVERSION_TLSv1_2:
     failf(data, "Your version of the OS does not support TLSv1.2");
-    return CURLE_SSL_CONNECT_ERROR;
-  case CURL_SSLVERSION_TLSv1_3:
+    return CARLE_SSL_CONNECT_ERROR;
+  case CARL_SSLVERSION_TLSv1_3:
     failf(data, "Your version of the OS does not support TLSv1.3");
-    return CURLE_SSL_CONNECT_ERROR;
-  case CURL_SSLVERSION_SSLv2:
+    return CARLE_SSL_CONNECT_ERROR;
+  case CARL_SSLVERSION_SSLv2:
     err = SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                        kSSLProtocol2,
                                        true);
     if(err != noErr) {
       failf(data, "Your version of the OS does not support SSLv2");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
     break;
-  case CURL_SSLVERSION_SSLv3:
+  case CARL_SSLVERSION_SSLv3:
     err = SSLSetProtocolVersionEnabled(backend->ssl_ctx,
                                        kSSLProtocol3,
                                        true);
     if(err != noErr) {
       failf(data, "Your version of the OS does not support SSLv3");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
     break;
   default:
-    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
-    return CURLE_SSL_CONNECT_ERROR;
+    failf(data, "Unrecognized parameter passed via CARLOPT_SSLVERSION");
+    return CARLE_SSL_CONNECT_ERROR;
   }
-#endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
 
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+#if (CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
   if(conn->bits.tls_enable_alpn) {
     if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
       CFMutableArrayRef alpnArr = CFArrayCreateMutable(NULL, 0,
                                                        &kCFTypeArrayCallBacks);
 
 #ifdef USE_NGHTTP2
-      if(data->set.httpversion >= CURL_HTTP_VERSION_2
-#ifndef CURL_DISABLE_PROXY
+      if(data->set.httpversion >= CARL_HTTP_VERSION_2
+#ifndef CARL_DISABLE_PROXY
          && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
 #endif
         ) {
@@ -1637,7 +1637,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
 #endif
 
   if(SSL_SET_OPTION(key)) {
-    infof(data, "WARNING: SSL: CURLOPT_SSLKEY is ignored by Secure "
+    infof(data, "WARNING: SSL: CARLOPT_SSLKEY is ignored by Secure "
           "Transport. The private key must be in the Keychain.\n");
   }
 
@@ -1674,15 +1674,15 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
       err = SecIdentityCopyCertificate(cert_and_key, &cert);
       if(err == noErr) {
         char *certp;
-        CURLcode result = CopyCertSubject(data, cert, &certp);
+        CARLcode result = CopyCertSubject(data, cert, &certp);
         if(!result) {
           infof(data, "Client certificate: %s\n", certp);
           free(certp);
         }
 
         CFRelease(cert);
-        if(result == CURLE_PEER_FAILED_VERIFICATION)
-          return CURLE_SSL_CERTPROBLEM;
+        if(result == CARLE_PEER_FAILED_VERIFICATION)
+          return CARLE_SSL_CERTPROBLEM;
         if(result)
           return result;
       }
@@ -1694,7 +1694,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
         CFRelease(certs);
       if(err != noErr) {
         failf(data, "SSL: SSLSetCertificate() failed: OSStatus %d", err);
-        return CURLE_SSL_CERTPROBLEM;
+        return CARLE_SSL_CERTPROBLEM;
       }
       CFRelease(cert_and_key);
     }
@@ -1725,7 +1725,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
                     "key: OSStatus %d", cert_showfilename_error, err);
         break;
       }
-      return CURLE_SSL_CERTPROBLEM;
+      return CARLE_SSL_CERTPROBLEM;
     }
   }
 
@@ -1733,7 +1733,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
    * fail to connect if the verification fails, or if it should continue
    * anyway. In the latter case the result of the verification is checked with
    * SSL_get_verify_result() below. */
-#if CURL_BUILD_MAC_10_6 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_6 || CARL_BUILD_IOS
   /* Snow Leopard introduced the SSLSetSessionOption() function, but due to
      a library bug with the way the kSSLSessionOptionBreakOnServerAuth flag
      works, it doesn't work as expected under Snow Leopard, Lion or
@@ -1749,11 +1749,11 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   Darwin 14.x.x is Yosemite (10.10)
   Darwin 15.x.x is El Capitan (10.11)
   */
-#if CURL_BUILD_MAC
+#if CARL_BUILD_MAC
   if(SSLSetSessionOption != NULL && darwinver_maj >= 13) {
 #else
   if(SSLSetSessionOption != NULL) {
-#endif /* CURL_BUILD_MAC */
+#endif /* CARL_BUILD_MAC */
     bool break_on_auth = !conn->ssl_config.verifypeer ||
       ssl_cafile || ssl_cablob;
     err = SSLSetSessionOption(backend->ssl_ctx,
@@ -1761,27 +1761,27 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
                               break_on_auth);
     if(err != noErr) {
       failf(data, "SSL: SSLSetSessionOption() failed: OSStatus %d", err);
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
   }
   else {
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     err = SSLSetEnableCertVerify(backend->ssl_ctx,
                                  conn->ssl_config.verifypeer?true:false);
     if(err != noErr) {
       failf(data, "SSL: SSLSetEnableCertVerify() failed: OSStatus %d", err);
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
-#endif /* CURL_SUPPORT_MAC_10_8 */
+#endif /* CARL_SUPPORT_MAC_10_8 */
   }
 #else
   err = SSLSetEnableCertVerify(backend->ssl_ctx,
                                conn->ssl_config.verifypeer?true:false);
   if(err != noErr) {
     failf(data, "SSL: SSLSetEnableCertVerify() failed: OSStatus %d", err);
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
-#endif /* CURL_BUILD_MAC_10_6 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_6 || CARL_BUILD_IOS */
 
   if((ssl_cafile || ssl_cablob) && verifypeer) {
     bool is_cert_data = ssl_cablob != NULL;
@@ -1789,7 +1789,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
 
     if(!(is_cert_file || is_cert_data)) {
       failf(data, "SSL: can't load CA certificate file %s", ssl_cafile);
-      return CURLE_SSL_CACERT_BADFILE;
+      return CARLE_SSL_CACERT_BADFILE;
     }
   }
 
@@ -1827,28 +1827,28 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   if(err != noErr) {
     failf(data, "SSL: SSLGetNumberSupportedCiphers() failed: OSStatus %d",
           err);
-    return CURLE_SSL_CIPHER;
+    return CARLE_SSL_CIPHER;
   }
   all_ciphers = malloc(all_ciphers_count*sizeof(SSLCipherSuite));
   if(!all_ciphers) {
     failf(data, "SSL: Failed to allocate memory for all ciphers");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
   allowed_ciphers = malloc(all_ciphers_count*sizeof(SSLCipherSuite));
   if(!allowed_ciphers) {
     Curl_safefree(all_ciphers);
     failf(data, "SSL: Failed to allocate memory for allowed ciphers");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
   err = SSLGetSupportedCiphers(backend->ssl_ctx, all_ciphers,
                                &all_ciphers_count);
   if(err != noErr) {
     Curl_safefree(all_ciphers);
     Curl_safefree(allowed_ciphers);
-    return CURLE_SSL_CIPHER;
+    return CARLE_SSL_CIPHER;
   }
   for(i = 0UL ; i < all_ciphers_count ; i++) {
-#if CURL_BUILD_MAC
+#if CARL_BUILD_MAC
    /* There's a known bug in early versions of Mountain Lion where ST's ECC
       ciphers (cipher suite 0xC001 through 0xC032) simply do not work.
       Work around the problem here by disabling those ciphers if we are
@@ -1857,7 +1857,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
        all_ciphers[i] >= 0xC001 && all_ciphers[i] <= 0xC032) {
       continue;
     }
-#endif /* CURL_BUILD_MAC */
+#endif /* CARL_BUILD_MAC */
     switch(all_ciphers[i]) {
       /* Disable NULL ciphersuites: */
       case SSL_NULL_WITH_NULL_NULL:
@@ -1933,10 +1933,10 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   Curl_safefree(allowed_ciphers);
   if(err != noErr) {
     failf(data, "SSL: SSLSetEnabledCiphers() failed: OSStatus %d", err);
-    return CURLE_SSL_CIPHER;
+    return CARLE_SSL_CIPHER;
   }
 
-#if CURL_BUILD_MAC_10_9 || CURL_BUILD_IOS_7
+#if CARL_BUILD_MAC_10_9 || CARL_BUILD_IOS_7
   /* We want to enable 1/n-1 when using a CBC cipher unless the user
      specifically doesn't want us doing that: */
   if(SSLSetSessionOption != NULL) {
@@ -1945,7 +1945,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
     SSLSetSessionOption(backend->ssl_ctx, kSSLSessionOptionFalseStart,
                       data->set.ssl.falsestart); /* false start support */
   }
-#endif /* CURL_BUILD_MAC_10_9 || CURL_BUILD_IOS_7 */
+#endif /* CARL_BUILD_MAC_10_9 || CARL_BUILD_IOS_7 */
 
   /* Check if there's a cached ID we can/should use here! */
   if(SSL_SET_OPTION(primary.sessionid)) {
@@ -1960,7 +1960,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
       Curl_ssl_sessionid_unlock(data);
       if(err != noErr) {
         failf(data, "SSL: SSLSetPeerID() failed: OSStatus %d", err);
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       /* Informational message */
       infof(data, "SSL re-using session ID\n");
@@ -1968,7 +1968,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
     /* If there isn't one, then let's make one up! This has to be done prior
        to starting the handshake. */
     else {
-      CURLcode result;
+      CARLcode result;
       ssl_sessionid =
         aprintf("%s:%d:%d:%s:%ld", ssl_cafile,
                 verifypeer, SSL_CONN_CONFIG(verifyhost), hostname, port);
@@ -1978,7 +1978,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
       if(err != noErr) {
         Curl_ssl_sessionid_unlock(data);
         failf(data, "SSL: SSLSetPeerID() failed: OSStatus %d", err);
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
 
       result = Curl_ssl_addsessionid(data, conn, ssl_sessionid,
@@ -1994,7 +1994,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   err = SSLSetIOFuncs(backend->ssl_ctx, SocketRead, SocketWrite);
   if(err != noErr) {
     failf(data, "SSL: SSLSetIOFuncs() failed: OSStatus %d", err);
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   /* pass the raw socket into the SSL layers */
@@ -2005,11 +2005,11 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
   err = SSLSetConnection(backend->ssl_ctx, connssl);
   if(err != noErr) {
     failf(data, "SSL: SSLSetConnection() failed: %d", err);
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   connssl->connecting_state = ssl_connect_2;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static long pem_to_der(const char *in, unsigned char **out, size_t *outlen)
@@ -2115,10 +2115,10 @@ static int append_cert_to_array(struct Curl_easy *data,
 {
     CFDataRef certdata = CFDataCreate(kCFAllocatorDefault, buf, buflen);
     char *certp;
-    CURLcode result;
+    CARLcode result;
     if(!certdata) {
       failf(data, "SSL: failed to allocate array for CA certificate");
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
 
     SecCertificateRef cacert =
@@ -2126,17 +2126,17 @@ static int append_cert_to_array(struct Curl_easy *data,
     CFRelease(certdata);
     if(!cacert) {
       failf(data, "SSL: failed to create SecCertificate from CA certificate");
-      return CURLE_SSL_CACERT_BADFILE;
+      return CARLE_SSL_CACERT_BADFILE;
     }
 
     /* Check if cacert is valid. */
     result = CopyCertSubject(data, cacert, &certp);
     switch(result) {
-      case CURLE_OK:
+      case CARLE_OK:
         break;
-      case CURLE_PEER_FAILED_VERIFICATION:
-        return CURLE_SSL_CACERT_BADFILE;
-      case CURLE_OUT_OF_MEMORY:
+      case CARLE_PEER_FAILED_VERIFICATION:
+        return CARLE_SSL_CACERT_BADFILE;
+      case CARLE_OUT_OF_MEMORY:
       default:
         return result;
     }
@@ -2145,10 +2145,10 @@ static int append_cert_to_array(struct Curl_easy *data,
     CFArrayAppendValue(array, cacert);
     CFRelease(cacert);
 
-    return CURLE_OK;
+    return CARLE_OK;
 }
 
-static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
+static CARLcode verify_cert(const char *cafile, struct Curl_easy *data,
                             SSLContextRef ctx)
 {
   int n = 0, rc;
@@ -2158,7 +2158,7 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
 
   if(read_cert(cafile, &certbuf, &buflen) < 0) {
     failf(data, "SSL: failed to read or invalid CA certificate");
-    return CURLE_SSL_CACERT_BADFILE;
+    return CARLE_SSL_CACERT_BADFILE;
   }
 
   /*
@@ -2175,7 +2175,7 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
   if(array == NULL) {
     free(certbuf);
     failf(data, "SSL: out of memory creating CA certificate array");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   while(offset < buflen) {
@@ -2191,7 +2191,7 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
       CFRelease(array);
       failf(data, "SSL: invalid CA certificate #%d (offset %zu) in bundle",
             n, offset);
-      return CURLE_SSL_CACERT_BADFILE;
+      return CARLE_SSL_CACERT_BADFILE;
     }
     offset += res;
 
@@ -2199,7 +2199,7 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
       /* This is not a PEM file, probably a certificate in DER format. */
       rc = append_cert_to_array(data, certbuf, buflen, array);
       free(certbuf);
-      if(rc != CURLE_OK) {
+      if(rc != CARLE_OK) {
         CFRelease(array);
         return rc;
       }
@@ -2213,7 +2213,7 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
 
     rc = append_cert_to_array(data, der, derlen, array);
     free(der);
-    if(rc != CURLE_OK) {
+    if(rc != CARLE_OK) {
       free(certbuf);
       CFRelease(array);
       return rc;
@@ -2225,12 +2225,12 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
   if(trust == NULL) {
     failf(data, "SSL: error getting certificate chain");
     CFRelease(array);
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
   else if(ret != noErr) {
     CFRelease(array);
     failf(data, "SSLCopyPeerTrust() returned error %d", ret);
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
 
   ret = SecTrustSetAnchorCertificates(trust, array);
@@ -2238,14 +2238,14 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
     CFRelease(array);
     CFRelease(trust);
     failf(data, "SecTrustSetAnchorCertificates() returned error %d", ret);
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
   ret = SecTrustSetAnchorCertificatesOnly(trust, true);
   if(ret != noErr) {
     CFRelease(array);
     CFRelease(trust);
     failf(data, "SecTrustSetAnchorCertificatesOnly() returned error %d", ret);
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
 
   SecTrustResultType trust_eval = 0;
@@ -2254,25 +2254,25 @@ static CURLcode verify_cert(const char *cafile, struct Curl_easy *data,
   CFRelease(trust);
   if(ret != noErr) {
     failf(data, "SecTrustEvaluate() returned error %d", ret);
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   }
 
   switch(trust_eval) {
     case kSecTrustResultUnspecified:
     case kSecTrustResultProceed:
-      return CURLE_OK;
+      return CARLE_OK;
 
     case kSecTrustResultRecoverableTrustFailure:
     case kSecTrustResultDeny:
     default:
       failf(data, "SSL: certificate verification failed (result: %d)",
             trust_eval);
-      return CURLE_PEER_FAILED_VERIFICATION;
+      return CARLE_PEER_FAILED_VERIFICATION;
   }
 }
 
 #ifdef SECTRANSP_PINNEDPUBKEY
-static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
+static CARLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
                                     SSLContextRef ctx,
                                     const char *pinnedpubkey)
 {  /* Scratch */
@@ -2282,11 +2282,11 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
   CFDataRef publicKeyBits = NULL;
 
   /* Result is returned to caller */
-  CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+  CARLcode result = CARLE_SSL_PINNEDPUBKEYNOTMATCH;
 
   /* if a path wasn't specified, don't pin */
   if(!pinnedpubkey)
-    return CURLE_OK;
+    return CARLE_OK;
 
 
   if(!ctx)
@@ -2378,7 +2378,7 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
 }
 #endif /* SECTRANSP_PINNEDPUBKEY */
 
-static CURLcode
+static CARLcode
 sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
                         int sockindex)
 {
@@ -2387,7 +2387,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
   OSStatus err;
   SSLCipherSuite cipher;
   SSLProtocol protocol = 0;
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
     conn->host.name;
 #else
@@ -2406,13 +2406,13 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
       case errSSLWouldBlock:  /* they're not done with us yet */
         connssl->connecting_state = backend->ssl_direction ?
             ssl_connect_2_writing : ssl_connect_2_reading;
-        return CURLE_OK;
+        return CARLE_OK;
 
       /* The below is errSSLServerAuthCompleted; it's not defined in
         Leopard's headers */
       case -9841:
         if(SSL_CONN_CONFIG(CAfile) && SSL_CONN_CONFIG(verifypeer)) {
-          CURLcode result = verify_cert(SSL_CONN_CONFIG(CAfile), data,
+          CARLcode result = verify_cert(SSL_CONN_CONFIG(CAfile), data,
                                         backend->ssl_ctx);
           if(result)
             return result;
@@ -2437,7 +2437,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
       case errSSLCrypto:
         failf(data, "An underlying cryptographic error was encountered");
         break;
-#if CURL_BUILD_MAC_10_11 || CURL_BUILD_IOS_9
+#if CARL_BUILD_MAC_10_11 || CARL_BUILD_IOS_9
       case errSSLWeakPeerEphemeralDHKey:
         failf(data, "Indicates a weak ephemeral Diffie-Hellman key");
         break;
@@ -2470,37 +2470,37 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
       /* These are all certificate problems with the server: */
       case errSSLXCertChainInvalid:
         failf(data, "SSL certificate problem: Invalid certificate chain");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLUnknownRootCert:
         failf(data, "SSL certificate problem: Untrusted root certificate");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLNoRootCert:
         failf(data, "SSL certificate problem: No root certificate");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLCertNotYetValid:
         failf(data, "SSL certificate problem: The certificate chain had a "
                     "certificate that is not yet valid");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLCertExpired:
       case errSSLPeerCertExpired:
         failf(data, "SSL certificate problem: Certificate chain had an "
               "expired certificate");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLBadCert:
       case errSSLPeerBadCert:
         failf(data, "SSL certificate problem: Couldn't understand the server "
               "certificate format");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLPeerUnsupportedCert:
         failf(data, "SSL certificate problem: An unsupported certificate "
                     "format was encountered");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLPeerCertRevoked:
         failf(data, "SSL certificate problem: The certificate was revoked");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
       case errSSLPeerCertUnknown:
         failf(data, "SSL certificate problem: The certificate is unknown");
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
 
       /* These are all certificate problems with the client: */
       case errSecAuthFailed:
@@ -2521,7 +2521,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
       case errSSLHostNameMismatch:
         failf(data, "SSL certificate peer verification failed, the "
               "certificate did not match \"%s\"\n", conn->host.dispname);
-        return CURLE_PEER_FAILED_VERIFICATION;
+        return CARLE_PEER_FAILED_VERIFICATION;
 
       /* Problem with SSL / TLS negotiation */
       case errSSLNegotiation:
@@ -2586,7 +2586,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
       case errSSLPeerUnexpectedMsg:
         failf(data, "Peer rejected unexpected message");
         break;
-#if CURL_BUILD_MAC_10_11 || CURL_BUILD_IOS_9
+#if CARL_BUILD_MAC_10_11 || CARL_BUILD_IOS_9
       /* Treaing non-fatal error as fatal like before */
       case errSSLClientHelloReceived:
         failf(data, "A non-fatal result for providing a server name "
@@ -2596,13 +2596,13 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
 
       /* Error codes defined in the enum but should never be returned.
          We list them here just in case. */
-#if CURL_BUILD_MAC_10_6
+#if CARL_BUILD_MAC_10_6
       /* Only returned when kSSLSessionOptionBreakOnCertRequested is set */
       case errSSLClientCertRequested:
         failf(data, "The server has requested a client certificate");
         break;
 #endif
-#if CURL_BUILD_MAC_10_9
+#if CARL_BUILD_MAC_10_9
       /* Alias for errSSLLast, end of error range */
       case errSSLUnexpectedRecord:
         failf(data, "Unexpected (skipped) record in DTLS");
@@ -2614,7 +2614,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
               hostname, err);
         break;
     }
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
   else {
     /* we have been connected fine, we're not waiting for anything else. */
@@ -2622,7 +2622,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
 
 #ifdef SECTRANSP_PINNEDPUBKEY
     if(data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG]) {
-      CURLcode result = pkp_pin_peer_pubkey(data, backend->ssl_ctx,
+      CARLcode result = pkp_pin_peer_pubkey(data, backend->ssl_ctx,
                             data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG]);
       if(result) {
         failf(data, "SSL: public key does not match pinned public key!");
@@ -2647,7 +2647,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
         infof(data, "TLS 1.0 connection using %s\n",
               TLSCipherNameForNumber(cipher));
         break;
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
       case kTLSProtocol11:
         infof(data, "TLS 1.1 connection using %s\n",
               TLSCipherNameForNumber(cipher));
@@ -2656,19 +2656,19 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
         infof(data, "TLS 1.2 connection using %s\n",
               TLSCipherNameForNumber(cipher));
         break;
-#endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
-#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#endif /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
+#if CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11
       case kTLSProtocol13:
         infof(data, "TLS 1.3 connection using %s\n",
               TLSCipherNameForNumber(cipher));
         break;
-#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
+#endif /* CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11 */
       default:
         infof(data, "Unknown protocol connection\n");
         break;
     }
 
-#if(CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+#if(CARL_BUILD_MAC_10_13 || CARL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
     if(conn->bits.tls_enable_alpn) {
       if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
         CFArrayRef alpnArr = NULL;
@@ -2682,18 +2682,18 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
         if(chosenProtocol &&
            !CFStringCompare(chosenProtocol, CFSTR(NGHTTP2_PROTO_VERSION_ID),
                             0)) {
-          conn->negnpn = CURL_HTTP_VERSION_2;
+          conn->negnpn = CARL_HTTP_VERSION_2;
         }
         else
 #endif
         if(chosenProtocol &&
            !CFStringCompare(chosenProtocol, CFSTR(ALPN_HTTP_1_1), 0)) {
-          conn->negnpn = CURL_HTTP_VERSION_1_1;
+          conn->negnpn = CARL_HTTP_VERSION_1_1;
         }
         else
           infof(data, "ALPN, server did not agree to a protocol\n");
 
-        Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
+        Curl_multiuse_state(data, conn->negnpn == CARL_HTTP_VERSION_2 ?
                             BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
 
         /* chosenProtocol is a reference to the string within alpnArr
@@ -2704,11 +2704,11 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
     }
 #endif
 
-    return CURLE_OK;
+    return CARLE_OK;
   }
 }
 
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
 /* This should be called during step3 of the connection at the earliest */
 static void
 show_verbose_server_cert(struct Curl_easy *data,
@@ -2726,8 +2726,8 @@ show_verbose_server_cert(struct Curl_easy *data,
   if(!backend->ssl_ctx)
     return;
 
-#if CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS
-#if CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS
+#if CARL_BUILD_IOS
 #pragma unused(server_certs)
   err = SSLCopyPeerTrust(backend->ssl_ctx, &trust);
   /* For some reason, SSLCopyPeerTrust() can return noErr and yet return
@@ -2735,7 +2735,7 @@ show_verbose_server_cert(struct Curl_easy *data,
   if(err == noErr && trust) {
     count = SecTrustGetCertificateCount(trust);
     for(i = 0L ; i < count ; i++) {
-      CURLcode result;
+      CARLcode result;
       char *certp;
       server_cert = SecTrustGetCertificateAtIndex(trust, i);
       result = CopyCertSubject(data, server_cert, &certp);
@@ -2762,7 +2762,7 @@ show_verbose_server_cert(struct Curl_easy *data,
       count = SecTrustGetCertificateCount(trust);
       for(i = 0L ; i < count ; i++) {
         char *certp;
-        CURLcode result;
+        CARLcode result;
         server_cert = SecTrustGetCertificateAtIndex(trust, i);
         result = CopyCertSubject(data, server_cert, &certp);
         if(!result) {
@@ -2774,14 +2774,14 @@ show_verbose_server_cert(struct Curl_easy *data,
     }
   }
   else {
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     err = SSLCopyPeerCertificates(backend->ssl_ctx, &server_certs);
     /* Just in case SSLCopyPeerCertificates() returns null too... */
     if(err == noErr && server_certs) {
       count = CFArrayGetCount(server_certs);
       for(i = 0L ; i < count ; i++) {
         char *certp;
-        CURLcode result;
+        CARLcode result;
         server_cert = (SecCertificateRef)CFArrayGetValueAtIndex(server_certs,
                                                                 i);
         result = CopyCertSubject(data, server_cert, &certp);
@@ -2792,16 +2792,16 @@ show_verbose_server_cert(struct Curl_easy *data,
       }
       CFRelease(server_certs);
     }
-#endif /* CURL_SUPPORT_MAC_10_8 */
+#endif /* CARL_SUPPORT_MAC_10_8 */
   }
-#endif /* CURL_BUILD_IOS */
+#endif /* CARL_BUILD_IOS */
 #else
 #pragma unused(trust)
   err = SSLCopyPeerCertificates(backend->ssl_ctx, &server_certs);
   if(err == noErr) {
     count = CFArrayGetCount(server_certs);
     for(i = 0L ; i < count ; i++) {
-      CURLcode result;
+      CARLcode result;
       char *certp;
       server_cert = (SecCertificateRef)CFArrayGetValueAtIndex(server_certs, i);
       result = CopyCertSubject(data, server_cert, &certp);
@@ -2812,11 +2812,11 @@ show_verbose_server_cert(struct Curl_easy *data,
     }
     CFRelease(server_certs);
   }
-#endif /* CURL_BUILD_MAC_10_7 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_7 || CARL_BUILD_IOS */
 }
-#endif /* !CURL_DISABLE_VERBOSE_STRINGS */
+#endif /* !CARL_DISABLE_VERBOSE_STRINGS */
 
-static CURLcode
+static CARLcode
 sectransp_connect_step3(struct Curl_easy *data, struct connectdata *conn,
                         int sockindex)
 {
@@ -2825,34 +2825,34 @@ sectransp_connect_step3(struct Curl_easy *data, struct connectdata *conn,
   /* There is no step 3!
    * Well, okay, if verbose mode is on, let's print the details of the
    * server certificates. */
-#ifndef CURL_DISABLE_VERBOSE_STRINGS
+#ifndef CARL_DISABLE_VERBOSE_STRINGS
   if(data->set.verbose)
     show_verbose_server_cert(data, conn, sockindex);
 #endif
 
   connssl->connecting_state = ssl_connect_done;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static Curl_recv sectransp_recv;
 static Curl_send sectransp_send;
 
-static CURLcode
+static CARLcode
 sectransp_connect_common(struct Curl_easy *data,
                          struct connectdata *conn,
                          int sockindex,
                          bool nonblocking,
                          bool *done)
 {
-  CURLcode result;
+  CARLcode result;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   int what;
 
   /* check if the connection has already been established */
   if(ssl_connection_complete == connssl->state) {
     *done = TRUE;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   if(ssl_connect_1 == connssl->connecting_state) {
@@ -2862,7 +2862,7 @@ sectransp_connect_common(struct Curl_easy *data,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
+      return CARLE_OPERATION_TIMEDOUT;
     }
 
     result = sectransp_connect_step1(data, conn, sockindex);
@@ -2880,34 +2880,34 @@ sectransp_connect_common(struct Curl_easy *data,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
+      return CARLE_OPERATION_TIMEDOUT;
     }
 
     /* if ssl is expecting something, check if it's available. */
     if(connssl->connecting_state == ssl_connect_2_reading ||
        connssl->connecting_state == ssl_connect_2_writing) {
 
-      curl_socket_t writefd = ssl_connect_2_writing ==
-      connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
-      curl_socket_t readfd = ssl_connect_2_reading ==
-      connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
+      carl_socket_t writefd = ssl_connect_2_writing ==
+      connssl->connecting_state?sockfd:CARL_SOCKET_BAD;
+      carl_socket_t readfd = ssl_connect_2_reading ==
+      connssl->connecting_state?sockfd:CARL_SOCKET_BAD;
 
-      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
+      what = Curl_socket_check(readfd, CARL_SOCKET_BAD, writefd,
                                nonblocking ? 0 : timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       else if(0 == what) {
         if(nonblocking) {
           *done = FALSE;
-          return CURLE_OK;
+          return CARLE_OK;
         }
         else {
           /* timeout */
           failf(data, "SSL connection timeout");
-          return CURLE_OPERATION_TIMEDOUT;
+          return CARLE_OPERATION_TIMEDOUT;
         }
       }
       /* socket is readable or writable */
@@ -2947,20 +2947,20 @@ sectransp_connect_common(struct Curl_easy *data,
   /* Reset our connect state machine */
   connssl->connecting_state = ssl_connect_1;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode sectransp_connect_nonblocking(struct Curl_easy *data,
+static CARLcode sectransp_connect_nonblocking(struct Curl_easy *data,
                                               struct connectdata *conn,
                                               int sockindex, bool *done)
 {
   return sectransp_connect_common(data, conn, sockindex, TRUE, done);
 }
 
-static CURLcode sectransp_connect(struct Curl_easy *data,
+static CARLcode sectransp_connect(struct Curl_easy *data,
                                   struct connectdata *conn, int sockindex)
 {
-  CURLcode result;
+  CARLcode result;
   bool done = FALSE;
 
   result = sectransp_connect_common(data, conn, sockindex, FALSE, &done);
@@ -2970,7 +2970,7 @@ static CURLcode sectransp_connect(struct Curl_easy *data,
 
   DEBUGASSERT(done);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void sectransp_close(struct Curl_easy *data, struct connectdata *conn,
@@ -2983,16 +2983,16 @@ static void sectransp_close(struct Curl_easy *data, struct connectdata *conn,
 
   if(backend->ssl_ctx) {
     (void)SSLClose(backend->ssl_ctx);
-#if CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS
+#if CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS
     if(SSLCreateContext != NULL)
       CFRelease(backend->ssl_ctx);
-#if CURL_SUPPORT_MAC_10_8
+#if CARL_SUPPORT_MAC_10_8
     else
       (void)SSLDisposeContext(backend->ssl_ctx);
-#endif  /* CURL_SUPPORT_MAC_10_8 */
+#endif  /* CARL_SUPPORT_MAC_10_8 */
 #else
     (void)SSLDisposeContext(backend->ssl_ctx);
-#endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
+#endif /* CARL_BUILD_MAC_10_8 || CARL_BUILD_IOS */
     backend->ssl_ctx = NULL;
   }
   backend->ssl_sockfd = 0;
@@ -3011,8 +3011,8 @@ static int sectransp_shutdown(struct Curl_easy *data,
   if(!backend->ssl_ctx)
     return 0;
 
-#ifndef CURL_DISABLE_FTP
-  if(data->set.ftp_ccc != CURLFTPSSL_CCC_ACTIVE)
+#ifndef CARL_DISABLE_FTP
+  if(data->set.ftp_ccc != CARLFTPSSL_CCC_ACTIVE)
     return 0;
 #endif
 
@@ -3112,7 +3112,7 @@ static bool sectransp_data_pending(const struct connectdata *conn,
     return false;
 }
 
-static CURLcode sectransp_random(struct Curl_easy *data UNUSED_PARAM,
+static CARLcode sectransp_random(struct Curl_easy *data UNUSED_PARAM,
                                  unsigned char *entropy, size_t length)
 {
   /* arc4random_buf() isn't available on cats older than Lion, so let's
@@ -3129,32 +3129,32 @@ static CURLcode sectransp_random(struct Curl_easy *data UNUSED_PARAM,
     random_number >>= 8;
   }
   i = random_number = 0;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode sectransp_md5sum(unsigned char *tmp, /* input */
+static CARLcode sectransp_md5sum(unsigned char *tmp, /* input */
                                  size_t tmplen,
                                  unsigned char *md5sum, /* output */
                                  size_t md5len)
 {
   (void)md5len;
   (void)CC_MD5(tmp, (CC_LONG)tmplen, md5sum);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode sectransp_sha256sum(const unsigned char *tmp, /* input */
+static CARLcode sectransp_sha256sum(const unsigned char *tmp, /* input */
                                     size_t tmplen,
                                     unsigned char *sha256sum, /* output */
                                     size_t sha256len)
 {
-  assert(sha256len >= CURL_SHA256_DIGEST_LENGTH);
+  assert(sha256len >= CARL_SHA256_DIGEST_LENGTH);
   (void)CC_SHA256(tmp, (CC_LONG)tmplen, sha256sum);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static bool sectransp_false_start(void)
 {
-#if CURL_BUILD_MAC_10_9 || CURL_BUILD_IOS_7
+#if CARL_BUILD_MAC_10_9 || CARL_BUILD_IOS_7
   if(SSLSetSessionOption != NULL)
     return TRUE;
 #endif
@@ -3165,7 +3165,7 @@ static ssize_t sectransp_send(struct Curl_easy *data,
                               int sockindex,
                               const void *mem,
                               size_t len,
-                              CURLcode *curlcode)
+                              CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
@@ -3199,11 +3199,11 @@ static ssize_t sectransp_send(struct Curl_easy *data,
         backend->ssl_write_buffered_length = 0UL;
         break;
       case errSSLWouldBlock: /* argh, try again */
-        *curlcode = CURLE_AGAIN;
+        *carlcode = CARLE_AGAIN;
         return -1L;
       default:
         failf(data, "SSLWrite() returned error %d", err);
-        *curlcode = CURLE_SEND_ERROR;
+        *carlcode = CARLE_SEND_ERROR;
         return -1L;
     }
   }
@@ -3216,11 +3216,11 @@ static ssize_t sectransp_send(struct Curl_easy *data,
           /* Data was buffered but not sent, we have to tell the caller
              to try sending again, and remember how much was buffered */
           backend->ssl_write_buffered_length = len;
-          *curlcode = CURLE_AGAIN;
+          *carlcode = CARLE_AGAIN;
           return -1L;
         default:
           failf(data, "SSLWrite() returned error %d", err);
-          *curlcode = CURLE_SEND_ERROR;
+          *carlcode = CARLE_SEND_ERROR;
           return -1L;
       }
     }
@@ -3232,7 +3232,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
                               int num,
                               char *buf,
                               size_t buffersize,
-                              CURLcode *curlcode)
+                              CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[num];
@@ -3248,7 +3248,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
       case errSSLWouldBlock:  /* return how much we read (if anything) */
         if(processed)
           return (ssize_t)processed;
-        *curlcode = CURLE_AGAIN;
+        *carlcode = CARLE_AGAIN;
         return -1L;
         break;
 
@@ -3258,7 +3258,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
          Either way, inform the caller that the server disconnected. */
       case errSSLClosedGraceful:
       case errSSLClosedNoNotify:
-        *curlcode = CURLE_OK;
+        *carlcode = CARLE_OK;
         return -1L;
         break;
 
@@ -3266,7 +3266,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
            Leopard's headers */
       case -9841:
         if(SSL_CONN_CONFIG(CAfile) && SSL_CONN_CONFIG(verifypeer)) {
-          CURLcode result = verify_cert(SSL_CONN_CONFIG(CAfile), data,
+          CARLcode result = verify_cert(SSL_CONN_CONFIG(CAfile), data,
                                         backend->ssl_ctx);
           if(result)
             return result;
@@ -3274,7 +3274,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
         goto again;
       default:
         failf(data, "SSLRead() return error %d", err);
-        *curlcode = CURLE_RECV_ERROR;
+        *carlcode = CARLE_RECV_ERROR;
         return -1L;
         break;
     }
@@ -3283,7 +3283,7 @@ static ssize_t sectransp_recv(struct Curl_easy *data,
 }
 
 static void *sectransp_get_internals(struct ssl_connect_data *connssl,
-                                     CURLINFO info UNUSED_PARAM)
+                                     CARLINFO info UNUSED_PARAM)
 {
   struct ssl_backend_data *backend = connssl->backend;
   (void)info;
@@ -3291,7 +3291,7 @@ static void *sectransp_get_internals(struct ssl_connect_data *connssl,
 }
 
 const struct Curl_ssl Curl_ssl_sectransp = {
-  { CURLSSLBACKEND_SECURETRANSPORT, "secure-transport" }, /* info */
+  { CARLSSLBACKEND_SECURETRANSPORT, "secure-transport" }, /* info */
 
 #ifdef SECTRANSP_PINNEDPUBKEY
   SSLSUPP_PINNEDPUBKEY,

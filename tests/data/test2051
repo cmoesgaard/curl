@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLOPT_CONNECT_TO
+CARLOPT_CONNECT_TO
 </keywords>
 </info>
 
@@ -41,17 +41,17 @@ http://%HOSTIP:%HTTPPORT/2051 -w "%{num_connects}\n" --next --connect-to ::%HOST
 <protocol>
 GET /2051 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /2051 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /2051 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

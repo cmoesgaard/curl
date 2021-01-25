@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,22 +19,22 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-# files used only in some libcurl test programs
+# files used only in some libcarl test programs
 TESTUTIL = testutil.c testutil.h
 
-# files used only in some libcurl test programs
+# files used only in some libcarl test programs
 TSTTRACE = testtrace.c testtrace.h
 
-# files used only in some libcurl test programs
+# files used only in some libcarl test programs
 WARNLESS = ../../lib/warnless.c ../../lib/warnless.h
 
-# files used only in some libcurl test programs
-MULTIBYTE = ../../lib/curl_multibyte.c ../../lib/curl_multibyte.h
+# files used only in some libcarl test programs
+MULTIBYTE = ../../lib/carl_multibyte.c ../../lib/carl_multibyte.h
 
 # these files are used in every single test program below
 SUPPORTFILES = first.c test.h
 
-# These are all libcurl test programs
+# These are all libcarl test programs
 noinst_PROGRAMS = chkhostname libauthretry libntlmconnect                \
  chkdecimalpoint                                                         \
  lib500 lib501 lib502 lib503 lib504 lib505 lib506 lib507 lib508 lib509   \
@@ -64,13 +64,13 @@ noinst_PROGRAMS = chkhostname libauthretry libntlmconnect                \
          lib3010
 
 chkdecimalpoint_SOURCES = chkdecimalpoint.c ../../lib/mprintf.c \
- ../../lib/curl_ctype.c  ../../lib/dynbuf.c ../../lib/strdup.c
+ ../../lib/carl_ctype.c  ../../lib/dynbuf.c ../../lib/strdup.c
 chkdecimalpoint_LDADD =
-chkdecimalpoint_CPPFLAGS = $(AM_CPPFLAGS) -DCURL_STATICLIB \
- -DCURLX_NO_MEMORY_CALLBACKS -DBUILDING_LIBCURL
+chkdecimalpoint_CPPFLAGS = $(AM_CPPFLAGS) -DCARL_STATICLIB \
+ -DCARLX_NO_MEMORY_CALLBACKS -DBUILDING_LIBCARL
 
-chkhostname_SOURCES = chkhostname.c ../../lib/curl_gethostname.c
-chkhostname_LDADD = @CURL_NETWORK_LIBS@
+chkhostname_SOURCES = chkhostname.c ../../lib/carl_gethostname.c
+chkhostname_LDADD = @CARL_NETWORK_LIBS@
 chkhostname_DEPENDENCIES =
 chkhostname_CPPFLAGS = $(AM_CPPFLAGS)
 

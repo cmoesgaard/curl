@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_DICT
+#ifndef CARL_DISABLE_DICT
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -51,15 +51,15 @@
 #endif
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "transfer.h"
 #include "sendf.h"
 #include "escape.h"
 #include "progress.h"
 #include "dict.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 #include "strcase.h"
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -67,7 +67,7 @@
  * Forward declarations.
  */
 
-static CURLcode dict_do(struct Curl_easy *data, bool *done);
+static CARLcode dict_do(struct Curl_easy *data, bool *done);
 
 /*
  * DICT protocol handler.
@@ -90,8 +90,8 @@ const struct Curl_handler Curl_handler_dict = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_DICT,                            /* defport */
-  CURLPROTO_DICT,                       /* protocol */
-  CURLPROTO_DICT,                       /* family */
+  CARLPROTO_DICT,                       /* protocol */
+  CARLPROTO_DICT,                       /* family */
   PROTOPT_NONE | PROTOPT_NOURLQUERY     /* flags */
 };
 
@@ -101,7 +101,7 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
   char *dictp;
   size_t len;
 
-  CURLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len,
+  CARLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len,
                                    REJECT_NADA);
   if(!newp || result)
     return NULL;
@@ -129,12 +129,12 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
 }
 
 /* sendf() sends formatted data to the server */
-static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
+static CARLcode sendf(carl_socket_t sockfd, struct Curl_easy *data,
                       const char *fmt, ...)
 {
   ssize_t bytes_written;
   size_t write_len;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *s;
   char *sptr;
   va_list ap;
@@ -142,7 +142,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
   s = vaprintf(fmt, ap); /* returns an allocated string */
   va_end(ap);
   if(!s)
-    return CURLE_OUT_OF_MEMORY; /* failure */
+    return CARLE_OUT_OF_MEMORY; /* failure */
 
   bytes_written = 0;
   write_len = strlen(s);
@@ -155,7 +155,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
     if(result)
       break;
 
-    Curl_debug(data, CURLINFO_DATA_OUT, sptr, (size_t)bytes_written);
+    Curl_debug(data, CARLINFO_DATA_OUT, sptr, (size_t)bytes_written);
 
     if((size_t)bytes_written != write_len) {
       /* if not all was written at once, we must advance the pointer, decrease
@@ -172,7 +172,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
   return result;
 }
 
-static CURLcode dict_do(struct Curl_easy *data, bool *done)
+static CARLcode dict_do(struct Curl_easy *data, bool *done)
 {
   char *word;
   char *eword;
@@ -181,9 +181,9 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
   char *strategy = NULL;
   char *nthdef = NULL; /* This is not part of the protocol, but required
                           by RFC 2229 */
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
   char *path = data->state.up.path;
 
@@ -227,10 +227,10 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     eword = unescape_word(data, word);
     if(!eword)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     result = sendf(sockfd, data,
-                   "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
+                   "CLIENT " LIBCARL_NAME " " LIBCARL_VERSION "\r\n"
                    "MATCH "
                    "%s "    /* database */
                    "%s "    /* strategy */
@@ -275,10 +275,10 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     eword = unescape_word(data, word);
     if(!eword)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     result = sendf(sockfd, data,
-                   "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
+                   "CLIENT " LIBCARL_NAME " " LIBCARL_VERSION "\r\n"
                    "DEFINE "
                    "%s "     /* database */
                    "%s\r\n"  /* word */
@@ -306,7 +306,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
           ppath[i] = ' ';
       }
       result = sendf(sockfd, data,
-                     "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
+                     "CLIENT " LIBCARL_NAME " " LIBCARL_VERSION "\r\n"
                      "%s\r\n"
                      "QUIT\r\n", ppath);
       if(result) {
@@ -318,6 +318,6 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
-#endif /*CURL_DISABLE_DICT*/
+#endif /*CARL_DISABLE_DICT*/

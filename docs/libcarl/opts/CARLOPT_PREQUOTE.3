@@ -1,0 +1,66 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_PREQUOTE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_PREQUOTE \- commands to run before an FTP transfer
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_PREQUOTE,
+                          struct carl_slist *cmds);
+.SH DESCRIPTION
+Pass a pointer to a linked list of FTP commands to pass to the server after
+the transfer type is set. The linked list should be a fully valid list of
+struct carl_slist structs properly filled in as described for
+\fICARLOPT_QUOTE(3)\fP. Disable this operation again by setting a NULL to this
+option.
+
+While \fICARLOPT_QUOTE(3)\fP and \fICARLOPT_POSTQUOTE(3)\fP work for SFTP,
+this option does not.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+FTP
+.SH EXAMPLE
+.nf
+struct carl_slist *cmdlist = NULL;
+cmdlist = carl_slist_append(cmdlist, "SYST");
+
+carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/foo.bin");
+
+  /* pass in the FTP commands to run */
+  carl_easy_setopt(carl, CARLOPT_PREQUOTE, cmdlist);
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Along with the protocol support
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_QUOTE "(3), " CARLOPT_POSTQUOTE "(3), "

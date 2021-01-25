@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
 
 This script generates the manpage.
 
-Example: gen.pl <command> [files] > curl.1
+Example: gen.pl <command> [files] > carl.1
 
 Dev notes:
 
@@ -108,7 +108,7 @@ sub protocols {
 sub added {
     my ($standalone, $data)=@_;
     if($standalone) {
-        return ".SH \"ADDED\"\nAdded in curl version $data\n";
+        return ".SH \"ADDED\"\nAdded in carl version $data\n";
     }
     else {
         return "Added in $data. ";
@@ -204,9 +204,9 @@ sub single {
     }
 
     if($standalone) {
-        print ".TH curl 1 \"30 Nov 2016\" \"curl 7.52.0\" \"curl manual\"\n";
+        print ".TH carl 1 \"30 Nov 2016\" \"carl 7.52.0\" \"carl manual\"\n";
         print ".SH OPTION\n";
-        print "curl $opt\n";
+        print "carl $opt\n";
     }
     else {
         print ".IP \"$opt\"\n";
@@ -249,7 +249,7 @@ sub single {
     }
     if($requires) {
         my $l = manpageify($long);
-        push @foot, "$l requires that the underlying libcurl".
+        push @foot, "$l requires that the underlying libcarl".
             " was built to support $requires. ";
     }
     if($mutexed) {
@@ -354,7 +354,7 @@ sub listhelp {
             $opt = "    --$long";
         }
         for my $i (0 .. $#categories) {
-            $bitmask .= 'CURLHELP_' . uc $categories[$i];
+            $bitmask .= 'CARLHELP_' . uc $categories[$i];
             # If not last element, append |
             if($i < $#categories) {
                 $bitmask .= ' | ';
@@ -394,7 +394,7 @@ sub listcats {
     @categories = sort @categories;
     unshift @categories, 'hidden';
     for my $i (0..$#categories) {
-        print '#define ' . 'CURLHELP_' . uc($categories[$i]) . ' ' . "1u << " . $i . "u\n";
+        print '#define ' . 'CARLHELP_' . uc($categories[$i]) . ' ' . "1u << " . $i . "u\n";
     }
 }
 

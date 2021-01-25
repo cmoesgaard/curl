@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HOSTIP_H
-#define HEADER_CURL_HOSTIP_H
+#ifndef HEADER_CARL_HOSTIP_H
+#define HEADER_CARL_HOSTIP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,9 +22,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 #include "hash.h"
-#include "curl_addrinfo.h"
+#include "carl_addrinfo.h"
 #include "timeval.h" /* for timediff_t */
 #include "asyn.h"
 
@@ -42,12 +42,12 @@
  * required for storing all possible aliases and IP numbers is according to
  * Stevens' Unix Network Programming 2nd edition, p. 304: 8192 bytes!
  */
-#define CURL_HOSTENT_SIZE 9000
+#define CARL_HOSTENT_SIZE 9000
 
-#define CURL_TIMEOUT_RESOLVE 300 /* when using asynch methods, we allow this
+#define CARL_TIMEOUT_RESOLVE 300 /* when using asynch methods, we allow this
                                     many seconds for a name resolve */
 
-#define CURL_ASYNC_SUCCESS CURLE_OK
+#define CARL_ASYNC_SUCCESS CARLE_OK
 
 struct addrinfo;
 struct hostent;
@@ -65,7 +65,7 @@ struct Curl_hash *Curl_global_host_cache_init(void);
 
 struct Curl_dns_entry {
   struct Curl_addrinfo *addr;
-  /* timestamp == 0 -- permanent CURLOPT_RESOLVE entry (doesn't time out) */
+  /* timestamp == 0 -- permanent CARLOPT_RESOLVE entry (doesn't time out) */
   time_t timestamp;
   /* use-counter, use Curl_resolv_unlock to release reference */
   long inuse;
@@ -80,10 +80,10 @@ struct Curl_dns_entry {
  */
 /* return codes */
 enum resolve_t {
-  CURLRESOLV_TIMEDOUT = -2,
-  CURLRESOLV_ERROR    = -1,
-  CURLRESOLV_RESOLVED =  0,
-  CURLRESOLV_PENDING  =  1
+  CARLRESOLV_TIMEDOUT = -2,
+  CARLRESOLV_ERROR    = -1,
+  CARLRESOLV_RESOLVED =  0,
+  CARLRESOLV_PENDING  =  1
 };
 enum resolve_t Curl_resolv(struct Curl_easy *data,
                            const char *hostname,
@@ -95,7 +95,7 @@ enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
                                    struct Curl_dns_entry **dnsentry,
                                    timediff_t timeoutms);
 
-#ifdef CURLRES_IPV6
+#ifdef CARLRES_IPV6
 /*
  * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
@@ -105,7 +105,7 @@ bool Curl_ipv6works(struct Curl_easy *data);
 #endif
 
 /*
- * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
+ * Curl_ipvalid() checks what CARL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
 bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn);
@@ -136,8 +136,8 @@ void Curl_hostcache_prune(struct Curl_easy *data);
 /* Return # of addresses in a Curl_addrinfo struct */
 int Curl_num_addresses(const struct Curl_addrinfo *addr);
 
-#if defined(CURLDEBUG) && defined(HAVE_GETNAMEINFO)
-int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
+#if defined(CARLDEBUG) && defined(HAVE_GETNAMEINFO)
+int carl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
                        GETNAMEINFO_TYPE_ARG2 salen,
                        char *host, GETNAMEINFO_TYPE_ARG46 hostlen,
                        char *serv, GETNAMEINFO_TYPE_ARG46 servlen,
@@ -148,15 +148,15 @@ int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
 /* IPv4 threadsafe resolve function used for synch and asynch builds */
 struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname, int port);
 
-CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_connect);
+CARLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_connect);
 
 /*
  * Curl_addrinfo_callback() is used when we build with any asynch specialty.
  * Handles end of async request processing. Inserts ai into hostcache when
- * status is CURL_ASYNC_SUCCESS. Twiddles fields in conn to indicate async
+ * status is CARL_ASYNC_SUCCESS. Twiddles fields in conn to indicate async
  * request completed whether successful or failed.
  */
-CURLcode Curl_addrinfo_callback(struct Curl_easy *data,
+CARLcode Curl_addrinfo_callback(struct Curl_easy *data,
                                 int status,
                                 struct Curl_addrinfo *ai);
 
@@ -191,9 +191,9 @@ Curl_cache_addr(struct Curl_easy *data, struct Curl_addrinfo *addr,
                 const char *hostname, int port);
 
 #ifndef INADDR_NONE
-#define CURL_INADDR_NONE (in_addr_t) ~0
+#define CARL_INADDR_NONE (in_addr_t) ~0
 #else
-#define CURL_INADDR_NONE INADDR_NONE
+#define CARL_INADDR_NONE INADDR_NONE
 #endif
 
 #ifdef HAVE_SIGSETJMP
@@ -202,33 +202,33 @@ Curl_cache_addr(struct Curl_easy *data, struct Curl_addrinfo *addr,
  * address that we can jump back to from inside a signal handler.
  * This is not thread-safe stuff.
  */
-extern sigjmp_buf curl_jmpenv;
+extern sigjmp_buf carl_jmpenv;
 #endif
 
 /*
  * Function provided by the resolver backend to set DNS servers to use.
  */
-CURLcode Curl_set_dns_servers(struct Curl_easy *data, char *servers);
+CARLcode Curl_set_dns_servers(struct Curl_easy *data, char *servers);
 
 /*
  * Function provided by the resolver backend to set
  * outgoing interface to use for DNS requests
  */
-CURLcode Curl_set_dns_interface(struct Curl_easy *data,
+CARLcode Curl_set_dns_interface(struct Curl_easy *data,
                                 const char *interf);
 
 /*
  * Function provided by the resolver backend to set
  * local IPv4 address to use as source address for DNS requests
  */
-CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
                                 const char *local_ip4);
 
 /*
  * Function provided by the resolver backend to set
  * local IPv6 address to use as source address for DNS requests
  */
-CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
                                 const char *local_ip6);
 
 /*
@@ -237,12 +237,12 @@ CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
 void Curl_hostcache_clean(struct Curl_easy *data, struct Curl_hash *hash);
 
 /*
- * Populate the cache with specified entries from CURLOPT_RESOLVE.
+ * Populate the cache with specified entries from CARLOPT_RESOLVE.
  */
-CURLcode Curl_loadhostpairs(struct Curl_easy *data);
-CURLcode Curl_resolv_check(struct Curl_easy *data,
+CARLcode Curl_loadhostpairs(struct Curl_easy *data);
+CARLcode Curl_resolv_check(struct Curl_easy *data,
                            struct Curl_dns_entry **dns);
 int Curl_resolv_getsock(struct Curl_easy *data,
-                        curl_socket_t *socks);
+                        carl_socket_t *socks);
 
-#endif /* HEADER_CURL_HOSTIP_H */
+#endif /* HEADER_CARL_HOSTIP_H */

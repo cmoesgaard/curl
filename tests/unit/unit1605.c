@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,39 +19,39 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "llist.h"
 
-static CURL *easy;
+static CARL *easy;
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  int res = CURLE_OK;
+  int res = CARLE_OK;
 
-  global_init(CURL_GLOBAL_ALL);
-  easy = curl_easy_init();
+  global_init(CARL_GLOBAL_ALL);
+  easy = carl_easy_init();
   if(!easy) {
-    curl_global_cleanup();
-    return CURLE_OUT_OF_MEMORY;
+    carl_global_cleanup();
+    return CARLE_OUT_OF_MEMORY;
   }
   return res;
 }
 
 static void unit_stop(void)
 {
-  curl_easy_cleanup(easy);
-  curl_global_cleanup();
+  carl_easy_cleanup(easy);
+  carl_global_cleanup();
 }
 
 UNITTEST_START
   int len;
   char *esc;
 
-  esc = curl_easy_escape(easy, "", -1);
+  esc = carl_easy_escape(easy, "", -1);
   fail_unless(esc == NULL, "negative string length can't work");
 
-  esc = curl_easy_unescape(easy, "%41%41%41%41", -1, &len);
+  esc = carl_easy_unescape(easy, "%41%41%41%41", -1, &len);
   fail_unless(esc == NULL, "negative string length can't work");
 
 UNITTEST_STOP

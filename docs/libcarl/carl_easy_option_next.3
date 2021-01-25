@@ -1,0 +1,74 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_easy_option_next 3 "27 Aug 2020" "libcarl 7.73.0" "libcarl Manual"
+.SH NAME
+carl_easy_option_next - iterate over easy setopt options
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+typedef enum {
+  CARLOT_LONG,    /* long (a range of values) */
+  CARLOT_VALUES,  /*      (a defined set or bitmask) */
+  CARLOT_OFF_T,   /* carl_off_t (a range of values) */
+  CARLOT_OBJECT,  /* pointer (void *) */
+  CARLOT_STRING,  /*         (char * to zero terminated buffer) */
+  CARLOT_SLIST,   /*         (struct carl_slist *) */
+  CARLOT_CBPTR,   /*         (void * passed as-is to a callback) */
+  CARLOT_BLOB,    /* blob (struct carl_blob *) */
+  CARLOT_FUNCTION /* function pointer */
+} carl_easytype;
+
+/* The CARLOPTTYPE_* id ranges can still be used to figure out what type/size
+   to use for carl_easy_setopt() for the given id */
+struct carl_easyoption {
+  const char *name;
+  CARLoption id;
+  carl_easytype type;
+  unsigned int flags;
+};
+
+const struct carl_easyoption *
+carl_easy_option_next(const struct carl_easyoption *prev);
+.fi
+.SH DESCRIPTION
+This function returns a pointer to the first or the next carl_easyoption
+struct, providing an ability to iterate over all known options for
+\fIcarl_easy_setopt(3)\fP in this instance of libcarl.
+
+Pass a \fBNULL\fP argument as \fBprev\fP to get the first option returned, or
+pass in the current option to get the next one returned. If there is no more
+option to return, \fIcarl_easy_option_next(3)\fP returns NULL.
+
+The options returned by this functions are the ones known to this libcarl and
+information about what argument type they want.
+
+If the \fBCARLOT_FLAG_ALIAS\fP bit is set in the flags field, it means the
+name is provided for backwards compatibility as an alias.
+.SH AVAILABILITY
+This function was added in libcarl 7.73.0
+.SH RETURN VALUE
+A pointer to the carl_easyoption struct for the next option or NULL if no more
+options.
+.SH "SEE ALSO"
+.BR carl_easy_option_by_name "(3)," carl_easy_option_by_id "(3),"
+.BR carl_easy_setopt "(3),"

@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,53 +20,53 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-# Determine if curl-config --protocols/--features matches the
-# curl --version protocols/features
+# Determine if carl-config --protocols/--features matches the
+# carl --version protocols/features
 if ( $#ARGV != 2 )
 {
-    print "Usage: $0 curl-config-script curl-version-output-file features|protocols\n";
+    print "Usage: $0 carl-config-script carl-version-output-file features|protocols\n";
     exit 3;
 }
 
 my $what=$ARGV[2];
 
-# Read the output of curl --version
-my $curl_protocols="";
-open(CURL, "$ARGV[1]") || die "Can't get curl $what list\n";
-while( <CURL> )
+# Read the output of carl --version
+my $carl_protocols="";
+open(CARL, "$ARGV[1]") || die "Can't get carl $what list\n";
+while( <CARL> )
 {
-    $curl_protocols = lc($_) if ( /$what:/i );
+    $carl_protocols = lc($_) if ( /$what:/i );
 }
-close CURL;
+close CARL;
 
-$curl_protocols =~ s/\r//;
-$curl_protocols =~ /\w+: (.*)$/;
-@curl = split / /,$1;
+$carl_protocols =~ s/\r//;
+$carl_protocols =~ /\w+: (.*)$/;
+@carl = split / /,$1;
 
-# These features are not supported by curl-config
-@curl = grep(!/^(Debug|TrackMemory|Metalink|Largefile|CharConv)$/i, @curl);
-@curl = sort @curl;
+# These features are not supported by carl-config
+@carl = grep(!/^(Debug|TrackMemory|Metalink|Largefile|CharConv)$/i, @carl);
+@carl = sort @carl;
 
-# Read the output of curl-config
-my @curl_config;
-open(CURLCONFIG, "sh $ARGV[0] --$what|") || die "Can't get curl-config $what list\n";
-while( <CURLCONFIG> )
+# Read the output of carl-config
+my @carl_config;
+open(CARLCONFIG, "sh $ARGV[0] --$what|") || die "Can't get carl-config $what list\n";
+while( <CARLCONFIG> )
 {
     chomp;
-    # ignore curl-config --features not in curl's feature list
-    push @curl_config, lc($_);
+    # ignore carl-config --features not in carl's feature list
+    push @carl_config, lc($_);
 }
-close CURLCONFIG;
+close CARLCONFIG;
 
-@curl_config = sort @curl_config;
+@carl_config = sort @carl_config;
 
-my $curlproto = join ' ', @curl;
-my $curlconfigproto = join ' ', @curl_config;
+my $carlproto = join ' ', @carl;
+my $carlconfigproto = join ' ', @carl_config;
 
-my $different = $curlproto ne $curlconfigproto;
+my $different = $carlproto ne $carlconfigproto;
 if ($different) {
     print "Mismatch in $what lists:\n";
-    print "curl:        $curlproto\n";
-    print "curl-config: $curlconfigproto\n";
+    print "carl:        $carlproto\n";
+    print "carl-config: $carlconfigproto\n";
 }
 exit $different;

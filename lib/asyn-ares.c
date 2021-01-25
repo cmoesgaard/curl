@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 /***********************************************************************
  * Only for ares-enabled builds
@@ -28,7 +28,7 @@
  * as defined in asyn.h, nothing else belongs in this file!
  **********************************************************************/
 
-#ifdef CURLRES_ARES
+#ifdef CARLRES_ARES
 
 #include <limits.h>
 #ifdef HAVE_NETINET_IN_H
@@ -67,7 +67,7 @@
 #include "select.h"
 #include "progress.h"
 
-#  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
+#  if defined(CARL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
   defined(WIN32)
 #    define CARES_STATICLIB
 #  endif
@@ -81,8 +81,8 @@
 #endif
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 struct thread_data {
@@ -90,7 +90,7 @@ struct thread_data {
   struct Curl_addrinfo *temp_ai; /* intermediary result while fetching c-ares
                                     parts */
   int last_status;
-  struct curltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
+  struct carltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
 };
 
 /* How long we are willing to wait for additional parallel responses after
@@ -106,23 +106,23 @@ struct thread_data {
 
 /*
  * Curl_resolver_global_init() - the generic low-level asynchronous name
- * resolve API.  Called from curl_global_init() to initialize global resolver
+ * resolve API.  Called from carl_global_init() to initialize global resolver
  * environment.  Initializes ares library.
  */
 int Curl_resolver_global_init(void)
 {
 #ifdef CARES_HAVE_ARES_LIBRARY_INIT
   if(ares_library_init(ARES_LIB_INIT_ALL)) {
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
   }
 #endif
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Curl_resolver_global_cleanup()
  *
- * Called from curl_global_cleanup() to destroy global resolver environment.
+ * Called from carl_global_cleanup() to destroy global resolver environment.
  * Deinitializes ares library.
  */
 void Curl_resolver_global_cleanup(void)
@@ -146,11 +146,11 @@ static void sock_state_cb(void *data, ares_socket_t socket_fd,
 /*
  * Curl_resolver_init()
  *
- * Called from curl_easy_init() -> Curl_open() to initialize resolver
+ * Called from carl_easy_init() -> Curl_open() to initialize resolver
  * URL-state specific environment ('resolver' member of the UrlState
  * structure).  Fills the passed pointer by the initialized ares_channel.
  */
-CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
+CARLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
 {
   int status;
   struct ares_options options;
@@ -160,11 +160,11 @@ CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
   status = ares_init_options((ares_channel*)resolver, &options, optmask);
   if(status != ARES_SUCCESS) {
     if(status == ARES_ENOMEM)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     else
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
   }
-  return CURLE_OK;
+  return CARLE_OK;
   /* make sure that all other returns from this function should destroy the
      ares channel before returning error! */
 }
@@ -172,7 +172,7 @@ CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
 /*
  * Curl_resolver_cleanup()
  *
- * Called from curl_easy_cleanup() -> Curl_close() to cleanup resolver
+ * Called from carl_easy_cleanup() -> Curl_close() to cleanup resolver
  * URL-state specific environment ('resolver' member of the UrlState
  * structure).  Destroys the ares channel.
  */
@@ -184,11 +184,11 @@ void Curl_resolver_cleanup(void *resolver)
 /*
  * Curl_resolver_duphandle()
  *
- * Called from curl_easy_duphandle() to duplicate resolver URL-state specific
+ * Called from carl_easy_duphandle() to duplicate resolver URL-state specific
  * environment ('resolver' member of the UrlState structure).  Duplicates the
  * 'from' ares channel and passes the resulting channel to the 'to' pointer.
  */
-CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to, void *from)
+CARLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to, void *from)
 {
   (void)from;
   /*
@@ -246,7 +246,7 @@ static void destroy_async_data(struct Curl_async *async)
 
 /*
  * Curl_resolver_getsock() is called when someone from the outside world
- * (using curl_multi_fdset()) wants to get our fd_set setup and we're talking
+ * (using carl_multi_fdset()) wants to get our fd_set setup and we're talking
  * with ares. The caller must make sure that this function is only called when
  * we have a working ares channel.
  *
@@ -254,7 +254,7 @@ static void destroy_async_data(struct Curl_async *async)
  */
 
 int Curl_resolver_getsock(struct Curl_easy *data,
-                          curl_socket_t *socks)
+                          carl_socket_t *socks)
 {
   struct timeval maxtime;
   struct timeval timebuf;
@@ -263,7 +263,7 @@ int Curl_resolver_getsock(struct Curl_easy *data,
   int max = ares_getsock((ares_channel)data->state.async.resolver,
                          (ares_socket_t *)socks, MAX_SOCKSPEREASYHANDLE);
 
-  maxtime.tv_sec = CURL_TIMEOUT_RESOLVE;
+  maxtime.tv_sec = CARL_TIMEOUT_RESOLVE;
   maxtime.tv_usec = 0;
 
   timeout = ares_timeout((ares_channel)data->state.async.resolver, &maxtime,
@@ -342,13 +342,13 @@ static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
  * name resolve request has completed. It should also make sure to time-out if
  * the operation seems to take too long.
  *
- * Returns normal CURLcode errors.
+ * Returns normal CARLcode errors.
  */
-CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
+CARLcode Curl_resolver_is_resolved(struct Curl_easy *data,
                                    struct Curl_dns_entry **dns)
 {
   struct thread_data *res = data->state.async.tdata;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   DEBUGASSERT(dns);
   *dns = NULL;
@@ -388,8 +388,8 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
       failf(data, "Could not resolve: %s (%s)",
             data->state.async.hostname,
             ares_strerror(data->state.async.status));
-      result = data->conn->bits.proxy?CURLE_COULDNT_RESOLVE_PROXY:
-        CURLE_COULDNT_RESOLVE_HOST;
+      result = data->conn->bits.proxy?CARLE_COULDNT_RESOLVE_PROXY:
+        CARLE_COULDNT_RESOLVE_HOST;
     }
     else
       *dns = data->state.async.dns;
@@ -408,15 +408,15 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
  *
  * 'entry' MUST be non-NULL.
  *
- * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved,
- * CURLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
+ * Returns CARLE_COULDNT_RESOLVE_HOST if the host was not resolved,
+ * CARLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
  */
-CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
+CARLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
                                    struct Curl_dns_entry **entry)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   timediff_t timeout;
-  struct curltime now = Curl_now();
+  struct carltime now = Curl_now();
 
   DEBUGASSERT(entry);
   *entry = NULL; /* clear on entry */
@@ -425,10 +425,10 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
   if(timeout < 0) {
     /* already expired! */
     connclose(data->conn, "Timed out before name resolve started");
-    return CURLE_OPERATION_TIMEDOUT;
+    return CARLE_OPERATION_TIMEDOUT;
   }
   if(!timeout)
-    timeout = CURL_TIMEOUT_RESOLVE * 1000; /* default name resolve timeout */
+    timeout = CARL_TIMEOUT_RESOLVE * 1000; /* default name resolve timeout */
 
   /* Wait for the name resolve query to complete. */
   while(!result) {
@@ -462,9 +462,9 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
       break;
 
     if(Curl_pgrsUpdate(data))
-      result = CURLE_ABORTED_BY_CALLBACK;
+      result = CARLE_ABORTED_BY_CALLBACK;
     else {
-      struct curltime now2 = Curl_now();
+      struct carltime now2 = Curl_now();
       timediff_t timediff = Curl_timediff(now2, now); /* spent time */
       if(timediff <= 0)
         timeout -= 1; /* always deduct at least 1 */
@@ -475,7 +475,7 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
       now = now2; /* for next loop */
     }
     if(timeout < 0)
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
   }
   if(result)
     /* failure, so we cancel the ares operation */
@@ -539,7 +539,7 @@ static void query_completed_cb(void *arg,  /* (struct connectdata *) */
   if(res) {
     res->num_pending--;
 
-    if(CURL_ASYNC_SUCCESS == status) {
+    if(CARL_ASYNC_SUCCESS == status) {
       struct Curl_addrinfo *ai = Curl_he2ai(hostent, data->state.async.port);
       if(ai) {
         compound_results(res, ai);
@@ -638,10 +638,10 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                            to PF_INET */
     break;
 #endif
-  case CURL_IPRESOLVE_V4:
+  case CARL_IPRESOLVE_V4:
     family = PF_INET;
     break;
-  case CURL_IPRESOLVE_V6:
+  case CARL_IPRESOLVE_V6:
     family = PF_INET6;
     break;
   }
@@ -701,10 +701,10 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
   return NULL; /* no struct yet */
 }
 
-CURLcode Curl_set_dns_servers(struct Curl_easy *data,
+CARLcode Curl_set_dns_servers(struct Curl_easy *data,
                               char *servers)
 {
-  CURLcode result = CURLE_NOT_BUILT_IN;
+  CARLcode result = CARLE_NOT_BUILT_IN;
   int ares_result;
 
   /* If server is NULL or empty, this would purge all DNS servers
@@ -714,7 +714,7 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
    * it gets from the OS (for instance from /etc/resolv.conf on Linux).
    */
   if(!(servers && servers[0]))
-    return CURLE_OK;
+    return CARLE_OK;
 
 #if (ARES_VERSION >= 0x010704)
 #if (ARES_VERSION >= 0x010b00)
@@ -725,16 +725,16 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
 #endif
   switch(ares_result) {
   case ARES_SUCCESS:
-    result = CURLE_OK;
+    result = CARLE_OK;
     break;
   case ARES_ENOMEM:
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
     break;
   case ARES_ENOTINITIALIZED:
   case ARES_ENODATA:
   case ARES_EBADSTR:
   default:
-    result = CURLE_BAD_FUNCTION_ARGUMENT;
+    result = CARLE_BAD_FUNCTION_ARGUMENT;
     break;
   }
 #else /* too old c-ares version! */
@@ -744,7 +744,7 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
   return result;
 }
 
-CURLcode Curl_set_dns_interface(struct Curl_easy *data,
+CARLcode Curl_set_dns_interface(struct Curl_easy *data,
                                 const char *interf)
 {
 #if (ARES_VERSION >= 0x010704)
@@ -753,15 +753,15 @@ CURLcode Curl_set_dns_interface(struct Curl_easy *data,
 
   ares_set_local_dev((ares_channel)data->state.async.resolver, interf);
 
-  return CURLE_OK;
+  return CARLE_OK;
 #else /* c-ares version too old! */
   (void)data;
   (void)interf;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 #endif
 }
 
-CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
                                 const char *local_ip4)
 {
 #if (ARES_VERSION >= 0x010704)
@@ -772,22 +772,22 @@ CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
   }
   else {
     if(Curl_inet_pton(AF_INET, local_ip4, &a4) != 1) {
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      return CARLE_BAD_FUNCTION_ARGUMENT;
     }
   }
 
   ares_set_local_ip4((ares_channel)data->state.async.resolver,
                      ntohl(a4.s_addr));
 
-  return CURLE_OK;
+  return CARLE_OK;
 #else /* c-ares version too old! */
   (void)data;
   (void)local_ip4;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 #endif
 }
 
-CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
+CARLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
                                 const char *local_ip6)
 {
 #if (ARES_VERSION >= 0x010704) && defined(ENABLE_IPV6)
@@ -799,17 +799,17 @@ CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
   }
   else {
     if(Curl_inet_pton(AF_INET6, local_ip6, a6) != 1) {
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      return CARLE_BAD_FUNCTION_ARGUMENT;
     }
   }
 
   ares_set_local_ip6((ares_channel)data->state.async.resolver, a6);
 
-  return CURLE_OK;
+  return CARLE_OK;
 #else /* c-ares version too old! */
   (void)data;
   (void)local_ip6;
-  return CURLE_NOT_BUILT_IN;
+  return CARLE_NOT_BUILT_IN;
 #endif
 }
-#endif /* CURLRES_ARES */
+#endif /* CARLRES_ARES */

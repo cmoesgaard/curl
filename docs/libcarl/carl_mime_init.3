@@ -1,0 +1,69 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_mime_init 3 "22 August 2017" "libcarl 7.56.0" "libcarl Manual"
+.SH NAME
+carl_mime_init - create a mime handle
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "carl_mime * carl_mime_init(CARL * " easy_handle ");"
+.ad
+.SH DESCRIPTION
+\fIcarl_mime_init(3)\fP creates a handle to a new empty mime structure
+intended to be used with \fIeasy_handle\fP. This mime structure can be
+subsequently filled using the mime API, then attached to \fIeasy_handle\fP
+using option \fICARLOPT_MIMEPOST(3)\fP within a \fIcarl_easy_setopt(3)\fP
+call.
+
+Using a mime handle is the recommended way to post an HTTP form, format and
+send a multi-part e-mail with SMTP or upload such an e-mail to an IMAP server.
+
+.SH AVAILABILITY
+As long as at least one of HTTP, SMTP or IMAP is enabled. Added in 7.56.0.
+.SH RETURN VALUE
+A mime struct handle, or NULL upon failure.
+.SH EXAMPLE
+.nf
+
+ CARL *easy = carl_easy_init();
+ carl_mime *mime;
+ carl_mimepart *part;
+
+ /* Build an HTTP form with a single field named "data", */
+ mime = carl_mime_init(easy);
+ part = carl_mime_addpart(mime);
+ carl_mime_data(part, "This is the field data", CARL_ZERO_TERMINATED);
+ carl_mime_name(part, "data");
+
+ /* Post and send it. */
+ carl_easy_setopt(easy, CARLOPT_MIMEPOST, mime);
+ carl_easy_setopt(easy, CARLOPT_URL, "https://example.com");
+ carl_easy_perform(easy);
+
+ /* Clean-up. */
+ carl_easy_cleanup(easy);
+ carl_mime_free(mime);
+
+.SH "SEE ALSO"
+.BR carl_mime_addpart "(3),"
+.BR carl_mime_free "(3),"
+.BR CARLOPT_MIMEPOST "(3)"

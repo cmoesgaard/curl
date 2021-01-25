@@ -45,7 +45,7 @@ lib584
 </tool>
 
  <name>
-CURLOPT_MIMEPOST first set then set to NULL
+CARLOPT_MIMEPOST first set then set to NULL
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT/584

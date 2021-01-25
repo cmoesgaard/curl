@@ -1,5 +1,5 @@
 <testcase>
-# Redirection is used to force curl to realize that the server is
+# Redirection is used to force carl to realize that the server is
 # speaking HTTP 1.0. The request is impossible to satisfy with HTTP 1.0
 # because chunked encoding is unavailable, so the request must fail.
 <info>
@@ -16,7 +16,7 @@ chunked Transfer-Encoding
 <reply>
 <data>
 HTTP/1.0 301 Redirect swsclose
-Server: testcurl
+Server: testcarl
 Content-Type: text/plain
 Location: /newlocation/10730002
 Content-Length: 0
@@ -52,7 +52,7 @@ which is impossible in HTTP/1.0
 <protocol>
 PUT /1073 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Transfer-Encoding: chunked
 Expect: 100-continue

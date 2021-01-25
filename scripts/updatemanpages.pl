@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -29,12 +29,12 @@ use Tie::File;
 
 # Data from the command line.
 
-my $curlver = $ARGV[0];
-my $curldate = $ARGV[1];
+my $carlver = $ARGV[0];
+my $carldate = $ARGV[1];
 
 # Directories and extensions.
 
-my @dirlist = ("docs/", "docs/libcurl/", "docs/libcurl/opts/", "tests/");
+my @dirlist = ("docs/", "docs/libcarl/", "docs/libcarl/opts/", "tests/");
 my @extlist = (".1", ".3");
 my @excludelist = ("mk-ca-bundle.1", "template.3");
 
@@ -173,7 +173,7 @@ sub processth{
   $itemver = "\"";
   $itemver .= $itemname;
   $itemver .= " ";
-  $itemver .= $curlver;
+  $itemver .= $carlver;
   $itemver .= "\"";
 
   $tharray[4] = $itemver;
@@ -229,9 +229,9 @@ sub processfile{
   close($file_dist_handle);
 }
 
-# Check that $curlver is set, otherwise print arguments and exit.
+# Check that $carlver is set, otherwise print arguments and exit.
 
-if(!$curlver) {
+if(!$carlver) {
   printargs();
 }
 
@@ -293,7 +293,7 @@ foreach my $dirname (@dirlist) {
 
       if($repodata) {
         my $thisdate;
-        if(!$curldate) {
+        if(!$carldate) {
           if($repodata =~ /^Date: +(.*)/) {
             $thisdate = $1;
           }
@@ -303,7 +303,7 @@ foreach my $dirname (@dirlist) {
           }
         }
         else {
-          $thisdate = $curldate;
+          $thisdate = $carldate;
         }
         processfile(($dirname . $file), $thisdate);
         print $dirname . $file . " page updated to $thisdate\n";

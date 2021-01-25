@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,22 +22,22 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if !defined(CARL_DISABLE_CRYPTO_AUTH)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "urldata.h"
 
 #include "vauth/vauth.h"
-#include "curl_base64.h"
-#include "curl_hmac.h"
-#include "curl_md5.h"
+#include "carl_base64.h"
+#include "carl_hmac.h"
+#include "carl_md5.h"
 #include "warnless.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -52,12 +52,12 @@
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_decode_cram_md5_message(const char *chlg64, char **outptr,
+CARLcode Curl_auth_decode_cram_md5_message(const char *chlg64, char **outptr,
                                            size_t *outlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t chlg64len = strlen(chlg64);
 
   *outptr = NULL;
@@ -86,15 +86,15 @@ CURLcode Curl_auth_decode_cram_md5_message(const char *chlg64, char **outptr,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_cram_md5_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_cram_md5_message(struct Curl_easy *data,
                                            const char *chlg,
                                            const char *userp,
                                            const char *passwdp,
                                            char **outptr, size_t *outlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t chlglen = 0;
   struct HMAC_context *ctxt;
   unsigned char digest[MD5_DIGEST_LEN];
@@ -106,14 +106,14 @@ CURLcode Curl_auth_create_cram_md5_message(struct Curl_easy *data,
   /* Compute the digest using the password as the key */
   ctxt = Curl_HMAC_init(Curl_HMAC_MD5,
                         (const unsigned char *) passwdp,
-                        curlx_uztoui(strlen(passwdp)));
+                        carlx_uztoui(strlen(passwdp)));
   if(!ctxt)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Update the digest with the given challenge */
   if(chlglen > 0)
     Curl_HMAC_update(ctxt, (const unsigned char *) chlg,
-                     curlx_uztoui(chlglen));
+                     carlx_uztoui(chlglen));
 
   /* Finalise the digest */
   Curl_HMAC_final(ctxt, digest);
@@ -125,7 +125,7 @@ CURLcode Curl_auth_create_cram_md5_message(struct Curl_easy *data,
     digest[5], digest[6], digest[7], digest[8], digest[9], digest[10],
     digest[11], digest[12], digest[13], digest[14], digest[15]);
   if(!response)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Base64 encode the response */
   result = Curl_base64_encode(data, response, 0, outptr, outlen);
@@ -135,4 +135,4 @@ CURLcode Curl_auth_create_cram_md5_message(struct Curl_easy *data,
   return result;
 }
 
-#endif /* !CURL_DISABLE_CRYPTO_AUTH */
+#endif /* !CARL_DISABLE_CRYPTO_AUTH */

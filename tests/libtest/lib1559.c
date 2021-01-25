@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,10 +28,10 @@
 #define EXCESSIVE 10*1000*1000
 int test(char *URL)
 {
-  CURLcode res = 0;
-  CURL *curl = NULL;
+  CARLcode res = 0;
+  CARL *carl = NULL;
   char *longurl = malloc(EXCESSIVE);
-  CURLU *u;
+  CARLU *u;
   (void)URL;
 
   if(!longurl)
@@ -40,35 +40,35 @@ int test(char *URL)
   memset(longurl, 'a', EXCESSIVE);
   longurl[EXCESSIVE-1] = 0;
 
-  global_init(CURL_GLOBAL_ALL);
-  easy_init(curl);
+  global_init(CARL_GLOBAL_ALL);
+  easy_init(carl);
 
-  res = curl_easy_setopt(curl, CURLOPT_URL, longurl);
-  printf("CURLOPT_URL %d bytes URL == %d\n",
+  res = carl_easy_setopt(carl, CARLOPT_URL, longurl);
+  printf("CARLOPT_URL %d bytes URL == %d\n",
          EXCESSIVE, (int)res);
 
-  res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, longurl);
-  printf("CURLOPT_POSTFIELDS %d bytes data == %d\n",
+  res = carl_easy_setopt(carl, CARLOPT_POSTFIELDS, longurl);
+  printf("CARLOPT_POSTFIELDS %d bytes data == %d\n",
          EXCESSIVE, (int)res);
 
-  u = curl_url();
+  u = carl_url();
   if(u) {
-    CURLUcode uc = curl_url_set(u, CURLUPART_URL, longurl, 0);
-    printf("CURLUPART_URL %d bytes URL == %d\n",
+    CARLUcode uc = carl_url_set(u, CARLUPART_URL, longurl, 0);
+    printf("CARLUPART_URL %d bytes URL == %d\n",
            EXCESSIVE, (int)uc);
-    uc = curl_url_set(u, CURLUPART_SCHEME, longurl, CURLU_NON_SUPPORT_SCHEME);
-    printf("CURLUPART_SCHEME %d bytes scheme == %d\n",
+    uc = carl_url_set(u, CARLUPART_SCHEME, longurl, CARLU_NON_SUPPORT_SCHEME);
+    printf("CARLUPART_SCHEME %d bytes scheme == %d\n",
            EXCESSIVE, (int)uc);
-    uc = curl_url_set(u, CURLUPART_USER, longurl, 0);
-    printf("CURLUPART_USER %d bytes user == %d\n",
+    uc = carl_url_set(u, CARLUPART_USER, longurl, 0);
+    printf("CARLUPART_USER %d bytes user == %d\n",
            EXCESSIVE, (int)uc);
-    curl_url_cleanup(u);
+    carl_url_cleanup(u);
   }
 
 test_cleanup:
   free(longurl);
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res; /* return the final return code */
 }

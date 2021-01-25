@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -34,15 +34,15 @@ void config_init(struct OperationConfig *config)
   config->use_httpget = FALSE;
   config->create_dirs = FALSE;
   config->maxredirs = DEFAULT_MAXREDIRS;
-  config->proto = CURLPROTO_ALL;
+  config->proto = CARLPROTO_ALL;
   config->proto_present = FALSE;
-  config->proto_redir = CURLPROTO_ALL & /* All except FILE, SCP and SMB */
-    ~(CURLPROTO_FILE | CURLPROTO_SCP | CURLPROTO_SMB |
-      CURLPROTO_SMBS);
+  config->proto_redir = CARLPROTO_ALL & /* All except FILE, SCP and SMB */
+    ~(CARLPROTO_FILE | CARLPROTO_SCP | CARLPROTO_SMB |
+      CARLPROTO_SMBS);
   config->proto_redir_present = FALSE;
   config->proto_default = NULL;
   config->tcp_nodelay = TRUE; /* enabled by default */
-  config->happy_eyeballs_timeout_ms = CURL_HET_DEFAULT;
+  config->happy_eyeballs_timeout_ms = CARL_HET_DEFAULT;
   config->http09_allowed = FALSE;
   config->ftp_skip_ip = TRUE;
 }
@@ -87,7 +87,7 @@ static void free_config_fields(struct OperationConfig *config)
   Curl_safefree(config->noproxy);
 
   Curl_safefree(config->mail_from);
-  curl_slist_free_all(config->mail_rcpt);
+  carl_slist_free_all(config->mail_rcpt);
   Curl_safefree(config->mail_auth);
 
   Curl_safefree(config->netrc_file);
@@ -145,22 +145,22 @@ static void free_config_fields(struct OperationConfig *config)
   Curl_safefree(config->writeout);
   Curl_safefree(config->proto_default);
 
-  curl_slist_free_all(config->quote);
-  curl_slist_free_all(config->postquote);
-  curl_slist_free_all(config->prequote);
+  carl_slist_free_all(config->quote);
+  carl_slist_free_all(config->postquote);
+  carl_slist_free_all(config->prequote);
 
-  curl_slist_free_all(config->headers);
-  curl_slist_free_all(config->proxyheaders);
+  carl_slist_free_all(config->headers);
+  carl_slist_free_all(config->proxyheaders);
 
-  curl_mime_free(config->mimepost);
+  carl_mime_free(config->mimepost);
   config->mimepost = NULL;
   tool_mime_free(config->mimeroot);
   config->mimeroot = NULL;
   config->mimecurrent = NULL;
 
-  curl_slist_free_all(config->telnet_options);
-  curl_slist_free_all(config->resolve);
-  curl_slist_free_all(config->connect_to);
+  carl_slist_free_all(config->telnet_options);
+  carl_slist_free_all(config->resolve);
+  carl_slist_free_all(config->connect_to);
 
   Curl_safefree(config->preproxy);
   Curl_safefree(config->proxy_service_name);

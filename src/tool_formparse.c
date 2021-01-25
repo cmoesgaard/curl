@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_convert.h"
@@ -82,12 +82,12 @@ static struct tool_mime *tool_mime_new_data(struct tool_mime *parent,
 static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
                                                 const char *filename,
                                                 bool isremotefile,
-                                                CURLcode *errcode)
+                                                CARLcode *errcode)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct tool_mime *m = NULL;
 
-  *errcode = CURLE_OUT_OF_MEMORY;
+  *errcode = CARLE_OUT_OF_MEMORY;
   if(strcmp(filename, "-")) {
     /* This is a normal file. */
     filename = strdup(filename);
@@ -99,15 +99,15 @@ static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
         m->data = filename;
         if(!isremotefile)
           m->kind = TOOLMIME_FILEDATA;
-       *errcode = CURLE_OK;
+       *errcode = CARLE_OK;
       }
     }
   }
   else {        /* Standard input. */
     int fd = fileno(stdin);
     char *data = NULL;
-    curl_off_t size;
-    curl_off_t origin;
+    carl_off_t size;
+    carl_off_t origin;
     struct_stat sbuf;
 
     set_binmode(stdin);
@@ -132,7 +132,7 @@ static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
       }
 
       if(ferror(stdin)) {
-        result = CURLE_READ_ERROR;
+        result = CARLE_READ_ERROR;
         Curl_safefree(data);
         data = NULL;
       }
@@ -142,7 +142,7 @@ static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
         if(!data)
           return m;
       }
-      size = curlx_uztoso(stdinsize);
+      size = carlx_uztoso(stdinsize);
       origin = 0;
     }
     m = tool_mime_new(parent, TOOLMIME_STDIN);
@@ -173,7 +173,7 @@ void tool_mime_free(struct tool_mime *mime)
     CONST_SAFEFREE(mime->type);
     CONST_SAFEFREE(mime->encoder);
     CONST_SAFEFREE(mime->data);
-    curl_slist_free_all(mime->headers);
+    carl_slist_free_all(mime->headers);
     free(mime);
   }
 }
@@ -184,20 +184,20 @@ size_t tool_mime_stdin_read(char *buffer,
                             size_t size, size_t nitems, void *arg)
 {
   struct tool_mime *sip = (struct tool_mime *) arg;
-  curl_off_t bytesleft;
+  carl_off_t bytesleft;
   (void) size;  /* Always 1: ignored. */
 
   if(sip->size >= 0) {
     if(sip->curpos >= sip->size)
       return 0;  /* At eof. */
     bytesleft = sip->size - sip->curpos;
-    if(curlx_uztoso(nitems) > bytesleft)
-      nitems = curlx_sotouz(bytesleft);
+    if(carlx_uztoso(nitems) > bytesleft)
+      nitems = carlx_sotouz(bytesleft);
   }
   if(nitems) {
     if(sip->data) {
       /* Return data from memory. */
-      memcpy(buffer, sip->data + curlx_sotouz(sip->curpos), nitems);
+      memcpy(buffer, sip->data + carlx_sotouz(sip->curpos), nitems);
     }
     else {
       /* Read from stdin. */
@@ -208,15 +208,15 @@ size_t tool_mime_stdin_read(char *buffer,
           warnf(sip->config, "stdin: %s\n", strerror(errno));
           sip->config = NULL;
         }
-        return CURL_READFUNC_ABORT;
+        return CARL_READFUNC_ABORT;
       }
     }
-    sip->curpos += curlx_uztoso(nitems);
+    sip->curpos += carlx_uztoso(nitems);
   }
   return nitems;
 }
 
-int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence)
+int tool_mime_stdin_seek(void *instream, carl_off_t offset, int whence)
 {
   struct tool_mime *sip = (struct tool_mime *) instream;
 
@@ -229,71 +229,71 @@ int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence)
     break;
   }
   if(offset < 0)
-    return CURL_SEEKFUNC_CANTSEEK;
+    return CARL_SEEKFUNC_CANTSEEK;
   if(!sip->data) {
     if(fseek(stdin, (long) (offset + sip->origin), SEEK_SET))
-      return CURL_SEEKFUNC_CANTSEEK;
+      return CARL_SEEKFUNC_CANTSEEK;
   }
   sip->curpos = offset;
-  return CURL_SEEKFUNC_OK;
+  return CARL_SEEKFUNC_OK;
 }
 
-/* Translate an internal mime tree into a libcurl mime tree. */
+/* Translate an internal mime tree into a libcarl mime tree. */
 
-static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
-                               curl_mime *mime)
+static CARLcode tool2carlparts(CARL *carl, struct tool_mime *m,
+                               carl_mime *mime)
 {
-  CURLcode ret = CURLE_OK;
-  curl_mimepart *part = NULL;
-  curl_mime *submime = NULL;
+  CARLcode ret = CARLE_OK;
+  carl_mimepart *part = NULL;
+  carl_mime *submime = NULL;
   const char *filename = NULL;
 
   if(m) {
-    ret = tool2curlparts(curl, m->prev, mime);
+    ret = tool2carlparts(carl, m->prev, mime);
     if(!ret) {
-      part = curl_mime_addpart(mime);
+      part = carl_mime_addpart(mime);
       if(!part)
-        ret = CURLE_OUT_OF_MEMORY;
+        ret = CARLE_OUT_OF_MEMORY;
     }
     if(!ret) {
       filename = m->filename;
       switch(m->kind) {
       case TOOLMIME_PARTS:
-        ret = tool2curlmime(curl, m, &submime);
+        ret = tool2carlmime(carl, m, &submime);
         if(!ret) {
-          ret = curl_mime_subparts(part, submime);
+          ret = carl_mime_subparts(part, submime);
           if(ret)
-            curl_mime_free(submime);
+            carl_mime_free(submime);
         }
         break;
 
       case TOOLMIME_DATA:
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
         /* Our data is always textual: convert it to ASCII. */
         {
           size_t size = strlen(m->data);
           char *cp = malloc(size + 1);
 
           if(!cp)
-            ret = CURLE_OUT_OF_MEMORY;
+            ret = CARLE_OUT_OF_MEMORY;
           else {
             memcpy(cp, m->data, size + 1);
             ret = convert_to_network(cp, size);
             if(!ret)
-              ret = curl_mime_data(part, cp, CURL_ZERO_TERMINATED);
+              ret = carl_mime_data(part, cp, CARL_ZERO_TERMINATED);
             free(cp);
           }
         }
 #else
-        ret = curl_mime_data(part, m->data, CURL_ZERO_TERMINATED);
+        ret = carl_mime_data(part, m->data, CARL_ZERO_TERMINATED);
 #endif
         break;
 
       case TOOLMIME_FILE:
       case TOOLMIME_FILEDATA:
-        ret = curl_mime_filedata(part, m->data);
+        ret = carl_mime_filedata(part, m->data);
         if(!ret && m->kind == TOOLMIME_FILEDATA && !filename)
-          ret = curl_mime_filename(part, NULL);
+          ret = carl_mime_filename(part, NULL);
         break;
 
       case TOOLMIME_STDIN:
@@ -301,9 +301,9 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
           filename = "-";
         /* FALLTHROUGH */
       case TOOLMIME_STDINDATA:
-        ret = curl_mime_data_cb(part, m->size,
-                                (curl_read_callback) tool_mime_stdin_read,
-                                (curl_seek_callback) tool_mime_stdin_seek,
+        ret = carl_mime_data_cb(part, m->size,
+                                (carl_read_callback) tool_mime_stdin_read,
+                                (carl_seek_callback) tool_mime_stdin_seek,
                                 NULL, m);
         break;
 
@@ -313,30 +313,30 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
       }
     }
     if(!ret && filename)
-      ret = curl_mime_filename(part, filename);
+      ret = carl_mime_filename(part, filename);
     if(!ret)
-      ret = curl_mime_type(part, m->type);
+      ret = carl_mime_type(part, m->type);
     if(!ret)
-      ret = curl_mime_headers(part, m->headers, 0);
+      ret = carl_mime_headers(part, m->headers, 0);
     if(!ret)
-      ret = curl_mime_encoder(part, m->encoder);
+      ret = carl_mime_encoder(part, m->encoder);
     if(!ret)
-      ret = curl_mime_name(part, m->name);
+      ret = carl_mime_name(part, m->name);
   }
   return ret;
 }
 
-CURLcode tool2curlmime(CURL *curl, struct tool_mime *m, curl_mime **mime)
+CARLcode tool2carlmime(CARL *carl, struct tool_mime *m, carl_mime **mime)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
 
-  *mime = curl_mime_init(curl);
+  *mime = carl_mime_init(carl);
   if(!*mime)
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
   else
-    ret = tool2curlparts(curl, m->subparts, *mime);
+    ret = tool2carlparts(carl, m->subparts, *mime);
   if(ret) {
-    curl_mime_free(*mime);
+    carl_mime_free(*mime);
     *mime = NULL;
   }
   return ret;
@@ -399,9 +399,9 @@ static char *get_param_word(char **str, char **end_pos, char endchar)
 }
 
 /* Append slist item and return -1 if failed. */
-static int slist_append(struct curl_slist **plist, const char *data)
+static int slist_append(struct carl_slist **plist, const char *data)
 {
-  struct curl_slist *s = curl_slist_append(*plist, data);
+  struct carl_slist *s = carl_slist_append(*plist, data);
 
   if(!s)
     return -1;
@@ -413,7 +413,7 @@ static int slist_append(struct curl_slist **plist, const char *data)
 /* Read headers from a file and append to list. */
 static int read_field_headers(struct OperationConfig *config,
                               const char *filename, FILE *fp,
-                              struct curl_slist **pheaders)
+                              struct carl_slist **pheaders)
 {
   size_t hdrlen = 0;
   size_t pos = 0;
@@ -476,7 +476,7 @@ static int read_field_headers(struct OperationConfig *config,
 static int get_param_part(struct OperationConfig *config, char endchar,
                           char **str, char **pdata, char **ptype,
                           char **pfilename, char **pencoder,
-                          struct curl_slist **pheaders)
+                          struct carl_slist **pheaders)
 {
   char *p = *str;
   char *type = NULL;
@@ -488,7 +488,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
   char type_major[128] = "";
   char type_minor[128] = "";
   char *endct = NULL;
-  struct curl_slist *headers = NULL;
+  struct carl_slist *headers = NULL;
 
   if(ptype)
     *ptype = NULL;
@@ -521,7 +521,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
       /* verify that this is a fine type specifier */
       if(2 != sscanf(type, "%127[^/ ]/%127[^;, \n]", type_major, type_minor)) {
         warnf(config->global, "Illegally formatted content-type field!\n");
-        curl_slist_free_all(headers);
+        carl_slist_free_all(headers);
         return -1; /* illegal content-type syntax! */
       }
 
@@ -579,7 +579,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
 
           fclose(fp);
           if(i) {
-            curl_slist_free_all(headers);
+            carl_slist_free_all(headers);
             return -1;
           }
         }
@@ -599,7 +599,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
         *endpos = '\0';
         if(slist_append(&headers, hdr)) {
           fprintf(config->global->errors, "Out of memory for field header!\n");
-          curl_slist_free_all(headers);
+          carl_slist_free_all(headers);
           return -1;
         }
       }
@@ -664,7 +664,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
   else if(headers) {
     warnf(config->global,
           "Field headers not allowed here: %s\n", headers->data);
-    curl_slist_free_all(headers);
+    carl_slist_free_all(headers);
   }
 
   *str = p;
@@ -714,7 +714,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
  * 'name=@filename;filename="play, play, and play.txt"'
  *
  * If filename/path contains ',' or ';', it must be quoted by double-quotes,
- * else curl will fail to figure out the correct filename. if the filename
+ * else carl will fail to figure out the correct filename. if the filename
  * tobe quoted contains '"' or '\', '"' and '\' must be escaped by backslash.
  *
  ***************************************************************************/
@@ -725,7 +725,7 @@ static int get_param_part(struct OperationConfig *config, char endchar,
     (ptr) = (init);                                                     \
     if(!(ptr)) {                                                        \
       warnf(config->global, "out of memory!\n");                        \
-      curl_slist_free_all(headers);                                     \
+      carl_slist_free_all(headers);                                     \
       Curl_safefree(contents);                                          \
       return retcode;                                                   \
     }                                                                   \
@@ -752,9 +752,9 @@ int formparse(struct OperationConfig *config,
   char *type = NULL;
   char *filename = NULL;
   char *encoder = NULL;
-  struct curl_slist *headers = NULL;
+  struct carl_slist *headers = NULL;
   struct tool_mime *part = NULL;
-  CURLcode res;
+  CARLcode res;
 
   /* Allocate the main mime structure if needed. */
   if(!*mimecurrent) {
@@ -828,10 +828,10 @@ int formparse(struct OperationConfig *config,
         part->headers = headers;
         headers = NULL;
         part->config = config->global;
-        if(res == CURLE_READ_ERROR) {
+        if(res == CARLE_READ_ERROR) {
             /* An error occurred while reading stdin: if read has started,
                issue the error now. Else, delay it until processed by
-               libcurl. */
+               libcarl. */
           if(part->size > 0) {
             warnf(config->global,
                   "error while reading standard input\n");
@@ -841,7 +841,7 @@ int formparse(struct OperationConfig *config,
           CONST_SAFEFREE(part->data);
           part->data = NULL;
           part->size = -1;
-          res = CURLE_OK;
+          res = CARLE_OK;
         }
         SET_TOOL_MIME_PTR(part, filename, 11);
         SET_TOOL_MIME_PTR(part, type, 12);
@@ -866,10 +866,10 @@ int formparse(struct OperationConfig *config,
         part->headers = headers;
         headers = NULL;
         part->config = config->global;
-        if(res == CURLE_READ_ERROR) {
+        if(res == CARLE_READ_ERROR) {
             /* An error occurred while reading stdin: if read has started,
                issue the error now. Else, delay it until processed by
-               libcurl. */
+               libcarl. */
           if(part->size > 0) {
             warnf(config->global,
                   "error while reading standard input\n");
@@ -879,7 +879,7 @@ int formparse(struct OperationConfig *config,
           CONST_SAFEFREE(part->data);
           part->data = NULL;
           part->size = -1;
-          res = CURLE_OK;
+          res = CARLE_OK;
         }
       }
       else {

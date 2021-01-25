@@ -1,14 +1,14 @@
 # Hyper
 
-Hyper is a separate HTTP library written in Rust. curl can be told to use this
+Hyper is a separate HTTP library written in Rust. carl can be told to use this
 library as a backend to deal with HTTP.
 
 ## Experimental!
 
-Hyper support in curl is considered **EXPERIMENTAL** until further notice. It
+Hyper support in carl is considered **EXPERIMENTAL** until further notice. It
 needs to be explicitly enabled at build-time.
 
-Further development and tweaking of the Hyper backend support in curl will
+Further development and tweaking of the Hyper backend support in carl will
 happen in in the master branch using pull-requests, just like ordinary
 changes.
 
@@ -18,7 +18,7 @@ The C API for Hyper is brand new and under development. This description
 assumes that you get and build that C API off [the branch in Hyper's git
 repository](https://github.com/hyperium/hyper/tree/hyper-capi).
 
-## build curl with hyper
+## build carl with hyper
 
 Build hyper and enable the C API:
 
@@ -26,24 +26,24 @@ Build hyper and enable the C API:
      % cd hyper
      % RUSTFLAGS="--cfg hyper_unstable_ffi" cargo build --features client,http1,http2,ffi
 
-Build curl to use hyper's C API:
+Build carl to use hyper's C API:
 
-     % git clone https://github.com/curl/curl
-     % cd curl
+     % git clone https://github.com/carl/carl
+     % cd carl
      % ./buildconf
      % ./configure --with-hyper=<hyper dir>
      % make
 
 # using Hyper internally
 
-Hyper is a low level HTTP transport library. curl itself provides all HTTP
-headers and Hyper provides all received headers back to curl.
+Hyper is a low level HTTP transport library. carl itself provides all HTTP
+headers and Hyper provides all received headers back to carl.
 
-Therefore, most of the "header logic" in curl as in responding to and acting
-on specific input and output headers are done the same way in curl code.
+Therefore, most of the "header logic" in carl as in responding to and acting
+on specific input and output headers are done the same way in carl code.
 
 The API in Hyper delivers received HTTP headers as (cleaned up) name=value
-pairs, making it impossible for curl to know the exact byte representation
+pairs, making it impossible for carl to know the exact byte representation
 over the wire with Hyper.
 
 ## Remaining issues
@@ -61,4 +61,4 @@ still need attention and verification include:
 - transfer encoding
 - alt-svc
 - hsts
-- DoH ([#6389](https://github.com/curl/curl/issues/6389))
+- DoH ([#6389](https://github.com/carl/carl/issues/6389))

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_VERSION_WIN32_H
-#define HEADER_CURL_VERSION_WIN32_H
+#ifndef HEADER_CARL_VERSION_WIN32_H
+#define HEADER_CARL_VERSION_WIN32_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(WIN32)
 
@@ -43,11 +43,11 @@ typedef enum {
 } PlatformIdentifier;
 
 /* This is used to verify if we are running on a specific windows version */
-bool curlx_verify_windows_version(const unsigned int majorVersion,
+bool carlx_verify_windows_version(const unsigned int majorVersion,
                                   const unsigned int minorVersion,
                                   const PlatformIdentifier platform,
                                   const VersionCondition condition);
 
 #endif /* WIN32 */
 
-#endif /* HEADER_CURL_VERSION_WIN32_H */
+#endif /* HEADER_CARL_VERSION_WIN32_H */

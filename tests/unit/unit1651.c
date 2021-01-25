@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,13 +19,13 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "x509asn1.h"
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -35,7 +35,7 @@ static void unit_stop(void)
 #if defined(USE_GSKIT) || defined(USE_NSS) || defined(USE_GNUTLS) || \
     defined(USE_WOLFSSL) || defined(USE_SCHANNEL)
 
-/* cert captured from gdb when connecting to curl.se on October 26
+/* cert captured from gdb when connecting to carl.se on October 26
    2018 */
 static unsigned char cert[] = {
   0x30, 0x82, 0x0F, 0x5B, 0x30, 0x82, 0x0E, 0x43, 0xA0, 0x03, 0x02, 0x01, 0x02,
@@ -345,10 +345,10 @@ static unsigned char cert[] = {
 
 UNITTEST_START
 {
-  CURLcode result;
+  CARLcode result;
   const char *beg = (const char *)&cert[0];
   const char *end = (const char *)&cert[sizeof(cert)];
-  struct Curl_easy *data = curl_easy_init();
+  struct Curl_easy *data = carl_easy_init();
   int i;
   int byte;
   if(!data)
@@ -356,7 +356,7 @@ UNITTEST_START
 
   result = Curl_extract_certinfo(data, 0, beg, end);
 
-  fail_unless(result == CURLE_OK, "Curl_extract_certinfo returned error");
+  fail_unless(result == CARLE_OK, "Curl_extract_certinfo returned error");
 
   /* a poor man's fuzzing of some initial data to make sure nothing bad
      happens */
@@ -368,7 +368,7 @@ UNITTEST_START
       cert[i] = backup;
     }
   }
-  curl_easy_cleanup(data);
+  carl_easy_cleanup(data);
 }
 UNITTEST_STOP
 

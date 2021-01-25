@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/710 --proxy socks5://%HOSTIP:%SOCKSPORT
 <protocol>
 GET /710 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

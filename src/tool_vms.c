@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,10 +28,10 @@
 #include <unixlib.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
-#include "curlx.h"
+#define ENABLE_CARLX_PRINTF
+#include "carlx.h"
 
-#include "curlmsg_vms.h"
+#include "carlmsg_vms.h"
 #include "tool_vms.h"
 
 #include "memdebug.h" /* keep this as LAST include */
@@ -42,7 +42,7 @@ void decc$exit(int __status);
 static int vms_shell = -1;
 
 /* VMS has a DCL shell and and also has Unix shells ported to it.
- * When curl is running under a Unix shell, we want it to be as much
+ * When carl is running under a Unix shell, we want it to be as much
  * like Unix as possible.
  */
 int is_vms_shell(void)
@@ -99,8 +99,8 @@ void vms_special_exit(int code, int vms_show)
   }
 #endif
 
-  if(code > CURL_LAST) {   /* If CURL_LAST exceeded then */
-    vms_code = CURL_LAST;  /* curlmsg.h is out of sync.  */
+  if(code > CARL_LAST) {   /* If CARL_LAST exceeded then */
+    vms_code = CARL_LAST;  /* carlmsg.h is out of sync.  */
   }
   else {
     vms_code = vms_cond[code] | vms_show;

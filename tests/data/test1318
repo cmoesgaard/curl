@@ -46,12 +46,12 @@ HTTP with --resolve and same host name using different cases
 <protocol>
 GET /1318 HTTP/1.1
 Host: MiXeDcAsE.cOm:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /13180001 HTTP/1.1
 Host: mixedcase.com:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

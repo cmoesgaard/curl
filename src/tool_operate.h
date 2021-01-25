@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_OPERATE_H
-#define HEADER_CURL_TOOL_OPERATE_H
+#ifndef HEADER_CARL_TOOL_OPERATE_H
+#define HEADER_CARL_TOOL_OPERATE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -31,7 +31,7 @@ struct per_transfer {
   struct per_transfer *next;
   struct per_transfer *prev;
   struct OperationConfig *config; /* for this transfer */
-  CURL *curl;
+  CARL *carl;
   long retry_numretries;
   long retry_sleep_default;
   long retry_sleep;
@@ -54,7 +54,7 @@ struct per_transfer {
   struct HdrCbData hdrcbdata;
   long num_headers;
   bool was_last_header_empty;
-  char errorbuffer[CURL_ERROR_SIZE];
+  char errorbuffer[CARL_ERROR_SIZE];
 
   bool added; /* set TRUE when added to the multi handle */
   time_t startat; /* when doing parallel transfers, this is a retry transfer
@@ -62,10 +62,10 @@ struct per_transfer {
                      should get started (again) */
 
   /* for parallel progress bar */
-  curl_off_t dltotal;
-  curl_off_t dlnow;
-  curl_off_t ultotal;
-  curl_off_t ulnow;
+  carl_off_t dltotal;
+  carl_off_t dlnow;
+  carl_off_t ultotal;
+  carl_off_t ulnow;
   bool dltotal_added; /* if the total has been added from this */
   bool ultotal_added;
 
@@ -75,8 +75,8 @@ struct per_transfer {
   char *uploadfile;
 };
 
-CURLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[]);
+CARLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[]);
 
 extern struct per_transfer *transfers; /* first node */
 
-#endif /* HEADER_CURL_TOOL_OPERATE_H */
+#endif /* HEADER_CARL_TOOL_OPERATE_H */

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONNECT_H
-#define HEADER_CURL_CONNECT_H
+#ifndef HEADER_CARL_CONNECT_H
+#define HEADER_CARL_CONNECT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,25 +21,25 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include "nonblock.h" /* for curlx_nonblock(), formerly Curl_nonblock() */
+#include "nonblock.h" /* for carlx_nonblock(), formerly Curl_nonblock() */
 #include "sockaddr.h"
 #include "timeval.h"
 
-CURLcode Curl_is_connected(struct Curl_easy *data,
+CARLcode Curl_is_connected(struct Curl_easy *data,
                            struct connectdata *conn,
                            int sockindex,
                            bool *connected);
 
-CURLcode Curl_connecthost(struct Curl_easy *data,
+CARLcode Curl_connecthost(struct Curl_easy *data,
                           struct connectdata *conn,
                           const struct Curl_dns_entry *host);
 
 /* generic function that returns how much time there's left to run, according
    to the timeouts set */
 timediff_t Curl_timeleft(struct Curl_easy *data,
-                         struct curltime *nowp,
+                         struct carltime *nowp,
                          bool duringconnect);
 
 #define DEFAULT_CONNECT_TIMEOUT 300000 /* milliseconds == five minutes */
@@ -48,12 +48,12 @@ timediff_t Curl_timeleft(struct Curl_easy *data,
  * Used to extract socket and connectdata struct for the most recent
  * transfer on the given Curl_easy.
  *
- * The returned socket will be CURL_SOCKET_BAD in case of failure!
+ * The returned socket will be CARL_SOCKET_BAD in case of failure!
  */
-curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
+carl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
                                   struct connectdata **connp);
 
-bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
+bool Curl_addr2string(struct sockaddr *sa, carl_socklen_t salen,
                       char *addr, long *port);
 
 /*
@@ -71,24 +71,24 @@ bool Curl_connalive(struct connectdata *conn);
    Buffer Size
 
 */
-void Curl_sndbufset(curl_socket_t sockfd);
+void Curl_sndbufset(carl_socket_t sockfd);
 #else
 #define Curl_sndbufset(y) Curl_nop_stmt
 #endif
 
 void Curl_updateconninfo(struct Curl_easy *data, struct connectdata *conn,
-                         curl_socket_t sockfd);
+                         carl_socket_t sockfd);
 void Curl_conninfo_remote(struct Curl_easy *data, struct connectdata *conn,
-                          curl_socket_t sockfd);
+                          carl_socket_t sockfd);
 void Curl_conninfo_local(struct Curl_easy *data, struct connectdata *conn,
-                         curl_socket_t sockfd);
+                         carl_socket_t sockfd);
 void Curl_persistconninfo(struct Curl_easy *data, struct connectdata *conn);
 int Curl_closesocket(struct Curl_easy *data, struct connectdata *conn,
-                     curl_socket_t sock);
+                     carl_socket_t sock);
 
 /*
- * The Curl_sockaddr_ex structure is basically libcurl's external API
- * curl_sockaddr structure with enough space available to directly hold any
+ * The Curl_sockaddr_ex structure is basically libcarl's external API
+ * carl_sockaddr structure with enough space available to directly hold any
  * protocol-specific address structures. The variable declared here will be
  * used to pass / receive data to/from the fopensocket callback if this has
  * been set, before that, it is initialized from parameters.
@@ -112,10 +112,10 @@ struct Curl_sockaddr_ex {
  * socket callback is set, used that!
  *
  */
-CURLcode Curl_socket(struct Curl_easy *data,
+CARLcode Curl_socket(struct Curl_easy *data,
                      const struct Curl_addrinfo *ai,
                      struct Curl_sockaddr_ex *addr,
-                     curl_socket_t *sockfd);
+                     carl_socket_t *sockfd);
 
 /*
  * Curl_conncontrol() marks the end of a connection/stream. The 'closeit'
@@ -135,16 +135,16 @@ CURLcode Curl_socket(struct Curl_easy *data,
 
 void Curl_conncontrol(struct connectdata *conn,
                       int closeit
-#if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
+#if defined(DEBUGBUILD) && !defined(CARL_DISABLE_VERBOSE_STRINGS)
                       , const char *reason
 #endif
   );
 
-#if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
+#if defined(DEBUGBUILD) && !defined(CARL_DISABLE_VERBOSE_STRINGS)
 #define streamclose(x,y) Curl_conncontrol(x, CONNCTRL_STREAM, y)
 #define connclose(x,y) Curl_conncontrol(x, CONNCTRL_CONNECTION, y)
 #define connkeep(x,y) Curl_conncontrol(x, CONNCTRL_KEEP, y)
-#else /* if !DEBUGBUILD || CURL_DISABLE_VERBOSE_STRINGS */
+#else /* if !DEBUGBUILD || CARL_DISABLE_VERBOSE_STRINGS */
 #define streamclose(x,y) Curl_conncontrol(x, CONNCTRL_STREAM)
 #define connclose(x,y) Curl_conncontrol(x, CONNCTRL_CONNECTION)
 #define connkeep(x,y) Curl_conncontrol(x, CONNCTRL_KEEP)
@@ -152,4 +152,4 @@ void Curl_conncontrol(struct connectdata *conn,
 
 bool Curl_conn_data_pending(struct connectdata *conn, int sockindex);
 
-#endif /* HEADER_CURL_CONNECT_H */
+#endif /* HEADER_CARL_CONNECT_H */

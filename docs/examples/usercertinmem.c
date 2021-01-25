@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,7 +32,7 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <stdio.h>
 
 static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -41,7 +41,7 @@ static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream)
   return (nmemb*size);
 }
 
-static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
+static CARLcode sslctx_function(CARL *carl, void *sslctx, void *parm)
 {
   X509 *cert = NULL;
   BIO *bio = NULL;
@@ -113,7 +113,7 @@ static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"\
     "-----END RSA PRIVATE KEY-----\n";
 
-  (void)curl; /* avoid warnings */
+  (void)carl; /* avoid warnings */
   (void)parm; /* avoid warnings */
 
   /* get a BIO */
@@ -169,38 +169,38 @@ static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
     X509_free(cert);
 
   /* all set to go */
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 int main(void)
 {
-  CURL *ch;
-  CURLcode rv;
+  CARL *ch;
+  CARLcode rv;
 
-  curl_global_init(CURL_GLOBAL_ALL);
-  ch = curl_easy_init();
-  curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
-  curl_easy_setopt(ch, CURLOPT_HEADER, 0L);
-  curl_easy_setopt(ch, CURLOPT_NOPROGRESS, 1L);
-  curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
-  curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, writefunction);
-  curl_easy_setopt(ch, CURLOPT_WRITEDATA, stdout);
-  curl_easy_setopt(ch, CURLOPT_HEADERFUNCTION, writefunction);
-  curl_easy_setopt(ch, CURLOPT_HEADERDATA, stderr);
-  curl_easy_setopt(ch, CURLOPT_SSLCERTTYPE, "PEM");
+  carl_global_init(CARL_GLOBAL_ALL);
+  ch = carl_easy_init();
+  carl_easy_setopt(ch, CARLOPT_VERBOSE, 0L);
+  carl_easy_setopt(ch, CARLOPT_HEADER, 0L);
+  carl_easy_setopt(ch, CARLOPT_NOPROGRESS, 1L);
+  carl_easy_setopt(ch, CARLOPT_NOSIGNAL, 1L);
+  carl_easy_setopt(ch, CARLOPT_WRITEFUNCTION, writefunction);
+  carl_easy_setopt(ch, CARLOPT_WRITEDATA, stdout);
+  carl_easy_setopt(ch, CARLOPT_HEADERFUNCTION, writefunction);
+  carl_easy_setopt(ch, CARLOPT_HEADERDATA, stderr);
+  carl_easy_setopt(ch, CARLOPT_SSLCERTTYPE, "PEM");
 
   /* both VERIFYPEER and VERIFYHOST are set to 0 in this case because there is
      no CA certificate*/
 
-  curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(ch, CURLOPT_SSL_VERIFYHOST, 0L);
-  curl_easy_setopt(ch, CURLOPT_URL, "https://www.example.com/");
-  curl_easy_setopt(ch, CURLOPT_SSLKEYTYPE, "PEM");
+  carl_easy_setopt(ch, CARLOPT_SSL_VERIFYPEER, 0L);
+  carl_easy_setopt(ch, CARLOPT_SSL_VERIFYHOST, 0L);
+  carl_easy_setopt(ch, CARLOPT_URL, "https://www.example.com/");
+  carl_easy_setopt(ch, CARLOPT_SSLKEYTYPE, "PEM");
 
   /* first try: retrieve page without user certificate and key -> will fail
    */
-  rv = curl_easy_perform(ch);
-  if(rv == CURLE_OK) {
+  rv = carl_easy_perform(ch);
+  if(rv == CARLE_OK) {
     printf("*** transfer succeeded ***\n");
   }
   else {
@@ -211,16 +211,16 @@ int main(void)
    * load the certificate and key by installing a function doing the necessary
    * "modifications" to the SSL CONTEXT just before link init
    */
-  curl_easy_setopt(ch, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
-  rv = curl_easy_perform(ch);
-  if(rv == CURLE_OK) {
+  carl_easy_setopt(ch, CARLOPT_SSL_CTX_FUNCTION, sslctx_function);
+  rv = carl_easy_perform(ch);
+  if(rv == CARLE_OK) {
     printf("*** transfer succeeded ***\n");
   }
   else {
     printf("*** transfer failed ***\n");
   }
 
-  curl_easy_cleanup(ch);
-  curl_global_cleanup();
+  carl_easy_cleanup(ch);
+  carl_global_cleanup();
   return rv;
 }

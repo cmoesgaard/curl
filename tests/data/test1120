@@ -29,14 +29,14 @@ ftp://%HOSTIP:%FTPPORT/a/path/1120
 
 # Verify data after the test has been "shot"
 <verify>
-# Strip all valid kinds of PORT and EPRT that curl can send
+# Strip all valid kinds of PORT and EPRT that carl can send
 <protocol>
 USER anonymous
 PASS ftp@example.com
 PWD
 CWD a
 </protocol>
-# CURLE_OPERATION_TIMEDOUT is 28
+# CARLE_OPERATION_TIMEDOUT is 28
 <errorcode>
 28
 </errorcode>

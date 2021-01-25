@@ -1,0 +1,59 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_KRBLEVEL 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_KRBLEVEL \- set FTP kerberos security level
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_KRBLEVEL, char *level);
+.SH DESCRIPTION
+Pass a char * as parameter. Set the kerberos security level for FTP; this also
+enables kerberos awareness.  This is a string that should match one of the
+following: \&'clear', \&'safe', \&'confidential' or \&'private'.  If the
+string is set but doesn't match one of these, 'private' will be used. Set the
+string to NULL to disable kerberos support for FTP.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+FTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/foo.bin");
+  carl_easy_setopt(carl, CARLOPT_KRBLEVEL, "private");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+This option was known as CARLOPT_KRB4LEVEL up to 7.16.3
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_KRBLEVEL "(3), " CARLOPT_USE_SSL "(3), "

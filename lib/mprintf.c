@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -35,11 +35,11 @@
  * page at https://daniel.haxx.se/projects/trio/
  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 #include "dynbuf.h"
-#include <curl/mprintf.h>
+#include <carl/mprintf.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -323,7 +323,7 @@ static int dprintf_Pass1(const char *format, struct va_stack *vto,
           break;
 #if defined(MP_HAVE_INT_EXTENSIONS)
         case 'I':
-#if (SIZEOF_CURL_OFF_T > SIZEOF_LONG)
+#if (SIZEOF_CARL_OFF_T > SIZEOF_LONG)
           flags |= FLAGS_LONGLONG;
 #else
           flags |= FLAGS_LONG;
@@ -352,7 +352,7 @@ static int dprintf_Pass1(const char *format, struct va_stack *vto,
 #endif
           break;
         case 'O':
-#if (SIZEOF_CURL_OFF_T > SIZEOF_LONG)
+#if (SIZEOF_CARL_OFF_T > SIZEOF_LONG)
           flags |= FLAGS_LONGLONG;
 #else
           flags |= FLAGS_LONG;
@@ -919,7 +919,7 @@ static int dprintf_formatf(
           if(width >= (long)sizeof(work))
             width = sizeof(work)-1;
           /* RECURSIVE USAGE */
-          len = curl_msnprintf(fptr, left, "%ld", width);
+          len = carl_msnprintf(fptr, left, "%ld", width);
           fptr += len;
           left -= len;
         }
@@ -940,7 +940,7 @@ static int dprintf_formatf(
           if(prec < 0)
             prec = 0;
           /* RECURSIVE USAGE */
-          len = curl_msnprintf(fptr, left, ".%ld", prec);
+          len = carl_msnprintf(fptr, left, ".%ld", prec);
           fptr += len;
         }
         if(p->flags & FLAGS_LONG)
@@ -1004,7 +1004,7 @@ static int addbyter(int output, FILE *data)
   return -1;
 }
 
-int curl_mvsnprintf(char *buffer, size_t maxlength, const char *format,
+int carl_mvsnprintf(char *buffer, size_t maxlength, const char *format,
                     va_list ap_save)
 {
   int retcode;
@@ -1026,12 +1026,12 @@ int curl_mvsnprintf(char *buffer, size_t maxlength, const char *format,
   return retcode;
 }
 
-int curl_msnprintf(char *buffer, size_t maxlength, const char *format, ...)
+int carl_msnprintf(char *buffer, size_t maxlength, const char *format, ...)
 {
   int retcode;
   va_list ap_save; /* argument pointer */
   va_start(ap_save, format);
-  retcode = curl_mvsnprintf(buffer, maxlength, format, ap_save);
+  retcode = carl_mvsnprintf(buffer, maxlength, format, ap_save);
   va_end(ap_save);
   return retcode;
 }
@@ -1068,7 +1068,7 @@ int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save)
   return 0;
 }
 
-char *curl_mvaprintf(const char *format, va_list ap_save)
+char *carl_mvaprintf(const char *format, va_list ap_save)
 {
   int retcode;
   struct asprintf info;
@@ -1087,12 +1087,12 @@ char *curl_mvaprintf(const char *format, va_list ap_save)
   return strdup("");
 }
 
-char *curl_maprintf(const char *format, ...)
+char *carl_maprintf(const char *format, ...)
 {
   va_list ap_save;
   char *s;
   va_start(ap_save, format);
-  s = curl_mvaprintf(format, ap_save);
+  s = carl_mvaprintf(format, ap_save);
   va_end(ap_save);
   return s;
 }
@@ -1106,7 +1106,7 @@ static int storebuffer(int output, FILE *data)
   return outc; /* act like fputc() ! */
 }
 
-int curl_msprintf(char *buffer, const char *format, ...)
+int carl_msprintf(char *buffer, const char *format, ...)
 {
   va_list ap_save; /* argument pointer */
   int retcode;
@@ -1117,7 +1117,7 @@ int curl_msprintf(char *buffer, const char *format, ...)
   return retcode;
 }
 
-int curl_mprintf(const char *format, ...)
+int carl_mprintf(const char *format, ...)
 {
   int retcode;
   va_list ap_save; /* argument pointer */
@@ -1128,7 +1128,7 @@ int curl_mprintf(const char *format, ...)
   return retcode;
 }
 
-int curl_mfprintf(FILE *whereto, const char *format, ...)
+int carl_mfprintf(FILE *whereto, const char *format, ...)
 {
   int retcode;
   va_list ap_save; /* argument pointer */
@@ -1138,7 +1138,7 @@ int curl_mfprintf(FILE *whereto, const char *format, ...)
   return retcode;
 }
 
-int curl_mvsprintf(char *buffer, const char *format, va_list ap_save)
+int carl_mvsprintf(char *buffer, const char *format, va_list ap_save)
 {
   int retcode;
   retcode = dprintf_formatf(&buffer, storebuffer, format, ap_save);
@@ -1146,12 +1146,12 @@ int curl_mvsprintf(char *buffer, const char *format, va_list ap_save)
   return retcode;
 }
 
-int curl_mvprintf(const char *format, va_list ap_save)
+int carl_mvprintf(const char *format, va_list ap_save)
 {
   return dprintf_formatf(stdout, fputc, format, ap_save);
 }
 
-int curl_mvfprintf(FILE *whereto, const char *format, va_list ap_save)
+int carl_mvfprintf(FILE *whereto, const char *format, va_list ap_save)
 {
   return dprintf_formatf(whereto, fputc, format, ap_save);
 }

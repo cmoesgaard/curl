@@ -17,7 +17,7 @@
 none
 </server>
  <name>
-curl invalid category --help
+carl invalid category --help
  </name>
  <command>
 --help sdfafdsfadsfsd
@@ -31,12 +31,12 @@ curl invalid category --help
 0
 </errorcode>
 <stdout mode="text">
-Usage: curl [options...] <url>
+Usage: carl [options...] <url>
 Invalid category provided, here is a list of all categories:
 
  auth        Different types of authentication methods
  connection  Low level networking operations
- curl        The command line tool itself
+ carl        The command line tool itself
  dns         General DNS options
  file        FILE protocol options
  ftp         FTP protocol options
@@ -55,7 +55,7 @@ Invalid category provided, here is a list of all categories:
  tftp        TFTP protocol options
  tls         All TLS/SSL related options
  upload      All options for uploads
- verbose     Options related to any kind of command line output of curl
+ verbose     Options related to any kind of command line output of carl
 </stdout>
 </verify>
 </testcase>

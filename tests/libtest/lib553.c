@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -57,20 +57,20 @@ static char buf[SIZE_HEADERS + 100];
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_FAILED_INIT;
+  CARL *carl;
+  CARLcode res = CARLE_FAILED_INIT;
   int i;
-  struct curl_slist *headerlist = NULL, *hl;
+  struct carl_slist *headerlist = NULL, *hl;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
@@ -78,38 +78,38 @@ int test(char *URL)
     int len = msnprintf(buf, sizeof(buf), "Header%d: ", i);
     memset(&buf[len], 'A', SIZE_HEADERS);
     buf[len + SIZE_HEADERS] = 0; /* null-terminate */
-    hl = curl_slist_append(headerlist,  buf);
+    hl = carl_slist_append(headerlist,  buf);
     if(!hl)
       goto test_cleanup;
     headerlist = hl;
   }
 
-  hl = curl_slist_append(headerlist, "Expect: ");
+  hl = carl_slist_append(headerlist, "Expect: ");
   if(!hl)
     goto test_cleanup;
   headerlist = hl;
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-  test_setopt(curl, CURLOPT_POST, 1L);
-#ifdef CURL_DOES_CONVERSIONS
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_HTTPHEADER, headerlist);
+  test_setopt(carl, CARLOPT_POST, 1L);
+#ifdef CARL_DOES_CONVERSIONS
   /* Convert the POST data to ASCII */
-  test_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
+  test_setopt(carl, CARLOPT_TRANSFERTEXT, 1L);
 #endif
-  test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)POSTLEN);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_HEADER, 1L);
-  test_setopt(curl, CURLOPT_READFUNCTION, myreadfunc);
+  test_setopt(carl, CARLOPT_POSTFIELDSIZE, (long)POSTLEN);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_READFUNCTION, myreadfunc);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
-  curl_slist_free_all(headerlist);
+  carl_slist_free_all(headerlist);
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return (int)res;
 }

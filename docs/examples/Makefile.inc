@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 #
 ###########################################################################
 
-# These are all libcurl example programs to be test compiled
+# These are all libcarl example programs to be test compiled
 check_PROGRAMS = 10-at-a-time anyauthput cookie_interface debug fileupload \
   fopen ftpget ftpgetresp ftpupload getinfo getinmemory http-post httpput  \
   https multi-app multi-debugcallback multi-double multi-post multi-single \
@@ -40,7 +40,7 @@ check_PROGRAMS = 10-at-a-time anyauthput cookie_interface debug fileupload \
 
 # These examples require external dependencies that may not be commonly
 # available on POSIX systems, so don't bother attempting to compile them here.
-COMPLICATED_EXAMPLES = curlgtk.c curlx.c htmltitle.cpp cacertinmem.c \
+COMPLICATED_EXAMPLES = carlgtk.c carlx.c htmltitle.cpp cacertinmem.c \
   ghiper.c hiperfifo.c htmltidy.c multithread.c opensslthreadlock.c \
   sampleconv.c synctime.c threaded-ssl.c evhiperfifo.c \
   smooth-gtk-thread.c version-check.pl href_extractor.c \

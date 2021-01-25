@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 /*
- * The purpose of this test is to minimally exercise libcurl's internal
- * curl_m*printf formatting capabilities and handling of some data types.
+ * The purpose of this test is to minimally exercise libcarl's internal
+ * carl_m*printf formatting capabilities and handling of some data types.
  */
 
 #include "test.h"
@@ -35,20 +35,20 @@
 
 #include "memdebug.h"
 
-#if (SIZEOF_CURL_OFF_T > SIZEOF_LONG)
-#  define MPRNT_SUFFIX_CURL_OFF_T  LL
+#if (SIZEOF_CARL_OFF_T > SIZEOF_LONG)
+#  define MPRNT_SUFFIX_CARL_OFF_T  LL
 #else
-#  define MPRNT_SUFFIX_CURL_OFF_T  L
+#  define MPRNT_SUFFIX_CARL_OFF_T  L
 #endif
 
 
-#ifdef CURL_ISOCPP
+#ifdef CARL_ISOCPP
 #  define MPRNT_OFF_T_C_HELPER2(Val,Suffix) Val ## Suffix
 #else
 #  define MPRNT_OFF_T_C_HELPER2(Val,Suffix) Val/**/Suffix
 #endif
 #define MPRNT_OFF_T_C_HELPER1(Val,Suffix) MPRNT_OFF_T_C_HELPER2(Val,Suffix)
-#define MPRNT_OFF_T_C(Val)  MPRNT_OFF_T_C_HELPER1(Val,MPRNT_SUFFIX_CURL_OFF_T)
+#define MPRNT_OFF_T_C(Val)  MPRNT_OFF_T_C_HELPER1(Val,MPRNT_SUFFIX_CARL_OFF_T)
 
 
 #define BUFSZ    256
@@ -103,8 +103,8 @@ struct siglong_st {
 };
 
 
-struct curloff_st {
-  curl_off_t num;       /* curl_off_t      */
+struct carloff_st {
+  carl_off_t num;       /* carl_off_t      */
   const char *expected; /* expected string */
   char result[BUFSZ];   /* result string   */
 };
@@ -116,7 +116,7 @@ static struct unsint_st   ui_test[UINT_TESTS_ARRSZ];
 static struct sigint_st   si_test[SINT_TESTS_ARRSZ];
 static struct unslong_st  ul_test[ULONG_TESTS_ARRSZ];
 static struct siglong_st  sl_test[SLONG_TESTS_ARRSZ];
-static struct curloff_st  co_test[COFFT_TESTS_ARRSZ];
+static struct carloff_st  co_test[COFFT_TESTS_ARRSZ];
 
 
 static int test_unsigned_short_formatting(void)
@@ -205,7 +205,7 @@ static int test_unsigned_short_formatting(void)
       us_test[i].result[j] = 'X';
     us_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(us_test[i].result, "%hu", us_test[i].num);
+    (void)carl_msprintf(us_test[i].result, "%hu", us_test[i].num);
 
     if(memcmp(us_test[i].result,
                us_test[i].expected,
@@ -218,9 +218,9 @@ static int test_unsigned_short_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() unsigned short tests OK!\n");
+    printf("All carl_mprintf() unsigned short tests OK!\n");
   else
-    printf("Some curl_mprintf() unsigned short tests Failed!\n");
+    printf("Some carl_mprintf() unsigned short tests Failed!\n");
 
   return failed;
 }
@@ -375,7 +375,7 @@ static int test_signed_short_formatting(void)
       ss_test[i].result[j] = 'X';
     ss_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(ss_test[i].result, "%hd", ss_test[i].num);
+    (void)carl_msprintf(ss_test[i].result, "%hd", ss_test[i].num);
 
     if(memcmp(ss_test[i].result,
               ss_test[i].expected,
@@ -388,9 +388,9 @@ static int test_signed_short_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() signed short tests OK!\n");
+    printf("All carl_mprintf() signed short tests OK!\n");
   else
-    printf("Some curl_mprintf() signed short tests Failed!\n");
+    printf("Some carl_mprintf() signed short tests Failed!\n");
 
   return failed;
 }
@@ -525,7 +525,7 @@ static int test_unsigned_int_formatting(void)
       ui_test[i].result[j] = 'X';
     ui_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(ui_test[i].result, "%u", ui_test[i].num);
+    (void)carl_msprintf(ui_test[i].result, "%u", ui_test[i].num);
 
     if(memcmp(ui_test[i].result,
                ui_test[i].expected,
@@ -538,9 +538,9 @@ static int test_unsigned_int_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() unsigned int tests OK!\n");
+    printf("All carl_mprintf() unsigned int tests OK!\n");
   else
-    printf("Some curl_mprintf() unsigned int tests Failed!\n");
+    printf("Some carl_mprintf() unsigned int tests Failed!\n");
 
   return failed;
 }
@@ -753,7 +753,7 @@ static int test_signed_int_formatting(void)
       si_test[i].result[j] = 'X';
     si_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(si_test[i].result, "%d", si_test[i].num);
+    (void)carl_msprintf(si_test[i].result, "%d", si_test[i].num);
 
     if(memcmp(si_test[i].result,
               si_test[i].expected,
@@ -766,9 +766,9 @@ static int test_signed_int_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() signed int tests OK!\n");
+    printf("All carl_mprintf() signed int tests OK!\n");
   else
-    printf("Some curl_mprintf() signed int tests Failed!\n");
+    printf("Some carl_mprintf() signed int tests Failed!\n");
 
   return failed;
 }
@@ -902,7 +902,7 @@ static int test_unsigned_long_formatting(void)
       ul_test[i].result[j] = 'X';
     ul_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(ul_test[i].result, "%lu", ul_test[i].num);
+    (void)carl_msprintf(ul_test[i].result, "%lu", ul_test[i].num);
 
     if(memcmp(ul_test[i].result,
                ul_test[i].expected,
@@ -915,9 +915,9 @@ static int test_unsigned_long_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() unsigned long tests OK!\n");
+    printf("All carl_mprintf() unsigned long tests OK!\n");
   else
-    printf("Some curl_mprintf() unsigned long tests Failed!\n");
+    printf("Some carl_mprintf() unsigned long tests Failed!\n");
 
   return failed;
 }
@@ -1130,7 +1130,7 @@ static int test_signed_long_formatting(void)
       sl_test[i].result[j] = 'X';
     sl_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(sl_test[i].result, "%ld", sl_test[i].num);
+    (void)carl_msprintf(sl_test[i].result, "%ld", sl_test[i].num);
 
     if(memcmp(sl_test[i].result,
               sl_test[i].expected,
@@ -1143,21 +1143,21 @@ static int test_signed_long_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() signed long tests OK!\n");
+    printf("All carl_mprintf() signed long tests OK!\n");
   else
-    printf("Some curl_mprintf() signed long tests Failed!\n");
+    printf("Some carl_mprintf() signed long tests Failed!\n");
 
   return failed;
 }
 
 
-static int test_curl_off_t_formatting(void)
+static int test_carl_off_t_formatting(void)
 {
   int i, j;
   int num_cofft_tests = 0;
   int failed = 0;
 
-#if (SIZEOF_CURL_OFF_T == 2)
+#if (SIZEOF_CARL_OFF_T == 2)
 
   i = 1; co_test[i].num = MPRNT_OFF_T_C(0x7FFF); co_test[i].expected = "32767";
   i++; co_test[i].num = MPRNT_OFF_T_C(0x7FFE); co_test[i].expected = "32766";
@@ -1200,7 +1200,7 @@ static int test_curl_off_t_formatting(void)
 
   num_cofft_tests = i;
 
-#elif (SIZEOF_CURL_OFF_T == 4)
+#elif (SIZEOF_CARL_OFF_T == 4)
 
   i = 1; co_test[i].num = MPRNT_OFF_T_C(0x7FFFFFFF); co_test[i].expected = "2147483647";
   i++; co_test[i].num = MPRNT_OFF_T_C(0x7FFFFFFE); co_test[i].expected = "2147483646";
@@ -1267,7 +1267,7 @@ static int test_curl_off_t_formatting(void)
 
   num_cofft_tests = i;
 
-#elif (SIZEOF_CURL_OFF_T == 8)
+#elif (SIZEOF_CARL_OFF_T == 8)
 
   i = 1; co_test[i].num = MPRNT_OFF_T_C(0x7FFFFFFFFFFFFFFF); co_test[i].expected = "9223372036854775807";
   i++; co_test[i].num = MPRNT_OFF_T_C(0x7FFFFFFFFFFFFFFE); co_test[i].expected = "9223372036854775806";
@@ -1358,13 +1358,13 @@ static int test_curl_off_t_formatting(void)
       co_test[i].result[j] = 'X';
     co_test[i].result[BUFSZ-1] = '\0';
 
-    (void)curl_msprintf(co_test[i].result, "%" CURL_FORMAT_CURL_OFF_T,
+    (void)carl_msprintf(co_test[i].result, "%" CARL_FORMAT_CARL_OFF_T,
                         co_test[i].num);
 
     if(memcmp(co_test[i].result,
               co_test[i].expected,
               strlen(co_test[i].expected))) {
-      printf("curl_off_t test #%.2d: Failed (Expected: %s Got: %s)\n",
+      printf("carl_off_t test #%.2d: Failed (Expected: %s Got: %s)\n",
              i, co_test[i].expected, co_test[i].result);
       failed++;
     }
@@ -1372,9 +1372,9 @@ static int test_curl_off_t_formatting(void)
   }
 
   if(!failed)
-    printf("All curl_mprintf() curl_off_t tests OK!\n");
+    printf("All carl_mprintf() carl_off_t tests OK!\n");
   else
-    printf("Some curl_mprintf() curl_off_t tests Failed!\n");
+    printf("Some carl_mprintf() carl_off_t tests Failed!\n");
 
   return failed;
 }
@@ -1413,31 +1413,31 @@ static int test_string_formatting(void)
 {
   int errors = 0;
   char buf[256];
-  curl_msnprintf(buf, sizeof(buf), "%0*d%s", 2, 9, "foo");
+  carl_msnprintf(buf, sizeof(buf), "%0*d%s", 2, 9, "foo");
   errors += string_check(buf, "09foo");
 
-  curl_msnprintf(buf, sizeof(buf), "%*.*s", 5, 2, "foo");
+  carl_msnprintf(buf, sizeof(buf), "%*.*s", 5, 2, "foo");
   errors += string_check(buf, "   fo");
 
-  curl_msnprintf(buf, sizeof(buf), "%*.*s", 2, 5, "foo");
+  carl_msnprintf(buf, sizeof(buf), "%*.*s", 2, 5, "foo");
   errors += string_check(buf, "foo");
 
-  curl_msnprintf(buf, sizeof(buf), "%*.*s", 0, 10, "foo");
+  carl_msnprintf(buf, sizeof(buf), "%*.*s", 0, 10, "foo");
   errors += string_check(buf, "foo");
 
-  curl_msnprintf(buf, sizeof(buf), "%-10s", "foo");
+  carl_msnprintf(buf, sizeof(buf), "%-10s", "foo");
   errors += string_check(buf, "foo       ");
 
-  curl_msnprintf(buf, sizeof(buf), "%10s", "foo");
+  carl_msnprintf(buf, sizeof(buf), "%10s", "foo");
   errors += string_check(buf, "       foo");
 
-  curl_msnprintf(buf, sizeof(buf), "%*.*s", -10, -10, "foo");
+  carl_msnprintf(buf, sizeof(buf), "%*.*s", -10, -10, "foo");
   errors += string_check(buf, "foo       ");
 
   if(!errors)
-    printf("All curl_mprintf() strings tests OK!\n");
+    printf("All carl_mprintf() strings tests OK!\n");
   else
-    printf("Some curl_mprintf() string tests Failed!\n");
+    printf("Some carl_mprintf() string tests Failed!\n");
 
   return errors;
 }
@@ -1449,7 +1449,7 @@ static int test_weird_arguments(void)
   int rc;
 
   /* MAX_PARAMETERS is 128, try exact 128! */
-  rc = curl_msnprintf(buf, sizeof(buf),
+  rc = carl_msnprintf(buf, sizeof(buf),
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 */
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 1 */
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 2 */
@@ -1479,7 +1479,7 @@ static int test_weird_arguments(void)
                       0, 1, 2, 3, 4, 5, 6, 7); /* 8 */
 
   if(rc != 128) {
-    printf("curl_mprintf() returned %d and not 128!\n", rc);
+    printf("carl_mprintf() returned %d and not 128!\n", rc);
     errors++;
   }
 
@@ -1501,7 +1501,7 @@ static int test_weird_arguments(void)
 
   /* MAX_PARAMETERS is 128, try more! */
   buf[0] = 0;
-  rc = curl_msnprintf(buf, sizeof(buf),
+  rc = carl_msnprintf(buf, sizeof(buf),
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 */
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 1 */
                       "%d%d%d%d%d%d%d%d%d%d" /* 10 2 */
@@ -1531,7 +1531,7 @@ static int test_weird_arguments(void)
                       0, 1, 2, 3, 4, 5, 6, 7, 8);   /* 9 */
 
   if(rc != -1) {
-    printf("curl_mprintf() returned %d and not -1!\n", rc);
+    printf("carl_mprintf() returned %d and not -1!\n", rc);
     errors++;
   }
 
@@ -1539,17 +1539,17 @@ static int test_weird_arguments(void)
 
   /* Do not skip sanity checks with parameters! */
   buf[0] = 0;
-  rc = curl_msnprintf(buf, sizeof(buf), "%d, %.*1$d", 500, 1);
+  rc = carl_msnprintf(buf, sizeof(buf), "%d, %.*1$d", 500, 1);
 
   if(rc != 256) {
-    printf("curl_mprintf() returned %d and not 256!\n", rc);
+    printf("carl_mprintf() returned %d and not 256!\n", rc);
     errors++;
   }
 
   errors += strlen_check(buf, 255);
 
   if(errors)
-    printf("Some curl_mprintf() weird arguments tests failed!\n");
+    printf("Some carl_mprintf() weird arguments tests failed!\n");
 
   return errors;
 }
@@ -1562,102 +1562,102 @@ static int test_float_formatting(void)
 {
   int errors = 0;
   char buf[512]; /* larger than max float size */
-  curl_msnprintf(buf, sizeof(buf), "%f", 9.0);
+  carl_msnprintf(buf, sizeof(buf), "%f", 9.0);
   errors += string_check(buf, "9.000000");
 
-  curl_msnprintf(buf, sizeof(buf), "%.1f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%.1f", 9.1);
   errors += string_check(buf, "9.1");
 
-  curl_msnprintf(buf, sizeof(buf), "%.2f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%.2f", 9.1);
   errors += string_check(buf, "9.10");
 
-  curl_msnprintf(buf, sizeof(buf), "%.0f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%.0f", 9.1);
   errors += string_check(buf, "9");
 
-  curl_msnprintf(buf, sizeof(buf), "%0f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%0f", 9.1);
   errors += string_check(buf, "9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%10f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%10f", 9.1);
   errors += string_check(buf, "  9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%10.3f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%10.3f", 9.1);
   errors += string_check(buf, "     9.100");
 
-  curl_msnprintf(buf, sizeof(buf), "%-10.3f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%-10.3f", 9.1);
   errors += string_check(buf, "9.100     ");
 
-  curl_msnprintf(buf, sizeof(buf), "%-10.3f", 9.123456);
+  carl_msnprintf(buf, sizeof(buf), "%-10.3f", 9.123456);
   errors += string_check(buf, "9.123     ");
 
-  curl_msnprintf(buf, sizeof(buf), "%.-2f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%.-2f", 9.1);
   errors += string_check(buf, "9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%*f", 10, 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%*f", 10, 9.1);
   errors += string_check(buf, "  9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%*f", 3, 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%*f", 3, 9.1);
   errors += string_check(buf, "9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.2987654);
   errors += string_check(buf, "9.298765");
 
-  curl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.298765);
+  carl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.298765);
   errors += string_check(buf, "9.298765");
 
-  curl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.29876);
+  carl_msnprintf(buf, sizeof(buf), "%*f", 6, 9.29876);
   errors += string_check(buf, "9.298760");
 
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 6, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 6, 9.2987654);
   errors += string_check(buf, "9.298765");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 5, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 5, 9.2987654);
   errors += string_check(buf, "9.29877");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 4, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 4, 9.2987654);
   errors += string_check(buf, "9.2988");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 3, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 3, 9.2987654);
   errors += string_check(buf, "9.299");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 2, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 2, 9.2987654);
   errors += string_check(buf, "9.30");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 1, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 1, 9.2987654);
   errors += string_check(buf, "9.3");
-  curl_msnprintf(buf, sizeof(buf), "%.*f", 0, 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", 0, 9.2987654);
   errors += string_check(buf, "9");
 
   /* very large precisions easily turn into system specific outputs so we only
      check the output buffer length here as we know the internal limit */
 
-  curl_msnprintf(buf, sizeof(buf), "%.*f", (1<<30), 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%.*f", (1<<30), 9.2987654);
   errors += strlen_check(buf, 325);
 
-  curl_msnprintf(buf, sizeof(buf), "%10000.10000f", 9.2987654);
+  carl_msnprintf(buf, sizeof(buf), "%10000.10000f", 9.2987654);
   errors += strlen_check(buf, 325);
 
-  curl_msnprintf(buf, sizeof(buf), "%240.10000f",
+  carl_msnprintf(buf, sizeof(buf), "%240.10000f",
                  123456789123456789123456789.2987654);
   errors += strlen_check(buf, 325);
 
   /* check negative when used signed */
-  curl_msnprintf(buf, sizeof(buf), "%*f", INT_MIN, 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%*f", INT_MIN, 9.1);
   errors += string_check(buf, "9.100000");
 
-  /* curl_msnprintf() limits a single float output to 325 bytes maximum
+  /* carl_msnprintf() limits a single float output to 325 bytes maximum
      width */
-  curl_msnprintf(buf, sizeof(buf), "%*f", (1<<30), 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%*f", (1<<30), 9.1);
   errors += string_check(buf, "                                                                                                                                                                                                                                                                                                                             9.100000");
-  curl_msnprintf(buf, sizeof(buf), "%100000f", 9.1);
+  carl_msnprintf(buf, sizeof(buf), "%100000f", 9.1);
   errors += string_check(buf, "                                                                                                                                                                                                                                                                                                                             9.100000");
 
-  curl_msnprintf(buf, sizeof(buf), "%f", MAXIMIZE);
+  carl_msnprintf(buf, sizeof(buf), "%f", MAXIMIZE);
   errors += strlen_check(buf, 317);
 
-  curl_msnprintf(buf, 2, "%f", MAXIMIZE);
+  carl_msnprintf(buf, 2, "%f", MAXIMIZE);
   errors += strlen_check(buf, 1);
-  curl_msnprintf(buf, 3, "%f", MAXIMIZE);
+  carl_msnprintf(buf, 3, "%f", MAXIMIZE);
   errors += strlen_check(buf, 2);
-  curl_msnprintf(buf, 4, "%f", MAXIMIZE);
+  carl_msnprintf(buf, 4, "%f", MAXIMIZE);
   errors += strlen_check(buf, 3);
-  curl_msnprintf(buf, 5, "%f", MAXIMIZE);
+  carl_msnprintf(buf, 5, "%f", MAXIMIZE);
   errors += strlen_check(buf, 4);
-  curl_msnprintf(buf, 6, "%f", MAXIMIZE);
+  carl_msnprintf(buf, 6, "%f", MAXIMIZE);
   errors += strlen_check(buf, 5);
 
   if(!errors)
@@ -1696,7 +1696,7 @@ int test(char *URL)
 
   errors += test_signed_long_formatting();
 
-  errors += test_curl_off_t_formatting();
+  errors += test_carl_off_t_formatting();
 
   errors += test_string_formatting();
 

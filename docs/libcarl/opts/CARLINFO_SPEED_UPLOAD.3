@@ -1,0 +1,61 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLINFO_SPEED_UPLOAD 3 "28 Aug 2015" "libcarl 7.44.0" "carl_easy_getinfo options"
+.SH NAME
+CARLINFO_SPEED_UPLOAD \- get upload speed
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_getinfo(CARL *handle, CARLINFO_SPEED_UPLOAD, double *speed);
+.SH DESCRIPTION
+Pass a pointer to a double to receive the average upload speed that carl
+measured for the complete upload. Measured in bytes/second.
+
+\fICARLINFO_SPEED_UPLOAD_T(3)\fP is a newer replacement that returns a more
+sensible variable type.
+.SH PROTOCOLS
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* Perform the request */
+  res = carl_easy_perform(carl);
+
+  if(!res) {
+    double speed;
+    res = carl_easy_getinfo(carl, CARLINFO_SPEED_UPLOAD, &speed);
+    if(!res) {
+      printf("Upload speed %.0f bytes/sec\\n", ul);
+    }
+  }
+}
+.fi
+.SH AVAILABILITY
+Added in
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR carl_easy_getinfo "(3), " carl_easy_setopt "(3), "
+.BR CARLINFO_SPEED_DOWNLOAD "(3), "

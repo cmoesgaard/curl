@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CFGABLE_H
-#define HEADER_CURL_TOOL_CFGABLE_H
+#ifndef HEADER_CARL_TOOL_CFGABLE_H
+#define HEADER_CARL_TOOL_CFGABLE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -31,7 +31,7 @@ typedef enum {
   ERR_NONE,
   ERR_BINARY_TERMINAL = 1, /* binary to terminal detected */
   ERR_LAST
-} curl_error;
+} carl_error;
 
 struct GlobalConfig;
 
@@ -73,14 +73,14 @@ struct OperationConfig {
   long proto_redir;
   bool proto_redir_present;
   char *proto_default;
-  curl_off_t resume_from;
+  carl_off_t resume_from;
   char *postfields;
-  curl_off_t postfieldsize;
+  carl_off_t postfieldsize;
   char *referer;
   double timeout;
   double connecttimeout;
   long maxredirs;
-  curl_off_t max_filesize;
+  carl_off_t max_filesize;
   char *output_dir;
   char *headerfile;
   char *ftpport;
@@ -105,10 +105,10 @@ struct OperationConfig {
   char *proxy_tls_authtype;
   char *proxyuserpwd;
   char *proxy;
-  int proxyver;             /* set to CURLPROXY_HTTP* define */
+  int proxyver;             /* set to CARLPROXY_HTTP* define */
   char *noproxy;
   char *mail_from;
-  struct curl_slist *mail_rcpt;
+  struct carl_slist *mail_rcpt;
   char *mail_auth;
   bool mail_rcpt_allowfails; /* --mail-rcpt-allowfails */
   char *sasl_authzid;       /* Authorisation identity (identity to use) */
@@ -186,29 +186,29 @@ struct OperationConfig {
   bool proxybasic;
   bool proxyanyauth;
   char *writeout;           /* %-styled format string to output */
-  struct curl_slist *quote;
-  struct curl_slist *postquote;
-  struct curl_slist *prequote;
+  struct carl_slist *quote;
+  struct carl_slist *postquote;
+  struct carl_slist *prequote;
   long ssl_version;
   long ssl_version_max;
   long proxy_ssl_version;
   long ip_version;
-  long create_file_mode; /* CURLOPT_NEW_FILE_PERMS */
-  curl_TimeCond timecond;
-  curl_off_t condtime;
-  struct curl_slist *headers;
-  struct curl_slist *proxyheaders;
+  long create_file_mode; /* CARLOPT_NEW_FILE_PERMS */
+  carl_TimeCond timecond;
+  carl_off_t condtime;
+  struct carl_slist *headers;
+  struct carl_slist *proxyheaders;
   struct tool_mime *mimeroot;
   struct tool_mime *mimecurrent;
-  curl_mime *mimepost;
-  struct curl_slist *telnet_options;
-  struct curl_slist *resolve;
-  struct curl_slist *connect_to;
+  carl_mime *mimepost;
+  struct carl_slist *telnet_options;
+  struct carl_slist *resolve;
+  struct carl_slist *connect_to;
   HttpReq httpreq;
 
   /* for bandwidth limiting features: */
-  curl_off_t sendpersecond; /* send to peer */
-  curl_off_t recvpersecond; /* receive from peer */
+  carl_off_t sendpersecond; /* send to peer */
+  carl_off_t recvpersecond; /* receive from peer */
 
   bool ftp_ssl;
   bool ftp_ssl_reqd;
@@ -277,11 +277,11 @@ struct OperationConfig {
   double expect100timeout;
   bool suppress_connect_headers;  /* suppress proxy CONNECT response headers
                                      from user callbacks */
-  curl_error synthetic_error;     /* if non-zero, it overrides any libcurl
+  carl_error synthetic_error;     /* if non-zero, it overrides any libcarl
                                      error */
   bool ssh_compression;           /* enable/disable SSH compression */
   long happy_eyeballs_timeout_ms; /* happy eyeballs timeout in milliseconds.
-                                     0 is valid. default: CURL_HET_DEFAULT. */
+                                     0 is valid. default: CARL_HET_DEFAULT. */
   bool haproxy_protocol;          /* whether to send HAProxy protocol v1 */
   bool disallow_username_in_url;  /* disallow usernames in URLs */
   char *aws_sigv4_provider;
@@ -305,11 +305,11 @@ struct GlobalConfig {
   bool trace_fopened;
   trace tracetype;
   bool tracetime;                 /* include timestamp? */
-  int progressmode;               /* CURL_PROGRESS_BAR / CURL_PROGRESS_STATS */
-  char *libcurl;                  /* Output libcurl code to this file name */
+  int progressmode;               /* CARL_PROGRESS_BAR / CARL_PROGRESS_STATS */
+  char *libcarl;                  /* Output libcarl code to this file name */
   bool fail_early;                /* exit on first transfer error */
   bool styled_output;             /* enable fancy output style detection */
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
   bool test_event_based;
 #endif
   bool parallel;
@@ -324,4 +324,4 @@ struct GlobalConfig {
 void config_init(struct OperationConfig *config);
 void config_free(struct OperationConfig *config);
 
-#endif /* HEADER_CURL_TOOL_CFGABLE_H */
+#endif /* HEADER_CARL_TOOL_CFGABLE_H */

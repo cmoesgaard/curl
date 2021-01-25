@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 #include "netrc.h"
 #include "memdebug.h" /* LAST include file */
 
@@ -27,16 +27,16 @@ static char *login;
 static char *password;
 static char filename[64];
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
   password = strdup("");
   login = strdup("");
   if(!password || !login) {
     Curl_safefree(password);
     Curl_safefree(login);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -178,7 +178,7 @@ UNITTEST_START
   free(login);
   login = strdup("");
   abort_unless(login != NULL, "returned NULL!");
-  result = Curl_parsenetrc("curl.example.com", &login, &password,
+  result = Curl_parsenetrc("carl.example.com", &login, &password,
              &login_changed, &password_changed, filename);
   fail_unless(result == 0, "Host should have been found");
   abort_unless(password != NULL, "returned NULL!");
@@ -196,7 +196,7 @@ UNITTEST_START
   free(password);
   password = strdup("");
   abort_unless(password != NULL, "returned NULL!");
-  result = Curl_parsenetrc("curl.example.com", &login, &password,
+  result = Curl_parsenetrc("carl.example.com", &login, &password,
              &login_changed, &password_changed, filename);
   fail_unless(result == 0, "Host should have been found");
   abort_unless(password != NULL, "returned NULL!");

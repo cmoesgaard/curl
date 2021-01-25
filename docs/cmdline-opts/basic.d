@@ -4,7 +4,7 @@ See-also: proxy-basic
 Protocols: HTTP
 Category: auth
 ---
-Tells curl to use HTTP Basic authentication with the remote host. This is the
+Tells carl to use HTTP Basic authentication with the remote host. This is the
 default and this option is usually pointless, unless you use it to override a
 previously set option that sets a different authentication method (such as
 --ntlm, --digest, or --negotiate).

@@ -2,44 +2,44 @@
 
 ## There are still bugs
 
- Curl and libcurl keep being developed. Adding features and changing code
+ Curl and libcarl keep being developed. Adding features and changing code
  means that bugs will sneak in, no matter how hard we try not to.
 
  Of course there are lots of bugs left. And lots of misfeatures.
 
- To help us make curl the stable and solid product we want it to be, we need
+ To help us make carl the stable and solid product we want it to be, we need
  bug reports and bug fixes.
 
 ## Where to report
 
  If you can't fix a bug yourself and submit a fix for it, try to report an as
- detailed report as possible to a curl mailing list to allow one of us to have
- a go at a solution. You can optionally also submit your problem in [curl's
- bug tracking system](https://github.com/curl/curl/issues).
+ detailed report as possible to a carl mailing list to allow one of us to have
+ a go at a solution. You can optionally also submit your problem in [carl's
+ bug tracking system](https://github.com/carl/carl/issues).
 
  Please read the rest of this document below first before doing that!
 
  If you feel you need to ask around first, find a suitable [mailing list](
- https://curl.se/mail/) and post your questions there.
+ https://carl.se/mail/) and post your questions there.
 
 ## Security bugs
 
- If you find a bug or problem in curl or libcurl that you think has a security
+ If you find a bug or problem in carl or libcarl that you think has a security
  impact, for example a bug that can put users in danger or make them
  vulnerable if the bug becomes public knowledge, then please report that bug
  using our security development process.
 
  Security related bugs or bugs that are suspected to have a security impact,
- should be reported on the [curl security tracker at
- HackerOne](https://hackerone.com/curl).
+ should be reported on the [carl security tracker at
+ HackerOne](https://hackerone.com/carl).
 
- This ensures that the report reaches the curl security team so that they
+ This ensures that the report reaches the carl security team so that they
  first can be deal with the report away from the public to minimize the harm
  and impact it will have on existing users out there who might be using the
  vulnerable versions.
 
- The curl project's process for handling security related issues is
- [documented separately](https://curl.se/dev/secprocess.html).
+ The carl project's process for handling security related issues is
+ [documented separately](https://carl.se/dev/secprocess.html).
 
 ## What to report
 
@@ -49,9 +49,9 @@
 
  - your operating system's name and version number
 
- - what version of curl you're using (`curl -V` is fine)
+ - what version of carl you're using (`carl -V` is fine)
 
- - versions of the used libraries that libcurl is built to use
+ - versions of the used libraries that libcarl is built to use
 
  - what URL you were working with (if possible), at least which protocol
 
@@ -61,11 +61,11 @@
  pieces in your report. You will benefit from this yourself, as it will enable
  us to help you quicker and more accurately.
 
- Since curl deals with networks, it often helps us if you include a protocol
+ Since carl deals with networks, it often helps us if you include a protocol
  debug dump with your bug report. The output you get by using the `-v` or
  `--trace` options.
 
- If curl crashed, causing a core dump (in unix), there is hardly any use to
+ If carl crashed, causing a core dump (in unix), there is hardly any use to
  send that huge file to anyone of us. Unless we have an exact same system
  setup as you, we can't do much with it. Instead we ask you to get a stack
  trace and send that (much smaller) output to us instead!
@@ -73,22 +73,22 @@
  The address and how to subscribe to the mailing lists are detailed in the
  `MANUAL.md` file.
 
-## libcurl problems
+## libcarl problems
 
- When you've written your own application with libcurl to perform transfers,
+ When you've written your own application with libcarl to perform transfers,
  it is even more important to be specific and detailed when reporting bugs.
 
- Tell us the libcurl version and your operating system. Tell us the name and
+ Tell us the libcarl version and your operating system. Tell us the name and
  version of all relevant sub-components like for example the SSL library
- you're using and what name resolving your libcurl uses. If you use SFTP or
+ you're using and what name resolving your libcarl uses. If you use SFTP or
  SCP, the libssh2 version is relevant etc.
 
  Showing us a real source code example repeating your problem is the best way
  to get our attention and it will greatly increase our chances to understand
  your problem and to work on a fix (if we agree it truly is a problem).
 
- Lots of problems that appear to be libcurl problems are actually just abuses
- of the libcurl API or other malfunctions in your applications. It is advised
+ Lots of problems that appear to be libcarl problems are actually just abuses
+ of the libcarl API or other malfunctions in your applications. It is advised
  that you run your problematic program using a memory debug tool like valgrind
  or similar before you post memory-related or "crashing" problems to us.
 
@@ -97,9 +97,9 @@
  If the problems or bugs you describe are considered to be bugs, we want to
  have the problems fixed.
 
- There are no developers in the curl project that are paid to work on bugs.
+ There are no developers in the carl project that are paid to work on bugs.
  All developers that take on reported bugs do this on a voluntary basis. We do
- it out of an ambition to keep curl and libcurl excellent products and out of
+ it out of an ambition to keep carl and libcarl excellent products and out of
  pride.
 
  But please do not assume that you can just lump over something to us and it
@@ -119,7 +119,7 @@
 
  Run the program until it cores.
 
- Run your debugger on the core file, like `<debugger> curl
+ Run your debugger on the core file, like `<debugger> carl
  core`. `<debugger>` should be replaced with the name of your debugger, in
  most cases that will be `gdb`, but `dbx` and others also occur.
 
@@ -127,50 +127,50 @@
  prompt, enter `where` (without quotes) and press return.
 
  The list that is presented is the stack trace. If everything worked, it is
- supposed to contain the chain of functions that were called when curl
+ supposed to contain the chain of functions that were called when carl
  crashed. Include the stack trace with your detailed bug report. It'll help a
  lot.
 
-## Bugs in libcurl bindings
+## Bugs in libcarl bindings
 
- There will of course pop up bugs in libcurl bindings. You should then
+ There will of course pop up bugs in libcarl bindings. You should then
  primarily approach the team that works on that particular binding and see
  what you can do to help them fix the problem.
 
- If you suspect that the problem exists in the underlying libcurl, then please
+ If you suspect that the problem exists in the underlying libcarl, then please
  convert your program over to plain C and follow the steps outlined above.
 
 ## Bugs in old versions
 
- The curl project typically releases new versions every other month, and we
+ The carl project typically releases new versions every other month, and we
  fix several hundred bugs per year. For a huge table of releases, number of
- bug fixes and more, see: https://curl.se/docs/releases.html
+ bug fixes and more, see: https://carl.se/docs/releases.html
 
- The developers in the curl project do not have bandwidth or energy enough to
+ The developers in the carl project do not have bandwidth or energy enough to
  maintain several branches or to spend much time on hunting down problems in
  old versions when chances are we already fixed them or at least that they've
  changed nature and appearance in later versions.
 
  When you experience a problem and want to report it, you really SHOULD
- include the version number of the curl you're using when you experience the
- issue. If that version number shows us that you're using an out-of-date curl,
- you should also try out a modern curl version to see if the problem persists
+ include the version number of the carl you're using when you experience the
+ issue. If that version number shows us that you're using an out-of-date carl,
+ you should also try out a modern carl version to see if the problem persists
  or how/if it has changed in appearance.
 
  Even if you cannot immediately upgrade your application/system to run the
- latest curl version, you can most often at least run a test version or
+ latest carl version, you can most often at least run a test version or
  experimental build or similar, to get this confirmed or not.
 
- At times people insist that they cannot upgrade to a modern curl version, but
+ At times people insist that they cannot upgrade to a modern carl version, but
  instead they "just want the bug fixed". That's fine, just don't count on us
  spending many cycles on trying to identify which single commit, if that's
  even possible, that at some point in the past fixed the problem you're now
  experiencing.
 
- Security wise, it is almost always a bad idea to lag behind the current curl
+ Security wise, it is almost always a bad idea to lag behind the current carl
  versions by a lot. We keeping discovering and reporting security problems
  over time see you can see in [this
- table](https://curl.se/docs/vulnerabilities.html)
+ table](https://carl.se/docs/vulnerabilities.html)
 
 # Bug fixing procedure
 
@@ -247,7 +247,7 @@
 
  The `TODO` document is full of ideas and suggestions of what we can add or
  fix one day. You're always encouraged and free to grab one of those items and
- take up a discussion with the curl development team on how that could be
+ take up a discussion with the carl development team on how that could be
  implemented or provided in the project so that you can work on ticking it odd
  that document.
 
@@ -256,7 +256,7 @@
 
 ## Closing off stalled bugs
 
- The [issue and pull request trackers](https://github.com/curl/curl) only
+ The [issue and pull request trackers](https://github.com/carl/carl) only
  holds "active" entries open (using a non-precise definition of what active
  actually is, but they're at least not completely dead). Those that are
  abandoned or in other ways dormant will be closed and sometimes added to

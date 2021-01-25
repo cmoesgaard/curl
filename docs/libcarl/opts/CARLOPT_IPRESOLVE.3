@@ -1,0 +1,64 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_IPRESOLVE 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_IPRESOLVE \- specify which IP protocol version to use
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_IPRESOLVE, long resolve);
+.SH DESCRIPTION
+Allows an application to select what kind of IP addresses to use when
+resolving host names. This is only interesting when using host names that
+resolve addresses using more than one version of IP. The allowed values are:
+.IP CARL_IPRESOLVE_WHATEVER
+Default, resolves addresses to all IP versions that your system allows.
+.IP CARL_IPRESOLVE_V4
+Resolve to IPv4 addresses.
+.IP CARL_IPRESOLVE_V6
+Resolve to IPv6 addresses.
+.SH DEFAULT
+CARL_IPRESOLVE_WHATEVER
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/foo.bin");
+
+  /* resolve host name using IPv6-names only */
+  carl_easy_setopt(carl, CARLOPT_IPRESOLVE, CARL_IPRESOLVE_V6);
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_HTTP_VERSION "(3), " CARLOPT_SSLVERSION "(3), "

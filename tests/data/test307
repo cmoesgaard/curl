@@ -29,7 +29,7 @@ OpenSSL
 https
 </server>
 <precheck>
-perl %SRCDIR/libtest/test307.pl %CURL
+perl %SRCDIR/libtest/test307.pl %CARL
 </precheck>
 
  <name>
@@ -46,7 +46,7 @@ simple HTTPS GET with openssl engine
 <protocol>
 GET /307 HTTP/1.1
 Host: %HOSTIP:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

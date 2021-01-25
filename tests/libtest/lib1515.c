@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 /*
- * Check for bugs #1303 and #1327: libcurl should never remove DNS entries
- * created via CURLOPT_RESOLVE, neither after DNS_CACHE_TIMEOUT elapses
+ * Check for bugs #1303 and #1327: libcarl should never remove DNS entries
+ * created via CARLOPT_RESOLVE, neither after DNS_CACHE_TIMEOUT elapses
  * (test1515) nor a dead connection is detected (test1616).
  */
 
@@ -39,38 +39,38 @@
 #define sleep(sec) Sleep ((sec)*1000)
 #endif
 
-static int debug_callback(CURL *curl, curl_infotype info, char *msg,
+static int debug_callback(CARL *carl, carl_infotype info, char *msg,
                           size_t len, void *ptr)
 {
-  (void)curl;
+  (void)carl;
   (void)ptr;
 
-  if(info == CURLINFO_TEXT)
+  if(info == CARLINFO_TEXT)
     fprintf(stderr, "debug: %.*s", (int) len, msg);
 
   return 0;
 }
 
-static int do_one_request(CURLM *m, char *URL, char *resolve)
+static int do_one_request(CARLM *m, char *URL, char *resolve)
 {
-  CURL *curls;
-  struct curl_slist *resolve_list = NULL;
+  CARL *carls;
+  struct carl_slist *resolve_list = NULL;
   int still_running;
   int res = 0;
-  CURLMsg *msg;
+  CARLMsg *msg;
   int msgs_left;
 
-  resolve_list = curl_slist_append(resolve_list, resolve);
+  resolve_list = carl_slist_append(resolve_list, resolve);
 
-  easy_init(curls);
+  easy_init(carls);
 
-  easy_setopt(curls, CURLOPT_URL, URL);
-  easy_setopt(curls, CURLOPT_RESOLVE, resolve_list);
-  easy_setopt(curls, CURLOPT_DEBUGFUNCTION, debug_callback);
-  easy_setopt(curls, CURLOPT_VERBOSE, 1);
-  easy_setopt(curls, CURLOPT_DNS_CACHE_TIMEOUT, DNS_TIMEOUT);
+  easy_setopt(carls, CARLOPT_URL, URL);
+  easy_setopt(carls, CARLOPT_RESOLVE, resolve_list);
+  easy_setopt(carls, CARLOPT_DEBUGFUNCTION, debug_callback);
+  easy_setopt(carls, CARLOPT_VERBOSE, 1);
+  easy_setopt(carls, CARLOPT_DNS_CACHE_TIMEOUT, DNS_TIMEOUT);
 
-  multi_add_handle(m, curls);
+  multi_add_handle(m, carls);
   multi_perform(m, &still_running);
 
   abort_on_test_timeout();
@@ -96,8 +96,8 @@ static int do_one_request(CURLM *m, char *URL, char *resolve)
   }
 
   do {
-    msg = curl_multi_info_read(m, &msgs_left);
-    if(msg && msg->msg == CURLMSG_DONE && msg->easy_handle == curls) {
+    msg = carl_multi_info_read(m, &msgs_left);
+    if(msg && msg->msg == CARLMSG_DONE && msg->easy_handle == carls) {
       res = msg->data.result;
       break;
     }
@@ -105,16 +105,16 @@ static int do_one_request(CURLM *m, char *URL, char *resolve)
 
 test_cleanup:
 
-  curl_multi_remove_handle(m, curls);
-  curl_easy_cleanup(curls);
-  curl_slist_free_all(resolve_list);
+  carl_multi_remove_handle(m, carls);
+  carl_easy_cleanup(carls);
+  carl_slist_free_all(resolve_list);
 
   return res;
 }
 
 int test(char *URL)
 {
-  CURLM *multi = NULL;
+  CARLM *multi = NULL;
   int res = 0;
   char *address = libtest_arg2;
   char *port = libtest_arg3;
@@ -128,7 +128,7 @@ int test(char *URL)
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
   multi_init(multi);
 
   for(i = 1; i <= count; i++) {
@@ -147,8 +147,8 @@ int test(char *URL)
 
 test_cleanup:
 
-  curl_multi_cleanup(multi);
-  curl_global_cleanup();
+  carl_multi_cleanup(multi);
+  carl_global_cleanup();
 
   return (int) res;
 }

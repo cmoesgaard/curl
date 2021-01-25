@@ -10,7 +10,7 @@ Write the received protocol headers to the specified file.
 
 This option is handy to use when you want to store the headers that an HTTP
 site sends to you. Cookies from the headers could then be read in a second
-curl invocation by using the --cookie option! The --cookie-jar option is a
+carl invocation by using the --cookie option! The --cookie-jar option is a
 better way to store cookies.
 
 If no headers are received, the use of this option will create an empty file.

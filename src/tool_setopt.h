@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_SETOPT_H
-#define HEADER_CURL_TOOL_SETOPT_H
+#ifndef HEADER_CARL_TOOL_SETOPT_H
+#define HEADER_CARL_TOOL_SETOPT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -38,9 +38,9 @@
   } while(0)
 
 /* allow removed features to simulate success: */
-bool tool_setopt_skip(CURLoption tag);
+bool tool_setopt_skip(CARLoption tag);
 
-#ifndef CURL_DISABLE_LIBCURL_OPTION
+#ifndef CARL_DISABLE_LIBCARL_OPTION
 
 /* Associate symbolic names with option values */
 struct NameValue {
@@ -53,56 +53,56 @@ struct NameValueUnsigned {
   unsigned long value;
 };
 
-extern const struct NameValue setopt_nv_CURLPROXY[];
-extern const struct NameValue setopt_nv_CURL_SOCKS_PROXY[];
-extern const struct NameValue setopt_nv_CURL_HTTP_VERSION[];
-extern const struct NameValue setopt_nv_CURL_SSLVERSION[];
-extern const struct NameValue setopt_nv_CURL_TIMECOND[];
-extern const struct NameValue setopt_nv_CURLFTPSSL_CCC[];
-extern const struct NameValue setopt_nv_CURLUSESSL[];
-extern const struct NameValueUnsigned setopt_nv_CURLSSLOPT[];
-extern const struct NameValue setopt_nv_CURL_NETRC[];
-extern const struct NameValue setopt_nv_CURLPROTO[];
-extern const struct NameValueUnsigned setopt_nv_CURLAUTH[];
-extern const struct NameValueUnsigned setopt_nv_CURLHSTS[];
+extern const struct NameValue setopt_nv_CARLPROXY[];
+extern const struct NameValue setopt_nv_CARL_SOCKS_PROXY[];
+extern const struct NameValue setopt_nv_CARL_HTTP_VERSION[];
+extern const struct NameValue setopt_nv_CARL_SSLVERSION[];
+extern const struct NameValue setopt_nv_CARL_TIMECOND[];
+extern const struct NameValue setopt_nv_CARLFTPSSL_CCC[];
+extern const struct NameValue setopt_nv_CARLUSESSL[];
+extern const struct NameValueUnsigned setopt_nv_CARLSSLOPT[];
+extern const struct NameValue setopt_nv_CARL_NETRC[];
+extern const struct NameValue setopt_nv_CARLPROTO[];
+extern const struct NameValueUnsigned setopt_nv_CARLAUTH[];
+extern const struct NameValueUnsigned setopt_nv_CARLHSTS[];
 
 /* Map options to NameValue sets */
-#define setopt_nv_CURLOPT_HSTS_CTRL setopt_nv_CURLHSTS
-#define setopt_nv_CURLOPT_HTTP_VERSION setopt_nv_CURL_HTTP_VERSION
-#define setopt_nv_CURLOPT_HTTPAUTH setopt_nv_CURLAUTH
-#define setopt_nv_CURLOPT_SSLVERSION setopt_nv_CURL_SSLVERSION
-#define setopt_nv_CURLOPT_PROXY_SSLVERSION setopt_nv_CURL_SSLVERSION
-#define setopt_nv_CURLOPT_TIMECONDITION setopt_nv_CURL_TIMECOND
-#define setopt_nv_CURLOPT_FTP_SSL_CCC setopt_nv_CURLFTPSSL_CCC
-#define setopt_nv_CURLOPT_USE_SSL setopt_nv_CURLUSESSL
-#define setopt_nv_CURLOPT_SSL_OPTIONS setopt_nv_CURLSSLOPT
-#define setopt_nv_CURLOPT_NETRC setopt_nv_CURL_NETRC
-#define setopt_nv_CURLOPT_PROTOCOLS setopt_nv_CURLPROTO
-#define setopt_nv_CURLOPT_REDIR_PROTOCOLS setopt_nv_CURLPROTO
-#define setopt_nv_CURLOPT_PROXYTYPE setopt_nv_CURLPROXY
-#define setopt_nv_CURLOPT_PROXYAUTH setopt_nv_CURLAUTH
-#define setopt_nv_CURLOPT_SOCKS5_AUTH setopt_nv_CURLAUTH
+#define setopt_nv_CARLOPT_HSTS_CTRL setopt_nv_CARLHSTS
+#define setopt_nv_CARLOPT_HTTP_VERSION setopt_nv_CARL_HTTP_VERSION
+#define setopt_nv_CARLOPT_HTTPAUTH setopt_nv_CARLAUTH
+#define setopt_nv_CARLOPT_SSLVERSION setopt_nv_CARL_SSLVERSION
+#define setopt_nv_CARLOPT_PROXY_SSLVERSION setopt_nv_CARL_SSLVERSION
+#define setopt_nv_CARLOPT_TIMECONDITION setopt_nv_CARL_TIMECOND
+#define setopt_nv_CARLOPT_FTP_SSL_CCC setopt_nv_CARLFTPSSL_CCC
+#define setopt_nv_CARLOPT_USE_SSL setopt_nv_CARLUSESSL
+#define setopt_nv_CARLOPT_SSL_OPTIONS setopt_nv_CARLSSLOPT
+#define setopt_nv_CARLOPT_NETRC setopt_nv_CARL_NETRC
+#define setopt_nv_CARLOPT_PROTOCOLS setopt_nv_CARLPROTO
+#define setopt_nv_CARLOPT_REDIR_PROTOCOLS setopt_nv_CARLPROTO
+#define setopt_nv_CARLOPT_PROXYTYPE setopt_nv_CARLPROXY
+#define setopt_nv_CARLOPT_PROXYAUTH setopt_nv_CARLAUTH
+#define setopt_nv_CARLOPT_SOCKS5_AUTH setopt_nv_CARLAUTH
 
-/* Intercept setopt calls for --libcurl */
+/* Intercept setopt calls for --libcarl */
 
-CURLcode tool_setopt_enum(CURL *curl, struct GlobalConfig *config,
-                          const char *name, CURLoption tag,
+CARLcode tool_setopt_enum(CARL *carl, struct GlobalConfig *config,
+                          const char *name, CARLoption tag,
                           const struct NameValue *nv, long lval);
-CURLcode tool_setopt_flags(CURL *curl, struct GlobalConfig *config,
-                           const char *name, CURLoption tag,
+CARLcode tool_setopt_flags(CARL *carl, struct GlobalConfig *config,
+                           const char *name, CARLoption tag,
                            const struct NameValue *nv, long lval);
-CURLcode tool_setopt_bitmask(CURL *curl, struct GlobalConfig *config,
-                             const char *name, CURLoption tag,
+CARLcode tool_setopt_bitmask(CARL *carl, struct GlobalConfig *config,
+                             const char *name, CARLoption tag,
                              const struct NameValueUnsigned *nv, long lval);
-CURLcode tool_setopt_mimepost(CURL *curl, struct GlobalConfig *config,
-                              const char *name, CURLoption tag,
-                              curl_mime *mimepost);
-CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
-                           const char *name, CURLoption tag,
-                           struct curl_slist *list);
-CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
+CARLcode tool_setopt_mimepost(CARL *carl, struct GlobalConfig *config,
+                              const char *name, CARLoption tag,
+                              carl_mime *mimepost);
+CARLcode tool_setopt_slist(CARL *carl, struct GlobalConfig *config,
+                           const char *name, CARLoption tag,
+                           struct carl_slist *list);
+CARLcode tool_setopt(CARL *carl, bool str, struct GlobalConfig *global,
                      struct OperationConfig *config,
-                     const char *name, CURLoption tag, ...);
+                     const char *name, CARLoption tag, ...);
 
 #define my_setopt(x,y,z) \
   SETOPT_CHECK(tool_setopt(x, FALSE, global, config, #y, y, z), y)
@@ -129,35 +129,35 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
 
 #define res_setopt_str(x,y,z) tool_setopt(x, TRUE, global, config, #y, y, z)
 
-#else /* CURL_DISABLE_LIBCURL_OPTION */
+#else /* CARL_DISABLE_LIBCARL_OPTION */
 
-/* No --libcurl, so pass options directly to library */
+/* No --libcarl, so pass options directly to library */
 
 #define my_setopt(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_str(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_enum(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_flags(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_bitmask(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_mimepost(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
 #define my_setopt_slist(x,y,z) \
-  SETOPT_CHECK(curl_easy_setopt(x, y, z), y)
+  SETOPT_CHECK(carl_easy_setopt(x, y, z), y)
 
-#define res_setopt(x,y,z) curl_easy_setopt(x,y,z)
+#define res_setopt(x,y,z) carl_easy_setopt(x,y,z)
 
-#define res_setopt_str(x,y,z) curl_easy_setopt(x,y,z)
+#define res_setopt_str(x,y,z) carl_easy_setopt(x,y,z)
 
-#endif /* CURL_DISABLE_LIBCURL_OPTION */
+#endif /* CARL_DISABLE_LIBCARL_OPTION */
 
-#endif /* HEADER_CURL_TOOL_SETOPT_H */
+#endif /* HEADER_CARL_TOOL_SETOPT_H */

@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -32,7 +32,7 @@ TOPDIR = ..
 include ../packages/DOS/common.dj
 include Makefile.inc
 
-CSOURCES = $(CURL_CFILES)
+CSOURCES = $(CARL_CFILES)
 
 ifeq ($(USE_SSL),1)
   EX_LIBS += $(OPENSSL_ROOT)/lib/libssl.a $(OPENSSL_ROOT)/lib/libcrypt.a
@@ -53,20 +53,20 @@ endif
 
 EX_LIBS += $(WATT32_ROOT)/lib/libwatt.a
 
-PROGRAM  = curl.exe
+PROGRAM  = carl.exe
 OBJECTS += $(addprefix $(OBJ_DIR)/, $(CSOURCES:.c=.o))
 
 all: $(OBJ_DIR) $(PROGRAM)
-	@echo Welcome to curl
+	@echo Welcome to carl
 
-$(PROGRAM): $(OBJECTS) ../lib/libcurl.a
+$(PROGRAM): $(OBJECTS) ../lib/libcarl.a
 	$(CC) -o $@ $^ $(LDFLAGS) $(EX_LIBS)
 
 #
 # groff 1.18+ requires "-P -c"
 #
-tool_hugehelp.c: ../docs/MANUAL ../docs/curl.1 mkhelp.pl
-	groff -Tascii -man ../docs/curl.1 | \
+tool_hugehelp.c: ../docs/MANUAL ../docs/carl.1 mkhelp.pl
+	groff -Tascii -man ../docs/carl.1 | \
 	perl -w mkhelp.pl ../docs/MANUAL > $@
 
 # clean generated files

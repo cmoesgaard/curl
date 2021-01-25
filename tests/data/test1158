@@ -48,7 +48,7 @@ foo
 <protocol>
 POST /we/want/1158 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 954
 Content-Type: multipart/form-data; boundary=----------------------------24e78000bd32

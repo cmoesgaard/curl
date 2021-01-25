@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -32,24 +32,24 @@
 int test(char *URL)
 {
   int res = 0;
-  CURL *curl = NULL;
+  CARL *carl = NULL;
   int running;
-  CURLM *m = NULL;
+  CARLM *m = NULL;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-  easy_setopt(curl, CURLOPT_PROXY, libtest_arg2);
-  easy_setopt(curl, CURLOPT_PROXYTYPE, (long)CURLPROXY_SOCKS4);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+  easy_setopt(carl, CARLOPT_PROXY, libtest_arg2);
+  easy_setopt(carl, CARLOPT_PROXYTYPE, (long)CARLPROXY_SOCKS4);
 
   multi_init(m);
 
-  multi_add_handle(m, curl);
+  multi_add_handle(m, carl);
 
   fprintf(stderr, "Start at URL 0\n");
 
@@ -85,9 +85,9 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UB */
 
-  curl_easy_cleanup(curl);
-  curl_multi_cleanup(m);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_multi_cleanup(m);
+  carl_global_cleanup();
 
   return res;
 }

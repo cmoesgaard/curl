@@ -1,0 +1,80 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_multi_setopt 3 "4 Nov 2014" "libcarl 7.39.0" "libcarl Manual"
+.SH NAME
+carl_multi_setopt \- set options for a carl multi handle
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM * multi_handle, CARLMoption option, param);
+.SH DESCRIPTION
+\fIcarl_multi_setopt(3)\fP is used to tell a libcarl multi handle how to
+behave. By using the appropriate options to \fIcarl_multi_setopt(3)\fP, you
+can change libcarl's behavior when using that multi handle.  All options are
+set with the \fIoption\fP followed by the parameter \fIparam\fP. That
+parameter can be a \fBlong\fP, a \fBfunction pointer\fP, an \fBobject
+pointer\fP or a \fBcarl_off_t\fP type, depending on what the specific option
+expects. Read this manual carefully as bad input values may cause libcarl to
+behave badly!  You can only set one option in each function call.
+
+.SH OPTIONS
+.IP CARLMOPT_CHUNK_LENGTH_PENALTY_SIZE
+See \fICARLMOPT_CHUNK_LENGTH_PENALTY_SIZE(3)\fP
+.IP CARLMOPT_CONTENT_LENGTH_PENALTY_SIZE
+See \fICARLMOPT_CONTENT_LENGTH_PENALTY_SIZE(3)\fP
+.IP CARLMOPT_MAX_HOST_CONNECTIONS
+See \fICARLMOPT_MAX_HOST_CONNECTIONS(3)\fP
+.IP CARLMOPT_MAX_PIPELINE_LENGTH
+See \fICARLMOPT_MAX_PIPELINE_LENGTH(3)\fP
+.IP CARLMOPT_MAX_TOTAL_CONNECTIONS
+See \fICARLMOPT_MAX_TOTAL_CONNECTIONS(3)\fP
+.IP CARLMOPT_MAXCONNECTS
+See \fICARLMOPT_MAXCONNECTS(3)\fP
+.IP CARLMOPT_PIPELINING
+See \fICARLMOPT_PIPELINING(3)\fP
+.IP CARLMOPT_PIPELINING_SITE_BL
+See \fICARLMOPT_PIPELINING_SITE_BL(3)\fP
+.IP CARLMOPT_PIPELINING_SERVER_BL
+See \fICARLMOPT_PIPELINING_SERVER_BL(3)\fP
+.IP CARLMOPT_PUSHFUNCTION
+See \fICARLMOPT_PUSHFUNCTION(3)\fP
+.IP CARLMOPT_PUSHDATA
+See \fICARLMOPT_PUSHDATA(3)\fP
+.IP CARLMOPT_SOCKETFUNCTION
+See \fICARLMOPT_SOCKETFUNCTION(3)\fP
+.IP CARLMOPT_SOCKETDATA
+See \fICARLMOPT_SOCKETDATA(3)\fP
+.IP CARLMOPT_TIMERFUNCTION
+See \fICARLMOPT_TIMERFUNCTION(3)\fP
+.IP CARLMOPT_TIMERDATA
+See \fICARLMOPT_TIMERDATA(3)\fP
+.IP CARLMOPT_MAX_CONCURRENT_STREAMS
+See \fICARLMOPT_MAX_CONCURRENT_STREAMS(3)\fP
+.SH RETURNS
+The standard CARLMcode for multi interface error codes. Note that it returns a
+CARLM_UNKNOWN_OPTION if you try setting an option that this version of libcarl
+doesn't know of.
+.SH AVAILABILITY
+This function was added in libcarl 7.15.4.
+.SH "SEE ALSO"
+.BR carl_multi_cleanup "(3), " carl_multi_init "(3), "
+.BR carl_multi_socket "(3), " carl_multi_info_read "(3)"

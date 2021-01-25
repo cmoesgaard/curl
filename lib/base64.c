@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,23 +22,23 @@
 
 /* Base64 encoding/decoding */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP_AUTH) || defined(USE_SSH) || \
-  !defined(CURL_DISABLE_LDAP) || \
-  !defined(CURL_DISABLE_SMTP) || \
-  !defined(CURL_DISABLE_POP3) || \
-  !defined(CURL_DISABLE_IMAP) || \
-  !defined(CURL_DISABLE_DOH) || defined(USE_SSL)
+#if !defined(CARL_DISABLE_HTTP_AUTH) || defined(USE_SSH) || \
+  !defined(CARL_DISABLE_LDAP) || \
+  !defined(CARL_DISABLE_SMTP) || \
+  !defined(CARL_DISABLE_POP3) || \
+  !defined(CARL_DISABLE_IMAP) || \
+  !defined(CARL_DISABLE_DOH) || defined(USE_SSL)
 
 #include "urldata.h" /* for the Curl_easy definition */
 #include "warnless.h"
-#include "curl_base64.h"
+#include "carl_base64.h"
 #include "non-ascii.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* ---- Base64 Encoding/Decoding Table --- */
@@ -78,14 +78,14 @@ static size_t decodeQuantum(unsigned char *dest, const char *src)
   }
 
   if(padding < 1)
-    dest[2] = curlx_ultouc(x & 0xFFUL);
+    dest[2] = carlx_ultouc(x & 0xFFUL);
 
   x >>= 8;
   if(padding < 2)
-    dest[1] = curlx_ultouc(x & 0xFFUL);
+    dest[1] = carlx_ultouc(x & 0xFFUL);
 
   x >>= 8;
-  dest[0] = curlx_ultouc(x & 0xFFUL);
+  dest[0] = carlx_ultouc(x & 0xFFUL);
 
   return 3 - padding;
 }
@@ -97,14 +97,14 @@ static size_t decodeQuantum(unsigned char *dest, const char *src)
  * pointer in *outptr to a newly allocated memory area holding decoded
  * data. Size of decoded data is returned in variable pointed by outlen.
  *
- * Returns CURLE_OK on success, otherwise specific error code. Function
- * output shall not be considered valid unless CURLE_OK is returned.
+ * Returns CARLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CARLE_OK is returned.
  *
  * When decoded data length is 0, returns NULL in *outptr.
  *
  * @unittest: 1302
  */
-CURLcode Curl_base64_decode(const char *src,
+CARLcode Curl_base64_decode(const char *src,
                             unsigned char **outptr, size_t *outlen)
 {
   size_t srclen = 0;
@@ -122,7 +122,7 @@ CURLcode Curl_base64_decode(const char *src,
 
   /* Check the length of the input string is valid */
   if(!srclen || srclen % 4)
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
 
   /* Find the position of any = padding characters */
   while((src[length] != '=') && src[length])
@@ -137,7 +137,7 @@ CURLcode Curl_base64_decode(const char *src,
 
   /* Check the = padding characters weren't part way through the input */
   if(length + padding != srclen)
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
 
   /* Calculate the number of quantums */
   numQuantums = srclen / 4;
@@ -148,7 +148,7 @@ CURLcode Curl_base64_decode(const char *src,
   /* Allocate our buffer including room for a zero terminator */
   newstr = malloc(rawlen + 1);
   if(!newstr)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   pos = newstr;
 
@@ -158,7 +158,7 @@ CURLcode Curl_base64_decode(const char *src,
     if(!result) {
       free(newstr);
 
-      return CURLE_BAD_CONTENT_ENCODING;
+      return CARLE_BAD_CONTENT_ENCODING;
     }
 
     pos += result;
@@ -172,15 +172,15 @@ CURLcode Curl_base64_decode(const char *src,
   *outptr = newstr;
   *outlen = rawlen;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode base64_encode(const char *table64,
+static CARLcode base64_encode(const char *table64,
                               struct Curl_easy *data,
                               const char *inputbuff, size_t insize,
                               char **outptr, size_t *outlen)
 {
-  CURLcode result;
+  CARLcode result;
   unsigned char ibuf[3];
   unsigned char obuf[4];
   int i;
@@ -199,12 +199,12 @@ static CURLcode base64_encode(const char *table64,
 
 #if SIZEOF_SIZE_T == 4
   if(insize > UINT_MAX/4)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 #endif
 
   base64data = output = malloc(insize * 4 / 3 + 4);
   if(!output)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /*
    * The base64 data needs to be created using the network encoding
@@ -275,7 +275,7 @@ static CURLcode base64_encode(const char *table64,
   /* Return the length of the new data */
   *outlen = strlen(base64data);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -288,14 +288,14 @@ static CURLcode base64_encode(const char *table64,
  *
  * Input length of 0 indicates input buffer holds a NUL-terminated string.
  *
- * Returns CURLE_OK on success, otherwise specific error code. Function
- * output shall not be considered valid unless CURLE_OK is returned.
+ * Returns CARLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CARLE_OK is returned.
  *
  * When encoded data length is 0, returns NULL in *outptr.
  *
  * @unittest: 1302
  */
-CURLcode Curl_base64_encode(struct Curl_easy *data,
+CARLcode Curl_base64_encode(struct Curl_easy *data,
                             const char *inputbuff, size_t insize,
                             char **outptr, size_t *outlen)
 {
@@ -312,14 +312,14 @@ CURLcode Curl_base64_encode(struct Curl_easy *data,
  *
  * Input length of 0 indicates input buffer holds a NUL-terminated string.
  *
- * Returns CURLE_OK on success, otherwise specific error code. Function
- * output shall not be considered valid unless CURLE_OK is returned.
+ * Returns CARLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CARLE_OK is returned.
  *
  * When encoded data length is 0, returns NULL in *outptr.
  *
  * @unittest: 1302
  */
-CURLcode Curl_base64url_encode(struct Curl_easy *data,
+CARLcode Curl_base64url_encode(struct Curl_easy *data,
                                const char *inputbuff, size_t insize,
                                char **outptr, size_t *outlen)
 {

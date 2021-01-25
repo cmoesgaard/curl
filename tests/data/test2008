@@ -69,7 +69,7 @@ perl %SRCDIR/libtest/notexists.pl log/2008 log/name2008 log/outfile2008
 <protocol>
 GET /2008 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

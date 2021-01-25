@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_getparam.h"
@@ -63,8 +63,8 @@ struct getout *new_getout(struct OperationConfig *config)
 
 ParameterError file2string(char **bufp, FILE *file)
 {
-  struct curlx_dynbuf dyn;
-  curlx_dyn_init(&dyn, MAX_FILE2STRING);
+  struct carlx_dynbuf dyn;
+  carlx_dyn_init(&dyn, MAX_FILE2STRING);
   if(file) {
     char buffer[256];
 
@@ -75,11 +75,11 @@ ParameterError file2string(char **bufp, FILE *file)
       ptr = strchr(buffer, '\n');
       if(ptr)
         *ptr = '\0';
-      if(curlx_dyn_add(&dyn, buffer))
+      if(carlx_dyn_add(&dyn, buffer))
         return PARAM_NO_MEM;
     }
   }
-  *bufp = curlx_dyn_ptr(&dyn);
+  *bufp = carlx_dyn_ptr(&dyn);
   return PARAM_OK;
 }
 
@@ -89,17 +89,17 @@ ParameterError file2memory(char **bufp, size_t *size, FILE *file)
 {
   if(file) {
     size_t nread;
-    struct curlx_dynbuf dyn;
-    curlx_dyn_init(&dyn, MAX_FILE2MEMORY);
+    struct carlx_dynbuf dyn;
+    carlx_dyn_init(&dyn, MAX_FILE2MEMORY);
     do {
       char buffer[4096];
       nread = fread(buffer, 1, sizeof(buffer), file);
       if(nread)
-        if(curlx_dyn_addn(&dyn, buffer, nread))
+        if(carlx_dyn_addn(&dyn, buffer, nread))
           return PARAM_NO_MEM;
     } while(nread);
-    *size = curlx_dyn_len(&dyn);
-    *bufp = curlx_dyn_ptr(&dyn);
+    *size = carlx_dyn_len(&dyn);
+    *bufp = carlx_dyn_ptr(&dyn);
   }
   else {
     *size = 0;
@@ -287,29 +287,29 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
     const char *name;
     long bit;
   } const protos[] = {
-    { "all", CURLPROTO_ALL },
-    { "http", CURLPROTO_HTTP },
-    { "https", CURLPROTO_HTTPS },
-    { "ftp", CURLPROTO_FTP },
-    { "ftps", CURLPROTO_FTPS },
-    { "scp", CURLPROTO_SCP },
-    { "sftp", CURLPROTO_SFTP },
-    { "telnet", CURLPROTO_TELNET },
-    { "ldap", CURLPROTO_LDAP },
-    { "ldaps", CURLPROTO_LDAPS },
-    { "dict", CURLPROTO_DICT },
-    { "file", CURLPROTO_FILE },
-    { "tftp", CURLPROTO_TFTP },
-    { "imap", CURLPROTO_IMAP },
-    { "imaps", CURLPROTO_IMAPS },
-    { "pop3", CURLPROTO_POP3 },
-    { "pop3s", CURLPROTO_POP3S },
-    { "smtp", CURLPROTO_SMTP },
-    { "smtps", CURLPROTO_SMTPS },
-    { "rtsp", CURLPROTO_RTSP },
-    { "gopher", CURLPROTO_GOPHER },
-    { "smb", CURLPROTO_SMB },
-    { "smbs", CURLPROTO_SMBS },
+    { "all", CARLPROTO_ALL },
+    { "http", CARLPROTO_HTTP },
+    { "https", CARLPROTO_HTTPS },
+    { "ftp", CARLPROTO_FTP },
+    { "ftps", CARLPROTO_FTPS },
+    { "scp", CARLPROTO_SCP },
+    { "sftp", CARLPROTO_SFTP },
+    { "telnet", CARLPROTO_TELNET },
+    { "ldap", CARLPROTO_LDAP },
+    { "ldaps", CARLPROTO_LDAPS },
+    { "dict", CARLPROTO_DICT },
+    { "file", CARLPROTO_FILE },
+    { "tftp", CARLPROTO_TFTP },
+    { "imap", CARLPROTO_IMAP },
+    { "imaps", CARLPROTO_IMAPS },
+    { "pop3", CARLPROTO_POP3 },
+    { "pop3s", CARLPROTO_POP3S },
+    { "smtp", CARLPROTO_SMTP },
+    { "smtps", CARLPROTO_SMTPS },
+    { "rtsp", CARLPROTO_RTSP },
+    { "gopher", CARLPROTO_GOPHER },
+    { "smb", CARLPROTO_SMB },
+    { "smbs", CARLPROTO_SMBS },
     { NULL, 0 }
   };
 
@@ -348,7 +348,7 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
     }
 
     for(pp = protos; pp->name; pp++) {
-      if(curl_strequal(token, pp->name)) {
+      if(carl_strequal(token, pp->name)) {
         switch(action) {
         case deny:
           *val &= ~(pp->bit);
@@ -377,24 +377,24 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
 }
 
 /**
- * Check if the given string is a protocol supported by libcurl
+ * Check if the given string is a protocol supported by libcarl
  *
  * @param str  the protocol name
  * @return PARAM_OK  protocol supported
- * @return PARAM_LIBCURL_UNSUPPORTED_PROTOCOL  protocol not supported
+ * @return PARAM_LIBCARL_UNSUPPORTED_PROTOCOL  protocol not supported
  * @return PARAM_REQUIRES_PARAMETER   missing parameter
  */
 int check_protocol(const char *str)
 {
   const char * const *pp;
-  const curl_version_info_data *curlinfo = curl_version_info(CURLVERSION_NOW);
+  const carl_version_info_data *carlinfo = carl_version_info(CARLVERSION_NOW);
   if(!str)
     return PARAM_REQUIRES_PARAMETER;
-  for(pp = curlinfo->protocols; *pp; pp++) {
-    if(curl_strequal(*pp, str))
+  for(pp = carlinfo->protocols; *pp; pp++) {
+    if(carl_strequal(*pp, str))
       return PARAM_OK;
   }
-  return PARAM_LIBCURL_UNSUPPORTED_PROTOCOL;
+  return PARAM_LIBCARL_UNSUPPORTED_PROTOCOL;
 }
 
 /**
@@ -405,19 +405,19 @@ int check_protocol(const char *str)
  * @param str  the buffer containing the offset
  * @return PARAM_OK if successful, a parameter specific error enum if failure.
  */
-ParameterError str2offset(curl_off_t *val, const char *str)
+ParameterError str2offset(carl_off_t *val, const char *str)
 {
   char *endptr;
   if(str[0] == '-')
     /* offsets aren't negative, this indicates weird input */
     return PARAM_NEGATIVE_NUMERIC;
 
-#if(SIZEOF_CURL_OFF_T > SIZEOF_LONG)
+#if(SIZEOF_CARL_OFF_T > SIZEOF_LONG)
   {
-    CURLofft offt = curlx_strtoofft(str, &endptr, 0, val);
-    if(CURL_OFFT_FLOW == offt)
+    CARLofft offt = carlx_strtoofft(str, &endptr, 0, val);
+    if(CARL_OFFT_FLOW == offt)
       return PARAM_NUMBER_TOO_LARGE;
-    else if(CURL_OFFT_INVAL == offt)
+    else if(CARL_OFFT_INVAL == offt)
       return PARAM_BAD_NUMERIC;
   }
 #else
@@ -433,7 +433,7 @@ ParameterError str2offset(curl_off_t *val, const char *str)
 }
 
 #define MAX_USERPWDLENGTH (100*1024)
-static CURLcode checkpasswd(const char *kind, /* for what purpose */
+static CARLcode checkpasswd(const char *kind, /* for what purpose */
                             const size_t i,   /* operation index */
                             const bool last,  /* TRUE if last operation */
                             char **userpwd)   /* pointer to allocated string */
@@ -442,7 +442,7 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
   char *osep;
 
   if(!*userpwd)
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* Attempt to find the password separator */
   psep = strchr(*userpwd, ':');
@@ -454,19 +454,19 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
     /* no password present, prompt for one */
     char passwd[2048] = "";
     char prompt[256];
-    struct curlx_dynbuf dyn;
+    struct carlx_dynbuf dyn;
 
-    curlx_dyn_init(&dyn, MAX_USERPWDLENGTH);
+    carlx_dyn_init(&dyn, MAX_USERPWDLENGTH);
     if(osep)
       *osep = '\0';
 
     /* build a nice-looking prompt */
     if(!i && last)
-      curlx_msnprintf(prompt, sizeof(prompt),
+      carlx_msnprintf(prompt, sizeof(prompt),
                       "Enter %s password for user '%s':",
                       kind, *userpwd);
     else
-      curlx_msnprintf(prompt, sizeof(prompt),
+      carlx_msnprintf(prompt, sizeof(prompt),
                       "Enter %s password for user '%s' on URL #%zu:",
                       kind, *userpwd, i + 1);
 
@@ -475,20 +475,20 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
     if(osep)
       *osep = ';';
 
-    if(curlx_dyn_addf(&dyn, "%s:%s", *userpwd, passwd))
-      return CURLE_OUT_OF_MEMORY;
+    if(carlx_dyn_addf(&dyn, "%s:%s", *userpwd, passwd))
+      return CARLE_OUT_OF_MEMORY;
 
     /* return the new string */
     free(*userpwd);
-    *userpwd = curlx_dyn_ptr(&dyn);
+    *userpwd = carlx_dyn_ptr(&dyn);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-ParameterError add2list(struct curl_slist **list, const char *ptr)
+ParameterError add2list(struct carl_slist **list, const char *ptr)
 {
-  struct curl_slist *newlist = curl_slist_append(*list, ptr);
+  struct carl_slist *newlist = carl_slist_append(*list, ptr);
   if(newlist)
     *list = newlist;
   else
@@ -499,45 +499,45 @@ ParameterError add2list(struct curl_slist **list, const char *ptr)
 
 int ftpfilemethod(struct OperationConfig *config, const char *str)
 {
-  if(curl_strequal("singlecwd", str))
-    return CURLFTPMETHOD_SINGLECWD;
-  if(curl_strequal("nocwd", str))
-    return CURLFTPMETHOD_NOCWD;
-  if(curl_strequal("multicwd", str))
-    return CURLFTPMETHOD_MULTICWD;
+  if(carl_strequal("singlecwd", str))
+    return CARLFTPMETHOD_SINGLECWD;
+  if(carl_strequal("nocwd", str))
+    return CARLFTPMETHOD_NOCWD;
+  if(carl_strequal("multicwd", str))
+    return CARLFTPMETHOD_MULTICWD;
 
   warnf(config->global, "unrecognized ftp file method '%s', using default\n",
         str);
 
-  return CURLFTPMETHOD_MULTICWD;
+  return CARLFTPMETHOD_MULTICWD;
 }
 
 int ftpcccmethod(struct OperationConfig *config, const char *str)
 {
-  if(curl_strequal("passive", str))
-    return CURLFTPSSL_CCC_PASSIVE;
-  if(curl_strequal("active", str))
-    return CURLFTPSSL_CCC_ACTIVE;
+  if(carl_strequal("passive", str))
+    return CARLFTPSSL_CCC_PASSIVE;
+  if(carl_strequal("active", str))
+    return CARLFTPSSL_CCC_ACTIVE;
 
   warnf(config->global, "unrecognized ftp CCC method '%s', using default\n",
         str);
 
-  return CURLFTPSSL_CCC_PASSIVE;
+  return CARLFTPSSL_CCC_PASSIVE;
 }
 
 long delegation(struct OperationConfig *config, const char *str)
 {
-  if(curl_strequal("none", str))
-    return CURLGSSAPI_DELEGATION_NONE;
-  if(curl_strequal("policy", str))
-    return CURLGSSAPI_DELEGATION_POLICY_FLAG;
-  if(curl_strequal("always", str))
-    return CURLGSSAPI_DELEGATION_FLAG;
+  if(carl_strequal("none", str))
+    return CARLGSSAPI_DELEGATION_NONE;
+  if(carl_strequal("policy", str))
+    return CARLGSSAPI_DELEGATION_POLICY_FLAG;
+  if(carl_strequal("always", str))
+    return CARLGSSAPI_DELEGATION_FLAG;
 
   warnf(config->global, "unrecognized delegation method '%s', using none\n",
         str);
 
-  return CURLGSSAPI_DELEGATION_NONE;
+  return CARLGSSAPI_DELEGATION_NONE;
 }
 
 /*
@@ -545,12 +545,12 @@ long delegation(struct OperationConfig *config, const char *str)
  */
 static char *my_useragent(void)
 {
-  return strdup(CURL_NAME "/" CURL_VERSION);
+  return strdup(CARL_NAME "/" CARL_VERSION);
 }
 
-CURLcode get_args(struct OperationConfig *config, const size_t i)
+CARLcode get_args(struct OperationConfig *config, const size_t i)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   bool last = (config->next ? FALSE : TRUE);
 
   /* Check we have a password for the given host user */
@@ -572,7 +572,7 @@ CURLcode get_args(struct OperationConfig *config, const size_t i)
     config->useragent = my_useragent();
     if(!config->useragent) {
       errorf(config->global, "out of memory\n");
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
     }
   }
 
@@ -594,11 +594,11 @@ ParameterError str2tls_max(long *val, const char *str)
     const char *tls_max_str;
     long tls_max;
   } const tls_max_array[] = {
-    { "default", CURL_SSLVERSION_MAX_DEFAULT },
-    { "1.0",     CURL_SSLVERSION_MAX_TLSv1_0 },
-    { "1.1",     CURL_SSLVERSION_MAX_TLSv1_1 },
-    { "1.2",     CURL_SSLVERSION_MAX_TLSv1_2 },
-    { "1.3",     CURL_SSLVERSION_MAX_TLSv1_3 }
+    { "default", CARL_SSLVERSION_MAX_DEFAULT },
+    { "1.0",     CARL_SSLVERSION_MAX_TLSv1_0 },
+    { "1.1",     CARL_SSLVERSION_MAX_TLSv1_1 },
+    { "1.2",     CARL_SSLVERSION_MAX_TLSv1_2 },
+    { "1.3",     CARL_SSLVERSION_MAX_TLSv1_3 }
   };
   size_t i = 0;
   if(!str)

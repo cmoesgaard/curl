@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,25 +23,25 @@
 
 #include "memdebug.h"
 
-#include <curl/multi.h>
+#include <carl/multi.h>
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
 
-  global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, URL);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    res = curl_easy_perform(curl);
+  global_init(CARL_GLOBAL_ALL);
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_URL, URL);
+    carl_easy_setopt(carl, CARLOPT_FOLLOWLOCATION, 1L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+    res = carl_easy_perform(carl);
 
     fprintf(stderr, "****************************** Do it again\n");
-    res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
+    res = carl_easy_perform(carl);
+    carl_easy_cleanup(carl);
   }
-  curl_global_cleanup();
+  carl_global_cleanup();
   return (int)res;
 }

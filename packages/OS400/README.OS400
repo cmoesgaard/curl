@@ -4,28 +4,28 @@ Implementation notes:
   This is a true OS/400 implementation, not a PASE implementation (for PASE,
 use AIX implementation).
 
-  The biggest problem with OS/400 is EBCDIC. Libcurl implements an internal
+  The biggest problem with OS/400 is EBCDIC. Libcarl implements an internal
 conversion mechanism, but it has been designed for computers that have a
 single native character set. OS/400 default native character set varies
 depending on the country for which it has been localized. And more, a job
 may dynamically alter its "native" character set.
   Several characters that do not have fixed code in EBCDIC variants are
-used in libcurl strings. As a consequence, using the existing conversion
+used in libcarl strings. As a consequence, using the existing conversion
 mechanism would have lead in a localized binary library - not portable across
 countries.
-  For this reason, and because libcurl was originally designed for ASCII based
+  For this reason, and because libcarl was originally designed for ASCII based
 operating systems, the current OS/400 implementation uses ASCII as internal
 character set. This has been accomplished using the QADRT library and
 include files, a C and system procedures ASCII wrapper library. See IBM QADRT
 description for more information.
-  This then results in libcurl being an ASCII library: any function string
+  This then results in libcarl being an ASCII library: any function string
 argument is taken/returned in ASCII and a C/C++ calling program built around
-QADRT may use libcurl functions as on any other platform.
+QADRT may use libcarl functions as on any other platform.
   QADRT does not define ASCII wrappers for all C/system procedures: the
 OS/400 configuration header file and an additional module (os400sys.c) define
-some more of them, that are used by libcurl and that QADRT left out.
+some more of them, that are used by libcarl and that QADRT left out.
   To support all the different variants of EBCDIC, non-standard wrapper
-procedures have been added to libcurl on OS/400: they provide an additional
+procedures have been added to libcarl on OS/400: they provide an additional
 CCSID (numeric Coded Character Set ID specific to OS/400) parameter for each
 string argument. String values passed to callback procedures are NOT converted,
 so text gathered this way is (probably !) ASCII.
@@ -33,10 +33,10 @@ so text gathered this way is (probably !) ASCII.
   Another OS/400 problem comes from the fact that the last fixed argument of a
 vararg procedure may not be of type char, unsigned char, short or unsigned
 short. Enums that are internally implemented by the C compiler as one of these
-types are also forbidden. Libcurl uses enums as vararg procedure tagfields...
-Happily, there is a pragma forcing enums to type "int". The original libcurl
+types are also forbidden. Libcarl uses enums as vararg procedure tagfields...
+Happily, there is a pragma forcing enums to type "int". The original libcarl
 header files are thus altered during build process to use this pragma, in
-order to force libcurl enums of being type int (the pragma disposition in use
+order to force libcarl enums of being type int (the pragma disposition in use
 before inclusion is restored before resuming the including unit compilation).
 
   Secure socket layer is provided by the IBM GSKit API: unlike other SSL
@@ -48,151 +48,151 @@ rather than individual certificate/key files. Certificate stores, as well as
 - By a keyring file pathname and (optionally) certificate label.
   To identify an SSL context by application identifier, use option
 SETOPT_SSLCERT to specify the application identifier.
-  To address an SSL context by keyring and certificate label, use CURLOPT_CAINFO
-to set-up the keyring pathname, CURLOPT_SSLCERT to define the certificate label
+  To address an SSL context by keyring and certificate label, use CARLOPT_CAINFO
+to set-up the keyring pathname, CARLOPT_SSLCERT to define the certificate label
 (omitting it will cause the default certificate in keyring to be used) and
-CURLOPT_KEYPASSWD to give the keyring password. If SSL is used without
+CARLOPT_KEYPASSWD to give the keyring password. If SSL is used without
 defining any of these options, the default (i.e.: system) keyring is used for
 server certificate validation.
 
   Non-standard EBCDIC wrapper prototypes are defined in an additional header
-file: ccsidcurl.h. These should be self-explanatory to an OS/400-aware
+file: ccsidcarl.h. These should be self-explanatory to an OS/400-aware
 designer. CCSID 0 can be used to select the current job's CCSID.
   Wrapper procedures with variable arguments are described below:
 
-_ curl_easy_setopt_ccsid()
+_ carl_easy_setopt_ccsid()
   Variable arguments are a string pointer and a CCSID (unsigned int) for
 options:
-        CURLOPT_ABSTRACT_UNIX_SOCKET
-        CURLOPT_ALTSVC
-        CURLOPT_CAINFO
-        CURLOPT_CAPATH
-        CURLOPT_COOKIE
-        CURLOPT_COOKIEFILE
-        CURLOPT_COOKIEJAR
-        CURLOPT_COOKIELIST
-        CURLOPT_COPYPOSTFIELDS
-        CURLOPT_CRLFILE
-        CURLOPT_CUSTOMREQUEST
-        CURLOPT_DEFAULT_PROTOCOL
-        CURLOPT_DNS_SERVERS
-        CURLOPT_DOH_URL
-        CURLOPT_EGDSOCKET
-        CURLOPT_ENCODING
-        CURLOPT_FTPPORT
-        CURLOPT_FTP_ACCOUNT
-        CURLOPT_FTP_ALTERNATIVE_TO_USER
-        CURLOPT_INTERFACE
-        CURLOPT_ISSUERCERT
-        CURLOPT_KEYPASSWD
-        CURLOPT_KRBLEVEL
-        CURLOPT_LOGIN_OPTIONS
-        CURLOPT_MAIL_AUTH
-        CURLOPT_MAIL_FROM
-        CURLOPT_NETRC_FILE
-        CURLOPT_NOPROXY
-        CURLOPT_PASSWORD
-        CURLOPT_PINNEDPUBLICKEY
-        CURLOPT_PRE_PROXY
-        CURLOPT_PROXY
-        CURLOPT_PROXYPASSWORD
-        CURLOPT_PROXYUSERNAME
-        CURLOPT_PROXYUSERPWD
-        CURLOPT_PROXY_CAINFO
-        CURLOPT_PROXY_CAPATH
-        CURLOPT_PROXY_CRLFILE
-        CURLOPT_PROXY_KEYPASSWD
-        CURLOPT_PROXY_PINNEDPUBLICKEY
-        CURLOPT_PROXY_SERVICE_NAME
-        CURLOPT_PROXY_SSLCERT
-        CURLOPT_PROXY_SSLCERTTYPE
-        CURLOPT_PROXY_SSLKEY
-        CURLOPT_PROXY_SSLKEYTYPE
-        CURLOPT_PROXY_SSL_CIPHER_LIST
-        CURLOPT_PROXY_TLS13_CIPHERS
-        CURLOPT_PROXY_TLSAUTH_PASSWORD
-        CURLOPT_PROXY_TLSAUTH_TYPE
-        CURLOPT_PROXY_TLSAUTH_USERNAME
-        CURLOPT_RANDOM_FILE
-        CURLOPT_RANGE
-        CURLOPT_REFERER
-        CURLOPT_REQUEST_TARGET
-        CURLOPT_RTSP_SESSION_UID
-        CURLOPT_RTSP_STREAM_URI
-        CURLOPT_RTSP_TRANSPORT
-        CURLOPT_SASL_AUTHZID
-        CURLOPT_SERVICE_NAME
-        CURLOPT_SOCKS5_GSSAPI_SERVICE
-        CURLOPT_SSH_HOST_PUBLIC_KEY_MD5
-        CURLOPT_SSH_KNOWNHOSTS
-        CURLOPT_SSH_PRIVATE_KEYFILE
-        CURLOPT_SSH_PUBLIC_KEYFILE
-        CURLOPT_SSLCERT
-        CURLOPT_SSLCERTTYPE
-        CURLOPT_SSLENGINE
-        CURLOPT_SSLKEY
-        CURLOPT_SSLKEYTYPE
-        CURLOPT_SSL_CIPHER_LIST
-        CURLOPT_TLS13_CIPHERS
-        CURLOPT_TLSAUTH_PASSWORD
-        CURLOPT_TLSAUTH_TYPE
-        CURLOPT_TLSAUTH_USERNAME
-        CURLOPT_UNIX_SOCKET_PATH
-        CURLOPT_URL
-        CURLOPT_USERAGENT
-        CURLOPT_USERNAME
-        CURLOPT_USERPWD
-        CURLOPT_XOAUTH2_BEARER
-  Else it is the same as for curl_easy_setopt().
-  Note that CURLOPT_ERRORBUFFER is not in the list above, since it gives the
+        CARLOPT_ABSTRACT_UNIX_SOCKET
+        CARLOPT_ALTSVC
+        CARLOPT_CAINFO
+        CARLOPT_CAPATH
+        CARLOPT_COOKIE
+        CARLOPT_COOKIEFILE
+        CARLOPT_COOKIEJAR
+        CARLOPT_COOKIELIST
+        CARLOPT_COPYPOSTFIELDS
+        CARLOPT_CRLFILE
+        CARLOPT_CUSTOMREQUEST
+        CARLOPT_DEFAULT_PROTOCOL
+        CARLOPT_DNS_SERVERS
+        CARLOPT_DOH_URL
+        CARLOPT_EGDSOCKET
+        CARLOPT_ENCODING
+        CARLOPT_FTPPORT
+        CARLOPT_FTP_ACCOUNT
+        CARLOPT_FTP_ALTERNATIVE_TO_USER
+        CARLOPT_INTERFACE
+        CARLOPT_ISSUERCERT
+        CARLOPT_KEYPASSWD
+        CARLOPT_KRBLEVEL
+        CARLOPT_LOGIN_OPTIONS
+        CARLOPT_MAIL_AUTH
+        CARLOPT_MAIL_FROM
+        CARLOPT_NETRC_FILE
+        CARLOPT_NOPROXY
+        CARLOPT_PASSWORD
+        CARLOPT_PINNEDPUBLICKEY
+        CARLOPT_PRE_PROXY
+        CARLOPT_PROXY
+        CARLOPT_PROXYPASSWORD
+        CARLOPT_PROXYUSERNAME
+        CARLOPT_PROXYUSERPWD
+        CARLOPT_PROXY_CAINFO
+        CARLOPT_PROXY_CAPATH
+        CARLOPT_PROXY_CRLFILE
+        CARLOPT_PROXY_KEYPASSWD
+        CARLOPT_PROXY_PINNEDPUBLICKEY
+        CARLOPT_PROXY_SERVICE_NAME
+        CARLOPT_PROXY_SSLCERT
+        CARLOPT_PROXY_SSLCERTTYPE
+        CARLOPT_PROXY_SSLKEY
+        CARLOPT_PROXY_SSLKEYTYPE
+        CARLOPT_PROXY_SSL_CIPHER_LIST
+        CARLOPT_PROXY_TLS13_CIPHERS
+        CARLOPT_PROXY_TLSAUTH_PASSWORD
+        CARLOPT_PROXY_TLSAUTH_TYPE
+        CARLOPT_PROXY_TLSAUTH_USERNAME
+        CARLOPT_RANDOM_FILE
+        CARLOPT_RANGE
+        CARLOPT_REFERER
+        CARLOPT_REQUEST_TARGET
+        CARLOPT_RTSP_SESSION_UID
+        CARLOPT_RTSP_STREAM_URI
+        CARLOPT_RTSP_TRANSPORT
+        CARLOPT_SASL_AUTHZID
+        CARLOPT_SERVICE_NAME
+        CARLOPT_SOCKS5_GSSAPI_SERVICE
+        CARLOPT_SSH_HOST_PUBLIC_KEY_MD5
+        CARLOPT_SSH_KNOWNHOSTS
+        CARLOPT_SSH_PRIVATE_KEYFILE
+        CARLOPT_SSH_PUBLIC_KEYFILE
+        CARLOPT_SSLCERT
+        CARLOPT_SSLCERTTYPE
+        CARLOPT_SSLENGINE
+        CARLOPT_SSLKEY
+        CARLOPT_SSLKEYTYPE
+        CARLOPT_SSL_CIPHER_LIST
+        CARLOPT_TLS13_CIPHERS
+        CARLOPT_TLSAUTH_PASSWORD
+        CARLOPT_TLSAUTH_TYPE
+        CARLOPT_TLSAUTH_USERNAME
+        CARLOPT_UNIX_SOCKET_PATH
+        CARLOPT_URL
+        CARLOPT_USERAGENT
+        CARLOPT_USERNAME
+        CARLOPT_USERPWD
+        CARLOPT_XOAUTH2_BEARER
+  Else it is the same as for carl_easy_setopt().
+  Note that CARLOPT_ERRORBUFFER is not in the list above, since it gives the
 address of an (empty) character buffer, not the address of a string.
-CURLOPT_POSTFIELDS stores the address of static binary data (of type void *) and
-thus is not converted. If CURLOPT_COPYPOSTFIELDS is issued after
-CURLOPT_POSTFIELDSIZE != -1, the data size is adjusted according to the
+CARLOPT_POSTFIELDS stores the address of static binary data (of type void *) and
+thus is not converted. If CARLOPT_COPYPOSTFIELDS is issued after
+CARLOPT_POSTFIELDSIZE != -1, the data size is adjusted according to the
 CCSID conversion result length.
 
-_ curl_formadd_ccsid()
+_ carl_formadd_ccsid()
   In the variable argument list, string pointers should be followed by a (long)
 CCSID for the following options:
-        CURLFORM_FILENAME
-        CURLFORM_CONTENTTYPE
-        CURLFORM_BUFFER
-        CURLFORM_FILE
-        CURLFORM_FILECONTENT
-        CURLFORM_COPYCONTENTS
-        CURLFORM_COPYNAME
-        CURLFORM_PTRNAME
+        CARLFORM_FILENAME
+        CARLFORM_CONTENTTYPE
+        CARLFORM_BUFFER
+        CARLFORM_FILE
+        CARLFORM_FILECONTENT
+        CARLFORM_COPYCONTENTS
+        CARLFORM_COPYNAME
+        CARLFORM_PTRNAME
   If taken from an argument array, an additional array entry must follow each
 entry containing one of the above option. This additional entry holds the CCSID
 in its value field, and the option field is meaningless.
   It is not possible to have a string pointer and its CCSID across a function
 parameter/array boundary.
-  Please note that CURLFORM_PTRCONTENTS and CURLFORM_BUFFERPTR are considered
+  Please note that CARLFORM_PTRCONTENTS and CARLFORM_BUFFERPTR are considered
 unconvertible strings and thus are NOT followed by a CCSID.
 
-_ curl_easy_getinfo_ccsid()
+_ carl_easy_getinfo_ccsid()
   The following options are followed by a 'char * *' and a CCSID. Unlike
-curl_easy_getinfo(), the value returned in the pointer should be freed after
+carl_easy_getinfo(), the value returned in the pointer should be freed after
 use:
-        CURLINFO_EFFECTIVE_URL
-        CURLINFO_CONTENT_TYPE
-        CURLINFO_FTP_ENTRY_PATH
-        CURLINFO_REDIRECT_URL
-        CURLINFO_PRIMARY_IP
-        CURLINFO_RTSP_SESSION_ID
-        CURLINFO_LOCAL_IP
-        CURLINFO_SCHEME
-  Likewise, the following options are followed by a struct curl_slist * * and a
+        CARLINFO_EFFECTIVE_URL
+        CARLINFO_CONTENT_TYPE
+        CARLINFO_FTP_ENTRY_PATH
+        CARLINFO_REDIRECT_URL
+        CARLINFO_PRIMARY_IP
+        CARLINFO_RTSP_SESSION_ID
+        CARLINFO_LOCAL_IP
+        CARLINFO_SCHEME
+  Likewise, the following options are followed by a struct carl_slist * * and a
 CCSID.
-        CURLINFO_SSL_ENGINES
-        CURLINFO_COOKIELIST
-Lists returned should be released with curl_slist_free_all() after use.
-  Option CURLINFO_CERTINFO is followed by a struct curl_certinfo * * and a
-CCSID. Returned structures should be free'ed using curl_certinfo_free_all()
+        CARLINFO_SSL_ENGINES
+        CARLINFO_COOKIELIST
+Lists returned should be released with carl_slist_free_all() after use.
+  Option CARLINFO_CERTINFO is followed by a struct carl_certinfo * * and a
+CCSID. Returned structures should be free'ed using carl_certinfo_free_all()
 after use.
-  Other options are processed like in curl_easy_getinfo().
+  Other options are processed like in carl_easy_getinfo().
 
-_ curl_pushheader_bynum_cssid() and curl_pushheader_byname_ccsid()
+_ carl_pushheader_bynum_cssid() and carl_pushheader_byname_ccsid()
   Although the prototypes are self-explanatory, the returned string pointer
 should be freed after use, as opposite to the non-ccsid versions of these
 procedures.
@@ -205,7 +205,7 @@ in fact, very few common utilities are available. As a consequence, the
 config-os400.h has been coded manually and the compilation scripts are
 a set of shell scripts stored in subdirectory packages/OS400.
 
-  The "curl" command and the test environment are currently not supported on
+  The "carl" command and the test environment are currently not supported on
 OS/400.
 
 
@@ -247,10 +247,10 @@ _ If data compression has to be supported, ZLIB development environment must
   be installed.
 _ Likewise, if SCP and SFTP protocols have to be compiled in, LIBSSH2
   developent environment must be installed.
-_ Install the curl source directory in IFS. Do NOT install it in the
-  installation target directory (which defaults to /curl).
+_ Install the carl source directory in IFS. Do NOT install it in the
+  installation target directory (which defaults to /carl).
 _ Enter shell (QSH)
-_ Change current directory to the curl installation directory
+_ Change current directory to the carl installation directory
 _ Change current directory to ./packages/OS400
 _ Edit file iniscript.sh. You may want to change tunable configuration
   parameters, like debug info generation, optimisation level, listing option,
@@ -263,28 +263,28 @@ _ Examine the makelog file to check for compilation errors.
 
   Leaving file initscript.sh unchanged, this will produce the following OS/400
 objects:
-_ Library CURL. All other objects will be stored in this library.
-_ Modules for all libcurl units.
-_ Binding directory CURL_A, to be used at calling program link time for
+_ Library CARL. All other objects will be stored in this library.
+_ Modules for all libcarl units.
+_ Binding directory CARL_A, to be used at calling program link time for
   statically binding the modules (specify BNDSRVPGM(QADRTTS QGLDCLNT QGLDBRDR)
-  when creating a program using CURL_A).
-_ Service program CURL.<soname>, where <soname> is extracted from the
+  when creating a program using CARL_A).
+_ Service program CARL.<soname>, where <soname> is extracted from the
   lib/Makefile.am VERSION variable. To be used at calling program run-time
-  when this program has dynamically bound curl at link time.
-_ Binding directory CURL. To be used to dynamically bind libcurl when linking a
+  when this program has dynamically bound carl at link time.
+_ Binding directory CARL. To be used to dynamically bind libcarl when linking a
   calling program.
 _ Source file H. It contains all the include members needed to compile a C/C++
-  module using libcurl, and an ILE/RPG /copy member for support in this
+  module using libcarl, and an ILE/RPG /copy member for support in this
   language.
-_ Standard C/C++ libcurl include members in file H.
-_ CCSIDCURL member in file H. This defines the non-standard EBCDIC wrappers for
+_ Standard C/C++ libcarl include members in file H.
+_ CCSIDCARL member in file H. This defines the non-standard EBCDIC wrappers for
   C and C++.
-_ CURL.INC member in file H. This defines everything needed by an ILE/RPG
-  program using libcurl.
+_ CARL.INC member in file H. This defines everything needed by an ILE/RPG
+  program using libcarl.
 _ LIBxxx modules and programs. Although the test environment is not supported
-  on OS/400, the libcurl test programs are compiled for manual tests.
-_ IFS directory /curl/include/curl containing the C header files for IFS source
-  C/C++ compilation and curl.inc.rpgle for IFS source ILE/RPG compilation.
+  on OS/400, the libcarl test programs are compiled for manual tests.
+_ IFS directory /carl/include/carl containing the C header files for IFS source
+  C/C++ compilation and carl.inc.rpgle for IFS source ILE/RPG compilation.
 
 
 
@@ -298,44 +298,44 @@ _ The EBCDIC CCSID used by QADRT is 37 by default, NOT THE JOB'S CCSID. If
   LC_CTYPE, or by setting environment variable QADRT_ENV_LOCALE to the locale
   object path before executing the program.
 _ Do not use original source include files unless you know what you are doing.
-  Use the installed members instead (in /QSYS.LIB/CURL.LIB/H.FILE and
-  /curl/include/curl).
+  Use the installed members instead (in /QSYS.LIB/CARL.LIB/H.FILE and
+  /carl/include/carl).
 
 
 
 ILE/RPG support:
 
   Since 95% of the OS/400 programmers use ILE/RPG exclusively, a definition
-  /INCLUDE member is provided for this language. To include all libcurl
+  /INCLUDE member is provided for this language. To include all libcarl
   definitions in an ILE/RPG module, line
 
-     h bnddir('CURL/CURL')
+     h bnddir('CARL/CARL')
 
 must figure in the program header, and line
 
-     d/include curl/h,curl.inc
+     d/include carl/h,carl.inc
 
 in the global data section of the module's source code.
 
   No vararg procedure support exists in ILE/RPG: for this reason, the following
 considerations apply:
-_ Procedures curl_easy_setopt_long(), curl_easy_setopt_object(),
-  curl_easy_setopt_function() and curl_easy_setopt_offset() are all alias
-  prototypes to curl_easy_setopt(), but with different parameter lists.
-_ Procedures curl_easy_getinfo_string(), curl_easy_getinfo_long(),
-  curl_easy_getinfo_double(), curl_easy_getinfo_slist(),
-  curl_easy_getinfo_ptr(), curl_easy_getinfo_socket() and
-  curl_easy_getinfo_off_t() are all alias prototypes to curl_easy_getinfo(),
+_ Procedures carl_easy_setopt_long(), carl_easy_setopt_object(),
+  carl_easy_setopt_function() and carl_easy_setopt_offset() are all alias
+  prototypes to carl_easy_setopt(), but with different parameter lists.
+_ Procedures carl_easy_getinfo_string(), carl_easy_getinfo_long(),
+  carl_easy_getinfo_double(), carl_easy_getinfo_slist(),
+  carl_easy_getinfo_ptr(), carl_easy_getinfo_socket() and
+  carl_easy_getinfo_off_t() are all alias prototypes to carl_easy_getinfo(),
   but with different parameter lists.
-_ Procedures curl_multi_setopt_long(), curl_multi_setopt_object(),
-  curl_multi_setopt_function() and curl_multi_setopt_offset() are all alias
-  prototypes to curl_multi_setopt(), but with different parameter lists.
-_ The prototype of procedure curl_formadd() allows specifying a pointer option
-  and the CURLFORM_END option. This makes possible to use an option array
+_ Procedures carl_multi_setopt_long(), carl_multi_setopt_object(),
+  carl_multi_setopt_function() and carl_multi_setopt_offset() are all alias
+  prototypes to carl_multi_setopt(), but with different parameter lists.
+_ The prototype of procedure carl_formadd() allows specifying a pointer option
+  and the CARLFORM_END option. This makes possible to use an option array
   without any additional definition. If some specific incompatible argument
   list is used in the ILE/RPG program, the latter must define a specialised
-  alias. The same applies to curl_formadd_ccsid() too.
+  alias. The same applies to carl_formadd_ccsid() too.
 
-  Since RPG cannot cast a long to a pointer, procedure curl_form_long_value()
-is provided for that purpose: this allows storing a long value in the curl_forms
+  Since RPG cannot cast a long to a pointer, procedure carl_form_long_value()
+is provided for that purpose: this allows storing a long value in the carl_forms
 array.

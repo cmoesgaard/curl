@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,11 +20,11 @@
  *
  ***************************************************************************/
 /* <DESC>
- * Show how CURLOPT_DEBUGFUNCTION can be used.
+ * Show how CARLOPT_DEBUGFUNCTION can be used.
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 struct data {
   char trace_ascii; /* 1 or 0 */
@@ -82,7 +82,7 @@ void dump(const char *text,
 }
 
 static
-int my_trace(CURL *handle, curl_infotype type,
+int my_trace(CARL *handle, carl_infotype type,
              char *data, size_t size,
              void *userp)
 {
@@ -91,28 +91,28 @@ int my_trace(CURL *handle, curl_infotype type,
   (void)handle; /* prevent compiler warning */
 
   switch(type) {
-  case CURLINFO_TEXT:
+  case CARLINFO_TEXT:
     fprintf(stderr, "== Info: %s", data);
     /* FALLTHROUGH */
   default: /* in case a new one is introduced to shock us */
     return 0;
 
-  case CURLINFO_HEADER_OUT:
+  case CARLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
-  case CURLINFO_DATA_OUT:
+  case CARLINFO_DATA_OUT:
     text = "=> Send data";
     break;
-  case CURLINFO_SSL_DATA_OUT:
+  case CARLINFO_SSL_DATA_OUT:
     text = "=> Send SSL data";
     break;
-  case CURLINFO_HEADER_IN:
+  case CARLINFO_HEADER_IN:
     text = "<= Recv header";
     break;
-  case CURLINFO_DATA_IN:
+  case CARLINFO_DATA_IN:
     text = "<= Recv data";
     break;
-  case CURLINFO_SSL_DATA_IN:
+  case CARLINFO_SSL_DATA_IN:
     text = "<= Recv SSL data";
     break;
   }
@@ -123,32 +123,32 @@ int my_trace(CURL *handle, curl_infotype type,
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   struct data config;
 
   config.trace_ascii = 1; /* enable ascii tracing */
 
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    curl_easy_setopt(curl, CURLOPT_DEBUGDATA, &config);
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_DEBUGFUNCTION, my_trace);
+    carl_easy_setopt(carl, CARLOPT_DEBUGDATA, &config);
 
     /* the DEBUGFUNCTION has no effect until we enable VERBOSE */
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-    /* example.com is redirected, so we tell libcurl to follow redirection */
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    /* example.com is redirected, so we tell libcarl to follow redirection */
+    carl_easy_setopt(carl, CARLOPT_FOLLOWLOCATION, 1L);
 
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/");
-    res = curl_easy_perform(curl);
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   return 0;
 }

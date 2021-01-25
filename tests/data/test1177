@@ -2,7 +2,7 @@
 <info>
 <keywords>
 source analysis
-CURL_VERSION
+CARL_VERSION
 </keywords>
 </info>
 
@@ -14,11 +14,11 @@ none
 </server>
 
  <name>
-Verify that CURL_VERSION_* in headers and docs are in sync
+Verify that CARL_VERSION_* in headers and docs are in sync
  </name>
 
 <command type="perl">
-%SRCDIR/version-scan.pl %SRCDIR/../docs/libcurl/curl_version_info.3 %SRCDIR/../include/curl/curl.h
+%SRCDIR/version-scan.pl %SRCDIR/../docs/libcarl/carl_version_info.3 %SRCDIR/../include/carl/carl.h
 </command>
 </client>
 

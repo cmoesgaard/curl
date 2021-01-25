@@ -1,0 +1,267 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_formadd 3 "24 June 2002" "libcarl 7.9.8" "libcarl Manual"
+.SH NAME
+carl_formadd - add a section to a multipart/formdata HTTP POST
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "CARLFORMcode carl_formadd(struct carl_httppost ** " firstitem,
+.BI "struct carl_httppost ** " lastitem, " ...);"
+.ad
+.SH DESCRIPTION
+This function is deprecated. Do not use! See \fIcarl_mime_init(3)\fP instead!
+
+carl_formadd() is used to append sections when building a multipart/formdata
+HTTP POST (sometimes referred to as RFC2388-style posts). Append one section
+at a time until you've added all the sections you want included and then you
+pass the \fIfirstitem\fP pointer as parameter to \fICARLOPT_HTTPPOST(3)\fP.
+\fIlastitem\fP is set after each \fIcarl_formadd(3)\fP call and on repeated
+invokes it should be left as set to allow repeated invokes to find the end of
+the list faster.
+
+After the \fIlastitem\fP pointer follow the real arguments.
+
+The pointers \fIfirstitem\fP and \fIlastitem\fP should both be pointing to
+NULL in the first call to this function. All list-data will be allocated by
+the function itself. You must call \fIcarl_formfree(3)\fP on the
+\fIfirstitem\fP after the form post has been done to free the resources.
+
+Using POST with HTTP 1.1 implies the use of a "Expect: 100-continue" header.
+You can disable this header with \fICARLOPT_HTTPHEADER(3)\fP as usual.
+
+First, there are some basics you need to understand about multipart/formdata
+posts. Each part consists of at least a NAME and a CONTENTS part. If the part
+is made for file upload, there are also a stored CONTENT-TYPE and a FILENAME.
+Below, we'll discuss what options you use to set these properties in the
+parts you want to add to your post.
+
+The options listed first are for making normal parts. The options from
+\fICARLFORM_FILE\fP through \fICARLFORM_BUFFERLENGTH\fP are for file upload
+parts.
+.SH OPTIONS
+.IP CARLFORM_COPYNAME
+followed by a string which provides the \fIname\fP of this part. libcarl
+copies the string so your application doesn't need to keep it around after
+this function call. If the name isn't NUL-terminated, you must set its length
+with \fBCARLFORM_NAMELENGTH\fP. The \fIname\fP is not allowed to contain
+zero-valued bytes. The copied data will be freed by \fIcarl_formfree(3)\fP.
+.IP CARLFORM_PTRNAME
+followed by a string which provides the \fIname\fP of this part. libcarl
+will use the pointer and refer to the data in your application, so you
+must make sure it remains until carl no longer needs it. If the name
+isn't NUL-terminated, you must set its length with \fBCARLFORM_NAMELENGTH\fP.
+The \fIname\fP is not allowed to contain zero-valued bytes.
+.IP CARLFORM_COPYCONTENTS
+followed by a pointer to the contents of this part, the actual data
+to send away. libcarl copies the provided data, so your application doesn't
+need to keep it around after this function call. If the data isn't null
+terminated, or if you'd like it to contain zero bytes, you must
+set the length of the name with \fBCARLFORM_CONTENTSLENGTH\fP. The copied
+data will be freed by \fIcarl_formfree(3)\fP.
+.IP CARLFORM_PTRCONTENTS
+followed by a pointer to the contents of this part, the actual data
+to send away. libcarl will use the pointer and refer to the data in your
+application, so you must make sure it remains until carl no longer needs it.
+If the data isn't NUL-terminated, or if you'd like it to contain zero bytes,
+you must set its length  with \fBCARLFORM_CONTENTSLENGTH\fP.
+.IP CARLFORM_CONTENTLEN
+followed by a carl_off_t value giving the length of the contents. Note that
+for \fICARLFORM_STREAM\fP contents, this option is mandatory.
+
+If you pass a 0 (zero) for this option, libcarl will instead do a strlen() on
+the contents to figure out the size. If you really want to send a zero byte
+content then you must make sure strlen() on the data pointer returns zero.
+
+(Option added in 7.46.0)
+.IP CARLFORM_CONTENTSLENGTH
+(This option is deprecated. Use \fICARLFORM_CONTENTLEN\fP instead!)
+
+followed by a long giving the length of the contents. Note that for
+\fICARLFORM_STREAM\fP contents, this option is mandatory.
+
+If you pass a 0 (zero) for this option, libcarl will instead do a strlen() on
+the contents to figure out the size. If you really want to send a zero byte
+content then you must make sure strlen() on the data pointer returns zero.
+.IP CARLFORM_FILECONTENT
+followed by a filename, causes that file to be read and its contents used
+as data in this part. This part does \fInot\fP automatically become a file
+upload part simply because its data was read from a file.
+
+The specified file needs to kept around until the associated transfer is done.
+.IP CARLFORM_FILE
+followed by a filename, makes this part a file upload part. It sets the
+\fIfilename\fP field to the basename of the provided filename, it reads the
+contents of the file and passes them as data and sets the content-type if the
+given file match one of the internally known file extensions.  For
+\fBCARLFORM_FILE\fP the user may send one or more files in one part by
+providing multiple \fBCARLFORM_FILE\fP arguments each followed by the filename
+(and each \fICARLFORM_FILE\fP is allowed to have a
+\fICARLFORM_CONTENTTYPE\fP).
+
+The given upload file has to exist in its full in the file system already when
+the upload starts, as libcarl needs to read the correct file size beforehand.
+
+The specified file needs to kept around until the associated transfer is done.
+.IP CARLFORM_CONTENTTYPE
+is used in combination with \fICARLFORM_FILE\fP. Followed by a pointer to a
+string which provides the content-type for this part, possibly instead of an
+internally chosen one.
+.IP CARLFORM_FILENAME
+is used in combination with \fICARLFORM_FILE\fP. Followed by a pointer to a
+string, it tells libcarl to use the given string as the \fIfilename\fP in the
+file upload part instead of the actual file name.
+.IP CARLFORM_BUFFER
+is used for custom file upload parts without use of \fICARLFORM_FILE\fP.  It
+tells libcarl that the file contents are already present in a buffer.  The
+parameter is a string which provides the \fIfilename\fP field in the content
+header.
+.IP CARLFORM_BUFFERPTR
+is used in combination with \fICARLFORM_BUFFER\fP. The parameter is a pointer
+to the buffer to be uploaded. This buffer must not be freed until after
+\fIcarl_easy_cleanup(3)\fP is called. You must also use
+\fICARLFORM_BUFFERLENGTH\fP to set the number of bytes in the buffer.
+.IP CARLFORM_BUFFERLENGTH
+is used in combination with \fICARLFORM_BUFFER\fP. The parameter is a
+long which gives the length of the buffer.
+.IP CARLFORM_STREAM
+Tells libcarl to use the \fICARLOPT_READFUNCTION(3)\fP callback to get
+data. The parameter you pass to \fICARLFORM_STREAM\fP is the pointer passed on
+to the read callback's fourth argument. If you want the part to look like a
+file upload one, set the \fICARLFORM_FILENAME\fP parameter as well. Note that
+when using \fICARLFORM_STREAM\fP, \fICARLFORM_CONTENTSLENGTH\fP must also be
+set with the total expected length of the part unless the formpost is sent
+chunked encoded. (Option added in libcarl 7.18.2)
+.IP CARLFORM_ARRAY
+Another possibility to send options to carl_formadd() is the
+\fBCARLFORM_ARRAY\fP option, that passes a struct carl_forms array pointer as
+its value. Each carl_forms structure element has a CARLformoption and a char
+pointer. The final element in the array must be a CARLFORM_END. All available
+options can be used in an array, except the CARLFORM_ARRAY option itself!  The
+last argument in such an array must always be \fBCARLFORM_END\fP.
+.IP CARLFORM_CONTENTHEADER
+specifies extra headers for the form POST section.  This takes a carl_slist
+prepared in the usual way using \fBcarl_slist_append\fP and appends the list
+of headers to those libcarl automatically generates. The list must exist while
+the POST occurs, if you free it before the post completes you may experience
+problems.
+
+When you've passed the HttpPost pointer to \fIcarl_easy_setopt(3)\fP (using
+the \fICARLOPT_HTTPPOST(3)\fP option), you must not free the list until after
+you've called \fIcarl_easy_cleanup(3)\fP for the carl handle.
+
+See example below.
+.SH AVAILABILITY
+Deprecated in 7.56.0. Before this release, field names were allowed to
+contain zero-valued bytes. The pseudo-filename "-" to read stdin is
+discouraged although still supported, but data is not read before being
+actually sent: the effective data size can then not be automatically
+determined, resulting in a chunked encoding transfer. Backslashes and
+double quotes in field and file names are now escaped before transmission.
+.SH RETURN VALUE
+0 means everything was ok, non-zero means an error occurred corresponding
+to a CARL_FORMADD_* constant defined in
+.I <carl/carl.h>
+.SH EXAMPLE
+.nf
+
+ struct carl_httppost* post = NULL;
+ struct carl_httppost* last = NULL;
+ char namebuffer[] = "name buffer";
+ long namelength = strlen(namebuffer);
+ char buffer[] = "test buffer";
+ char htmlbuffer[] = "<HTML>test buffer</HTML>";
+ long htmlbufferlength = strlen(htmlbuffer);
+ struct carl_forms forms[3];
+ char file1[] = "my-face.jpg";
+ char file2[] = "your-face.jpg";
+ /* add null character into htmlbuffer, to demonstrate that
+    transfers of buffers containing null characters actually work
+ */
+ htmlbuffer[8] = '\\0';
+
+ /* Add simple name/content section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "name",
+              CARLFORM_COPYCONTENTS, "content", CARLFORM_END);
+
+ /* Add simple name/content/contenttype section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "htmlcode",
+              CARLFORM_COPYCONTENTS, "<HTML></HTML>",
+              CARLFORM_CONTENTTYPE, "text/html", CARLFORM_END);
+
+ /* Add name/ptrcontent section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "name_for_ptrcontent",
+              CARLFORM_PTRCONTENTS, buffer, CARLFORM_END);
+
+ /* Add ptrname/ptrcontent section */
+ carl_formadd(&post, &last, CARLFORM_PTRNAME, namebuffer,
+              CARLFORM_PTRCONTENTS, buffer, CARLFORM_NAMELENGTH,
+              namelength, CARLFORM_END);
+
+ /* Add name/ptrcontent/contenttype section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "html_code_with_hole",
+              CARLFORM_PTRCONTENTS, htmlbuffer,
+              CARLFORM_CONTENTSLENGTH, htmlbufferlength,
+              CARLFORM_CONTENTTYPE, "text/html", CARLFORM_END);
+
+ /* Add simple file section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "picture",
+              CARLFORM_FILE, "my-face.jpg", CARLFORM_END);
+
+ /* Add file/contenttype section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "picture",
+              CARLFORM_FILE, "my-face.jpg",
+              CARLFORM_CONTENTTYPE, "image/jpeg", CARLFORM_END);
+
+ /* Add two file section */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "pictures",
+              CARLFORM_FILE, "my-face.jpg",
+              CARLFORM_FILE, "your-face.jpg", CARLFORM_END);
+
+ /* Add two file section using CARLFORM_ARRAY */
+ forms[0].option = CARLFORM_FILE;
+ forms[0].value  = file1;
+ forms[1].option = CARLFORM_FILE;
+ forms[1].value  = file2;
+ forms[2].option  = CARLFORM_END;
+
+ /* Add a buffer to upload */
+ carl_formadd(&post, &last,
+              CARLFORM_COPYNAME, "name",
+              CARLFORM_BUFFER, "data",
+              CARLFORM_BUFFERPTR, record,
+              CARLFORM_BUFFERLENGTH, record_length,
+              CARLFORM_END);
+
+ /* no option needed for the end marker */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "pictures",
+              CARLFORM_ARRAY, forms, CARLFORM_END);
+ /* Add the content of a file as a normal post text value */
+ carl_formadd(&post, &last, CARLFORM_COPYNAME, "filecontent",
+              CARLFORM_FILECONTENT, ".bashrc", CARLFORM_END);
+ /* Set the form info */
+ carl_easy_setopt(carl, CARLOPT_HTTPPOST, post);
+
+.SH "SEE ALSO"
+.BR carl_easy_setopt "(3),"
+.BR carl_formfree "(3),"
+.BR carl_mime_init "(3)"

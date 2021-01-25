@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,14 +21,14 @@
  ***************************************************************************/
 #include "test.h"
 
-/* test case and code based on https://github.com/curl/curl/issues/3927 */
+/* test case and code based on https://github.com/carl/carl/issues/3927 */
 
 #include "testutil.h"
 #include "warnless.h"
 #include "memdebug.h"
 
-static int dload_progress_cb(void *a, curl_off_t b, curl_off_t c,
-                             curl_off_t d, curl_off_t e)
+static int dload_progress_cb(void *a, carl_off_t b, carl_off_t c,
+                             carl_off_t d, carl_off_t e)
 {
   (void)a;
   (void)b;
@@ -46,25 +46,25 @@ static size_t write_cb(char *d, size_t n, size_t l, void *p)
   return n*l;
 }
 
-static CURLcode run(CURL *hnd, long limit, long time)
+static CARLcode run(CARL *hnd, long limit, long time)
 {
-  curl_easy_setopt(hnd, CURLOPT_LOW_SPEED_LIMIT, limit);
-  curl_easy_setopt(hnd, CURLOPT_LOW_SPEED_TIME, time);
-  return curl_easy_perform(hnd);
+  carl_easy_setopt(hnd, CARLOPT_LOW_SPEED_LIMIT, limit);
+  carl_easy_setopt(hnd, CARLOPT_LOW_SPEED_TIME, time);
+  return carl_easy_perform(hnd);
 }
 
 int test(char *URL)
 {
-  CURLcode ret;
-  CURL *hnd;
-  char buffer[CURL_ERROR_SIZE];
-  curl_global_init(CURL_GLOBAL_ALL);
-  hnd = curl_easy_init();
-  curl_easy_setopt(hnd, CURLOPT_URL, URL);
-  curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_cb);
-  curl_easy_setopt(hnd, CURLOPT_ERRORBUFFER, buffer);
-  curl_easy_setopt(hnd, CURLOPT_NOPROGRESS, 0L);
-  curl_easy_setopt(hnd, CURLOPT_XFERINFOFUNCTION, dload_progress_cb);
+  CARLcode ret;
+  CARL *hnd;
+  char buffer[CARL_ERROR_SIZE];
+  carl_global_init(CARL_GLOBAL_ALL);
+  hnd = carl_easy_init();
+  carl_easy_setopt(hnd, CARLOPT_URL, URL);
+  carl_easy_setopt(hnd, CARLOPT_WRITEFUNCTION, write_cb);
+  carl_easy_setopt(hnd, CARLOPT_ERRORBUFFER, buffer);
+  carl_easy_setopt(hnd, CARLOPT_NOPROGRESS, 0L);
+  carl_easy_setopt(hnd, CARLOPT_XFERINFOFUNCTION, dload_progress_cb);
 
   printf("Start: %d\n", time(NULL));
   ret = run(hnd, 1, 2);
@@ -72,14 +72,14 @@ int test(char *URL)
     fprintf(stderr, "error %d: %s\n", ret, buffer);
 
   ret = run(hnd, 12000, 1);
-  if(ret != CURLE_OPERATION_TIMEDOUT)
+  if(ret != CARLE_OPERATION_TIMEDOUT)
     fprintf(stderr, "error %d: %s\n", ret, buffer);
   else
     ret = 0;
 
   printf("End: %d\n", time(NULL));
-  curl_easy_cleanup(hnd);
-  curl_global_cleanup();
+  carl_easy_cleanup(hnd);
+  carl_global_cleanup();
 
   return (int)ret;
 }

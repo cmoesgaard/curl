@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,26 +28,26 @@
 
 int test(char *URL)
 {
-  CURLcode code;
+  CARLcode code;
   int rc = 99;
 
-  code = curl_global_init(CURL_GLOBAL_ALL);
-  if(code == CURLE_OK) {
-    CURL *curl = curl_easy_init();
-    if(curl) {
-      CURL *curl2;
+  code = carl_global_init(CARL_GLOBAL_ALL);
+  if(code == CARLE_OK) {
+    CARL *carl = carl_easy_init();
+    if(carl) {
+      CARL *carl2;
 
-      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-      curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+      carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+      carl_easy_setopt(carl, CARLOPT_HEADER, 1L);
 
-      curl2 = curl_easy_duphandle(curl);
-      if(curl2) {
+      carl2 = carl_easy_duphandle(carl);
+      if(carl2) {
 
-        code = curl_easy_setopt(curl2, CURLOPT_URL, URL);
-        if(code == CURLE_OK) {
+        code = carl_easy_setopt(carl2, CARLOPT_URL, URL);
+        if(code == CARLE_OK) {
 
-          code = curl_easy_perform(curl2);
-          if(code == CURLE_OK)
+          code = carl_easy_perform(carl2);
+          if(code == CARLE_OK)
             rc = 0;
           else
             rc = 1;
@@ -55,17 +55,17 @@ int test(char *URL)
         else
           rc = 2;
 
-        curl_easy_cleanup(curl2);
+        carl_easy_cleanup(carl2);
       }
       else
         rc = 3;
 
-      curl_easy_cleanup(curl);
+      carl_easy_cleanup(carl);
     }
     else
       rc = 4;
 
-    curl_global_cleanup();
+    carl_global_cleanup();
   }
   else
     rc = 5;

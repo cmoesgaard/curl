@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CB_PRG_H
-#define HEADER_CURL_TOOL_CB_PRG_H
+#ifndef HEADER_CARL_TOOL_CB_PRG_H
+#define HEADER_CARL_TOOL_CB_PRG_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,16 +23,16 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define CURL_PROGRESS_STATS 0 /* default progress display */
-#define CURL_PROGRESS_BAR   1
+#define CARL_PROGRESS_STATS 0 /* default progress display */
+#define CARL_PROGRESS_BAR   1
 
 struct ProgressData {
   int         calls;
-  curl_off_t  prev;
+  carl_off_t  prev;
   struct timeval prevtime;
   int         width;
   FILE       *out;  /* where to write everything to */
-  curl_off_t  initial_size;
+  carl_off_t  initial_size;
   unsigned int tick;
   int bar;
   int barmove;
@@ -42,11 +42,11 @@ void progressbarinit(struct ProgressData *bar,
                      struct OperationConfig *config);
 
 /*
-** callback for CURLOPT_PROGRESSFUNCTION
+** callback for CARLOPT_PROGRESSFUNCTION
 */
 
 int tool_progress_cb(void *clientp,
-                     curl_off_t dltotal, curl_off_t dlnow,
-                     curl_off_t ultotal, curl_off_t ulnow);
+                     carl_off_t dltotal, carl_off_t dlnow,
+                     carl_off_t ultotal, carl_off_t ulnow);
 
-#endif /* HEADER_CURL_TOOL_CB_PRG_H */
+#endif /* HEADER_CARL_TOOL_CB_PRG_H */

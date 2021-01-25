@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/345 --etag-compare log/etag345 --etag-save log/etag345
 <protocol>
 GET /345 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 If-None-Match: "21025-dc7-39462498"
 

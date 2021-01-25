@@ -1,11 +1,11 @@
-# How to get started helping out in the curl project
+# How to get started helping out in the carl project
 
 We are always in need of more help. If you are new to the project and are
 looking for ways to contribute and help out, this document aims to give a few
 good starting points.
 
-A good idea is to start by subscribing to the [curl-library mailing
-list](https://cool.haxx.se/mailman/listinfo/curl-library) to keep track of the
+A good idea is to start by subscribing to the [carl-library mailing
+list](https://cool.haxx.se/mailman/listinfo/carl-library) to keep track of the
 current discussion topics.
 
 ## Scratch your own itch
@@ -18,7 +18,7 @@ down and report the bug. Or make your first pull request with a fix for that.
 ## Smaller tasks
 
 Some projects mark small issues as "beginner friendly", "bite-sized" or
-similar. We don't do that in curl since such issues never linger around long
+similar. We don't do that in carl since such issues never linger around long
 enough. Simple issues get handled very fast.
 
 If you're looking for a smaller or simpler task in the project to help out
@@ -35,7 +35,7 @@ even maybe not a terribly experienced developer, here's our advice:
 ## Help wanted
 
 In the issue tracker we occasionally mark bugs with [help
-wanted](https://github.com/curl/curl/labels/help%20wanted), as a sign that the
+wanted](https://github.com/carl/carl/labels/help%20wanted), as a sign that the
 bug is acknowledged to exist and that there's nobody known to work on this
 issue for the moment. Those are bugs that are fine to "grab" and provide a
 pull request for. The complexity level of these will of course vary, so pick
@@ -45,25 +45,25 @@ one that piques your interest.
 
 Some bugs are known and haven't yet received attention and work enough to get
 fixed. We collect such known existing flaws in the
-[KNOWN_BUGS](https://curl.se/docs/knownbugs.html) page. Many of them link
+[KNOWN_BUGS](https://carl.se/docs/knownbugs.html) page. Many of them link
 to the original bug report with some additional details, but some may also
 have aged a bit and may require some verification that the bug still exists in
 the same way and that what was said about it in the past is still valid.
 
 ## Fix autobuild problems
 
-On the [autobuilds page](https://curl.se/dev/builds.html) we show a
-collection of test results from the automatic curl build and tests that are
+On the [autobuilds page](https://carl.se/dev/builds.html) we show a
+collection of test results from the automatic carl build and tests that are
 performed by volunteers. Fixing compiler warnings and errors shown there is
 something we value greatly. Also, if you own or run systems or architectures
 that aren't already tested in the autobuilds, we also appreciate more
-volunteers running builds automatically to help us keep curl portable.
+volunteers running builds automatically to help us keep carl portable.
 
 ## TODO items
 
 Ideas for features and functions that we have considered worthwhile to
 implement and provide are kept in the
-[TODO](https://curl.se/docs/todo.html) file. Some of the ideas are
+[TODO](https://carl.se/docs/todo.html) file. Some of the ideas are
 rough. Some are well thought out. Some probably aren't really suitable
 anymore.
 
@@ -81,7 +81,7 @@ the specific implementation. Either way is fine.
 
 ## CONTRIBUTE
 
-We offer [guidelines](https://curl.se/dev/contribute.html) that are
-suitable to be familiar with before you decide to contribute to curl. If
+We offer [guidelines](https://carl.se/dev/contribute.html) that are
+suitable to be familiar with before you decide to contribute to carl. If
 you're used to open source development, you'll probably not find many
 surprises in there.

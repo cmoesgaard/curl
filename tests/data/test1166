@@ -39,12 +39,12 @@ http://%HOSTIP:%HTTPPORT/want/1166 http://%HOSTIP:%HTTPPORT/want/1166
 <protocol>
 GET /want/1166 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /want/1166 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -31,14 +31,14 @@
 
 int test(char *URL)
 {
-  CURL *handle = NULL;
-  CURLcode res = 0;
-  CURLU *urlp = NULL;
+  CARL *handle = NULL;
+  CARLcode res = 0;
+  CARLU *urlp = NULL;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
   easy_init(handle);
 
-  urlp = curl_url();
+  urlp = carl_url();
 
   if(!urlp) {
     fprintf(stderr, "problem init URL api.");
@@ -46,30 +46,30 @@ int test(char *URL)
   }
 
   /* this doesn't set the PATH part */
-  if(curl_url_set(urlp, CURLUPART_HOST, "www.example.com", 0) ||
-     curl_url_set(urlp, CURLUPART_SCHEME, "http", 0) ||
-     curl_url_set(urlp, CURLUPART_PORT, "80", 0)) {
-    fprintf(stderr, "problem setting CURLUPART");
+  if(carl_url_set(urlp, CARLUPART_HOST, "www.example.com", 0) ||
+     carl_url_set(urlp, CARLUPART_SCHEME, "http", 0) ||
+     carl_url_set(urlp, CARLUPART_PORT, "80", 0)) {
+    fprintf(stderr, "problem setting CARLUPART");
     goto test_cleanup;
   }
 
-  easy_setopt(handle, CURLOPT_CURLU, urlp);
-  easy_setopt(handle, CURLOPT_VERBOSE, 1L);
-  easy_setopt(handle, CURLOPT_PROXY, URL);
+  easy_setopt(handle, CARLOPT_CARLU, urlp);
+  easy_setopt(handle, CARLOPT_VERBOSE, 1L);
+  easy_setopt(handle, CARLOPT_PROXY, URL);
 
-  res = curl_easy_perform(handle);
+  res = carl_easy_perform(handle);
 
   if(res) {
-    fprintf(stderr, "%s:%d curl_easy_perform() failed with code %d (%s)\n",
-            __FILE__, __LINE__, res, curl_easy_strerror(res));
+    fprintf(stderr, "%s:%d carl_easy_perform() failed with code %d (%s)\n",
+            __FILE__, __LINE__, res, carl_easy_strerror(res));
     goto test_cleanup;
   }
 
 test_cleanup:
 
-  curl_url_cleanup(urlp);
-  curl_easy_cleanup(handle);
-  curl_global_cleanup();
+  carl_url_cleanup(urlp);
+  carl_easy_cleanup(handle);
+  carl_global_cleanup();
 
   return res;
 }

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,13 +20,13 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_LDAP) && !defined(USE_OPENLDAP)
+#if !defined(CARL_DISABLE_LDAP) && !defined(USE_OPENLDAP)
 
 /*
  * Notice that USE_OPENLDAP is only a source code selection switch. When
- * libcurl is built with USE_OPENLDAP defined the libcurl source code that
+ * libcarl is built with USE_OPENLDAP defined the libcarl source code that
  * gets compiled is the code from openldap.c, otherwise the code that gets
  * compiled is the code from ldap.c.
  *
@@ -55,20 +55,20 @@
 #endif
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "sendf.h"
 #include "escape.h"
 #include "progress.h"
 #include "transfer.h"
 #include "strcase.h"
 #include "strtok.h"
-#include "curl_ldap.h"
-#include "curl_multibyte.h"
-#include "curl_base64.h"
+#include "carl_ldap.h"
+#include "carl_multibyte.h"
+#include "carl_base64.h"
 #include "connect.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #ifndef HAVE_LDAP_URL_PARSE
@@ -126,7 +126,7 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp);
 #endif
 
 
-static CURLcode ldap_do(struct Curl_easy *data, bool *done);
+static CARLcode ldap_do(struct Curl_easy *data, bool *done);
 
 /*
  * LDAP protocol handler.
@@ -149,8 +149,8 @@ const struct Curl_handler Curl_handler_ldap = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_LDAP,                            /* defport */
-  CURLPROTO_LDAP,                       /* protocol */
-  CURLPROTO_LDAP,                       /* family */
+  CARLPROTO_LDAP,                       /* protocol */
+  CARLPROTO_LDAP,                       /* family */
   PROTOPT_NONE                          /* flags */
 };
 
@@ -176,8 +176,8 @@ const struct Curl_handler Curl_handler_ldaps = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_LDAPS,                           /* defport */
-  CURLPROTO_LDAPS,                      /* protocol */
-  CURLPROTO_LDAP,                       /* family */
+  CARLPROTO_LDAPS,                      /* protocol */
+  CARLPROTO_LDAP,                       /* family */
   PROTOPT_SSL                           /* flags */
 };
 #endif
@@ -195,19 +195,19 @@ static int ldap_win_bind_auth(LDAP *server, const char *user,
   memset(&cred, 0, sizeof(cred));
 
 #if defined(USE_SPNEGO)
-  if(authflags & CURLAUTH_NEGOTIATE) {
+  if(authflags & CARLAUTH_NEGOTIATE) {
     method = LDAP_AUTH_NEGOTIATE;
   }
   else
 #endif
 #if defined(USE_NTLM)
-  if(authflags & CURLAUTH_NTLM) {
+  if(authflags & CARLAUTH_NTLM) {
     method = LDAP_AUTH_NTLM;
   }
   else
 #endif
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
-  if(authflags & CURLAUTH_DIGEST) {
+#if !defined(CARL_DISABLE_CRYPTO_AUTH)
+  if(authflags & CARLAUTH_DIGEST) {
     method = LDAP_AUTH_DIGEST;
   }
   else
@@ -240,14 +240,14 @@ static int ldap_win_bind(struct connectdata *conn, LDAP *server,
   PTCHAR inuser = NULL;
   PTCHAR inpass = NULL;
 
-  if(user && passwd && (conn->data->set.httpauth & CURLAUTH_BASIC)) {
-    inuser = curlx_convert_UTF8_to_tchar((char *) user);
-    inpass = curlx_convert_UTF8_to_tchar((char *) passwd);
+  if(user && passwd && (conn->data->set.httpauth & CARLAUTH_BASIC)) {
+    inuser = carlx_convert_UTF8_to_tchar((char *) user);
+    inpass = carlx_convert_UTF8_to_tchar((char *) passwd);
 
     rc = ldap_simple_bind_s(server, inuser, inpass);
 
-    curlx_unicodefree(inuser);
-    curlx_unicodefree(inpass);
+    carlx_unicodefree(inuser);
+    carlx_unicodefree(inpass);
   }
 #if defined(USE_WINDOWS_SSPI)
   else {
@@ -260,15 +260,15 @@ static int ldap_win_bind(struct connectdata *conn, LDAP *server,
 #endif /* #if defined(USE_WIN32_LDAP) */
 
 #if defined(USE_WIN32_LDAP)
-#define FREE_ON_WINLDAP(x) curlx_unicodefree(x)
+#define FREE_ON_WINLDAP(x) carlx_unicodefree(x)
 #else
 #define FREE_ON_WINLDAP(x)
 #endif
 
 
-static CURLcode ldap_do(struct Curl_easy *data, bool *done)
+static CARLcode ldap_do(struct Curl_easy *data, bool *done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   int rc = 0;
   LDAP *server = NULL;
   LDAPURLDesc *ludp = NULL;
@@ -280,7 +280,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
   int ldap_ssl = 0;
   char *val_b64 = NULL;
   size_t val_b64_sz = 0;
-  curl_off_t dlsize = 0;
+  carl_off_t dlsize = 0;
 #ifdef LDAP_OPT_NETWORK_TIMEOUT
   struct timeval ldap_timeout = {10, 0}; /* 10 sec connection/search timeout */
 #endif
@@ -304,7 +304,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
 #endif
   if(rc != 0) {
     failf(data, "LDAP local: %s", ldap_err2string(rc));
-    result = CURLE_LDAP_INVALID_URL;
+    result = CARLE_LDAP_INVALID_URL;
     goto quit;
   }
 
@@ -315,9 +315,9 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
           ldap_ssl ? "encrypted" : "cleartext");
 
 #if defined(USE_WIN32_LDAP)
-  host = curlx_convert_UTF8_to_tchar(conn->host.name);
+  host = carlx_convert_UTF8_to_tchar(conn->host.name);
   if(!host) {
-    result = CURLE_OUT_OF_MEMORY;
+    result = CARLE_OUT_OF_MEMORY;
 
     goto quit;
   }
@@ -344,11 +344,11 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
 #else
     int ldap_option;
     char *ldap_ca = conn->ssl_config.CAfile;
-#if defined(CURL_HAS_NOVELL_LDAPSDK)
+#if defined(CARL_HAS_NOVELL_LDAPSDK)
     rc = ldapssl_client_init(NULL, NULL);
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ldapssl_client_init %s", ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
+      result = CARLE_SSL_CERTPROBLEM;
       goto quit;
     }
     if(conn->ssl_config.verifypeer) {
@@ -360,7 +360,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
       if(!ldap_ca) {
         failf(data, "LDAP local: ERROR %s CA cert not set!",
               (cert_type == LDAPSSL_CERT_FILETYPE_DER ? "DER" : "PEM"));
-        result = CURLE_SSL_CERTPROBLEM;
+        result = CARLE_SSL_CERTPROBLEM;
         goto quit;
       }
       infof(data, "LDAP local: using %s CA cert '%s'\n",
@@ -371,7 +371,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
         failf(data, "LDAP local: ERROR setting %s CA cert: %s",
                 (cert_type == LDAPSSL_CERT_FILETYPE_DER ? "DER" : "PEM"),
                 ldap_err2string(rc));
-        result = CURLE_SSL_CERTPROBLEM;
+        result = CARLE_SSL_CERTPROBLEM;
         goto quit;
       }
       ldap_option = LDAPSSL_VERIFY_SERVER;
@@ -382,14 +382,14 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR setting cert verify mode: %s",
               ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
+      result = CARLE_SSL_CERTPROBLEM;
       goto quit;
     }
     server = ldapssl_init(host, (int)conn->port, 1);
     if(server == NULL) {
       failf(data, "LDAP local: Cannot connect to %s:%ld",
             conn->host.dispname, conn->port);
-      result = CURLE_COULDNT_CONNECT;
+      result = CARLE_COULDNT_CONNECT;
       goto quit;
     }
 #elif defined(LDAP_OPT_X_TLS)
@@ -398,12 +398,12 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
       if((data->set.ssl.cert_type) &&
          (!strcasecompare(data->set.ssl.cert_type, "PEM"))) {
         failf(data, "LDAP local: ERROR OpenLDAP only supports PEM cert-type!");
-        result = CURLE_SSL_CERTPROBLEM;
+        result = CARLE_SSL_CERTPROBLEM;
         goto quit;
       }
       if(!ldap_ca) {
         failf(data, "LDAP local: ERROR PEM CA cert not set!");
-        result = CURLE_SSL_CERTPROBLEM;
+        result = CARLE_SSL_CERTPROBLEM;
         goto quit;
       }
       infof(data, "LDAP local: using PEM CA cert: %s\n", ldap_ca);
@@ -411,7 +411,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
       if(rc != LDAP_SUCCESS) {
         failf(data, "LDAP local: ERROR setting PEM CA cert: %s",
                 ldap_err2string(rc));
-        result = CURLE_SSL_CERTPROBLEM;
+        result = CARLE_SSL_CERTPROBLEM;
         goto quit;
       }
       ldap_option = LDAP_OPT_X_TLS_DEMAND;
@@ -423,14 +423,14 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR setting cert verify mode: %s",
               ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
+      result = CARLE_SSL_CERTPROBLEM;
       goto quit;
     }
     server = ldap_init(host, (int)conn->port);
     if(server == NULL) {
       failf(data, "LDAP local: Cannot connect to %s:%ld",
             conn->host.dispname, conn->port);
-      result = CURLE_COULDNT_CONNECT;
+      result = CARLE_COULDNT_CONNECT;
       goto quit;
     }
     ldap_option = LDAP_OPT_X_TLS_HARD;
@@ -438,7 +438,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR setting SSL/TLS mode: %s",
               ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
+      result = CARLE_SSL_CERTPROBLEM;
       goto quit;
     }
 /*
@@ -446,7 +446,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR starting SSL/TLS mode: %s",
               ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
+      result = CARLE_SSL_CERTPROBLEM;
       goto quit;
     }
 */
@@ -455,18 +455,18 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
        should check in first place if we can support LDAP SSL/TLS */
     failf(data, "LDAP local: SSL/TLS not supported with this version "
             "of the OpenLDAP toolkit\n");
-    result = CURLE_SSL_CERTPROBLEM;
+    result = CARLE_SSL_CERTPROBLEM;
     goto quit;
 #endif
 #endif
-#endif /* CURL_LDAP_USE_SSL */
+#endif /* CARL_LDAP_USE_SSL */
   }
   else {
     server = ldap_init(host, (int)conn->port);
     if(server == NULL) {
       failf(data, "LDAP local: Cannot connect to %s:%ld",
             conn->host.dispname, conn->port);
-      result = CURLE_COULDNT_CONNECT;
+      result = CARLE_COULDNT_CONNECT;
       goto quit;
     }
   }
@@ -493,7 +493,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
     failf(data, "LDAP local: bind via ldap_simple_bind_s %s",
           ldap_err2string(rc));
 #endif
-    result = CURLE_LDAP_CANNOT_BIND;
+    result = CARLE_LDAP_CANNOT_BIND;
     goto quit;
   }
 
@@ -502,7 +502,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
 
   if(rc != 0 && rc != LDAP_SIZELIMIT_EXCEEDED) {
     failf(data, "LDAP remote: %s", ldap_err2string(rc));
-    result = CURLE_LDAP_SEARCH_FAILED;
+    result = CARLE_LDAP_SEARCH_FAILED;
     goto quit;
   }
 
@@ -523,11 +523,11 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
       size_t name_len;
 #if defined(USE_WIN32_LDAP)
       TCHAR *dn = ldap_get_dn(server, entryIterator);
-      name = curlx_convert_tchar_to_UTF8(dn);
+      name = carlx_convert_tchar_to_UTF8(dn);
       if(!name) {
         ldap_memfree(dn);
 
-        result = CURLE_OUT_OF_MEMORY;
+        result = CARLE_OUT_OF_MEMORY;
 
         goto quit;
       }
@@ -572,12 +572,12 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
       BerValue **vals;
       size_t attr_len;
 #if defined(USE_WIN32_LDAP)
-      char *attr = curlx_convert_tchar_to_UTF8(attribute);
+      char *attr = carlx_convert_tchar_to_UTF8(attribute);
       if(!attr) {
         if(ber)
           ber_free(ber, 0);
 
-        result = CURLE_OUT_OF_MEMORY;
+        result = CARLE_OUT_OF_MEMORY;
 
         goto quit;
     }
@@ -720,10 +720,10 @@ quit:
     ldap_free_urldesc(ludp);
   if(server)
     ldap_unbind_s(server);
-#if defined(HAVE_LDAP_SSL) && defined(CURL_HAS_NOVELL_LDAPSDK)
+#if defined(HAVE_LDAP_SSL) && defined(CARL_HAS_NOVELL_LDAPSDK)
   if(ldap_ssl)
     ldapssl_client_deinit();
-#endif /* HAVE_LDAP_SSL && CURL_HAS_NOVELL_LDAPSDK */
+#endif /* HAVE_LDAP_SSL && CARL_HAS_NOVELL_LDAPSDK */
 
   FREE_ON_WINLDAP(host);
 
@@ -741,7 +741,7 @@ static void _ldap_trace(const char *fmt, ...)
   va_list args;
 
   if(do_trace == -1) {
-    const char *env = getenv("CURL_TRACE");
+    const char *env = getenv("CARL_TRACE");
     do_trace = (env && strtol(env, NULL, 10) > 0);
   }
   if(!do_trace)
@@ -856,7 +856,7 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
   if(*p) {
     char *dn = p;
     char *unescaped;
-    CURLcode result;
+    CARLcode result;
 
     LDAP_TRACE(("DN '%s'\n", dn));
 
@@ -870,10 +870,10 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
 
 #if defined(USE_WIN32_LDAP)
     /* Convert the unescaped string to a tchar */
-    ludp->lud_dn = curlx_convert_UTF8_to_tchar(unescaped);
+    ludp->lud_dn = carlx_convert_UTF8_to_tchar(unescaped);
 
     /* Free the unescaped string as we are done with it */
-    curlx_unicodefree(unescaped);
+    carlx_unicodefree(unescaped);
 
     if(!ludp->lud_dn) {
       rc = LDAP_NO_MEMORY;
@@ -921,7 +921,7 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
 
     for(i = 0; i < count; i++) {
       char *unescaped;
-      CURLcode result;
+      CARLcode result;
 
       LDAP_TRACE(("attr[%zu] '%s'\n", i, attributes[i]));
 
@@ -938,10 +938,10 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
 
 #if defined(USE_WIN32_LDAP)
       /* Convert the unescaped string to a tchar */
-      ludp->lud_attrs[i] = curlx_convert_UTF8_to_tchar(unescaped);
+      ludp->lud_attrs[i] = carlx_convert_UTF8_to_tchar(unescaped);
 
       /* Free the unescaped string as we are done with it */
-      curlx_unicodefree(unescaped);
+      carlx_unicodefree(unescaped);
 
       if(!ludp->lud_attrs[i]) {
         free(attributes);
@@ -991,7 +991,7 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
   if(*p) {
     char *filter = p;
     char *unescaped;
-    CURLcode result;
+    CARLcode result;
 
     LDAP_TRACE(("filter '%s'\n", filter));
 
@@ -1006,10 +1006,10 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
 
 #if defined(USE_WIN32_LDAP)
     /* Convert the unescaped string to a tchar */
-    ludp->lud_filter = curlx_convert_UTF8_to_tchar(unescaped);
+    ludp->lud_filter = carlx_convert_UTF8_to_tchar(unescaped);
 
     /* Free the unescaped string as we are done with it */
-    curlx_unicodefree(unescaped);
+    carlx_unicodefree(unescaped);
 
     if(!ludp->lud_filter) {
       rc = LDAP_NO_MEMORY;
@@ -1072,4 +1072,4 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp)
   free(ludp);
 }
 #endif  /* !HAVE_LDAP_URL_PARSE */
-#endif  /* !CURL_DISABLE_LDAP && !USE_OPENLDAP */
+#endif  /* !CARL_DISABLE_LDAP && !USE_OPENLDAP */

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,12 +20,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 /***********************************************************************
  * Only for plain IPv4 builds
  **********************************************************************/
-#ifdef CURLRES_IPV4 /* plain IPv4 code coming up */
+#ifdef CARLRES_IPV4 /* plain IPv4 code coming up */
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -53,25 +53,25 @@
 #include "strerror.h"
 #include "url.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
- * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
+ * Curl_ipvalid() checks what CARL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
 bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn)
 {
   (void)data;
-  if(conn->ip_version == CURL_IPRESOLVE_V6)
+  if(conn->ip_version == CARL_IPRESOLVE_V6)
     /* An IPv6 address was requested and we can't get/use one */
     return FALSE;
 
   return TRUE; /* OK, proceed */
 }
 
-#ifdef CURLRES_SYNCH
+#ifdef CARLRES_SYNCH
 
 /*
  * Curl_getaddrinfo() - the IPv4 synchronous version.
@@ -96,7 +96,7 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 {
   struct Curl_addrinfo *ai = NULL;
 
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
+#ifdef CARL_DISABLE_VERBOSE_STRINGS
   (void)data;
 #endif
 
@@ -108,10 +108,10 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 
   return ai;
 }
-#endif /* CURLRES_SYNCH */
-#endif /* CURLRES_IPV4 */
+#endif /* CARLRES_SYNCH */
+#endif /* CARLRES_IPV4 */
 
-#if defined(CURLRES_IPV4) && !defined(CURLRES_ARES)
+#if defined(CARLRES_IPV4) && !defined(CARLRES_ARES)
 
 /*
  * Curl_ipv4_resolve_r() - ipv4 threadsafe resolver function.
@@ -153,7 +153,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
    */
   int h_errnop;
 
-  buf = calloc(1, CURL_HOSTENT_SIZE);
+  buf = calloc(1, CARL_HOSTENT_SIZE);
   if(!buf)
     return NULL; /* major failure */
   /*
@@ -167,7 +167,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
   h = gethostbyname_r(hostname,
                       (struct hostent *)buf,
                       (char *)buf + sizeof(struct hostent),
-                      CURL_HOSTENT_SIZE - sizeof(struct hostent),
+                      CARL_HOSTENT_SIZE - sizeof(struct hostent),
                       &h_errnop);
 
   /* If the buffer is too small, it returns NULL and sets errno to
@@ -186,7 +186,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
   (void)gethostbyname_r(hostname,
                       (struct hostent *)buf,
                       (char *)buf + sizeof(struct hostent),
-                      CURL_HOSTENT_SIZE - sizeof(struct hostent),
+                      CARL_HOSTENT_SIZE - sizeof(struct hostent),
                       &h, /* DIFFERENCE */
                       &h_errnop);
   /* Redhat 8, using glibc 2.2.93 changed the behavior. Now all of a
@@ -201,7 +201,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
    *
    * For now, we do that and thus we may call the function repeatedly and
    * fail for older glibc versions that return EAGAIN, until we run out of
-   * buffer size (step_size grows beyond CURL_HOSTENT_SIZE).
+   * buffer size (step_size grows beyond CARL_HOSTENT_SIZE).
    *
    * If anyone has a better fix, please tell us!
    *
@@ -242,7 +242,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
    * thread-safe", but at least the gethostbyname() function is.
    */
 
-  if(CURL_HOSTENT_SIZE >=
+  if(CARL_HOSTENT_SIZE >=
      (sizeof(struct hostent) + sizeof(struct hostent_data))) {
 
     /* August 22nd, 2000: Albert Chin-A-Young brought an updated version
@@ -266,7 +266,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
     /* This is the worst kind of the different gethostbyname_r() interfaces.
      * Since we don't know how big buffer this particular lookup required,
      * we can't realloc down the huge alloc without doing closer analysis of
-     * the returned data. Thus, we always use CURL_HOSTENT_SIZE for every
+     * the returned data. Thus, we always use CARL_HOSTENT_SIZE for every
      * name lookup. Fixing this would require an extra malloc() and then
      * calling Curl_addrinfo_copy() that subsequent realloc()s down the new
      * memory area to the actually used amount.
@@ -296,4 +296,4 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
 
   return ai;
 }
-#endif /* defined(CURLRES_IPV4) && !defined(CURLRES_ARES) */
+#endif /* defined(CARLRES_IPV4) && !defined(CARLRES_ARES) */

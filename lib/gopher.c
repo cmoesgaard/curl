@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,12 +20,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_GOPHER
+#ifndef CARL_DISABLE_GOPHER
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "transfer.h"
 #include "sendf.h"
 #include "connect.h"
@@ -37,8 +37,8 @@
 #include "url.h"
 #include "escape.h"
 #include "warnless.h"
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -46,10 +46,10 @@
  * Forward declarations.
  */
 
-static CURLcode gopher_do(struct Curl_easy *data, bool *done);
+static CARLcode gopher_do(struct Curl_easy *data, bool *done);
 #ifdef USE_SSL
-static CURLcode gopher_connect(struct Curl_easy *data, bool *done);
-static CURLcode gopher_connecting(struct Curl_easy *data, bool *done);
+static CARLcode gopher_connect(struct Curl_easy *data, bool *done);
+static CARLcode gopher_connecting(struct Curl_easy *data, bool *done);
 #endif
 
 /*
@@ -75,8 +75,8 @@ const struct Curl_handler Curl_handler_gopher = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_GOPHER,                          /* defport */
-  CURLPROTO_GOPHER,                     /* protocol */
-  CURLPROTO_GOPHER,                     /* family */
+  CARLPROTO_GOPHER,                     /* protocol */
+  CARLPROTO_GOPHER,                     /* family */
   PROTOPT_NONE                          /* flags */
 };
 
@@ -98,22 +98,22 @@ const struct Curl_handler Curl_handler_gophers = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_GOPHER,                          /* defport */
-  CURLPROTO_GOPHERS,                    /* protocol */
-  CURLPROTO_GOPHER,                     /* family */
+  CARLPROTO_GOPHERS,                    /* protocol */
+  CARLPROTO_GOPHER,                     /* family */
   PROTOPT_SSL                           /* flags */
 };
 
-static CURLcode gopher_connect(struct Curl_easy *data, bool *done)
+static CARLcode gopher_connect(struct Curl_easy *data, bool *done)
 {
   (void)data;
   (void)done;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode gopher_connecting(struct Curl_easy *data, bool *done)
+static CARLcode gopher_connecting(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
-  CURLcode result = Curl_ssl_connect(data, conn, FIRSTSOCKET);
+  CARLcode result = Curl_ssl_connect(data, conn, FIRSTSOCKET);
   if(result)
     connclose(conn, "Failed TLS connection");
   *done = TRUE;
@@ -121,11 +121,11 @@ static CURLcode gopher_connecting(struct Curl_easy *data, bool *done)
 }
 #endif
 
-static CURLcode gopher_do(struct Curl_easy *data, bool *done)
+static CARLcode gopher_do(struct Curl_easy *data, bool *done)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+  carl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   char *gopherpath;
   char *path = data->state.up.path;
   char *query = data->state.up.query;
@@ -147,7 +147,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
     gopherpath = strdup(path);
 
   if(!gopherpath)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Create selector. Degenerate cases: / and /1 => convert to "" */
   if(strlen(gopherpath) <= 2) {
@@ -170,7 +170,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
     sel_org = sel;
   }
 
-  k = curlx_uztosz(len);
+  k = carlx_uztosz(len);
 
   for(;;) {
     /* Break out of the loop if the selector is empty because OpenSSL and/or
@@ -194,7 +194,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
 
     timeout_ms = Curl_timeleft(data, NULL, FALSE);
     if(timeout_ms < 0) {
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
       break;
     }
     if(!timeout_ms)
@@ -208,11 +208,11 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
     */
     what = SOCKET_WRITABLE(sockfd, timeout_ms);
     if(what < 0) {
-      result = CURLE_SEND_ERROR;
+      result = CARLE_SEND_ERROR;
       break;
     }
     else if(!what) {
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
       break;
     }
   }
@@ -230,6 +230,6 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
     return result;
 
   Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
-  return CURLE_OK;
+  return CARLE_OK;
 }
-#endif /*CURL_DISABLE_GOPHER*/
+#endif /*CARL_DISABLE_GOPHER*/

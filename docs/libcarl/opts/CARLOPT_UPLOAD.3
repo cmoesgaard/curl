@@ -1,0 +1,78 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_UPLOAD 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_UPLOAD \- enable data upload
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_UPLOAD, long upload);
+.SH DESCRIPTION
+The long parameter \fIupload\fP set to 1 tells the library to prepare for and
+perform an upload. The \fICARLOPT_READDATA(3)\fP and
+\fICARLOPT_INFILESIZE(3)\fP or \fICARLOPT_INFILESIZE_LARGE(3)\fP options are
+also interesting for uploads. If the protocol is HTTP, uploading means using
+the PUT request unless you tell libcarl otherwise.
+
+Using PUT with HTTP 1.1 implies the use of a "Expect: 100-continue" header.
+You can disable this header with \fICARLOPT_HTTPHEADER(3)\fP as usual.
+
+If you use PUT to an HTTP 1.1 server, you can upload data without knowing the
+size before starting the transfer if you use chunked encoding. You enable this
+by adding a header like "Transfer-Encoding: chunked" with
+\fICARLOPT_HTTPHEADER(3)\fP. With HTTP 1.0 or without chunked transfer, you
+must specify the size.
+.SH DEFAULT
+0, default is download
+.SH PROTOCOLS
+Most
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  /* we want to use our own read function */
+  carl_easy_setopt(carl, CARLOPT_READFUNCTION, read_callback);
+
+  /* enable uploading */
+  carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
+
+  /* specify target */
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/dir/to/newfile");
+
+  /* now specify which pointer to pass to our callback */
+  carl_easy_setopt(carl, CARLOPT_READDATA, hd_src);
+
+  /* Set the size of the file to upload */
+  carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE, (carl_off_t)fsize);
+
+  /* Now run off and do what you've been told! */
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_PUT "(3), " CARLOPT_READFUNCTION "(3), "
+.BR CARLOPT_INFILESIZE_LARGE "(3), "

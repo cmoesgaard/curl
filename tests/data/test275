@@ -68,7 +68,7 @@ proxy
 CONNECT remotesite.com.275:%HTTPPORT HTTP/1.1
 Host: remotesite.com.275:%HTTPPORT
 Proxy-Authorization: Basic eW91YXJlOnlvdXJzZWxm
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>
@@ -76,13 +76,13 @@ Proxy-Connection: Keep-Alive
 GET /we/want/that/page/275 HTTP/1.1
 Host: remotesite.com.275:%HTTPPORT
 Authorization: Basic aWFtOm15c2VsZg==
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /we/want/that/page/275 HTTP/1.1
 Host: remotesite.com.275:%HTTPPORT
 Authorization: Basic aWFtOm15c2VsZg==
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

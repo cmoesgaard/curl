@@ -8,7 +8,7 @@ part of the remote file is used, the path is cut off.)
 
 The file will be saved in the current working directory. If you want the file
 saved in a different directory, make sure you change the current working
-directory before invoking curl with this option.
+directory before invoking carl with this option.
 
 The remote file name to use for saving is extracted from the given URL,
 nothing else, and if it already exists it will be overwritten. If you want the

@@ -41,7 +41,7 @@ http://%HOSTIP:%HTTPPORT/we/want/186 -F "name=daniel;type=moo/foo" -F "html= <bo
 <protocol>
 POST /we/want/186 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 320
 Content-Type: multipart/form-data; boundary=----------------------------212d9006ceb5

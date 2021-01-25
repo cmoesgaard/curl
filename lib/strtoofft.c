@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <errno.h>
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include "strtoofft.h"
 
@@ -33,7 +33,7 @@
  * https://www.opengroup.org/onlinepubs/009695399/functions/strtoimax.html
  */
 
-#if (SIZEOF_CURL_OFF_T > SIZEOF_LONG)
+#if (SIZEOF_CARL_OFF_T > SIZEOF_LONG)
 #  ifdef HAVE_STRTOLL
 #    define strtooff strtoll
 #  else
@@ -71,17 +71,17 @@ static const char valchars[] =
 static int get_char(char c, int base);
 
 /**
- * Custom version of the strtooff function.  This extracts a curl_off_t
+ * Custom version of the strtooff function.  This extracts a carl_off_t
  * value from the given input string and returns it.
  */
-static curl_off_t strtooff(const char *nptr, char **endptr, int base)
+static carl_off_t strtooff(const char *nptr, char **endptr, int base)
 {
   char *end;
   int is_negative = 0;
   int overflow;
   int i;
-  curl_off_t value = 0;
-  curl_off_t newval;
+  carl_off_t value = 0;
+  carl_off_t newval;
 
   /* Skip leading whitespace. */
   end = (char *)nptr;
@@ -150,9 +150,9 @@ static curl_off_t strtooff(const char *nptr, char **endptr, int base)
   }
   else {
     if(is_negative)
-      value = CURL_OFF_T_MIN;
+      value = CARL_OFF_T_MIN;
     else
-      value = CURL_OFF_T_MAX;
+      value = CARL_OFF_T_MAX;
 
     errno = ERANGE;
   }
@@ -212,11 +212,11 @@ static int get_char(char c, int base)
 /*
  * Parse a *positive* up to 64 bit number written in ascii.
  */
-CURLofft curlx_strtoofft(const char *str, char **endp, int base,
-                         curl_off_t *num)
+CARLofft carlx_strtoofft(const char *str, char **endp, int base,
+                         carl_off_t *num)
 {
   char *end;
-  curl_off_t number;
+  carl_off_t number;
   errno = 0;
   *num = 0; /* clear by default */
 
@@ -225,18 +225,18 @@ CURLofft curlx_strtoofft(const char *str, char **endp, int base,
   if('-' == *str) {
     if(endp)
       *endp = (char *)str; /* didn't actually move */
-    return CURL_OFFT_INVAL; /* nothing parsed */
+    return CARL_OFFT_INVAL; /* nothing parsed */
   }
   number = strtooff(str, &end, base);
   if(endp)
     *endp = end;
   if(errno == ERANGE)
     /* overflow/underflow */
-    return CURL_OFFT_FLOW;
+    return CARL_OFFT_FLOW;
   else if(str == end)
     /* nothing parsed */
-    return CURL_OFFT_INVAL;
+    return CARL_OFFT_INVAL;
 
   *num = number;
-  return CURL_OFFT_OK;
+  return CARL_OFFT_OK;
 }

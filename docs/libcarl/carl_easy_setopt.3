@@ -1,0 +1,683 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH carl_easy_setopt 3 "25 Jun 2014" "libcarl 7.38.0" "libcarl Manual"
+.SH NAME
+carl_easy_setopt \- set options for a carl easy handle
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLoption option, parameter);
+.SH DESCRIPTION
+\fIcarl_easy_setopt(3)\fP is used to tell libcarl how to behave. By setting
+the appropriate options, the application can change libcarl's behavior.  All
+options are set with an \fIoption\fP followed by a \fIparameter\fP. That
+parameter can be a \fBlong\fP, a \fBfunction pointer\fP, an \fBobject
+pointer\fP or a \fBcarl_off_t\fP, depending on what the specific option
+expects. Read this manual carefully as bad input values may cause libcarl to
+behave badly!  You can only set one option in each function call. A typical
+application uses many \fIcarl_easy_setopt(3)\fP calls in the setup phase.
+
+Options set with this function call are valid for all forthcoming transfers
+performed using this \fIhandle\fP.  The options are not in any way reset
+between transfers, so if you want subsequent transfers with different options,
+you must change them between the transfers. You can optionally reset all
+options back to internal default with \fIcarl_easy_reset(3)\fP.
+
+Strings passed to libcarl as 'char *' arguments, are copied by the library;
+thus the string storage associated to the pointer argument may be overwritten
+after \fIcarl_easy_setopt(3)\fP returns. The only exception to this rule is
+really \fICARLOPT_POSTFIELDS(3)\fP, but the alternative that copies the string
+\fICARLOPT_COPYPOSTFIELDS(3)\fP has some usage characteristics you need to
+read up on. This function does not accept input strings longer than
+\fBCARL_MAX_INPUT_LENGTH\fP (8 MB).
+
+The order in which the options are set does not matter.
+
+Before version 7.17.0, strings were not copied. Instead the user was forced
+keep them available until libcarl no longer needed them.
+
+The \fIhandle\fP is the return code from a \fIcarl_easy_init(3)\fP or
+\fIcarl_easy_duphandle(3)\fP call.
+.SH BEHAVIOR OPTIONS
+.IP CARLOPT_VERBOSE
+Display verbose information. See \fICARLOPT_VERBOSE(3)\fP
+.IP CARLOPT_HEADER
+Include the header in the body output. See \fICARLOPT_HEADER(3)\fP
+.IP CARLOPT_NOPROGRESS
+Shut off the progress meter. See \fICARLOPT_NOPROGRESS(3)\fP
+.IP CARLOPT_NOSIGNAL
+Do not install signal handlers. See \fICARLOPT_NOSIGNAL(3)\fP
+.IP CARLOPT_WILDCARDMATCH
+Transfer multiple files according to a file name pattern. See \fICARLOPT_WILDCARDMATCH(3)\fP
+.SH CALLBACK OPTIONS
+.IP CARLOPT_WRITEFUNCTION
+Callback for writing data. See \fICARLOPT_WRITEFUNCTION(3)\fP
+.IP CARLOPT_WRITEDATA
+Data pointer to pass to the write callback. See \fICARLOPT_WRITEDATA(3)\fP
+.IP CARLOPT_READFUNCTION
+Callback for reading data. See \fICARLOPT_READFUNCTION(3)\fP
+.IP CARLOPT_READDATA
+Data pointer to pass to the read callback. See \fICARLOPT_READDATA(3)\fP
+.IP CARLOPT_IOCTLFUNCTION
+Callback for I/O operations. See \fICARLOPT_IOCTLFUNCTION(3)\fP
+.IP CARLOPT_IOCTLDATA
+Data pointer to pass to the I/O callback. See \fICARLOPT_IOCTLDATA(3)\fP
+.IP CARLOPT_SEEKFUNCTION
+Callback for seek operations. See \fICARLOPT_SEEKFUNCTION(3)\fP
+.IP CARLOPT_SEEKDATA
+Data pointer to pass to the seek callback. See \fICARLOPT_SEEKDATA(3)\fP
+.IP CARLOPT_SOCKOPTFUNCTION
+Callback for sockopt operations. See \fICARLOPT_SOCKOPTFUNCTION(3)\fP
+.IP CARLOPT_SOCKOPTDATA
+Data pointer to pass to the sockopt callback. See \fICARLOPT_SOCKOPTDATA(3)\fP
+.IP CARLOPT_OPENSOCKETFUNCTION
+Callback for socket creation. See \fICARLOPT_OPENSOCKETFUNCTION(3)\fP
+.IP CARLOPT_OPENSOCKETDATA
+Data pointer to pass to the open socket callback. See \fICARLOPT_OPENSOCKETDATA(3)\fP
+.IP CARLOPT_CLOSESOCKETFUNCTION
+Callback for closing socket. See \fICARLOPT_CLOSESOCKETFUNCTION(3)\fP
+.IP CARLOPT_CLOSESOCKETDATA
+Data pointer to pass to the close socket callback. See \fICARLOPT_CLOSESOCKETDATA(3)\fP
+.IP CARLOPT_PROGRESSFUNCTION
+OBSOLETE callback for progress meter. See \fICARLOPT_PROGRESSFUNCTION(3)\fP
+.IP CARLOPT_PROGRESSDATA
+Data pointer to pass to the progress meter callback. See \fICARLOPT_PROGRESSDATA(3)\fP
+.IP CARLOPT_XFERINFOFUNCTION
+Callback for progress meter. See \fICARLOPT_XFERINFOFUNCTION(3)\fP
+.IP CARLOPT_XFERINFODATA
+Data pointer to pass to the progress meter callback. See \fICARLOPT_XFERINFODATA(3)\fP
+.IP CARLOPT_HEADERFUNCTION
+Callback for writing received headers. See \fICARLOPT_HEADERFUNCTION(3)\fP
+.IP CARLOPT_HEADERDATA
+Data pointer to pass to the header callback. See \fICARLOPT_HEADERDATA(3)\fP
+.IP CARLOPT_DEBUGFUNCTION
+Callback for debug information. See \fICARLOPT_DEBUGFUNCTION(3)\fP
+.IP CARLOPT_DEBUGDATA
+Data pointer to pass to the debug callback. See \fICARLOPT_DEBUGDATA(3)\fP
+.IP CARLOPT_SSL_CTX_FUNCTION
+Callback for SSL context logic. See \fICARLOPT_SSL_CTX_FUNCTION(3)\fP
+.IP CARLOPT_SSL_CTX_DATA
+Data pointer to pass to the SSL context callback. See \fICARLOPT_SSL_CTX_DATA(3)\fP
+.IP CARLOPT_CONV_TO_NETWORK_FUNCTION
+Callback for code base conversion. See \fICARLOPT_CONV_TO_NETWORK_FUNCTION(3)\fP
+.IP CARLOPT_CONV_FROM_NETWORK_FUNCTION
+Callback for code base conversion. See \fICARLOPT_CONV_FROM_NETWORK_FUNCTION(3)\fP
+.IP CARLOPT_CONV_FROM_UTF8_FUNCTION
+Callback for code base conversion. See \fICARLOPT_CONV_FROM_UTF8_FUNCTION(3)\fP
+.IP CARLOPT_INTERLEAVEFUNCTION
+Callback for RTSP interleaved data. See \fICARLOPT_INTERLEAVEFUNCTION(3)\fP
+.IP CARLOPT_INTERLEAVEDATA
+Data pointer to pass to the RTSP interleave callback. See \fICARLOPT_INTERLEAVEDATA(3)\fP
+.IP CARLOPT_CHUNK_BGN_FUNCTION
+Callback for wildcard download start of chunk. See \fICARLOPT_CHUNK_BGN_FUNCTION(3)\fP
+.IP CARLOPT_CHUNK_END_FUNCTION
+Callback for wildcard download end of chunk. See \fICARLOPT_CHUNK_END_FUNCTION(3)\fP
+.IP CARLOPT_CHUNK_DATA
+Data pointer to pass to the chunk callbacks. See \fICARLOPT_CHUNK_DATA(3)\fP
+.IP CARLOPT_FNMATCH_FUNCTION
+Callback for wildcard matching. See \fICARLOPT_FNMATCH_FUNCTION(3)\fP
+.IP CARLOPT_FNMATCH_DATA
+Data pointer to pass to the wildcard matching callback. See \fICARLOPT_FNMATCH_DATA(3)\fP
+.IP CARLOPT_SUPPRESS_CONNECT_HEADERS
+Suppress proxy CONNECT response headers from user callbacks. See \fICARLOPT_SUPPRESS_CONNECT_HEADERS(3)\fP
+.IP CARLOPT_RESOLVER_START_FUNCTION
+Callback to be called before a new resolve request is started. See \fICARLOPT_RESOLVER_START_FUNCTION(3)\fP
+.IP CARLOPT_RESOLVER_START_DATA
+Data pointer to pass to resolver start callback. See \fICARLOPT_RESOLVER_START_DATA(3)\fP
+.SH ERROR OPTIONS
+.IP CARLOPT_ERRORBUFFER
+Error message buffer. See \fICARLOPT_ERRORBUFFER(3)\fP
+.IP CARLOPT_STDERR
+stderr replacement stream. See \fICARLOPT_STDERR(3)\fP
+.IP CARLOPT_FAILONERROR
+Fail on HTTP 4xx errors. \fICARLOPT_FAILONERROR(3)\fP
+.IP CARLOPT_KEEP_SENDING_ON_ERROR
+Keep sending on HTTP >= 300 errors. \fICARLOPT_KEEP_SENDING_ON_ERROR(3)\fP
+.SH NETWORK OPTIONS
+.IP CARLOPT_URL
+URL to work on. See \fICARLOPT_URL(3)\fP
+.IP CARLOPT_PATH_AS_IS
+Disable squashing /../ and /./ sequences in the path. See \fICARLOPT_PATH_AS_IS(3)\fP
+.IP CARLOPT_PROTOCOLS
+Allowed protocols. See \fICARLOPT_PROTOCOLS(3)\fP
+.IP CARLOPT_REDIR_PROTOCOLS
+Protocols to allow redirects to. See \fICARLOPT_REDIR_PROTOCOLS(3)\fP
+.IP CARLOPT_DEFAULT_PROTOCOL
+Default protocol. See \fICARLOPT_DEFAULT_PROTOCOL(3)\fP
+.IP CARLOPT_PROXY
+Proxy to use. See \fICARLOPT_PROXY(3)\fP
+.IP CARLOPT_PRE_PROXY
+Socks proxy to use. See \fICARLOPT_PRE_PROXY(3)\fP
+.IP CARLOPT_PROXYPORT
+Proxy port to use. See \fICARLOPT_PROXYPORT(3)\fP
+.IP CARLOPT_PROXYTYPE
+Proxy type. See \fICARLOPT_PROXYTYPE(3)\fP
+.IP CARLOPT_NOPROXY
+Filter out hosts from proxy use. \fICARLOPT_NOPROXY(3)\fP
+.IP CARLOPT_HTTPPROXYTUNNEL
+Tunnel through the HTTP proxy. \fICARLOPT_HTTPPROXYTUNNEL(3)\fP
+.IP CARLOPT_CONNECT_TO
+Connect to a specific host and port. See \fICARLOPT_CONNECT_TO(3)\fP
+.IP CARLOPT_SOCKS5_AUTH
+Socks5 authentication methods. See \fICARLOPT_SOCKS5_AUTH(3)\fP
+.IP CARLOPT_SOCKS5_GSSAPI_SERVICE
+Socks5 GSSAPI service name. \fICARLOPT_SOCKS5_GSSAPI_SERVICE(3)\fP
+.IP CARLOPT_SOCKS5_GSSAPI_NEC
+Socks5 GSSAPI NEC mode. See \fICARLOPT_SOCKS5_GSSAPI_NEC(3)\fP
+.IP CARLOPT_PROXY_SERVICE_NAME
+Proxy authentication service name. \fICARLOPT_PROXY_SERVICE_NAME(3)\fP
+.IP CARLOPT_HAPROXYPROTOCOL
+Send an HAProxy PROXY protocol v1 header. See \fICARLOPT_HAPROXYPROTOCOL(3)\fP
+.IP CARLOPT_SERVICE_NAME
+Authentication service name. \fICARLOPT_SERVICE_NAME(3)\fP
+.IP CARLOPT_INTERFACE
+Bind connection locally to this. See \fICARLOPT_INTERFACE(3)\fP
+.IP CARLOPT_LOCALPORT
+Bind connection locally to this port. See \fICARLOPT_LOCALPORT(3)\fP
+.IP CARLOPT_LOCALPORTRANGE
+Bind connection locally to port range. See \fICARLOPT_LOCALPORTRANGE(3)\fP
+.IP CARLOPT_DNS_CACHE_TIMEOUT
+Timeout for DNS cache. See \fICARLOPT_DNS_CACHE_TIMEOUT(3)\fP
+.IP CARLOPT_DNS_USE_GLOBAL_CACHE
+OBSOLETE Enable global DNS cache. See \fICARLOPT_DNS_USE_GLOBAL_CACHE(3)\fP
+.IP CARLOPT_DOH_URL
+Use this DOH server for name resolves. See \fICARLOPT_DOH_URL(3)\fP
+.IP CARLOPT_BUFFERSIZE
+Ask for alternate buffer size. See \fICARLOPT_BUFFERSIZE(3)\fP
+.IP CARLOPT_PORT
+Port number to connect to. See \fICARLOPT_PORT(3)\fP
+.IP CARLOPT_TCP_FASTOPEN
+Enable TFO, TCP Fast Open. See \fICARLOPT_TCP_FASTOPEN(3)\fP
+.IP CARLOPT_TCP_NODELAY
+Disable the Nagle algorithm. See \fICARLOPT_TCP_NODELAY(3)\fP
+.IP CARLOPT_ADDRESS_SCOPE
+IPv6 scope for local addresses. See \fICARLOPT_ADDRESS_SCOPE(3)\fP
+.IP CARLOPT_TCP_KEEPALIVE
+Enable TCP keep-alive. See \fICARLOPT_TCP_KEEPALIVE(3)\fP
+.IP CARLOPT_TCP_KEEPIDLE
+Idle time before sending keep-alive. See \fICARLOPT_TCP_KEEPIDLE(3)\fP
+.IP CARLOPT_TCP_KEEPINTVL
+Interval between keep-alive probes. See \fICARLOPT_TCP_KEEPINTVL(3)\fP
+.IP CARLOPT_UNIX_SOCKET_PATH
+Path to a Unix domain socket. See \fICARLOPT_UNIX_SOCKET_PATH(3)\fP
+.IP CARLOPT_ABSTRACT_UNIX_SOCKET
+Path to an abstract Unix domain socket. See \fICARLOPT_ABSTRACT_UNIX_SOCKET(3)\fP
+.SH NAMES and PASSWORDS OPTIONS (Authentication)
+.IP CARLOPT_NETRC
+Enable .netrc parsing. See \fICARLOPT_NETRC(3)\fP
+.IP CARLOPT_NETRC_FILE
+\&.netrc file name. See \fICARLOPT_NETRC_FILE(3)\fP
+.IP CARLOPT_USERPWD
+User name and password. See \fICARLOPT_USERPWD(3)\fP
+.IP CARLOPT_PROXYUSERPWD
+Proxy user name and password. See \fICARLOPT_PROXYUSERPWD(3)\fP
+.IP CARLOPT_USERNAME
+User name. See \fICARLOPT_USERNAME(3)\fP
+.IP CARLOPT_PASSWORD
+Password. See \fICARLOPT_PASSWORD(3)\fP
+.IP CARLOPT_LOGIN_OPTIONS
+Login options. See \fICARLOPT_LOGIN_OPTIONS(3)\fP
+.IP CARLOPT_PROXYUSERNAME
+Proxy user name. See \fICARLOPT_PROXYUSERNAME(3)\fP
+.IP CARLOPT_PROXYPASSWORD
+Proxy password. See \fICARLOPT_PROXYPASSWORD(3)\fP
+.IP CARLOPT_HTTPAUTH
+HTTP server authentication methods. See \fICARLOPT_HTTPAUTH(3)\fP
+.IP CARLOPT_TLSAUTH_USERNAME
+TLS authentication user name. See \fICARLOPT_TLSAUTH_USERNAME(3)\fP
+.IP CARLOPT_PROXY_TLSAUTH_USERNAME
+Proxy TLS authentication user name. See \fICARLOPT_PROXY_TLSAUTH_USERNAME(3)\fP
+.IP CARLOPT_TLSAUTH_PASSWORD
+TLS authentication password. See \fICARLOPT_TLSAUTH_PASSWORD(3)\fP
+.IP CARLOPT_PROXY_TLSAUTH_PASSWORD
+Proxy TLS authentication password. See \fICARLOPT_PROXY_TLSAUTH_PASSWORD(3)\fP
+.IP CARLOPT_TLSAUTH_TYPE
+TLS authentication methods. See \fICARLOPT_TLSAUTH_TYPE(3)\fP
+.IP CARLOPT_PROXY_TLSAUTH_TYPE
+Proxy TLS authentication methods. See \fICARLOPT_PROXY_TLSAUTH_TYPE(3)\fP
+.IP CARLOPT_PROXYAUTH
+HTTP proxy authentication methods. See \fICARLOPT_PROXYAUTH(3)\fP
+.IP CARLOPT_SASL_AUTHZID
+SASL authorisation identity (identity to act as). See \fICARLOPT_SASL_AUTHZID(3)\fP
+.IP CARLOPT_SASL_IR
+Enable SASL initial response. See \fICARLOPT_SASL_IR(3)\fP
+.IP CARLOPT_XOAUTH2_BEARER
+OAuth2 bearer token. See \fICARLOPT_XOAUTH2_BEARER(3)\fP
+.IP CARLOPT_DISALLOW_USERNAME_IN_URL
+Don't allow username in URL. See \fICARLOPT_DISALLOW_USERNAME_IN_URL(3)\fP
+.SH HTTP OPTIONS
+.IP CARLOPT_AUTOREFERER
+Automatically set Referer: header. See \fICARLOPT_AUTOREFERER(3)\fP
+.IP CARLOPT_ACCEPT_ENCODING
+Accept-Encoding and automatic decompressing data. See \fICARLOPT_ACCEPT_ENCODING(3)\fP
+.IP CARLOPT_TRANSFER_ENCODING
+Request Transfer-Encoding. See \fICARLOPT_TRANSFER_ENCODING(3)\fP
+.IP CARLOPT_FOLLOWLOCATION
+Follow HTTP redirects. See \fICARLOPT_FOLLOWLOCATION(3)\fP
+.IP CARLOPT_UNRESTRICTED_AUTH
+Do not restrict authentication to original host. \fICARLOPT_UNRESTRICTED_AUTH(3)\fP
+.IP CARLOPT_MAXREDIRS
+Maximum number of redirects to follow. See \fICARLOPT_MAXREDIRS(3)\fP
+.IP CARLOPT_POSTREDIR
+How to act on redirects after POST. See \fICARLOPT_POSTREDIR(3)\fP
+.IP CARLOPT_PUT
+Issue an HTTP PUT request. See \fICARLOPT_PUT(3)\fP
+.IP CARLOPT_POST
+Issue an HTTP POST request. See \fICARLOPT_POST(3)\fP
+.IP CARLOPT_POSTFIELDS
+Send a POST with this data. See \fICARLOPT_POSTFIELDS(3)\fP
+.IP CARLOPT_POSTFIELDSIZE
+The POST data is this big. See \fICARLOPT_POSTFIELDSIZE(3)\fP
+.IP CARLOPT_POSTFIELDSIZE_LARGE
+The POST data is this big. See \fICARLOPT_POSTFIELDSIZE_LARGE(3)\fP
+.IP CARLOPT_COPYPOSTFIELDS
+Send a POST with this data - and copy it. See \fICARLOPT_COPYPOSTFIELDS(3)\fP
+.IP CARLOPT_HTTPPOST
+Multipart formpost HTTP POST. See \fICARLOPT_HTTPPOST(3)\fP
+.IP CARLOPT_REFERER
+Referer: header. See \fICARLOPT_REFERER(3)\fP
+.IP CARLOPT_USERAGENT
+User-Agent: header. See \fICARLOPT_USERAGENT(3)\fP
+.IP CARLOPT_HTTPHEADER
+Custom HTTP headers. See \fICARLOPT_HTTPHEADER(3)\fP
+.IP CARLOPT_HEADEROPT
+Control custom headers. See \fICARLOPT_HEADEROPT(3)\fP
+.IP CARLOPT_PROXYHEADER
+Custom HTTP headers sent to proxy. See \fICARLOPT_PROXYHEADER(3)\fP
+.IP CARLOPT_HTTP200ALIASES
+Alternative versions of 200 OK. See \fICARLOPT_HTTP200ALIASES(3)\fP
+.IP CARLOPT_COOKIE
+Cookie(s) to send. See \fICARLOPT_COOKIE(3)\fP
+.IP CARLOPT_COOKIEFILE
+File to read cookies from. See \fICARLOPT_COOKIEFILE(3)\fP
+.IP CARLOPT_COOKIEJAR
+File to write cookies to. See \fICARLOPT_COOKIEJAR(3)\fP
+.IP CARLOPT_COOKIESESSION
+Start a new cookie session. See \fICARLOPT_COOKIESESSION(3)\fP
+.IP CARLOPT_COOKIELIST
+Add or control cookies. See \fICARLOPT_COOKIELIST(3)\fP
+.IP CARLOPT_ALTSVC
+Specify the Alt-Svc: cache file name. See \fICARLOPT_ALTSVC(3)\fP
+.IP CARLOPT_ALTSVC_CTRL
+Enable and configure Alt-Svc: treatment. See \fICARLOPT_ALTSVC_CTRL(3)\fP
+.IP CARLOPT_HSTS
+Set HSTS cache file. See \fICARLOPT_HSTS(3)\fP
+.IP CARLOPT_HSTS_CTRL
+Enable HSTS. See \fICARLOPT_HSTS_CTRL(3)\fP
+.IP CARLOPT_HSTSREADFUNCTION
+Set HSTS read callback. See \fICARLOPT_HSTSREADFUNCTION(3)\fP
+.IP CARLOPT_HSTSREADDATA
+Pass pointer to the HSTS read callback. See \fICARLOPT_HSTSREADDATA(3)\fP
+.IP CARLOPT_HSTSWRITEFUNCTION
+Set HSTS write callback. See \fICARLOPT_HSTSWRITEFUNCTION(3)\fP
+.IP CARLOPT_HSTSWRITEDATA
+Pass pointer to the HSTS write callback. See \fICARLOPT_HSTSWRITEDATA(3)\fP
+.IP CARLOPT_HTTPGET
+Do an HTTP GET request. See \fICARLOPT_HTTPGET(3)\fP
+.IP CARLOPT_REQUEST_TARGET
+Set the request target. \fICARLOPT_REQUEST_TARGET(3)\fP
+.IP CARLOPT_HTTP_VERSION
+HTTP version to use. \fICARLOPT_HTTP_VERSION(3)\fP
+.IP CARLOPT_HTTP09_ALLOWED
+Allow HTTP/0.9 responses. \fICARLOPT_HTTP09_ALLOWED(3)\fP
+.IP CARLOPT_IGNORE_CONTENT_LENGTH
+Ignore Content-Length. See \fICARLOPT_IGNORE_CONTENT_LENGTH(3)\fP
+.IP CARLOPT_HTTP_CONTENT_DECODING
+Disable Content decoding. See \fICARLOPT_HTTP_CONTENT_DECODING(3)\fP
+.IP CARLOPT_HTTP_TRANSFER_DECODING
+Disable Transfer decoding. See \fICARLOPT_HTTP_TRANSFER_DECODING(3)\fP
+.IP CARLOPT_EXPECT_100_TIMEOUT_MS
+100-continue timeout. See \fICARLOPT_EXPECT_100_TIMEOUT_MS(3)\fP
+.IP CARLOPT_TRAILERFUNCTION
+Set callback for sending trailing headers. See
+\fICARLOPT_TRAILERFUNCTION(3)\fP
+.IP CARLOPT_TRAILERDATA
+Custom pointer passed to the trailing headers callback. See
+\fICARLOPT_TRAILERDATA(3)\fP
+.IP CARLOPT_PIPEWAIT
+Wait on connection to pipeline on it. See \fICARLOPT_PIPEWAIT(3)\fP
+.IP CARLOPT_STREAM_DEPENDS
+This HTTP/2 stream depends on another. See \fICARLOPT_STREAM_DEPENDS(3)\fP
+.IP CARLOPT_STREAM_DEPENDS_E
+This HTTP/2 stream depends on another exclusively. See
+\fICARLOPT_STREAM_DEPENDS_E(3)\fP
+.IP CARLOPT_STREAM_WEIGHT
+Set this HTTP/2 stream's weight. See \fICARLOPT_STREAM_WEIGHT(3)\fP
+.SH SMTP OPTIONS
+.IP CARLOPT_MAIL_FROM
+Address of the sender. See \fICARLOPT_MAIL_FROM(3)\fP
+.IP CARLOPT_MAIL_RCPT
+Address of the recipients. See \fICARLOPT_MAIL_RCPT(3)\fP
+.IP CARLOPT_MAIL_AUTH
+Authentication address. See \fICARLOPT_MAIL_AUTH(3)\fP
+.IP CARLOPT_MAIL_RCPT_ALLLOWFAILS
+Allow RCPT TO command to fail for some recipients. See \fICARLOPT_MAIL_RCPT_ALLLOWFAILS(3)\fP
+.SH TFTP OPTIONS
+.IP CARLOPT_TFTP_BLKSIZE
+TFTP block size. See \fICARLOPT_TFTP_BLKSIZE(3)\fP
+.IP CARLOPT_TFTP_NO_OPTIONS
+Do not send TFTP options requests. See \fICARLOPT_TFTP_NO_OPTIONS(3)\fP
+.SH FTP OPTIONS
+.IP CARLOPT_FTPPORT
+Use active FTP. See \fICARLOPT_FTPPORT(3)\fP
+.IP CARLOPT_QUOTE
+Commands to run before transfer. See \fICARLOPT_QUOTE(3)\fP
+.IP CARLOPT_POSTQUOTE
+Commands to run after transfer. See \fICARLOPT_POSTQUOTE(3)\fP
+.IP CARLOPT_PREQUOTE
+Commands to run just before transfer. See \fICARLOPT_PREQUOTE(3)\fP
+.IP CARLOPT_APPEND
+Append to remote file. See \fICARLOPT_APPEND(3)\fP
+.IP CARLOPT_FTP_USE_EPRT
+Use EPTR. See \fICARLOPT_FTP_USE_EPRT(3)\fP
+.IP CARLOPT_FTP_USE_EPSV
+Use EPSV. See \fICARLOPT_FTP_USE_EPSV(3)\fP
+.IP CARLOPT_FTP_USE_PRET
+Use PRET. See \fICARLOPT_FTP_USE_PRET(3)\fP
+.IP CARLOPT_FTP_CREATE_MISSING_DIRS
+Create missing directories on the remote server. See \fICARLOPT_FTP_CREATE_MISSING_DIRS(3)\fP
+.IP CARLOPT_FTP_RESPONSE_TIMEOUT
+Timeout for FTP responses. See \fICARLOPT_FTP_RESPONSE_TIMEOUT(3)\fP
+.IP CARLOPT_FTP_ALTERNATIVE_TO_USER
+Alternative to USER. See \fICARLOPT_FTP_ALTERNATIVE_TO_USER(3)\fP
+.IP CARLOPT_FTP_SKIP_PASV_IP
+Ignore the IP address in the PASV response. See \fICARLOPT_FTP_SKIP_PASV_IP(3)\fP
+.IP CARLOPT_FTPSSLAUTH
+Control how to do TLS. See \fICARLOPT_FTPSSLAUTH(3)\fP
+.IP CARLOPT_FTP_SSL_CCC
+Back to non-TLS again after authentication. See \fICARLOPT_FTP_SSL_CCC(3)\fP
+.IP CARLOPT_FTP_ACCOUNT
+Send ACCT command. See \fICARLOPT_FTP_ACCOUNT(3)\fP
+.IP CARLOPT_FTP_FILEMETHOD
+Specify how to reach files. See \fICARLOPT_FTP_FILEMETHOD(3)\fP
+.SH RTSP OPTIONS
+.IP CARLOPT_RTSP_REQUEST
+RTSP request. See \fICARLOPT_RTSP_REQUEST(3)\fP
+.IP CARLOPT_RTSP_SESSION_ID
+RTSP session-id. See \fICARLOPT_RTSP_SESSION_ID(3)\fP
+.IP CARLOPT_RTSP_STREAM_URI
+RTSP stream URI. See \fICARLOPT_RTSP_STREAM_URI(3)\fP
+.IP CARLOPT_RTSP_TRANSPORT
+RTSP Transport: header. See \fICARLOPT_RTSP_TRANSPORT(3)\fP
+.IP CARLOPT_RTSP_CLIENT_CSEQ
+Client CSEQ number. See \fICARLOPT_RTSP_CLIENT_CSEQ(3)\fP
+.IP CARLOPT_RTSP_SERVER_CSEQ
+CSEQ number for RTSP Server->Client request. See \fICARLOPT_RTSP_SERVER_CSEQ(3)\fP
+.IP CARLOPT_AWS_SIGV4
+AWS HTTP V4 Signature. See \fICARLOPT_AWS_SIGV4(3)\fP
+.SH PROTOCOL OPTIONS
+.IP CARLOPT_TRANSFERTEXT
+Use text transfer. See \fICARLOPT_TRANSFERTEXT(3)\fP
+.IP CARLOPT_PROXY_TRANSFER_MODE
+Add transfer mode to URL over proxy. See \fICARLOPT_PROXY_TRANSFER_MODE(3)\fP
+.IP CARLOPT_CRLF
+Convert newlines. See \fICARLOPT_CRLF(3)\fP
+.IP CARLOPT_RANGE
+Range requests. See \fICARLOPT_RANGE(3)\fP
+.IP CARLOPT_RESUME_FROM
+Resume a transfer. See \fICARLOPT_RESUME_FROM(3)\fP
+.IP CARLOPT_RESUME_FROM_LARGE
+Resume a transfer. See \fICARLOPT_RESUME_FROM_LARGE(3)\fP
+.IP CARLOPT_CARLU
+Set URL to work on with CARLU *. See \fICARLOPT_CARLU(3)\fP
+.IP CARLOPT_CUSTOMREQUEST
+Custom request/method. See \fICARLOPT_CUSTOMREQUEST(3)\fP
+.IP CARLOPT_FILETIME
+Request file modification date and time. See \fICARLOPT_FILETIME(3)\fP
+.IP CARLOPT_DIRLISTONLY
+List only. See \fICARLOPT_DIRLISTONLY(3)\fP
+.IP CARLOPT_NOBODY
+Do not get the body contents. See \fICARLOPT_NOBODY(3)\fP
+.IP CARLOPT_INFILESIZE
+Size of file to send. \fICARLOPT_INFILESIZE(3)\fP
+.IP CARLOPT_INFILESIZE_LARGE
+Size of file to send. \fICARLOPT_INFILESIZE_LARGE(3)\fP
+.IP CARLOPT_UPLOAD
+Upload data. See \fICARLOPT_UPLOAD(3)\fP
+.IP CARLOPT_UPLOAD_BUFFERSIZE
+Set upload buffer size. See \fICARLOPT_UPLOAD_BUFFERSIZE(3)\fP
+.IP CARLOPT_MIMEPOST
+Post/send MIME data. See \fICARLOPT_MIMEPOST(3)\fP
+.IP CARLOPT_MAXFILESIZE
+Maximum file size to get. See \fICARLOPT_MAXFILESIZE(3)\fP
+.IP CARLOPT_MAXFILESIZE_LARGE
+Maximum file size to get. See \fICARLOPT_MAXFILESIZE_LARGE(3)\fP
+.IP CARLOPT_TIMECONDITION
+Make a time conditional request. See \fICARLOPT_TIMECONDITION(3)\fP
+.IP CARLOPT_TIMEVALUE
+Time value for the time conditional request. See \fICARLOPT_TIMEVALUE(3)\fP
+.IP CARLOPT_TIMEVALUE_LARGE
+Time value for the time conditional request. See \fICARLOPT_TIMEVALUE_LARGE(3)\fP
+.SH CONNECTION OPTIONS
+.IP CARLOPT_TIMEOUT
+Timeout for the entire request. See \fICARLOPT_TIMEOUT(3)\fP
+.IP CARLOPT_TIMEOUT_MS
+Millisecond timeout for the entire request. See \fICARLOPT_TIMEOUT_MS(3)\fP
+.IP CARLOPT_LOW_SPEED_LIMIT
+Low speed limit to abort transfer. See \fICARLOPT_LOW_SPEED_LIMIT(3)\fP
+.IP CARLOPT_LOW_SPEED_TIME
+Time to be below the speed to trigger low speed abort. See \fICARLOPT_LOW_SPEED_TIME(3)\fP
+.IP CARLOPT_MAX_SEND_SPEED_LARGE
+Cap the upload speed to this. See \fICARLOPT_MAX_SEND_SPEED_LARGE(3)\fP
+.IP CARLOPT_MAX_RECV_SPEED_LARGE
+Cap the download speed to this. See \fICARLOPT_MAX_RECV_SPEED_LARGE(3)\fP
+.IP CARLOPT_MAXCONNECTS
+Maximum number of connections in the connection pool. See \fICARLOPT_MAXCONNECTS(3)\fP
+.IP CARLOPT_FRESH_CONNECT
+Use a new connection. \fICARLOPT_FRESH_CONNECT(3)\fP
+.IP CARLOPT_FORBID_REUSE
+Prevent subsequent connections from re-using this. See \fICARLOPT_FORBID_REUSE(3)\fP
+.IP CARLOPT_MAXAGE_CONN
+Limit the age of connections for reuse. See \fICARLOPT_MAXAGE_CONN(3)\fP
+.IP CARLOPT_CONNECTTIMEOUT
+Timeout for the connection phase. See \fICARLOPT_CONNECTTIMEOUT(3)\fP
+.IP CARLOPT_CONNECTTIMEOUT_MS
+Millisecond timeout for the connection phase. See \fICARLOPT_CONNECTTIMEOUT_MS(3)\fP
+.IP CARLOPT_IPRESOLVE
+IP version to resolve to. See \fICARLOPT_IPRESOLVE(3)\fP
+.IP CARLOPT_CONNECT_ONLY
+Only connect, nothing else. See \fICARLOPT_CONNECT_ONLY(3)\fP
+.IP CARLOPT_USE_SSL
+Use TLS/SSL. See \fICARLOPT_USE_SSL(3)\fP
+.IP CARLOPT_RESOLVE
+Provide fixed/fake name resolves. See \fICARLOPT_RESOLVE(3)\fP
+.IP CARLOPT_DNS_INTERFACE
+Bind name resolves to this interface. See \fICARLOPT_DNS_INTERFACE(3)\fP
+.IP CARLOPT_DNS_LOCAL_IP4
+Bind name resolves to this IP4 address. See \fICARLOPT_DNS_LOCAL_IP4(3)\fP
+.IP CARLOPT_DNS_LOCAL_IP6
+Bind name resolves to this IP6 address. See \fICARLOPT_DNS_LOCAL_IP6(3)\fP
+.IP CARLOPT_DNS_SERVERS
+Preferred DNS servers. See \fICARLOPT_DNS_SERVERS(3)\fP
+.IP CARLOPT_DNS_SHUFFLE_ADDRESSES
+Shuffle addresses before use. See \fICARLOPT_DNS_SHUFFLE_ADDRESSES(3)\fP
+.IP CARLOPT_ACCEPTTIMEOUT_MS
+Timeout for waiting for the server's connect back to be accepted. See \fICARLOPT_ACCEPTTIMEOUT_MS(3)\fP
+.IP CARLOPT_HAPPY_EYEBALLS_TIMEOUT_MS
+Timeout for happy eyeballs. See \fICARLOPT_HAPPY_EYEBALLS_TIMEOUT_MS(3)\fP
+.IP CARLOPT_UPKEEP_INTERVAL_MS
+Sets the interval at which connection upkeep are performed. See
+\fICARLOPT_UPKEEP_INTERVAL_MS(3)\fP
+.SH SSL and SECURITY OPTIONS
+.IP CARLOPT_SSLCERT
+Client cert. See \fICARLOPT_SSLCERT(3)\fP
+.IP CARLOPT_SSLCERT_BLOB
+Client cert memory buffer. See \fICARLOPT_SSLCERT_BLOB(3)\fP
+.IP CARLOPT_PROXY_SSLCERT
+Proxy client cert. See \fICARLOPT_PROXY_SSLCERT(3)\fP
+.IP CARLOPT_PROXY_SSLCERT_BLOB
+Proxy client cert memory buffer. See \fICARLOPT_PROXY_SSLCERT_BLOB(3)\fP
+.IP CARLOPT_SSLCERTTYPE
+Client cert type.  See \fICARLOPT_SSLCERTTYPE(3)\fP
+.IP CARLOPT_PROXY_SSLCERTTYPE
+Proxy client cert type.  See \fICARLOPT_PROXY_SSLCERTTYPE(3)\fP
+.IP CARLOPT_SSLKEY
+Client key. See \fICARLOPT_SSLKEY(3)\fP
+.IP CARLOPT_SSLKEY_BLOB
+Client key memory buffer. See \fICARLOPT_SSLKEY_BLOB(3)\fP
+.IP CARLOPT_PROXY_SSLKEY
+Proxy client key. See \fICARLOPT_PROXY_SSLKEY(3)\fP
+.IP CARLOPT_PROXY_SSLKEY_BLOB
+Proxy client key. See \fICARLOPT_PROXY_SSLKEY_BLOB(3)\fP
+.IP CARLOPT_SSLKEYTYPE
+Client key type. See \fICARLOPT_SSLKEYTYPE(3)\fP
+.IP CARLOPT_PROXY_SSLKEYTYPE
+Proxy client key type. See \fICARLOPT_PROXY_SSLKEYTYPE(3)\fP
+.IP CARLOPT_KEYPASSWD
+Client key password. See \fICARLOPT_KEYPASSWD(3)\fP
+.IP CARLOPT_PROXY_KEYPASSWD
+Proxy client key password. See \fICARLOPT_PROXY_KEYPASSWD(3)\fP
+.IP CARLOPT_SSL_EC_CURVES
+Set key exchange curves. See \fICARLOPT_SSL_EC_CURVES(3)\fP
+.IP CARLOPT_SSL_ENABLE_ALPN
+Enable use of ALPN. See \fICARLOPT_SSL_ENABLE_ALPN(3)\fP
+.IP CARLOPT_SSL_ENABLE_NPN
+Enable use of NPN. See \fICARLOPT_SSL_ENABLE_NPN(3)\fP
+.IP CARLOPT_SSLENGINE
+Use identifier with SSL engine. See \fICARLOPT_SSLENGINE(3)\fP
+.IP CARLOPT_SSLENGINE_DEFAULT
+Default SSL engine. See \fICARLOPT_SSLENGINE_DEFAULT(3)\fP
+.IP CARLOPT_SSL_FALSESTART
+Enable TLS False Start. See \fICARLOPT_SSL_FALSESTART(3)\fP
+.IP CARLOPT_SSLVERSION
+SSL version to use. See \fICARLOPT_SSLVERSION(3)\fP
+.IP CARLOPT_PROXY_SSLVERSION
+Proxy SSL version to use. See \fICARLOPT_PROXY_SSLVERSION(3)\fP
+.IP CARLOPT_SSL_VERIFYHOST
+Verify the host name in the SSL certificate. See \fICARLOPT_SSL_VERIFYHOST(3)\fP
+.IP CARLOPT_PROXY_SSL_VERIFYHOST
+Verify the host name in the proxy SSL certificate. See \fICARLOPT_PROXY_SSL_VERIFYHOST(3)\fP
+.IP CARLOPT_SSL_VERIFYPEER
+Verify the SSL certificate. See \fICARLOPT_SSL_VERIFYPEER(3)\fP
+.IP CARLOPT_PROXY_SSL_VERIFYPEER
+Verify the proxy SSL certificate. See \fICARLOPT_PROXY_SSL_VERIFYPEER(3)\fP
+.IP CARLOPT_SSL_VERIFYSTATUS
+Verify the SSL certificate's status. See \fICARLOPT_SSL_VERIFYSTATUS(3)\fP
+.IP CARLOPT_CAINFO
+CA cert bundle. See \fICARLOPT_CAINFO(3)\fP
+.IP CARLOPT_PROXY_CAINFO
+Proxy CA cert bundle. See \fICARLOPT_PROXY_CAINFO(3)\fP
+.IP CARLOPT_ISSUERCERT
+Issuer certificate. See \fICARLOPT_ISSUERCERT(3)\fP
+.IP CARLOPT_ISSUERCERT_BLOB
+Issuer certificate memory buffer. See \fICARLOPT_ISSUERCERT_BLOB(3)\fP
+.IP CARLOPT_PROXY_ISSUERCERT
+Proxy issuer certificate. See \fICARLOPT_PROXY_ISSUERCERT(3)\fP
+.IP CARLOPT_PROXY_ISSUERCERT_BLOB
+Proxy issuer certificate memory buffer. See \fICARLOPT_PROXY_ISSUERCERT_BLOB(3)\fP
+.IP CARLOPT_CAPATH
+Path to CA cert bundle. See \fICARLOPT_CAPATH(3)\fP
+.IP CARLOPT_PROXY_CAPATH
+Path to proxy CA cert bundle. See \fICARLOPT_PROXY_CAPATH(3)\fP
+.IP CARLOPT_CRLFILE
+Certificate Revocation List. See \fICARLOPT_CRLFILE(3)\fP
+.IP CARLOPT_PROXY_CRLFILE
+Proxy Certificate Revocation List. See \fICARLOPT_PROXY_CRLFILE(3)\fP
+.IP CARLOPT_CERTINFO
+Extract certificate info. See \fICARLOPT_CERTINFO(3)\fP
+.IP CARLOPT_PINNEDPUBLICKEY
+Set pinned SSL public key . See \fICARLOPT_PINNEDPUBLICKEY(3)\fP
+.IP CARLOPT_PROXY_PINNEDPUBLICKEY
+Set the proxy's pinned SSL public key. See
+\fICARLOPT_PROXY_PINNEDPUBLICKEY(3)\fP
+.IP CARLOPT_RANDOM_FILE
+Provide source for entropy random data. See \fICARLOPT_RANDOM_FILE(3)\fP
+.IP CARLOPT_EGDSOCKET
+Identify EGD socket for entropy. See \fICARLOPT_EGDSOCKET(3)\fP
+.IP CARLOPT_SSL_CIPHER_LIST
+Ciphers to use. See \fICARLOPT_SSL_CIPHER_LIST(3)\fP
+.IP CARLOPT_PROXY_SSL_CIPHER_LIST
+Proxy ciphers to use. See \fICARLOPT_PROXY_SSL_CIPHER_LIST(3)\fP
+.IP CARLOPT_TLS13_CIPHERS
+TLS 1.3 cipher suites to use. See \fICARLOPT_TLS13_CIPHERS(3)\fP
+.IP CARLOPT_PROXY_TLS13_CIPHERS
+Proxy TLS 1.3 cipher suites to use. See \fICARLOPT_PROXY_TLS13_CIPHERS(3)\fP
+.IP CARLOPT_SSL_SESSIONID_CACHE
+Disable SSL session-id cache. See \fICARLOPT_SSL_SESSIONID_CACHE(3)\fP
+.IP CARLOPT_SSL_OPTIONS
+Control SSL behavior. See \fICARLOPT_SSL_OPTIONS(3)\fP
+.IP CARLOPT_PROXY_SSL_OPTIONS
+Control proxy SSL behavior. See \fICARLOPT_PROXY_SSL_OPTIONS(3)\fP
+.IP CARLOPT_KRBLEVEL
+Kerberos security level. See \fICARLOPT_KRBLEVEL(3)\fP
+.IP CARLOPT_GSSAPI_DELEGATION
+Disable GSS-API delegation. See \fICARLOPT_GSSAPI_DELEGATION(3)\fP
+.SH SSH OPTIONS
+.IP CARLOPT_SSH_AUTH_TYPES
+SSH authentication types. See \fICARLOPT_SSH_AUTH_TYPES(3)\fP
+.IP CARLOPT_SSH_COMPRESSION
+Enable SSH compression. See \fICARLOPT_SSH_COMPRESSION(3)\fP
+.IP CARLOPT_SSH_HOST_PUBLIC_KEY_MD5
+MD5 of host's public key. See \fICARLOPT_SSH_HOST_PUBLIC_KEY_MD5(3)\fP
+.IP CARLOPT_SSH_PUBLIC_KEYFILE
+File name of public key. See \fICARLOPT_SSH_PUBLIC_KEYFILE(3)\fP
+.IP CARLOPT_SSH_PRIVATE_KEYFILE
+File name of private key. See \fICARLOPT_SSH_PRIVATE_KEYFILE(3)\fP
+.IP CARLOPT_SSH_KNOWNHOSTS
+File name with known hosts. See \fICARLOPT_SSH_KNOWNHOSTS(3)\fP
+.IP CARLOPT_SSH_KEYFUNCTION
+Callback for known hosts handling. See \fICARLOPT_SSH_KEYFUNCTION(3)\fP
+.IP CARLOPT_SSH_KEYDATA
+Custom pointer to pass to ssh key callback. See \fICARLOPT_SSH_KEYDATA(3)\fP
+.SH OTHER OPTIONS
+.IP CARLOPT_PRIVATE
+Private pointer to store. See \fICARLOPT_PRIVATE(3)\fP
+.IP CARLOPT_SHARE
+Share object to use. See \fICARLOPT_SHARE(3)\fP
+.IP CARLOPT_NEW_FILE_PERMS
+Mode for creating new remote files. See \fICARLOPT_NEW_FILE_PERMS(3)\fP
+.IP CARLOPT_NEW_DIRECTORY_PERMS
+Mode for creating new remote directories. See \fICARLOPT_NEW_DIRECTORY_PERMS(3)\fP
+.SH TELNET OPTIONS
+.IP CARLOPT_TELNETOPTIONS
+TELNET options. See \fICARLOPT_TELNETOPTIONS(3)\fP
+.SH RETURN VALUE
+\fICARLE_OK\fP (zero) means that the option was set properly, non-zero means an
+error occurred as \fI<carl/carl.h>\fP defines. See the \fIlibcarl-errors(3)\fP
+man page for the full list with descriptions.
+
+Strings passed on to libcarl must be shorter than 8000000 bytes, otherwise
+\fIcarl_easy_setopt(3)\fP returns \fBCARLE_BAD_FUNCTION_ARGUMENT\fP (added in
+7.65.0).
+
+\fBCARLE_BAD_FUNCTION_ARGUMENT\fP is returned when the argument to an option
+is invalid, like perhaps out of range.a
+
+If you try to set an option that libcarl doesn't know about, perhaps because
+the library is too old to support it or the option was removed in a recent
+version, this function will return \fICARLE_UNKNOWN_OPTION\fP. If support for
+the option was disabled at compile-time, it will return
+\fICARLE_NOT_BUILT_IN\fP.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode res;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+  res = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH "SEE ALSO"
+.BR carl_easy_init "(3), " carl_easy_cleanup "(3), " carl_easy_reset "(3), "
+.BR carl_easy_getinfo "(3), " carl_multi_setopt "(3), "

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_ASYN_H
-#define HEADER_CURL_ASYN_H
+#ifndef HEADER_CARL_ASYN_H
+#define HEADER_CARL_ASYN_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,8 +22,8 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
-#include "curl_addrinfo.h"
+#include "carl_setup.h"
+#include "carl_addrinfo.h"
 
 struct addrinfo;
 struct hostent;
@@ -41,30 +41,30 @@ struct Curl_dns_entry;
 /*
  * Curl_resolver_global_init()
  *
- * Called from curl_global_init() to initialize global resolver environment.
- * Returning anything else than CURLE_OK fails curl_global_init().
+ * Called from carl_global_init() to initialize global resolver environment.
+ * Returning anything else than CARLE_OK fails carl_global_init().
  */
 int Curl_resolver_global_init(void);
 
 /*
  * Curl_resolver_global_cleanup()
- * Called from curl_global_cleanup() to destroy global resolver environment.
+ * Called from carl_global_cleanup() to destroy global resolver environment.
  */
 void Curl_resolver_global_cleanup(void);
 
 /*
  * Curl_resolver_init()
- * Called from curl_easy_init() -> Curl_open() to initialize resolver
+ * Called from carl_easy_init() -> Curl_open() to initialize resolver
  * URL-state specific environment ('resolver' member of the UrlState
  * structure).  Should fill the passed pointer by the initialized handler.
- * Returning anything else than CURLE_OK fails curl_easy_init() with the
+ * Returning anything else than CARLE_OK fails carl_easy_init() with the
  * correspondent code.
  */
-CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver);
+CARLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver);
 
 /*
  * Curl_resolver_cleanup()
- * Called from curl_easy_cleanup() -> Curl_close() to cleanup resolver
+ * Called from carl_easy_cleanup() -> Curl_close() to cleanup resolver
  * URL-state specific environment ('resolver' member of the UrlState
  * structure).  Should destroy the handler and free all resources connected to
  * it.
@@ -73,13 +73,13 @@ void Curl_resolver_cleanup(void *resolver);
 
 /*
  * Curl_resolver_duphandle()
- * Called from curl_easy_duphandle() to duplicate resolver URL-state specific
+ * Called from carl_easy_duphandle() to duplicate resolver URL-state specific
  * environment ('resolver' member of the UrlState structure).  Should
  * duplicate the 'from' handle and pass the resulting handle to the 'to'
- * pointer.  Returning anything else than CURLE_OK causes failed
- * curl_easy_duphandle() call.
+ * pointer.  Returning anything else than CARLE_OK causes failed
+ * carl_easy_duphandle() call.
  */
-CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to,
+CARLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to,
                                  void *from);
 
 /*
@@ -114,7 +114,7 @@ void Curl_resolver_kill(struct Curl_easy *data);
  * return bitmask indicating what file descriptors (referring to array indexes
  * in the 'sock' array) to wait for, read/write.
  */
-int Curl_resolver_getsock(struct Curl_easy *data, curl_socket_t *sock);
+int Curl_resolver_getsock(struct Curl_easy *data, carl_socket_t *sock);
 
 /*
  * Curl_resolver_is_resolved()
@@ -123,9 +123,9 @@ int Curl_resolver_getsock(struct Curl_easy *data, curl_socket_t *sock);
  * completed. It should also make sure to time-out if the operation seems to
  * take too long.
  *
- * Returns normal CURLcode errors.
+ * Returns normal CARLcode errors.
  */
-CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
+CARLcode Curl_resolver_is_resolved(struct Curl_easy *data,
                                    struct Curl_dns_entry **dns);
 
 /*
@@ -136,10 +136,10 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
  *
  * If 'entry' is non-NULL, make it point to the resolved dns entry
  *
- * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved,
- * CURLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
+ * Returns CARLE_COULDNT_RESOLVE_HOST if the host was not resolved,
+ * CARLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
  */
-CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
+CARLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
                                    struct Curl_dns_entry **dnsentry);
 
 /*
@@ -158,20 +158,20 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                                                 int port,
                                                 int *waitp);
 
-#ifndef CURLRES_ASYNCH
+#ifndef CARLRES_ASYNCH
 /* convert these functions if an asynch resolver isn't used */
 #define Curl_resolver_cancel(x) Curl_nop_stmt
 #define Curl_resolver_kill(x) Curl_nop_stmt
-#define Curl_resolver_is_resolved(x,y) CURLE_COULDNT_RESOLVE_HOST
-#define Curl_resolver_wait_resolv(x,y) CURLE_COULDNT_RESOLVE_HOST
-#define Curl_resolver_duphandle(x,y,z) CURLE_OK
-#define Curl_resolver_init(x,y) CURLE_OK
-#define Curl_resolver_global_init() CURLE_OK
+#define Curl_resolver_is_resolved(x,y) CARLE_COULDNT_RESOLVE_HOST
+#define Curl_resolver_wait_resolv(x,y) CARLE_COULDNT_RESOLVE_HOST
+#define Curl_resolver_duphandle(x,y,z) CARLE_OK
+#define Curl_resolver_init(x,y) CARLE_OK
+#define Curl_resolver_global_init() CARLE_OK
 #define Curl_resolver_global_cleanup() Curl_nop_stmt
 #define Curl_resolver_cleanup(x) Curl_nop_stmt
 #endif
 
-#ifdef CURLRES_ASYNCH
+#ifdef CARLRES_ASYNCH
 #define Curl_resolver_asynch() 1
 #else
 #define Curl_resolver_asynch() 0
@@ -179,4 +179,4 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
 
 
 /********** end of generic resolver interface functions *****************/
-#endif /* HEADER_CURL_ASYN_H */
+#endif /* HEADER_CARL_ASYN_H */

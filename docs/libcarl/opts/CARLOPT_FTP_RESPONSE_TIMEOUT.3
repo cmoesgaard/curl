@@ -1,0 +1,62 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_FTP_RESPONSE_TIMEOUT 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_FTP_RESPONSE_TIMEOUT \- time allowed to wait for FTP response
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_FTP_RESPONSE_TIMEOUT, long timeout);
+.SH DESCRIPTION
+Pass a long.  Causes libcarl to set a \fItimeout\fP period (in seconds) on the
+amount of time that the server is allowed to take in order to send a response
+message for a command before the session is considered dead.  While libcarl is
+waiting for a response, this value overrides \fICARLOPT_TIMEOUT(3)\fP. It is
+recommended that if used in conjunction with \fICARLOPT_TIMEOUT(3)\fP, you set
+\fICARLOPT_FTP_RESPONSE_TIMEOUT(3)\fP to a value smaller than
+\fICARLOPT_TIMEOUT(3)\fP.
+.SH DEFAULT
+None
+.SH PROTOCOLS
+FTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/slow.txt");
+  /* wait no more than 23 seconds */
+  carl_easy_setopt(carl, CARLOPT_FTP_RESPONSE_TIMEOUT, 23L);
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.10.8
+.SH RETURN VALUE
+Returns CARLE_OK if FTP is supported, and CARLE_UNKNOWN_OPTION if not. Returns
+CARLE_BAD_FUNCTION_ARGUMENT if set to a negative value or a value that when
+converted to milliseconds is too large.
+.SH "SEE ALSO"
+.BR CARLOPT_TIMEOUT "(3), " CARLOPT_CONNECTTIMEOUT "(3), "
+.BR CARLOPT_LOW_SPEED_LIMIT "(3), "

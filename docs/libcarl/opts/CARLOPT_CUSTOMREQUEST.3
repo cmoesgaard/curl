@@ -1,0 +1,111 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_CUSTOMREQUEST 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_CUSTOMREQUEST \- custom string for request
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_CUSTOMREQUEST, char *request);
+.SH DESCRIPTION
+Pass a pointer to a null-terminated string as parameter.
+
+When you change the request method by setting \fICARLOPT_CUSTOMREQUEST(3)\fP
+to something, you don't actually change how libcarl behaves or acts in regards
+to the particular request method, it will only change the actual string sent
+in the request.
+
+Restore to the internal default by setting this to NULL.
+
+This option can be used to specify the request:
+.IP HTTP
+Instead of GET or HEAD when performing HTTP based requests. This is
+particularly useful, for example, for performing an HTTP DELETE request.
+
+For example:
+
+When you tell libcarl to do a HEAD request, but then specify a GET though a
+custom request libcarl will still act as if it sent a HEAD. To switch to a
+proper HEAD use \fICARLOPT_NOBODY(3)\fP, to switch to a proper POST use
+\fICARLOPT_POST(3)\fP or \fICARLOPT_POSTFIELDS(3)\fP and to switch to a proper
+GET use \fICARLOPT_HTTPGET(3)\fP.
+
+Many people have wrongly used this option to replace the entire request with
+their own, including multiple headers and POST contents. While that might work
+in many cases, it will cause libcarl to send invalid requests and it could
+possibly confuse the remote server badly. Use \fICARLOPT_POST(3)\fP and
+\fICARLOPT_POSTFIELDS(3)\fP to set POST data. Use \fICARLOPT_HTTPHEADER(3)\fP
+to replace or extend the set of headers sent by libcarl. Use
+\fICARLOPT_HTTP_VERSION(3)\fP to change HTTP version.
+
+.IP FTP
+Instead of LIST and NLST when performing FTP directory listings.
+.IP IMAP
+Instead of LIST when issuing IMAP based requests.
+.IP POP3
+Instead of LIST and RETR when issuing POP3 based requests.
+
+For example:
+
+When you tell libcarl to use a custom request it will behave like a LIST or
+RETR command was sent where it expects data to be returned by the server. As
+such \fICARLOPT_NOBODY(3)\fP should be used when specifying commands such as
+DELE and NOOP for example.
+.IP SMTP
+Instead of a HELP or VRFY when issuing SMTP based requests.
+
+For example:
+
+Normally a multiline response is returned which can be used, in conjunction
+with \fICARLOPT_MAIL_RCPT(3)\fP, to specify an EXPN request. If the
+\fICARLOPT_NOBODY(3)\fP option is specified then the request can be used to
+issue NOOP and RSET commands.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+HTTP, FTP, IMAP, POP3 and SMTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/foo.bin");
+
+  /* DELETE the given path */
+  carl_easy_setopt(carl, CARLOPT_CUSTOMREQUEST, "DELETE");
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+IMAP is supported since 7.30.0, POP3 since 7.26.0 and SMTP since 7.34.0.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_HTTPHEADER "(3), " CARLOPT_NOBODY "(3), "
+.BR CARLOPT_REQUEST_TARGET "(3), "

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_WRITEOUT_H
-#define HEADER_CURL_TOOL_WRITEOUT_H
+#ifndef HEADER_CARL_TOOL_WRITEOUT_H
+#define HEADER_CARL_TOOL_WRITEOUT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -83,11 +83,11 @@ struct writeoutvar {
   const char *name;
   writeoutid id;
   int is_ctrl;
-  CURLINFO cinfo;
+  CARLINFO cinfo;
   jsontype jsontype;
 };
 
-void ourWriteOut(CURL *curl, struct per_transfer *per, const char *writeinfo,
-                 CURLcode exitcode);
+void ourWriteOut(CARL *carl, struct per_transfer *per, const char *writeinfo,
+                 CARLcode exitcode);
 
-#endif /* HEADER_CURL_TOOL_WRITEOUT_H */
+#endif /* HEADER_CARL_TOOL_WRITEOUT_H */

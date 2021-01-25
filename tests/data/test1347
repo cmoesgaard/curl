@@ -25,7 +25,7 @@ Content-Disposition: filename=name1347; charset=funny; option=strange
 # Client-side
 <client>
 # this relies on the debug feature to allow us to set directory to store the
-# -O output in, using the CURL_TESTDIR variable
+# -O output in, using the CARL_TESTDIR variable
 <features>
 debug
 </features>
@@ -36,7 +36,7 @@ http
 HTTP GET with -O -i and Content-Disposition, without -D
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
 http://%HOSTIP:%HTTPPORT/1347 -i -O
@@ -52,7 +52,7 @@ perl %SRCDIR/libtest/notexists.pl log/name1347
 <protocol>
 GET /1347 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

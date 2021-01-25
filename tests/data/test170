@@ -37,13 +37,13 @@ http://a.galaxy.far.far.away/170 --proxy http://%HOSTIP:%HTTPPORT --proxy-user f
 POST http://a.galaxy.far.far.away/170 HTTP/1.1
 Host: a.galaxy.far.far.away
 Proxy-Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Content-Length: 0
 
 </protocol>
-# 52 is CURLE_GOT_NOTHING
+# 52 is CARLE_GOT_NOTHING
 <errorcode>
 52
 </errorcode>

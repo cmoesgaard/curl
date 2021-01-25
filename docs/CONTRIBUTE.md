@@ -1,46 +1,46 @@
-# Contributing to the curl project
+# Contributing to the carl project
 
 This document is intended to offer guidelines on how to best contribute to the
-curl project. This concerns new features as well as corrections to existing
+carl project. This concerns new features as well as corrections to existing
 flaws or bugs.
 
-## Learning curl
+## Learning carl
 
 ### Join the Community
 
-Skip over to [https://curl.se/mail/](https://curl.se/mail/) and join
+Skip over to [https://carl.se/mail/](https://carl.se/mail/) and join
 the appropriate mailing list(s).  Read up on details before you post
 questions. Read this file before you start sending patches! We prefer
 questions sent to and discussions being held on the mailing list(s), not sent
 to individuals.
 
-Before posting to one of the curl mailing lists, please read up on the
-[mailing list etiquette](https://curl.se/mail/etiquette.html).
+Before posting to one of the carl mailing lists, please read up on the
+[mailing list etiquette](https://carl.se/mail/etiquette.html).
 
-We also hang out on IRC in #curl on irc.freenode.net
+We also hang out on IRC in #carl on irc.freenode.net
 
 If you're at all interested in the code side of things, consider clicking
-'watch' on the [curl repo on github](https://github.com/curl/curl) to be
+'watch' on the [carl repo on github](https://github.com/carl/carl) to be
 notified of pull requests and new issues posted there.
 
 ### License and copyright
 
 When contributing with code, you agree to put your changes and new code under
-the same license curl and libcurl is already using unless stated and agreed
+the same license carl and libcarl is already using unless stated and agreed
 otherwise.
 
 If you add a larger piece of code, you can opt to make that file or set of
 files to use a different license as long as they don't enforce any changes to
 the rest of the package and they make sense. Such "separate parts" can not be
-GPL licensed (as we don't want copyleft to affect users of libcurl) but they
-must use "GPL compatible" licenses (as we want to allow users to use libcurl
+GPL licensed (as we don't want copyleft to affect users of libcarl) but they
+must use "GPL compatible" licenses (as we want to allow users to use libcarl
 properly in GPL licensed environments).
 
 When changing existing source code, you do not alter the copyright of the
 original file(s). The copyright will still be owned by the original creator(s)
 or those who have been assigned copyright by the original author(s).
 
-By submitting a patch to the curl project, you are assumed to have the right
+By submitting a patch to the carl project, you are assumed to have the right
 to the code and to be allowed by your employer or whatever to hand over that
 patch/code to us. We will credit you for your changes as far as possible, to
 give credit but also to keep a trace back to who made what changes. Please
@@ -49,12 +49,12 @@ always provide us with your full real name when contributing!
 ### What To Read
 
 Source code, the man pages, the [INTERNALS
-document](https://curl.se/dev/internals.html),
-[TODO](https://curl.se/docs/todo.html),
-[KNOWN_BUGS](https://curl.se/docs/knownbugs.html) and the [most recent
-changes](https://curl.se/dev/sourceactivity.html) in git. Just lurking on
-the [curl-library mailing
-list](https://curl.se/mail/list.cgi?list=curl-library) will give you a
+document](https://carl.se/dev/internals.html),
+[TODO](https://carl.se/docs/todo.html),
+[KNOWN_BUGS](https://carl.se/docs/knownbugs.html) and the [most recent
+changes](https://carl.se/dev/sourceactivity.html) in git. Just lurking on
+the [carl-library mailing
+list](https://carl.se/mail/list.cgi?list=carl-library) will give you a
 lot of insights on what's going on right now. Asking there is a good idea too.
 
 ## Write a good patch
@@ -62,7 +62,7 @@ lot of insights on what's going on right now. Asking there is a good idea too.
 ### Follow code style
 
 When writing C code, follow the
-[CODE_STYLE](https://curl.se/dev/code-style.html) already established in
+[CODE_STYLE](https://carl.se/dev/code-style.html) already established in
 the project. Consistent style makes code easier to read and mistakes less
 likely to happen. Run `make checksrc` before you submit anything, to make sure
 you follow the basic style. That script doesn't verify everything, but if it
@@ -129,9 +129,9 @@ verified your changes.
 ### How to get your changes into the main sources
 
 Ideally you file a [pull request on
-github](https://github.com/curl/curl/pulls), but you can also send your plain
-patch to [the curl-library mailing
-list](https://curl.se/mail/list.cgi?list=curl-library).
+github](https://github.com/carl/carl/pulls), but you can also send your plain
+patch to [the carl-library mailing
+list](https://carl.se/mail/list.cgi?list=carl-library).
 
 Either way, your change will be reviewed and discussed there and you will be
 expected to correct flaws pointed out and update accordingly, or the change
@@ -146,7 +146,7 @@ simply drop such changes.
 ### About pull requests
 
 With github it is easy to send a [pull
-request](https://github.com/curl/curl/pulls) to the curl project to have
+request](https://github.com/carl/carl/pulls) to the carl project to have
 changes merged.
 
 We strongly prefer pull requests to mailed patches, as it makes it a proper
@@ -183,11 +183,11 @@ Consider the following table while looking at pull request failures:
  | FreeBSD FreeBSD: ...                | stable | all errors and failures    |
  | LGTM analysis: Python               | stable | new findings               |
  | LGTM analysis:  C/C++               | stable | new findings               |
- | buildbot/curl_winssl_ ...           | stable | all errors and failures    |
+ | buildbot/carl_winssl_ ...           | stable | all errors and failures    |
  | continuous-integration/appveyor/pr  | stable | all errors and failures    |
  | continuous-integration/travis-ci/pr | stable | all errors and failures    |
- | curl.curl (linux ...)               | stable | all errors and failures    |
- | curl.curl (windows ...)             | flaky  | repetitive errors/failures |
+ | carl.carl (linux ...)               | stable | all errors and failures    |
+ | carl.carl (windows ...)             | flaky  | repetitive errors/failures |
  | deepcode-ci-bot                     | stable | new findings               |
  | musedev                             | stable | new findings               |
 
@@ -212,7 +212,7 @@ list or better yet: change it to a pull request.
 
 ### Write good commit messages
 
-A short guide to how to write commit messages in the curl project.
+A short guide to how to write commit messages in the carl project.
 
     ---- start ----
     [area]: [short line describing the main effect]
@@ -254,7 +254,7 @@ several high quality patches first, before you can be granted push access.
 
 You need to first checkout the repository:
 
-    git clone https://github.com/curl/curl.git
+    git clone https://github.com/carl/carl.git
 
 You then proceed and edit all the files you like and you commit them to your
 local repository:
@@ -272,14 +272,14 @@ can make patches out of your changes that are suitable for mailing:
 This creates files in your local directory named NNNN-[name].patch for each
 commit.
 
-Now send those patches off to the curl-library list. You can of course opt to
+Now send those patches off to the carl-library list. You can of course opt to
 do that with the 'git send-email' command.
 
 ### How To Make a Patch without git
 
-Keep a copy of the unmodified curl sources. Make your changes in a separate
+Keep a copy of the unmodified carl sources. Make your changes in a separate
 source tree. When you think you have something that you want to offer the
-curl community, use GNU diff to generate patches.
+carl community, use GNU diff to generate patches.
 
 If you have modified a single file, try something like:
 
@@ -288,7 +288,7 @@ If you have modified a single file, try something like:
 If you have modified several files, possibly in different directories, you
 can use diff recursively:
 
-    diff -ur curl-original-dir curl-modified-sources-dir > my-fixes.diff
+    diff -ur carl-original-dir carl-modified-sources-dir > my-fixes.diff
 
 The GNU diff and GNU patch tools exist for virtually all platforms, including
 all kinds of Unixes and Windows:

@@ -5,9 +5,9 @@
 [HTTP/3 Explained](https://daniel.haxx.se/http3-explained/) - the online free
 book describing the protocols involved.
 
-[QUIC implementation](https://github.com/curl/curl/wiki/QUIC-implementation) -
-the wiki page describing the plan for how to support QUIC and HTTP/3 in curl
-and libcurl.
+[QUIC implementation](https://github.com/carl/carl/wiki/QUIC-implementation) -
+the wiki page describing the plan for how to support QUIC and HTTP/3 in carl
+and libcarl.
 
 [quicwg.org](https://quicwg.org/) - home of the official protocol drafts
 
@@ -21,10 +21,10 @@ QUIC libraries we're experimenting with:
 
 ## Experimental!
 
-HTTP/3 and QUIC support in curl is considered **EXPERIMENTAL** until further
+HTTP/3 and QUIC support in carl is considered **EXPERIMENTAL** until further
 notice. It needs to be enabled at build-time.
 
-Further development and tweaking of the HTTP/3 support in curl will happen in
+Further development and tweaking of the HTTP/3 support in carl will happen in
 in the master branch using pull-requests, just like ordinary changes.
 
 # ngtcp2 version
@@ -59,11 +59,11 @@ Build ngtcp2
      % make
      % make install
 
-Build curl
+Build carl
 
      % cd ..
-     % git clone https://github.com/curl/curl
-     % cd curl
+     % git clone https://github.com/carl/carl
+     % cd carl
      % ./buildconf
      % LDFLAGS="-Wl,-rpath,<somewhere1>/lib" ./configure --with-ssl=<somewhere1> --with-nghttp3=<somewhere2> --with-ngtcp2=<somewhere3>
      % make
@@ -99,11 +99,11 @@ Build ngtcp2
      % make
      % make install
 
-Build curl
+Build carl
 
      % cd ..
-     % git clone https://github.com/curl/curl
-     % cd curl
+     % git clone https://github.com/carl/carl
+     % cd carl
      % ./buildconf
      % ./configure --without-ssl --with-gnutls=<somewhere1> --with-nghttp3=<somewhere2> --with-ngtcp2=<somewhere3>
      % make
@@ -120,11 +120,11 @@ Build quiche and BoringSSL:
      % mkdir deps/boringssl/src/lib
      % ln -vnf $(find target/release -name libcrypto.a -o -name libssl.a) deps/boringssl/src/lib/
 
-Build curl:
+Build carl:
 
      % cd ..
-     % git clone https://github.com/curl/curl
-     % cd curl
+     % git clone https://github.com/carl/carl
+     % cd carl
      % ./buildconf
      % ./configure LDFLAGS="-Wl,-rpath,$PWD/../quiche/target/release" --with-ssl=$PWD/../quiche/deps/boringssl/src --with-quiche=$PWD/../quiche/target/release
      % make
@@ -133,10 +133,10 @@ Build curl:
 
 Use HTTP/3 directly:
 
-    curl --http3 https://nghttp2.org:8443/
+    carl --http3 https://nghttp2.org:8443/
 
 Upgrade via Alt-Svc:
 
-    curl --alt-svc altsvc.cache https://quic.aiortc.org/
+    carl --alt-svc altsvc.cache https://quic.aiortc.org/
 
 See this [list of public HTTP/3 servers](https://bagder.github.io/HTTP3-test/)

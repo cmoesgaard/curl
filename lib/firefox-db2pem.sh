@@ -10,7 +10,7 @@
 # *
 # * This software is licensed as described in the file COPYING, which
 # * you should have received as part of this distribution. The terms
-# * are also available at https://curl.se/docs/copyright.html.
+# * are also available at https://carl.se/docs/copyright.html.
 # *
 # * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 # * KIND, either express or implied.
 # *
 # ***************************************************************************
-# This shell script creates a fresh ca-bundle.crt file for use with libcurl.
+# This shell script creates a fresh ca-bundle.crt file for use with libcarl.
 # It extracts all ca certs it finds in the local Firefox database and converts
 # them all into PEM format.
 #

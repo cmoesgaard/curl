@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,45 +30,45 @@
 /*
  * From "KNOWN_BUGS" April 2009:
 
- 59. If the CURLOPT_PORT option is used on an FTP URL like
+ 59. If the CARLOPT_PORT option is used on an FTP URL like
  "ftp://example.com/file;type=A" the ";type=A" is stripped off.
 
  */
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  /* get a curl handle */
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  /* get a carl handle */
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* enable verbose */
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
   /* set port number */
-  test_setopt(curl, CURLOPT_PORT, strtol(libtest_arg2, NULL, 10));
+  test_setopt(carl, CARLOPT_PORT, strtol(libtest_arg2, NULL, 10));
 
   /* specify target */
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
   /* Now run off and do what you've been told! */
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

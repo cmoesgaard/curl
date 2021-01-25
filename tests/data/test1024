@@ -84,17 +84,17 @@ http://%HOSTIP:%HTTPPORT/want/1024 -L -c log/jar1024
 <protocol>
 GET /want/1024 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /data/10240002.txt HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /want/10240003.txt HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Cookie: firstcookie=want
 

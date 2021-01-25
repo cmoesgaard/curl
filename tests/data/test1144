@@ -57,7 +57,7 @@ HTTP HEAD, receive no headers only body
 <protocol>
 HEAD /1144 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

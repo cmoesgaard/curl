@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -35,7 +35,7 @@ if($start eq "-h") {
     exit;
 }
 elsif($start eq "") {
-    $start = `git tag --sort=taggerdate | grep "^curl-" | tail -1`;
+    $start = `git tag --sort=taggerdate | grep "^carl-" | tail -1`;
     chomp $start;
 }
 
@@ -57,8 +57,8 @@ $bcontribs = `git show $start:docs/THANKS | grep -c '^[^ ]'`;
 $contribs = $acontribs - $bcontribs;
 
 # number of setops:
-$asetopts=`grep '^  CURLOPT(' include/curl/curl.h  | grep -cv OBSOLETE`;
-$bsetopts=`git show $start:include/curl/curl.h | grep '^  CURLOPT(' | grep -cv OBSOLETE`;
+$asetopts=`grep '^  CARLOPT(' include/carl/carl.h  | grep -cv OBSOLETE`;
+$bsetopts=`git show $start:include/carl/carl.h | grep '^  CARLOPT(' | grep -cv OBSOLETE`;
 $nsetopts = $asetopts - $bsetopts;
 
 # Number of command line options:
@@ -78,9 +78,9 @@ chomp $taggednice;
 $now=`date +%s`;
 $elapsed=$now - $tagged; # number of seconds since tag
 
-# Number of public functions in libcurl
-$apublic=`git grep ^CURL_EXTERN -- include/curl | wc -l`;
-$bpublic=`git grep ^CURL_EXTERN $start -- include/curl | wc -l`;
+# Number of public functions in libcarl
+$apublic=`git grep ^CARL_EXTERN -- include/carl | wc -l`;
+$bpublic=`git grep ^CARL_EXTERN $start -- include/carl | wc -l`;
 $public = $apublic - $bpublic;
 
 # diffstat
@@ -129,7 +129,7 @@ printf "Contributors:                   %d, %d new (total %d)\n",
     $numcontributors, $contribs, $acontribs;
 printf "New public functions:           %d (total %d)\n",
     $public, $apublic;
-printf "New curl_easy_setopt() options: %d (total %d)\n",
+printf "New carl_easy_setopt() options: %d (total %d)\n",
     $nsetopts, $asetopts;
 printf "New command line options:       %d (total %d)\n",
     $noptions, $aoptions;

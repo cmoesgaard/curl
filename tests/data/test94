@@ -48,7 +48,7 @@ https://test.anything.really.com:94 --proxy1.0 %HOSTIP:%HTTPPORT
 <protocol>
 CONNECT test.anything.really.com:94 HTTP/1.0
 Host: test.anything.really.com:94
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </protocol>

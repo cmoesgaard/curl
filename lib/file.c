@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_FILE
+#ifndef CARL_DISABLE_FILE
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -50,7 +50,7 @@
 
 #include "strtoofft.h"
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "progress.h"
 #include "sendf.h"
 #include "escape.h"
@@ -61,10 +61,10 @@
 #include "url.h"
 #include "parsedate.h" /* for the week day and month names */
 #include "warnless.h"
-#include "curl_range.h"
+#include "carl_range.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #if defined(WIN32) || defined(MSDOS) || defined(__EMX__)
@@ -81,14 +81,14 @@
  * Forward declarations.
  */
 
-static CURLcode file_do(struct Curl_easy *data, bool *done);
-static CURLcode file_done(struct Curl_easy *data,
-                          CURLcode status, bool premature);
-static CURLcode file_connect(struct Curl_easy *data, bool *done);
-static CURLcode file_disconnect(struct Curl_easy *data,
+static CARLcode file_do(struct Curl_easy *data, bool *done);
+static CARLcode file_done(struct Curl_easy *data,
+                          CARLcode status, bool premature);
+static CARLcode file_connect(struct Curl_easy *data, bool *done);
+static CARLcode file_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 bool dead_connection);
-static CURLcode file_setup_connection(struct Curl_easy *data,
+static CARLcode file_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
 
 /*
@@ -112,22 +112,22 @@ const struct Curl_handler Curl_handler_file = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   0,                                    /* defport */
-  CURLPROTO_FILE,                       /* protocol */
-  CURLPROTO_FILE,                       /* family */
+  CARLPROTO_FILE,                       /* protocol */
+  CARLPROTO_FILE,                       /* family */
   PROTOPT_NONETWORK | PROTOPT_NOURLQUERY /* flags */
 };
 
 
-static CURLcode file_setup_connection(struct Curl_easy *data,
+static CARLcode file_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
   (void)conn;
   /* allocate the FILE specific struct */
   data->req.p.file = calloc(1, sizeof(struct FILEPROTO));
   if(!data->req.p.file)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -135,7 +135,7 @@ static CURLcode file_setup_connection(struct Curl_easy *data,
  * do protocol-specific actions at connect-time.  We emulate a
  * connect-then-transfer protocol and "connect" to the file here
  */
-static CURLcode file_connect(struct Curl_easy *data, bool *done)
+static CARLcode file_connect(struct Curl_easy *data, bool *done)
 {
   char *real_path;
   struct FILEPROTO *file = data->req.p.file;
@@ -146,7 +146,7 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
 #endif
   size_t real_path_len;
 
-  CURLcode result = Curl_urldecode(data, data->state.up.path, 0, &real_path,
+  CARLcode result = Curl_urldecode(data, data->state.up.path, 0, &real_path,
                                    &real_path_len, REJECT_ZERO);
   if(result)
     return result;
@@ -181,7 +181,7 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
       actual_path[i] = '\\';
     else if(!actual_path[i]) { /* binary zero */
       Curl_safefree(real_path);
-      return CURLE_URL_MALFORMAT;
+      return CARLE_URL_MALFORMAT;
     }
 
   fd = open_readonly(actual_path, O_RDONLY|O_BINARY);
@@ -190,7 +190,7 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
   if(memchr(real_path, 0, real_path_len)) {
     /* binary zeroes indicate foul play */
     Curl_safefree(real_path);
-    return CURLE_URL_MALFORMAT;
+    return CARLE_URL_MALFORMAT;
   }
 
   fd = open_readonly(real_path, O_RDONLY);
@@ -201,16 +201,16 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
   file->fd = fd;
   if(!data->set.upload && (fd == -1)) {
     failf(data, "Couldn't open file %s", data->state.up.path);
-    file_done(data, CURLE_FILE_COULDNT_READ_FILE, FALSE);
-    return CURLE_FILE_COULDNT_READ_FILE;
+    file_done(data, CARLE_FILE_COULDNT_READ_FILE, FALSE);
+    return CARLE_FILE_COULDNT_READ_FILE;
   }
   *done = TRUE;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode file_done(struct Curl_easy *data,
-                          CURLcode status, bool premature)
+static CARLcode file_done(struct Curl_easy *data,
+                          CARLcode status, bool premature)
 {
   struct FILEPROTO *file = data->req.p.file;
   (void)status; /* not used */
@@ -224,10 +224,10 @@ static CURLcode file_done(struct Curl_easy *data,
     file->fd = -1;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode file_disconnect(struct Curl_easy *data,
+static CARLcode file_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 bool dead_connection)
 {
@@ -242,15 +242,15 @@ static CURLcode file_disconnect(struct Curl_easy *data,
 #define DIRSEP '/'
 #endif
 
-static CURLcode file_upload(struct Curl_easy *data)
+static CARLcode file_upload(struct Curl_easy *data)
 {
   struct FILEPROTO *file = data->req.p.file;
   const char *dir = strchr(file->path, DIRSEP);
   int fd;
   int mode;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *buf = data->state.buffer;
-  curl_off_t bytecount = 0;
+  carl_off_t bytecount = 0;
   struct_stat file_stat;
   const char *buf2;
 
@@ -261,10 +261,10 @@ static CURLcode file_upload(struct Curl_easy *data)
   data->req.upload_fromhere = buf;
 
   if(!dir)
-    return CURLE_FILE_COULDNT_READ_FILE; /* fix: better error code */
+    return CARLE_FILE_COULDNT_READ_FILE; /* fix: better error code */
 
   if(!dir[1])
-    return CURLE_FILE_COULDNT_READ_FILE; /* fix: better error code */
+    return CARLE_FILE_COULDNT_READ_FILE; /* fix: better error code */
 
 #ifdef O_BINARY
 #define MODE_DEFAULT O_WRONLY|O_CREAT|O_BINARY
@@ -280,7 +280,7 @@ static CURLcode file_upload(struct Curl_easy *data)
   fd = open(file->path, mode, data->set.new_file_perms);
   if(fd < 0) {
     failf(data, "Can't open %s for writing", file->path);
-    return CURLE_WRITE_ERROR;
+    return CARLE_WRITE_ERROR;
   }
 
   if(-1 != data->state.infilesize)
@@ -292,9 +292,9 @@ static CURLcode file_upload(struct Curl_easy *data)
     if(fstat(fd, &file_stat)) {
       close(fd);
       failf(data, "Can't get the size of %s", file->path);
-      return CURLE_WRITE_ERROR;
+      return CARLE_WRITE_ERROR;
     }
-    data->state.resume_from = (curl_off_t)file_stat.st_size;
+    data->state.resume_from = (carl_off_t)file_stat.st_size;
   }
 
   while(!result) {
@@ -312,7 +312,7 @@ static CURLcode file_upload(struct Curl_easy *data)
 
     /*skip bytes before resume point*/
     if(data->state.resume_from) {
-      if((curl_off_t)nread <= data->state.resume_from) {
+      if((carl_off_t)nread <= data->state.resume_from) {
         data->state.resume_from -= nread;
         nread = 0;
         buf2 = buf;
@@ -329,7 +329,7 @@ static CURLcode file_upload(struct Curl_easy *data)
     /* write the data to the target */
     nwrite = write(fd, buf2, nread);
     if(nwrite != nread) {
-      result = CURLE_SEND_ERROR;
+      result = CARLE_SEND_ERROR;
       break;
     }
 
@@ -338,12 +338,12 @@ static CURLcode file_upload(struct Curl_easy *data)
     Curl_pgrsSetUploadCounter(data, bytecount);
 
     if(Curl_pgrsUpdate(data))
-      result = CURLE_ABORTED_BY_CALLBACK;
+      result = CARLE_ABORTED_BY_CALLBACK;
     else
       result = Curl_speedcheck(data, Curl_now());
   }
   if(!result && Curl_pgrsUpdate(data))
-    result = CURLE_ABORTED_BY_CALLBACK;
+    result = CARLE_ABORTED_BY_CALLBACK;
 
   close(fd);
 
@@ -358,22 +358,22 @@ static CURLcode file_upload(struct Curl_easy *data)
  * opposed to sockets) we instead perform the whole do-operation in this
  * function.
  */
-static CURLcode file_do(struct Curl_easy *data, bool *done)
+static CARLcode file_do(struct Curl_easy *data, bool *done)
 {
   /* This implementation ignores the host name in conformance with
      RFC 1738. Only local files (reachable via the standard file system)
      are supported. This means that files on remotely mounted directories
      (via NFS, Samba, NT sharing) can be accessed through a file:// URL
   */
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct_stat statbuf; /* struct_stat instead of struct stat just to allow the
                           Windows version to have a different struct without
                           having to redefine the simple word 'stat' */
-  curl_off_t expected_size = -1;
+  carl_off_t expected_size = -1;
   bool size_known;
   bool fstated = FALSE;
   char *buf = data->state.buffer;
-  curl_off_t bytecount = 0;
+  carl_off_t bytecount = 0;
   int fd;
   struct FILEPROTO *file;
 
@@ -401,7 +401,7 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
   if(fstated && !data->state.range && data->set.timecondition) {
     if(!Curl_meets_timecondition(data, data->info.filetime)) {
       *done = TRUE;
-      return CURLE_OK;
+      return CARLE_OK;
     }
   }
 
@@ -412,7 +412,7 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
     char header[80];
     if(expected_size >= 0) {
       msnprintf(header, sizeof(header),
-                "Content-Length: %" CURL_FORMAT_CURL_OFF_T "\r\n",
+                "Content-Length: %" CARL_FORMAT_CARL_OFF_T "\r\n",
                 expected_size);
       result = Curl_client_write(data, CLIENTWRITE_HEADER, header, 0);
       if(result)
@@ -459,16 +459,16 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
   if(data->state.resume_from < 0) {
     if(!fstated) {
       failf(data, "Can't get the size of file.");
-      return CURLE_READ_ERROR;
+      return CARLE_READ_ERROR;
     }
-    data->state.resume_from += (curl_off_t)statbuf.st_size;
+    data->state.resume_from += (carl_off_t)statbuf.st_size;
   }
 
   if(data->state.resume_from <= expected_size)
     expected_size -= data->state.resume_from;
   else {
     failf(data, "failed to resume file:// transfer");
-    return CURLE_BAD_DOWNLOAD_RESUME;
+    return CARLE_BAD_DOWNLOAD_RESUME;
   }
 
   /* A high water mark has been specified so we obey... */
@@ -490,7 +490,7 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
   if(data->state.resume_from) {
     if(data->state.resume_from !=
        lseek(fd, data->state.resume_from, SEEK_SET))
-      return CURLE_BAD_DOWNLOAD_RESUME;
+      return CARLE_BAD_DOWNLOAD_RESUME;
   }
 
   Curl_pgrsTime(data, TIMER_STARTTRANSFER);
@@ -502,7 +502,7 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
 
     if(size_known) {
       bytestoread = (expected_size < data->set.buffer_size) ?
-        curlx_sotouz(expected_size) : (size_t)data->set.buffer_size;
+        carlx_sotouz(expected_size) : (size_t)data->set.buffer_size;
     }
     else
       bytestoread = data->set.buffer_size-1;
@@ -526,12 +526,12 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
     Curl_pgrsSetDownloadCounter(data, bytecount);
 
     if(Curl_pgrsUpdate(data))
-      result = CURLE_ABORTED_BY_CALLBACK;
+      result = CARLE_ABORTED_BY_CALLBACK;
     else
       result = Curl_speedcheck(data, Curl_now());
   }
   if(Curl_pgrsUpdate(data))
-    result = CURLE_ABORTED_BY_CALLBACK;
+    result = CARLE_ABORTED_BY_CALLBACK;
 
   return result;
 }

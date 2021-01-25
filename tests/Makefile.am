@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,13 +20,13 @@
 #
 ###########################################################################
 
-HTMLPAGES = testcurl.html runtests.html
-PDFPAGES = testcurl.pdf runtests.pdf
-MANDISTPAGES = runtests.1.dist testcurl.1.dist
+HTMLPAGES = testcarl.html runtests.html
+PDFPAGES = testcarl.pdf runtests.pdf
+MANDISTPAGES = runtests.1.dist testcarl.1.dist
 
 EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl           \
- getpart.pm FILEFORMAT.md README.md stunnel.pem memanalyze.pl testcurl.pl     \
- valgrind.pm ftp.pm sshserver.pl sshhelp.pm pathhelp.pm testcurl.1 runtests.1 \
+ getpart.pm FILEFORMAT.md README.md stunnel.pem memanalyze.pl testcarl.pl     \
+ valgrind.pm ftp.pm sshserver.pl sshhelp.pm pathhelp.pm testcarl.1 runtests.1 \
  serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl      \
  CMakeLists.txt mem-include-scan.pl valgrind.supp extern-scan.pl              \
  manpage-scan.pl nroff-scan.pl http2-server.pl dictserver.py                  \
@@ -56,7 +56,7 @@ CLEANFILES = .http.pid .https.pid .ftp.pid .ftps.pid $(MANDISTPAGES)
 
 MAN2HTML= roffit $< >$@
 
-curl:
+carl:
 	@cd $(top_builddir) && $(MAKE)
 
 if CROSSCOMPILING
@@ -113,7 +113,7 @@ checksrc:
 	cd unit && $(MAKE) checksrc
 	cd server && $(MAKE) checksrc
 
-if CURLDEBUG
+if CARLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif

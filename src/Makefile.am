@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -29,11 +29,11 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_srcdir)/include is for libcurl's external include files
-# $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
-# $(top_builddir)/src is for curl's generated src/curl_config.h file
-# $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "borrowed" files
-# $(top_srcdir)/src is for curl's src/tool_setup.h and "curl-private" files
+# $(top_srcdir)/include is for libcarl's external include files
+# $(top_builddir)/lib is for libcarl's generated lib/carl_config.h file
+# $(top_builddir)/src is for carl's generated src/carl_config.h file
+# $(top_srcdir)/lib for libcarl's lib/carl_setup.h and other "borrowed" files
+# $(top_srcdir)/src is for carl's src/tool_setup.h and "carl-private" files
 
 AM_CPPFLAGS = -I$(top_srcdir)/include        \
               -I$(top_builddir)/lib          \
@@ -41,42 +41,42 @@ AM_CPPFLAGS = -I$(top_srcdir)/include        \
               -I$(top_srcdir)/lib            \
               -I$(top_srcdir)/src
 
-bin_PROGRAMS = curl
+bin_PROGRAMS = carl
 
 SUBDIRS = ../docs
 
-if USE_CPPFLAG_CURL_STATICLIB
-AM_CPPFLAGS += -DCURL_STATICLIB
+if USE_CPPFLAG_CARL_STATICLIB
+AM_CPPFLAGS += -DCARL_STATICLIB
 endif
 
 include Makefile.inc
 
-# CURL_FILES comes from Makefile.inc
-curl_SOURCES = $(CURL_FILES)
+# CARL_FILES comes from Makefile.inc
+carl_SOURCES = $(CARL_FILES)
 
 # This might hold -Werror
-CFLAGS += @CURL_CFLAG_EXTRAS@
+CFLAGS += @CARL_CFLAG_EXTRAS@
 
 # Prevent LIBS from being used for all link targets
 LIBS = $(BLANK_AT_MAKETIME)
 
 if USE_EXPLICIT_LIB_DEPS
-curl_LDADD = $(top_builddir)/lib/libcurl.la @LIBMETALINK_LIBS@ @LIBCURL_LIBS@
+carl_LDADD = $(top_builddir)/lib/libcarl.la @LIBMETALINK_LIBS@ @LIBCARL_LIBS@
 else
-curl_LDADD = $(top_builddir)/lib/libcurl.la @LIBMETALINK_LIBS@ @NSS_LIBS@ @SSL_LIBS@ @ZLIB_LIBS@ @CURL_NETWORK_AND_TIME_LIBS@
+carl_LDADD = $(top_builddir)/lib/libcarl.la @LIBMETALINK_LIBS@ @NSS_LIBS@ @SSL_LIBS@ @ZLIB_LIBS@ @CARL_NETWORK_AND_TIME_LIBS@
 endif
 
-curl_LDFLAGS = @LIBMETALINK_LDFLAGS@
-curl_CPPFLAGS = $(AM_CPPFLAGS) $(LIBMETALINK_CPPFLAGS)
+carl_LDFLAGS = @LIBMETALINK_LDFLAGS@
+carl_CPPFLAGS = $(AM_CPPFLAGS) $(LIBMETALINK_CPPFLAGS)
 
 # if unit tests are enabled, build a static library to link them with
 if BUILD_UNITTESTS
-noinst_LTLIBRARIES = libcurltool.la
-libcurltool_la_CPPFLAGS = $(LIBMETALINK_CPPFLAGS) $(AM_CPPFLAGS) \
-                          -DCURL_STATICLIB -DUNITTESTS
-libcurltool_la_CFLAGS =
-libcurltool_la_LDFLAGS = -static $(LINKFLAGS)
-libcurltool_la_SOURCES = $(curl_SOURCES)
+noinst_LTLIBRARIES = libcarltool.la
+libcarltool_la_CPPFLAGS = $(LIBMETALINK_CPPFLAGS) $(AM_CPPFLAGS) \
+                          -DCARL_STATICLIB -DUNITTESTS
+libcarltool_la_CFLAGS =
+libcarltool_la_LDFLAGS = -static $(LINKFLAGS)
+libcarltool_la_SOURCES = $(carl_SOURCES)
 endif
 
 CLEANFILES = tool_hugehelp.c
@@ -85,12 +85,12 @@ CLEANFILES = tool_hugehelp.c
 NROFF=env LC_ALL=C @NROFF@ @MANOPT@ # figured out by the configure script
 
 EXTRA_DIST = mkhelp.pl makefile.dj                                     \
- Makefile.m32 macos/curl.mcp.xml.sit.hqx macos/MACINSTALL.TXT          \
- macos/src/curl_GUSIConfig.cpp macos/src/macos_main.cpp makefile.amiga \
- curl.rc Makefile.netware Makefile.inc CMakeLists.txt
+ Makefile.m32 macos/carl.mcp.xml.sit.hqx macos/MACINSTALL.TXT          \
+ macos/src/carl_GUSIConfig.cpp macos/src/macos_main.cpp makefile.amiga \
+ carl.rc Makefile.netware Makefile.inc CMakeLists.txt
 
 # Use absolute directory to disable VPATH
-MANPAGE=$(abs_top_builddir)/docs/curl.1
+MANPAGE=$(abs_top_builddir)/docs/carl.1
 MKHELP=$(top_srcdir)/src/mkhelp.pl
 HUGE=tool_hugehelp.c
 
@@ -141,7 +141,7 @@ checksrc:
 	$(CHECKSRC)(@PERL@ $(top_srcdir)/lib/checksrc.pl -D$(srcdir)        \
 	-W$(srcdir)/tool_hugehelp.c $(srcdir)/*.[ch])
 
-if CURLDEBUG
+if CARLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif
@@ -152,4 +152,4 @@ TIDYFLAGS=-checks=-clang-analyzer-security.insecureAPI.strcpy,-clang-analyzer-op
 TIDY:=clang-tidy
 
 tidy:
-	$(TIDY) $(CURL_CFILES) $(TIDYFLAGS) -- $(curl_CPPFLAGS) $(CPPFLAGS) -DHAVE_CONFIG_H
+	$(TIDY) $(CARL_CFILES) $(TIDYFLAGS) -- $(carl_CPPFLAGS) $(CPPFLAGS) -DHAVE_CONFIG_H

@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 ###########################################################################
 #
 # This script grew out of help from Przemyslaw Iskra and Balint Szilakszi
-# a late evening in the #curl IRC channel on freenode.
+# a late evening in the #carl IRC channel on freenode.
 #
 
 use strict;
@@ -51,9 +51,9 @@ my $root=$ARGV[0] || ".";
 # need an include directory when building out-of-tree
 my $i = ($ARGV[1]) ? "-I$ARGV[1] " : '';
 
-my $h = "$root/include/curl/curl.h";
-my $mh = "$root/include/curl/multi.h";
-my $ua = "$root/include/curl/urlapi.h";
+my $h = "$root/include/carl/carl.h";
+my $mh = "$root/include/carl/multi.h";
+my $ua = "$root/include/carl/urlapi.h";
 
 my $verbose=0;
 my $summary=0;
@@ -63,23 +63,23 @@ my @syms;
 my %doc;
 my %rem;
 
-open H_IN, "-|", "$Cpreprocessor $i$h" || die "Cannot preprocess curl.h";
+open H_IN, "-|", "$Cpreprocessor $i$h" || die "Cannot preprocess carl.h";
 while ( <H_IN> ) {
     if ( /enum\s+(\S+\s+)?{/ .. /}/ ) {
         s/^\s+//;
-        next unless /^CURL/;
+        next unless /^CARL/;
         chomp;
         s/[,\s].*//;
         push @syms, $_;
     }
 }
-close H_IN || die "Error preprocessing curl.h";
+close H_IN || die "Error preprocessing carl.h";
 
 sub scanheader {
     my ($f)=@_;
     open H, "<$f";
     while(<H>) {
-        if (/^#define (CURL[A-Za-z0-9_]*)/) {
+        if (/^#define (CARL[A-Za-z0-9_]*)/) {
             push @syms, $1;
         }
     }
@@ -90,9 +90,9 @@ scanheader($h);
 scanheader($mh);
 scanheader($ua);
 
-open S, "<$root/docs/libcurl/symbols-in-versions";
+open S, "<$root/docs/libcarl/symbols-in-versions";
 while(<S>) {
-    if(/(^CURL[^ \n]*) *(.*)/) {
+    if(/(^CARL[^ \n]*) *(.*)/) {
         my ($sym, $rest)=($1, $2);
         if($doc{$sym}) {
             print "Detected duplicate symbol: $sym\n";
@@ -116,16 +116,16 @@ for my $e (sort @syms) {
     # previously had a name, that is now removed. The OBSOLETE names should
     # never be used for anything.
     #
-    # CURL_EXTERN - is a define used for libcurl functions that are external,
+    # CARL_EXTERN - is a define used for libcarl functions that are external,
     # public. No app or other code should ever use it.
     #
-    # CURLINC_ - defines for header dual-include prevention, ignore those.
+    # CARLINC_ - defines for header dual-include prevention, ignore those.
     #
     # *_LAST and *_LASTENTRY are just prefix for the placeholders used for the
     # last entry in many enum series.
     #
 
-    if($e =~ /(OBSOLETE|^CURL_EXTERN|^CURLINC_|_LAST\z|_LASTENTRY\z)/) {
+    if($e =~ /(OBSOLETE|^CARL_EXTERN|^CARLINC_|_LAST\z|_LASTENTRY\z)/) {
         $ignored++;
         next;
     }

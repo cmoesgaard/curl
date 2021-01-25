@@ -62,12 +62,12 @@ http://åäö.se:%HTTPPORT/2046 --resolve xn--4cab6c.se:%HTTPPORT:%HOSTIP -w "%{
 <protocol>
 GET /2046 HTTP/1.1
 Host: xn--4cab6c.se:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /20460001 HTTP/1.1
 Host: xn--4cab6c.se:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

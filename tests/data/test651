@@ -26,13 +26,13 @@ hello
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib651
 </tool>
 
  <name>
-curl_formadd with huge COPYCONTENTS
+carl_formadd with huge COPYCONTENTS
  </name>
 <stdin>
  Some data from stdin

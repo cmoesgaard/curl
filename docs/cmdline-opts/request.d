@@ -15,11 +15,11 @@ Normally you don't need this option. All sorts of GET, HEAD, POST and PUT
 requests are rather invoked by using dedicated command line options.
 
 This option only changes the actual word used in the HTTP request, it does not
-alter the way curl behaves. So for example if you want to make a proper HEAD
+alter the way carl behaves. So for example if you want to make a proper HEAD
 request, using -X HEAD will not suffice. You need to use the --head option.
 
 The method string you set with --request will be used for all requests, which
-if you for example use --location may cause unintended side-effects when curl
+if you for example use --location may cause unintended side-effects when carl
 doesn't change request method according to the HTTP 30x response codes - and
 similar.
 

@@ -36,7 +36,7 @@ http://%HOSTIP:%NOLISTENPORT/we/want/our/1188 http://%HOSTIP:%HTTPPORT/we/want/o
 <protocol>
 GET /we/want/our/1188 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

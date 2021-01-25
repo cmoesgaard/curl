@@ -27,7 +27,7 @@ ftp://%HOSTIP:%FTPPORT/238
 
 # Verify data after the test has been "shot"
 <verify>
-# 13 = CURLE_FTP_WEIRD_PASV_REPLY
+# 13 = CARLE_FTP_WEIRD_PASV_REPLY
 <errorcode>
 13
 </errorcode>

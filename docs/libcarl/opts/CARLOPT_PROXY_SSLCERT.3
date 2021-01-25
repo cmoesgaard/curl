@@ -1,0 +1,72 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_PROXY_SSLCERT 3 "16 Nov 2016" "libcarl 7.52.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_PROXY_SSLCERT \- set SSL proxy client certificate
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_PROXY_SSLCERT, char *cert);
+.SH DESCRIPTION
+This option is for connecting to an HTTPS proxy, not an HTTPS server.
+
+Pass a pointer to a null-terminated string as parameter. The string should be
+the file name of your client certificate used to connect to the HTTPS proxy.
+The default format is "P12" on Secure Transport and "PEM" on other engines,
+and can be changed with \fICARLOPT_PROXY_SSLCERTTYPE(3)\fP.
+
+With NSS or Secure Transport, this can also be the nickname of the certificate
+you wish to authenticate with as it is named in the security database. If you
+want to use a file from the current directory, please precede it with "./"
+prefix, in order to avoid confusion with a nickname.
+
+When using a client certificate, you most likely also need to provide a
+private key with \fICARLOPT_PROXY_SSLKEY(3)\fP.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+Used with HTTPS proxy
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_PROXY, "https://proxy");
+  carl_easy_setopt(carl, CARLOPT_PROXY_SSLCERT, "client.pem");
+  carl_easy_setopt(carl, CARLOPT_PROXY_SSLKEY, "key.pem");
+  carl_easy_setopt(carl, CARLOPT_PROXY_KEYPASSWD, "s3cret");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.52.0
+.SH RETURN VALUE
+Returns CARLE_OK if TLS enabled, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_PROXY_SSLCERTTYPE "(3), " CARLOPT_PROXY_SSLKEY "(3), "
+.BR CARLOPT_SSLCERT "(3), "

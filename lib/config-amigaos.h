@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_AMIGAOS_H
-#define HEADER_CURL_CONFIG_AMIGAOS_H
+#ifndef HEADER_CARL_CONFIG_AMIGAOS_H
+#define HEADER_CARL_CONFIG_AMIGAOS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -91,17 +91,17 @@
 
 #define USE_MANUAL 1
 #define USE_OPENSSL 1
-#define CURL_DISABLE_LDAP 1
+#define CARL_DISABLE_LDAP 1
 
 #define OS "AmigaOS"
 
-#define PACKAGE "curl"
-#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
-#define PACKAGE_NAME "curl"
-#define PACKAGE_STRING "curl -"
-#define PACKAGE_TARNAME "curl"
+#define PACKAGE "carl"
+#define PACKAGE_BUGREPORT "a suitable mailing list: https://carl.se/mail/"
+#define PACKAGE_NAME "carl"
+#define PACKAGE_STRING "carl -"
+#define PACKAGE_TARNAME "carl"
 #define PACKAGE_VERSION "-"
-#define CURL_CA_BUNDLE "s:curl-ca-bundle.crt"
+#define CARL_CA_BUNDLE "s:carl-ca-bundle.crt"
 
 #define RETSIGTYPE void
 #define SELECT_TYPE_ARG1 int
@@ -161,4 +161,4 @@
 #define SEND_TYPE_RETV int
 
 #endif /* __AMIGA__ */
-#endif /* HEADER_CURL_CONFIG_AMIGAOS_H */
+#endif /* HEADER_CARL_CONFIG_AMIGAOS_H */

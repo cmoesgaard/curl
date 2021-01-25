@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,12 +20,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 /***********************************************************************
  * Only for IPv6-enabled builds
  **********************************************************************/
-#ifdef CURLRES_IPV6
+#ifdef CARLRES_IPV6
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -55,8 +55,8 @@
 #include "inet_pton.h"
 #include "connect.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -75,8 +75,8 @@ bool Curl_ipv6works(struct Curl_easy *data)
   else {
     int ipv6_works = -1;
     /* probe to see if we have a working IPv6 stack */
-    curl_socket_t s = socket(PF_INET6, SOCK_DGRAM, 0);
-    if(s == CURL_SOCKET_BAD)
+    carl_socket_t s = socket(PF_INET6, SOCK_DGRAM, 0);
+    if(s == CARL_SOCKET_BAD)
       /* an IPv6 address was requested but we can't get/use one */
       ipv6_works = 0;
     else {
@@ -88,18 +88,18 @@ bool Curl_ipv6works(struct Curl_easy *data)
 }
 
 /*
- * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
+ * Curl_ipvalid() checks what CARL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
 bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn)
 {
-  if(conn->ip_version == CURL_IPRESOLVE_V6)
+  if(conn->ip_version == CARL_IPRESOLVE_V6)
     return Curl_ipv6works(data);
 
   return TRUE;
 }
 
-#if defined(CURLRES_SYNCH)
+#if defined(CARLRES_SYNCH)
 
 #ifdef DEBUG_ADDRINFO
 static void dump_addrinfo(struct connectdata *conn,
@@ -146,10 +146,10 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 
   /* Check if a limited name resolve has been requested */
   switch(data->set.ipver) {
-  case CURL_IPRESOLVE_V4:
+  case CARL_IPRESOLVE_V4:
     pf = PF_INET;
     break;
-  case CURL_IPRESOLVE_V6:
+  case CARL_IPRESOLVE_V6:
     pf = PF_INET6;
     break;
   default:
@@ -197,6 +197,6 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 
   return res;
 }
-#endif /* CURLRES_SYNCH */
+#endif /* CARLRES_SYNCH */
 
-#endif /* CURLRES_IPV6 */
+#endif /* CARLRES_IPV6 */

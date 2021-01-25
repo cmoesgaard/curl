@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -34,7 +34,7 @@ static size_t consumed = 0;
 
 static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
-  size_t  amount = nmemb * size; /* Total bytes curl wants */
+  size_t  amount = nmemb * size; /* Total bytes carl wants */
 
   if(consumed == strlen(data)) {
     return 0;
@@ -53,66 +53,66 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 /*
  * carefully not leak memory on OOM
  */
-static int trailers_callback(struct curl_slist **list, void *userdata)
+static int trailers_callback(struct carl_slist **list, void *userdata)
 {
-  struct curl_slist *nlist = NULL;
-  struct curl_slist *nlist2 = NULL;
+  struct carl_slist *nlist = NULL;
+  struct carl_slist *nlist2 = NULL;
   (void)userdata;
-  nlist = curl_slist_append(*list, "my-super-awesome-trailer: trail1");
+  nlist = carl_slist_append(*list, "my-super-awesome-trailer: trail1");
   if(nlist)
-    nlist2 = curl_slist_append(nlist, "my-other-awesome-trailer: trail2");
+    nlist2 = carl_slist_append(nlist, "my-other-awesome-trailer: trail2");
   if(nlist2) {
     *list = nlist2;
-    return CURL_TRAILERFUNC_OK;
+    return CARL_TRAILERFUNC_OK;
   }
   else {
-    curl_slist_free_all(nlist);
-    return CURL_TRAILERFUNC_ABORT;
+    carl_slist_free_all(nlist);
+    return CARL_TRAILERFUNC_ABORT;
   }
 }
 
 int test(char *URL)
 {
-  CURL *curl = NULL;
-  CURLcode res = CURLE_FAILED_INIT;
+  CARL *carl = NULL;
+  CARLcode res = CARLE_FAILED_INIT;
   /* http and proxy header list*/
-  struct curl_slist *hhl = NULL;
+  struct carl_slist *hhl = NULL;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  hhl = curl_slist_append(hhl, "Trailer: my-super-awesome-trailer,"
+  hhl = carl_slist_append(hhl, "Trailer: my-super-awesome-trailer,"
                                " my-other-awesome-trailer");
   if(!hhl) {
     goto test_cleanup;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_HTTPHEADER, hhl);
-  test_setopt(curl, CURLOPT_PUT, 1L);
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
-  test_setopt(curl, CURLOPT_TRAILERFUNCTION, trailers_callback);
-  test_setopt(curl, CURLOPT_TRAILERDATA, NULL);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_HTTPHEADER, hhl);
+  test_setopt(carl, CARLOPT_PUT, 1L);
+  test_setopt(carl, CARLOPT_READFUNCTION, read_callback);
+  test_setopt(carl, CARLOPT_TRAILERFUNCTION, trailers_callback);
+  test_setopt(carl, CARLOPT_TRAILERDATA, NULL);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
-  curl_slist_free_all(hhl);
+  carl_slist_free_all(hhl);
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return (int)res;
 }

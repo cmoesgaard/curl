@@ -34,7 +34,7 @@ http
 HTTP GET with -Ji and Content-Disposition with existing file
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
 http://%HOSTIP:%HTTPPORT/1460 -Ji -O

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,13 +19,13 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -42,54 +42,54 @@ static size_t print_httppost_callback(void *arg, const char *buf, size_t len)
 
 UNITTEST_START
   int rc;
-  struct curl_httppost *post = NULL;
-  struct curl_httppost *last = NULL;
+  struct carl_httppost *post = NULL;
+  struct carl_httppost *last = NULL;
   size_t total_size = 0;
   char buffer[] = "test buffer";
 
-  rc = curl_formadd(&post, &last, CURLFORM_COPYNAME, "name",
-                    CURLFORM_COPYCONTENTS, "content", CURLFORM_END);
+  rc = carl_formadd(&post, &last, CARLFORM_COPYNAME, "name",
+                    CARLFORM_COPYCONTENTS, "content", CARLFORM_END);
 
-  fail_unless(rc == 0, "curl_formadd returned error");
+  fail_unless(rc == 0, "carl_formadd returned error");
 
-  /* after the first curl_formadd when there's a single entry, both pointers
+  /* after the first carl_formadd when there's a single entry, both pointers
      should point to the same struct */
   fail_unless(post == last, "post and last weren't the same");
 
-  rc = curl_formadd(&post, &last, CURLFORM_COPYNAME, "htmlcode",
-                    CURLFORM_COPYCONTENTS, "<HTML></HTML>",
-                    CURLFORM_CONTENTTYPE, "text/html", CURLFORM_END);
+  rc = carl_formadd(&post, &last, CARLFORM_COPYNAME, "htmlcode",
+                    CARLFORM_COPYCONTENTS, "<HTML></HTML>",
+                    CARLFORM_CONTENTTYPE, "text/html", CARLFORM_END);
 
-  fail_unless(rc == 0, "curl_formadd returned error");
+  fail_unless(rc == 0, "carl_formadd returned error");
 
-  rc = curl_formadd(&post, &last, CURLFORM_COPYNAME, "name_for_ptrcontent",
-                   CURLFORM_PTRCONTENTS, buffer, CURLFORM_END);
+  rc = carl_formadd(&post, &last, CARLFORM_COPYNAME, "name_for_ptrcontent",
+                   CARLFORM_PTRCONTENTS, buffer, CARLFORM_END);
 
-  fail_unless(rc == 0, "curl_formadd returned error");
+  fail_unless(rc == 0, "carl_formadd returned error");
 
-  rc = curl_formget(post, &total_size, print_httppost_callback);
+  rc = carl_formget(post, &total_size, print_httppost_callback);
 
-  fail_unless(rc == 0, "curl_formget returned error");
+  fail_unless(rc == 0, "carl_formget returned error");
 
-  fail_unless(total_size == 488, "curl_formget got wrong size back");
+  fail_unless(total_size == 488, "carl_formget got wrong size back");
 
-  curl_formfree(post);
+  carl_formfree(post);
 
   /* start a new formpost with a file upload and formget */
   post = last = NULL;
 
-  rc = curl_formadd(&post, &last,
-                    CURLFORM_PTRNAME, "name of file field",
-                    CURLFORM_FILE, "log/test-1308",
-                    CURLFORM_FILENAME, "custom named file",
-                    CURLFORM_END);
+  rc = carl_formadd(&post, &last,
+                    CARLFORM_PTRNAME, "name of file field",
+                    CARLFORM_FILE, "log/test-1308",
+                    CARLFORM_FILENAME, "custom named file",
+                    CARLFORM_END);
 
-  fail_unless(rc == 0, "curl_formadd returned error");
+  fail_unless(rc == 0, "carl_formadd returned error");
 
-  rc = curl_formget(post, &total_size, print_httppost_callback);
-  fail_unless(rc == 0, "curl_formget returned error");
-  fail_unless(total_size == 851, "curl_formget got wrong size back");
+  rc = carl_formget(post, &total_size, print_httppost_callback);
+  fail_unless(rc == 0, "carl_formget returned error");
+  fail_unless(total_size == 851, "carl_formget got wrong size back");
 
-  curl_formfree(post);
+  carl_formfree(post);
 
 UNITTEST_STOP

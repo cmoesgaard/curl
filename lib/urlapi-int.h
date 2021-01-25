@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_URLAPI_INT_H
-#define HEADER_CURL_URLAPI_INT_H
+#ifndef HEADER_CARL_URLAPI_INT_H
+#define HEADER_CARL_URLAPI_INT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,14 +21,14 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
-/* scheme is not URL encoded, the longest libcurl supported ones are... */
+#include "carl_setup.h"
+/* scheme is not URL encoded, the longest libcarl supported ones are... */
 #define MAX_SCHEME_LEN 40
 
 bool Curl_is_absolute_url(const char *url, char *scheme, size_t buflen);
 
 #ifdef DEBUGBUILD
-CURLUcode Curl_parse_port(struct Curl_URL *u, char *hostname, bool);
+CARLUcode Curl_parse_port(struct Curl_URL *u, char *hostname, bool);
 #endif
 
-#endif /* HEADER_CURL_URLAPI_INT_H */
+#endif /* HEADER_CARL_URLAPI_INT_H */

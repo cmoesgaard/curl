@@ -38,13 +38,13 @@ http://%HOSTIP:%HTTPPORT/1555
 <verify>
 <protocol>
 </protocol>
-# 42 == CURLE_ABORTED_BY_CALLBACK
+# 42 == CARLE_ABORTED_BY_CALLBACK
 <errorcode>
 42
 </errorcode>
 <stdout>
-curl_easy_recv returned 93
-curl_easy_send returned 93
+carl_easy_recv returned 93
+carl_easy_send returned 93
 </stdout>
 </verify>
 </testcase>

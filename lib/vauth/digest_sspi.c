@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,25 +23,25 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if defined(USE_WINDOWS_SSPI) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if defined(USE_WINDOWS_SSPI) && !defined(CARL_DISABLE_CRYPTO_AUTH)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "vauth/vauth.h"
 #include "vauth/digest.h"
 #include "urldata.h"
-#include "curl_base64.h"
+#include "carl_base64.h"
 #include "warnless.h"
-#include "curl_multibyte.h"
+#include "carl_multibyte.h"
 #include "sendf.h"
 #include "strdup.h"
 #include "strcase.h"
 #include "strerror.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -87,16 +87,16 @@ bool Curl_auth_is_digest_supported(void)
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              const char *chlg64,
                                              const char *userp,
                                              const char *passwdp,
                                              const char *service,
                                              char **outptr, size_t *outlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   TCHAR *spn = NULL;
   size_t chlglen = 0;
   size_t token_max = 0;
@@ -126,7 +126,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   if(!input_token) {
     infof(data, "DIGEST-MD5 handshake failure (empty challenge message)\n");
 
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   /* Query the security package for DigestSSP */
@@ -136,7 +136,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     free(input_token);
 
     failf(data, "SSPI: couldn't get auth info");
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   token_max = SecurityPackage->cbMaxToken;
@@ -149,7 +149,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   if(!output_token) {
     free(input_token);
 
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* Generate our SPN */
@@ -158,7 +158,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     free(output_token);
     free(input_token);
 
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   if(userp && *userp) {
@@ -192,7 +192,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     free(output_token);
     free(input_token);
 
-    return CURLE_LOGIN_DENIED;
+    return CARLE_LOGIN_DENIED;
   }
 
   /* Setup the challenge "input" security buffer */
@@ -201,7 +201,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   chlg_desc.pBuffers  = &chlg_buf;
   chlg_buf.BufferType = SECBUFFER_TOKEN;
   chlg_buf.pvBuffer   = input_token;
-  chlg_buf.cbBuffer   = curlx_uztoul(chlglen);
+  chlg_buf.cbBuffer   = carlx_uztoul(chlglen);
 
   /* Setup the response "output" security buffer */
   resp_desc.ulVersion = SECBUFFER_VERSION;
@@ -209,7 +209,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   resp_desc.pBuffers  = &resp_buf;
   resp_buf.BufferType = SECBUFFER_TOKEN;
   resp_buf.pvBuffer   = output_token;
-  resp_buf.cbBuffer   = curlx_uztoul(token_max);
+  resp_buf.cbBuffer   = carlx_uztoul(token_max);
 
   /* Generate our response message */
   status = s_pSecFn->InitializeSecurityContext(&credentials, NULL, spn,
@@ -230,12 +230,12 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     free(input_token);
 
     if(status == SEC_E_INSUFFICIENT_MEMORY)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     infof(data, "schannel: InitializeSecurityContext failed: %s\n",
           Curl_sspi_strerror(status, buffer, sizeof(buffer)));
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   /* Base64 encode the response */
@@ -273,9 +273,9 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
  * chlg     [in]     - The challenge message.
  * identity [in/out] - The identity structure.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_override_sspi_http_realm(const char *chlg,
+CARLcode Curl_override_sspi_http_realm(const char *chlg,
                                        SEC_WINNT_AUTH_IDENTITY *identity)
 {
   xcharp_u domain, dup_domain;
@@ -295,22 +295,22 @@ CURLcode Curl_override_sspi_http_realm(const char *chlg,
         if(strcasecompare(value, "realm")) {
 
           /* Setup identity's domain and length */
-          domain.tchar_ptr = curlx_convert_UTF8_to_tchar((char *) content);
+          domain.tchar_ptr = carlx_convert_UTF8_to_tchar((char *) content);
           if(!domain.tchar_ptr)
-            return CURLE_OUT_OF_MEMORY;
+            return CARLE_OUT_OF_MEMORY;
 
           dup_domain.tchar_ptr = _tcsdup(domain.tchar_ptr);
           if(!dup_domain.tchar_ptr) {
-            curlx_unicodefree(domain.tchar_ptr);
-            return CURLE_OUT_OF_MEMORY;
+            carlx_unicodefree(domain.tchar_ptr);
+            return CARLE_OUT_OF_MEMORY;
           }
 
           free(identity->Domain);
           identity->Domain = dup_domain.tbyte_ptr;
-          identity->DomainLength = curlx_uztoul(_tcslen(dup_domain.tchar_ptr));
+          identity->DomainLength = carlx_uztoul(_tcslen(dup_domain.tchar_ptr));
           dup_domain.tchar_ptr = NULL;
 
-          curlx_unicodefree(domain.tchar_ptr);
+          carlx_unicodefree(domain.tchar_ptr);
         }
         else {
           /* Unknown specifier, ignore it! */
@@ -329,7 +329,7 @@ CURLcode Curl_override_sspi_http_realm(const char *chlg,
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -343,9 +343,9 @@ CURLcode Curl_override_sspi_http_realm(const char *chlg,
  * chlg    [in]     - The challenge message.
  * digest  [in/out] - The digest data struct being used and modified.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
+CARLcode Curl_auth_decode_digest_http_message(const char *chlg,
                                               struct digestdata *digest)
 {
   size_t chlglen = strlen(chlg);
@@ -383,17 +383,17 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
     if(stale)
       Curl_auth_digest_cleanup(digest);
     else
-      return CURLE_LOGIN_DENIED;
+      return CARLE_LOGIN_DENIED;
   }
 
   /* Store the challenge for use later */
   digest->input_token = (BYTE *) Curl_memdup(chlg, chlglen + 1);
   if(!digest->input_token)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   digest->input_token_len = chlglen;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -414,9 +414,9 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                               const char *userp,
                                               const char *passwdp,
                                               const unsigned char *request,
@@ -440,7 +440,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                               &SecurityPackage);
   if(status != SEC_E_OK) {
     failf(data, "SSPI: couldn't get auth info");
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   token_max = SecurityPackage->cbMaxToken;
@@ -452,7 +452,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
      by the security package */
   output_token = malloc(token_max);
   if(!output_token) {
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* If the user/passwd that was used to make the identity for http_context
@@ -478,16 +478,16 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
     chlg_buf[0].cbBuffer   = 0;
     chlg_buf[1].BufferType = SECBUFFER_PKG_PARAMS;
     chlg_buf[1].pvBuffer   = (void *) request;
-    chlg_buf[1].cbBuffer   = curlx_uztoul(strlen((const char *) request));
+    chlg_buf[1].cbBuffer   = carlx_uztoul(strlen((const char *) request));
     chlg_buf[2].BufferType = SECBUFFER_PKG_PARAMS;
     chlg_buf[2].pvBuffer   = (void *) uripath;
-    chlg_buf[2].cbBuffer   = curlx_uztoul(strlen((const char *) uripath));
+    chlg_buf[2].cbBuffer   = carlx_uztoul(strlen((const char *) uripath));
     chlg_buf[3].BufferType = SECBUFFER_PKG_PARAMS;
     chlg_buf[3].pvBuffer   = NULL;
     chlg_buf[3].cbBuffer   = 0;
     chlg_buf[4].BufferType = SECBUFFER_PADDING;
     chlg_buf[4].pvBuffer   = output_token;
-    chlg_buf[4].cbBuffer   = curlx_uztoul(token_max);
+    chlg_buf[4].cbBuffer   = carlx_uztoul(token_max);
 
     status = s_pSecFn->MakeSignature(digest->http_context, 0, &chlg_desc, 0);
     if(status == SEC_E_OK)
@@ -518,14 +518,14 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
       /* Populate our identity structure */
       if(Curl_create_sspi_identity(userp, passwdp, &identity)) {
         free(output_token);
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
       }
 
       /* Populate our identity domain */
       if(Curl_override_sspi_http_realm((const char *) digest->input_token,
                                        &identity)) {
         free(output_token);
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
       }
 
       /* Allow proper cleanup of the identity structure */
@@ -540,7 +540,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
 
       if(!digest->user) {
         free(output_token);
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
       }
     }
 
@@ -550,7 +550,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
       if(!digest->passwd) {
         free(output_token);
         Curl_safefree(digest->user);
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
       }
     }
 
@@ -564,7 +564,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
       Curl_sspi_free_identity(p_identity);
       free(output_token);
 
-      return CURLE_LOGIN_DENIED;
+      return CARLE_LOGIN_DENIED;
     }
 
     /* Setup the challenge "input" security buffer if present */
@@ -573,10 +573,10 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
     chlg_desc.pBuffers     = chlg_buf;
     chlg_buf[0].BufferType = SECBUFFER_TOKEN;
     chlg_buf[0].pvBuffer   = digest->input_token;
-    chlg_buf[0].cbBuffer   = curlx_uztoul(digest->input_token_len);
+    chlg_buf[0].cbBuffer   = carlx_uztoul(digest->input_token_len);
     chlg_buf[1].BufferType = SECBUFFER_PKG_PARAMS;
     chlg_buf[1].pvBuffer   = (void *) request;
-    chlg_buf[1].cbBuffer   = curlx_uztoul(strlen((const char *) request));
+    chlg_buf[1].cbBuffer   = carlx_uztoul(strlen((const char *) request));
     chlg_buf[2].BufferType = SECBUFFER_PKG_PARAMS;
     chlg_buf[2].pvBuffer   = NULL;
     chlg_buf[2].cbBuffer   = 0;
@@ -587,22 +587,22 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
     resp_desc.pBuffers  = &resp_buf;
     resp_buf.BufferType = SECBUFFER_TOKEN;
     resp_buf.pvBuffer   = output_token;
-    resp_buf.cbBuffer   = curlx_uztoul(token_max);
+    resp_buf.cbBuffer   = carlx_uztoul(token_max);
 
-    spn = curlx_convert_UTF8_to_tchar((char *) uripath);
+    spn = carlx_convert_UTF8_to_tchar((char *) uripath);
     if(!spn) {
       s_pSecFn->FreeCredentialsHandle(&credentials);
 
       Curl_sspi_free_identity(p_identity);
       free(output_token);
 
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
 
     /* Allocate our new context handle */
     digest->http_context = calloc(1, sizeof(CtxtHandle));
     if(!digest->http_context)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     /* Generate our response message */
     status = s_pSecFn->InitializeSecurityContext(&credentials, NULL,
@@ -611,7 +611,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                                  &chlg_desc, 0,
                                                  digest->http_context,
                                                  &resp_desc, &attrs, &expiry);
-    curlx_unicodefree(spn);
+    carlx_unicodefree(spn);
 
     if(status == SEC_I_COMPLETE_NEEDED ||
        status == SEC_I_COMPLETE_AND_CONTINUE)
@@ -627,12 +627,12 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
       Curl_safefree(digest->http_context);
 
       if(status == SEC_E_INSUFFICIENT_MEMORY)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
 
       infof(data, "schannel: InitializeSecurityContext failed: %s\n",
             Curl_sspi_strerror(status, buffer, sizeof(buffer)));
 
-      return CURLE_AUTH_ERROR;
+      return CARLE_AUTH_ERROR;
     }
 
     output_token_len = resp_buf.cbBuffer;
@@ -645,7 +645,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
   if(!resp) {
     free(output_token);
 
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* Copy the generated response */
@@ -659,7 +659,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
   /* Free the response buffer */
   free(output_token);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -691,4 +691,4 @@ void Curl_auth_digest_cleanup(struct digestdata *digest)
   Curl_safefree(digest->passwd);
 }
 
-#endif /* USE_WINDOWS_SSPI && !CURL_DISABLE_CRYPTO_AUTH */
+#endif /* USE_WINDOWS_SSPI && !CARL_DISABLE_CRYPTO_AUTH */

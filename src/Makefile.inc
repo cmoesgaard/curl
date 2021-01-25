@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -23,33 +23,33 @@
 # Using the backslash as line continuation character might be problematic
 # with some make flavours, as Watcom's wmake showed us already. If we
 # ever want to change this in a portable manner then we should consider
-# this idea (posted to the libcurl list by Adam Kellas):
+# this idea (posted to the libcarl list by Adam Kellas):
 # CSRC1 = file1.c file2.c file3.c
 # CSRC2 = file4.c file5.c file6.c
 # CSOURCES = $(CSRC1) $(CSRC2)
 
-# libcurl has sources that provide functions named curlx_* that aren't part of
+# libcarl has sources that provide functions named carlx_* that aren't part of
 # the official API, but we re-use the code here to avoid duplication.
-CURLX_CFILES = \
+CARLX_CFILES = \
   ../lib/strtoofft.c \
   ../lib/nonblock.c \
   ../lib/warnless.c \
-  ../lib/curl_ctype.c \
-  ../lib/curl_multibyte.c \
+  ../lib/carl_ctype.c \
+  ../lib/carl_multibyte.c \
   ../lib/version_win32.c \
   ../lib/dynbuf.c
 
-CURLX_HFILES = \
-  ../lib/curl_setup.h \
+CARLX_HFILES = \
+  ../lib/carl_setup.h \
   ../lib/strtoofft.h \
   ../lib/nonblock.h \
   ../lib/warnless.h \
-  ../lib/curl_ctype.h \
-  ../lib/curl_multibyte.h \
+  ../lib/carl_ctype.h \
+  ../lib/carl_multibyte.h \
   ../lib/version_win32.h \
   ../lib/dynbuf.h
 
-CURL_CFILES = \
+CARL_CFILES = \
   slist_wc.c \
   tool_binmode.c \
   tool_bname.c \
@@ -92,7 +92,7 @@ CURL_CFILES = \
   tool_writeout_json.c \
   tool_xattr.c
 
-CURL_HFILES = \
+CARL_HFILES = \
   slist_wc.h \
   tool_binmode.h \
   tool_bname.h \
@@ -138,7 +138,7 @@ CURL_HFILES = \
   tool_writeout_json.h \
   tool_xattr.h
 
-CURL_RCFILES = curl.rc
+CARL_RCFILES = carl.rc
 
-# curl_SOURCES is special and gets assigned in src/Makefile.am
-CURL_FILES = $(CURL_CFILES) $(CURLX_CFILES) $(CURL_HFILES)
+# carl_SOURCES is special and gets assigned in src/Makefile.am
+CARL_FILES = $(CARL_CFILES) $(CARLX_CFILES) $(CARL_HFILES)

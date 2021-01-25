@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -82,7 +82,7 @@ void libtest_debug_dump(const char *timebuf, const char *text, FILE *stream,
   fflush(stream);
 }
 
-int libtest_debug_cb(CURL *handle, curl_infotype type,
+int libtest_debug_cb(CARL *handle, carl_infotype type,
                      unsigned char *data, size_t size,
                      void *userp)
 {
@@ -113,28 +113,28 @@ int libtest_debug_cb(CURL *handle, curl_infotype type,
   }
 
   switch(type) {
-  case CURLINFO_TEXT:
+  case CARLINFO_TEXT:
     fprintf(stderr, "%s== Info: %s", timestr, (char *)data);
     /* FALLTHROUGH */
   default: /* in case a new one is introduced to shock us */
     return 0;
 
-  case CURLINFO_HEADER_OUT:
+  case CARLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
-  case CURLINFO_DATA_OUT:
+  case CARLINFO_DATA_OUT:
     text = "=> Send data";
     break;
-  case CURLINFO_SSL_DATA_OUT:
+  case CARLINFO_SSL_DATA_OUT:
     text = "=> Send SSL data";
     break;
-  case CURLINFO_HEADER_IN:
+  case CARLINFO_HEADER_IN:
     text = "<= Recv header";
     break;
-  case CURLINFO_DATA_IN:
+  case CARLINFO_DATA_IN:
     text = "<= Recv data";
     break;
-  case CURLINFO_SSL_DATA_IN:
+  case CARLINFO_SSL_DATA_IN:
     text = "<= Recv SSL data";
     break;
   }

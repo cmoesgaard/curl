@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,36 +21,36 @@
 ###########################################################################
 AUTOMAKE_OPTIONS = foreign nostdinc
 
-CMAKE_DIST = CMakeLists.txt curl_config.h.cmake
+CMAKE_DIST = CMakeLists.txt carl_config.h.cmake
 
 EXTRA_DIST = Makefile.m32 config-win32.h config-win32ce.h           \
- config-plan9.h config-riscos.h config-mac.h curl_config.h.in       \
- makefile.dj config-dos.h libcurl.plist libcurl.rc config-amigaos.h \
+ config-plan9.h config-riscos.h config-mac.h carl_config.h.in       \
+ makefile.dj config-dos.h libcarl.plist libcarl.rc config-amigaos.h \
  makefile.amiga Makefile.netware nwlib.c nwos.c config-win32ce.h    \
  config-os400.h setup-os400.h                                       \
  config-tpf.h mk-ca-bundle.pl mk-ca-bundle.vbs $(CMAKE_DIST)        \
  firefox-db2pem.sh config-vxworks.h Makefile.vxworks checksrc.pl    \
  setup-win32.h
 
-lib_LTLIBRARIES = libcurl.la
+lib_LTLIBRARIES = libcarl.la
 
 if BUILD_UNITTESTS
-noinst_LTLIBRARIES = libcurlu.la
+noinst_LTLIBRARIES = libcarlu.la
 else
 noinst_LTLIBRARIES =
 endif
 
 # This might hold -Werror
-CFLAGS += @CURL_CFLAG_EXTRAS@
+CFLAGS += @CARL_CFLAG_EXTRAS@
 
 # Specify our include paths here, and do it relative to $(top_srcdir) and
 # $(top_builddir), to ensure that these paths which belong to the library
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_srcdir)/include is for libcurl's external include files
-# $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
-# $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "private" files
+# $(top_srcdir)/include is for libcarl's external include files
+# $(top_builddir)/lib is for libcarl's generated lib/carl_config.h file
+# $(top_srcdir)/lib for libcarl's lib/carl_setup.h and other "private" files
 # $(top_builddir)/ares is for in-tree c-ares's generated ares_build.h file
 # $(top_srcdir)/ares is for in-tree c-ares's external include files
 
@@ -78,59 +78,59 @@ VERSIONINFO=-version-info 11:0:7
 # 2. if interfaces were added use C+1:0:A+1
 # 3. if interfaces were removed, then use C+1:0:0
 #
-# For the full guide on libcurl ABI rules, see docs/libcurl/ABI
+# For the full guide on libcarl ABI rules, see docs/libcarl/ABI
 
-AM_CPPFLAGS += -DBUILDING_LIBCURL
+AM_CPPFLAGS += -DBUILDING_LIBCARL
 AM_LDFLAGS =
 AM_CFLAGS =
 
-libcurl_la_CPPFLAGS_EXTRA =
-libcurl_la_LDFLAGS_EXTRA =
-libcurl_la_CFLAGS_EXTRA =
+libcarl_la_CPPFLAGS_EXTRA =
+libcarl_la_LDFLAGS_EXTRA =
+libcarl_la_CFLAGS_EXTRA =
 
-if CURL_LT_SHLIB_USE_VERSION_INFO
-libcurl_la_LDFLAGS_EXTRA += $(VERSIONINFO)
+if CARL_LT_SHLIB_USE_VERSION_INFO
+libcarl_la_LDFLAGS_EXTRA += $(VERSIONINFO)
 endif
 
-if CURL_LT_SHLIB_USE_NO_UNDEFINED
-libcurl_la_LDFLAGS_EXTRA += -no-undefined
+if CARL_LT_SHLIB_USE_NO_UNDEFINED
+libcarl_la_LDFLAGS_EXTRA += -no-undefined
 endif
 
-if CURL_LT_SHLIB_USE_MIMPURE_TEXT
-libcurl_la_LDFLAGS_EXTRA += -mimpure-text
+if CARL_LT_SHLIB_USE_MIMPURE_TEXT
+libcarl_la_LDFLAGS_EXTRA += -mimpure-text
 endif
 
-if CURL_LT_SHLIB_USE_VERSIONED_SYMBOLS
-libcurl_la_LDFLAGS_EXTRA += -Wl,--version-script=libcurl.vers
+if CARL_LT_SHLIB_USE_VERSIONED_SYMBOLS
+libcarl_la_LDFLAGS_EXTRA += -Wl,--version-script=libcarl.vers
 else
 # if symbol-hiding is enabled, hide them!
-if DOING_CURL_SYMBOL_HIDING
-libcurl_la_LDFLAGS_EXTRA += -export-symbols-regex '^curl_.*'
+if DOING_CARL_SYMBOL_HIDING
+libcarl_la_LDFLAGS_EXTRA += -export-symbols-regex '^carl_.*'
 endif
 endif
 
-if USE_CPPFLAG_CURL_STATICLIB
-libcurl_la_CPPFLAGS_EXTRA += -DCURL_STATICLIB
+if USE_CPPFLAG_CARL_STATICLIB
+libcarl_la_CPPFLAGS_EXTRA += -DCARL_STATICLIB
 endif
 
-if DOING_CURL_SYMBOL_HIDING
-libcurl_la_CPPFLAGS_EXTRA += -DCURL_HIDDEN_SYMBOLS
-libcurl_la_CFLAGS_EXTRA += $(CFLAG_CURL_SYMBOL_HIDING)
+if DOING_CARL_SYMBOL_HIDING
+libcarl_la_CPPFLAGS_EXTRA += -DCARL_HIDDEN_SYMBOLS
+libcarl_la_CFLAGS_EXTRA += $(CFLAG_CARL_SYMBOL_HIDING)
 endif
 
-libcurl_la_CPPFLAGS = $(AM_CPPFLAGS) $(libcurl_la_CPPFLAGS_EXTRA)
-libcurl_la_LDFLAGS = $(AM_LDFLAGS) $(libcurl_la_LDFLAGS_EXTRA) $(LDFLAGS) $(LIBCURL_LIBS)
-libcurl_la_CFLAGS = $(AM_CFLAGS) $(libcurl_la_CFLAGS_EXTRA)
+libcarl_la_CPPFLAGS = $(AM_CPPFLAGS) $(libcarl_la_CPPFLAGS_EXTRA)
+libcarl_la_LDFLAGS = $(AM_LDFLAGS) $(libcarl_la_LDFLAGS_EXTRA) $(LDFLAGS) $(LIBCARL_LIBS)
+libcarl_la_CFLAGS = $(AM_CFLAGS) $(libcarl_la_CFLAGS_EXTRA)
 
-libcurlu_la_CPPFLAGS = $(AM_CPPFLAGS) -DCURL_STATICLIB -DUNITTESTS
-libcurlu_la_LDFLAGS = $(AM_LDFLAGS) -static $(LIBCURL_LIBS)
-libcurlu_la_CFLAGS = $(AM_CFLAGS)
+libcarlu_la_CPPFLAGS = $(AM_CPPFLAGS) -DCARL_STATICLIB -DUNITTESTS
+libcarlu_la_LDFLAGS = $(AM_LDFLAGS) -static $(LIBCARL_LIBS)
+libcarlu_la_CFLAGS = $(AM_CFLAGS)
 
 # Makefile.inc provides the CSOURCES and HHEADERS defines
 include Makefile.inc
 
-libcurl_la_SOURCES = $(CSOURCES) $(HHEADERS)
-libcurlu_la_SOURCES = $(CSOURCES) $(HHEADERS)
+libcarl_la_SOURCES = $(CSOURCES) $(HHEADERS)
+libcarlu_la_SOURCES = $(CSOURCES) $(HHEADERS)
 
 CHECKSRC = $(CS_$(V))
 CS_0 = @echo "  RUN     " $@;
@@ -138,10 +138,10 @@ CS_1 =
 CS_ = $(CS_0)
 
 checksrc:
-	$(CHECKSRC)(@PERL@ $(srcdir)/checksrc.pl -D$(srcdir) -W$(srcdir)/curl_config.h \
+	$(CHECKSRC)(@PERL@ $(srcdir)/checksrc.pl -D$(srcdir) -W$(srcdir)/carl_config.h \
 	$(srcdir)/*.[ch] $(srcdir)/vauth/*.[ch] $(srcdir)/vtls/*.[ch] $(srcdir)/vquic/*.[ch] $(srcdir)/vssh/*.[ch])
 
-if CURLDEBUG
+if CARLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif
@@ -155,4 +155,4 @@ tidy:
 	$(TIDY) $(CSOURCES) $(TIDYFLAGS) -- $(AM_CPPFLAGS) $(CPPFLAGS) -DHAVE_CONFIG_H
 
 optiontable:
-	perl optiontable.pl < $(top_srcdir)/include/curl/curl.h > easyoptions.c
+	perl optiontable.pl < $(top_srcdir)/include/carl/carl.h > easyoptions.c

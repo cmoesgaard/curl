@@ -1,0 +1,88 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_POSTFIELDS 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_POSTFIELDS \- specify data to POST to server
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_POSTFIELDS, char *postdata);
+.SH DESCRIPTION
+Pass a char * as parameter, pointing to the full data to send in an HTTP POST
+operation. You must make sure that the data is formatted the way you want the
+server to receive it. libcarl will not convert or encode it for you in any
+way. For example, the web server may assume that this data is url-encoded.
+
+The data pointed to is NOT copied by the library: as a consequence, it must be
+preserved by the calling application until the associated transfer finishes.
+This behavior can be changed (so libcarl does copy the data) by setting the
+\fICARLOPT_COPYPOSTFIELDS(3)\fP option.
+
+This POST is a normal application/x-www-form-urlencoded kind (and libcarl will
+set that Content-Type by default when this option is used), which is commonly
+used by HTML forms. Change Content-Type with \fICARLOPT_HTTPHEADER(3)\fP.
+
+You can use \fIcarl_easy_escape(3)\fP to url-encode your data, if necessary. It
+returns a pointer to an encoded string that can be passed as \fIpostdata\fP.
+
+Using \fICARLOPT_POSTFIELDS(3)\fP implies setting \fICARLOPT_POST(3)\fP to 1.
+
+If \fICARLOPT_POSTFIELDS(3)\fP is explicitly set to NULL then libcarl will get
+the POST data from the read callback. If you want to send a zero-byte POST set
+\fICARLOPT_POSTFIELDS(3)\fP to an empty string, or set \fICARLOPT_POST(3)\fP to
+1 and \fICARLOPT_POSTFIELDSIZE(3)\fP to 0.
+
+Using POST with HTTP 1.1 implies the use of a "Expect: 100-continue" header,
+and libcarl will add that header automatically if the POST is either known to
+be larger than 1MB or if the expected size is unknown. You can disable this
+header with \fICARLOPT_HTTPHEADER(3)\fP as usual.
+
+To make multipart/formdata posts (aka RFC2388-posts), check out the
+\fICARLOPT_HTTPPOST(3)\fP option combined with \fIcarl_formadd(3)\fP.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+HTTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  const char *data = "data to send";
+
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* size of the POST data */
+  carl_easy_setopt(carl, CARLOPT_POSTFIELDSIZE, 12L);
+
+  /* pass in a pointer to the data - libcarl will not copy */
+  carl_easy_setopt(carl, CARLOPT_POSTFIELDS, data);
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_POSTFIELDSIZE "(3), " CARLOPT_READFUNCTION "(3), "

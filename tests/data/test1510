@@ -52,7 +52,7 @@ http
 lib1510
 </tool>
  <name>
-HTTP GET connection cache limit (CURLOPT_MAXCONNECTS)
+HTTP GET connection cache limit (CARLOPT_MAXCONNECTS)
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT/path/1510 %HOSTIP %HTTPPORT

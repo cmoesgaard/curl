@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_VQUIC_QUICHE_H
-#define HEADER_CURL_VQUIC_QUICHE_H
+#ifndef HEADER_CARL_VQUIC_QUICHE_H
+#define HEADER_CARL_VQUIC_QUICHE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_QUICHE
 
@@ -41,10 +41,10 @@ struct quicsocket {
   quiche_h3_conn *h3c;
   quiche_h3_config *h3config;
   uint8_t scid[QUICHE_MAX_CONN_ID_LEN];
-  curl_socket_t sockfd;
+  carl_socket_t sockfd;
   uint32_t version;
 };
 
 #endif
 
-#endif /* HEADER_CURL_VQUIC_QUICHE_H */
+#endif /* HEADER_CARL_VQUIC_QUICHE_H */

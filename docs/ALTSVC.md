@@ -1,6 +1,6 @@
 # Alt-Svc
 
-curl features support for the Alt-Svc: HTTP header.
+carl features support for the Alt-Svc: HTTP header.
 
 ## Enable Alt-Svc in build
 
@@ -38,4 +38,4 @@ space separated fields.
 - handle multiple response headers, when one of them says `clear` (should
   override them all)
 - using `Age:` value for caching age as per spec
-- `CURLALTSVC_IMMEDIATELY` support
+- `CARLALTSVC_IMMEDIATELY` support

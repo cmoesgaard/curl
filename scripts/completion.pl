@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,11 +26,11 @@ use warnings;
 use Getopt::Long();
 use Pod::Usage();
 
-my $curl = 'curl';
+my $carl = 'carl';
 my $shell = 'zsh';
 my $help = 0;
 Getopt::Long::GetOptions(
-    'curl=s' => \$curl,
+    'carl=s' => \$carl,
     'shell=s' => \$shell,
     'help' => \$help,
 ) or Pod::Usage::pod2usage();
@@ -40,7 +40,7 @@ my $regex = '\s+(?:(-[^\s]+),\s)?(--[^\s]+)\s*(\<.+?\>)?\s+(.*)';
 my @opts = parse_main_opts('--help all', $regex);
 
 if ($shell eq 'fish') {
-    print "# curl fish completion\n\n";
+    print "# carl fish completion\n\n";
     print qq{$_ \n} foreach (@opts);
 } elsif ($shell eq 'zsh') {
     my $opts_str;
@@ -49,9 +49,9 @@ if ($shell eq 'fish') {
     chomp $opts_str;
 
 my $tmpl = <<"EOS";
-#compdef curl
+#compdef carl
 
-# curl zsh completion
+# carl zsh completion
 
 local curcontext="\$curcontext" state state_descr line
 typeset -A opt_args
@@ -74,7 +74,7 @@ sub parse_main_opts {
     my ($cmd, $regex) = @_;
 
     my @list;
-    my @lines = call_curl($cmd);
+    my @lines = call_carl($cmd);
 
     foreach my $line (@lines) {
         my ($short, $long, $arg, $desc) = ($line =~ /^$regex/) or next;
@@ -89,7 +89,7 @@ sub parse_main_opts {
         $desc =~ s/\:/\\\:/g if defined $desc;
 
         if ($shell eq 'fish') {
-            $option .= "complete --command curl";
+            $option .= "complete --command carl";
             $option .= " --short-option '" . strip_dash(trim($short)) . "'"
                 if defined $short;
             $option .= " --long-option '" . strip_dash(trim($long)) . "'"
@@ -127,13 +127,13 @@ sub parse_main_opts {
 sub trim { my $s = shift; $s =~ s/^\s+|\s+$//g; return $s };
 sub strip_dash { my $s = shift; $s =~ s/^-+//g; return $s };
 
-sub call_curl {
+sub call_carl {
     my ($cmd) = @_;
-    my $output = `"$curl" $cmd`;
+    my $output = `"$carl" $cmd`;
     if ($? == -1) {
-        die "Could not run curl: $!";
+        die "Could not run carl: $!";
     } elsif ((my $exit_code = $? >> 8) != 0) {
-        die "curl returned $exit_code with output:\n$output";
+        die "carl returned $exit_code with output:\n$output";
     }
     return split /\n/, $output;
 }
@@ -148,7 +148,7 @@ completion.pl - Generates tab-completion files for various shells
 
 completion.pl [options...]
 
-    --curl   path to curl executable
+    --carl   path to carl executable
     --shell  zsh/fish
     --help   prints this help
 

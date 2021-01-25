@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,19 +20,19 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(WIN32)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "version_win32.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
- * curlx_verify_windows_version()
+ * carlx_verify_windows_version()
  *
  * This is used to verify if we are running on a specific windows version.
  *
@@ -48,14 +48,14 @@
  *
  * Returns TRUE if matched; otherwise FALSE.
  */
-bool curlx_verify_windows_version(const unsigned int majorVersion,
+bool carlx_verify_windows_version(const unsigned int majorVersion,
                                   const unsigned int minorVersion,
                                   const PlatformIdentifier platform,
                                   const VersionCondition condition)
 {
   bool matched = FALSE;
 
-#if defined(CURL_WINDOWS_APP)
+#if defined(CARL_WINDOWS_APP)
   /* We have no way to determine the Windows version from Windows apps,
      so let's assume we're running on the target Windows version. */
   const WORD fullVersion = MAKEWORD(minorVersion, majorVersion);

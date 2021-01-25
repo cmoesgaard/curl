@@ -7,12 +7,12 @@
 README
 
   Curl is a command line tool for transferring data specified with URL
-  syntax. Find out how to use curl by reading the curl.1 man page or the
+  syntax. Find out how to use carl by reading the carl.1 man page or the
   MANUAL document. Find out how to install Curl by reading the INSTALL
   document.
 
-  libcurl is the library curl is using to do its job. It is readily
-  available to be used by your software. Read the libcurl.3 man page to
+  libcarl is the library carl is using to do its job. It is readily
+  available to be used by your software. Read the libcarl.3 man page to
   learn how!
 
   You find answers to the most frequent questions we get in the FAQ document.
@@ -24,29 +24,29 @@ README
 CONTACT
 
   If you have problems, questions, ideas or suggestions, please contact us
-  by posting to a suitable mailing list. See https://curl.se/mail/
+  by posting to a suitable mailing list. See https://carl.se/mail/
 
   All contributors to the project are listed in the THANKS document.
 
 WEBSITE
 
-  Visit the curl website for the latest news and downloads:
+  Visit the carl website for the latest news and downloads:
 
-        https://curl.se/
+        https://carl.se/
 
 GIT
 
   To download the very latest source off the GIT server do this:
 
-    git clone https://github.com/curl/curl.git
+    git clone https://github.com/carl/carl.git
 
-  (you'll get a directory named curl created, filled with the source code)
+  (you'll get a directory named carl created, filled with the source code)
 
 SECURITY PROBLEMS
 
   Report suspected security problems via our HackerOne page and not in public!
 
-    https://hackerone.com/curl
+    https://hackerone.com/carl
 
 NOTICE
 

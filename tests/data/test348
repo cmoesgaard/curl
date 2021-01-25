@@ -53,7 +53,7 @@ TYPE I
 STOR 348
 QUIT
 </protocol>
-# 70 - CURLE_REMOTE_DISK_FULL
+# 70 - CARLE_REMOTE_DISK_FULL
 <errorcode>
 70
 </errorcode>

@@ -52,13 +52,13 @@ http://www.åäö.se/page/165 -x %HOSTIP:%HTTPPORT http://www.große.de/page/165
 <protocol>
 GET http://www.xn--4cab6c.se/page/165 HTTP/1.1
 Host: www.xn--4cab6c.se
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 
 GET http://www.xn--groe-xna.de/page/165 HTTP/1.1
 Host: www.xn--groe-xna.de
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

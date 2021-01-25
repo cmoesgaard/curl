@@ -42,7 +42,7 @@ http://%HOSTIP:%HTTPPORT/1115
 <protocol>
 GET /1115 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

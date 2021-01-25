@@ -8,7 +8,7 @@ Category: auth http
 ---
 Enables NTLM authentication. The NTLM authentication method was designed by
 Microsoft and is used by IIS web servers. It is a proprietary protocol,
-reverse-engineered by clever people and implemented in curl based on their
+reverse-engineered by clever people and implemented in carl based on their
 efforts. This kind of behavior should not be endorsed, you should encourage
 everyone who uses NTLM to switch to a public and documented authentication
 method instead, such as Digest.

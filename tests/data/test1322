@@ -47,7 +47,7 @@ HTTP with --resolve and hostname with trailing dot
 <protocol>
 GET /1322 HTTP/1.1
 Host: example.com:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -1,0 +1,66 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SSLENGINE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SSLENGINE \- set SSL engine identifier
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SSLENGINE, char *id);
+.SH DESCRIPTION
+Pass a pointer to a null-terminated string as parameter. It will be used as
+the identifier for the crypto engine you want to use for your private key.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+All TLS based protocols: HTTPS, FTPS, IMAPS, POP3S, SMTPS etc.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_SSLENGINE, "dynamic");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Only if the SSL backend is OpenSSL built with engine support.
+.SH RETURN VALUE
+CARLE_OK - Engine found.
+
+CARLE_SSL_ENGINE_NOTFOUND - Engine not found, or OpenSSL was not built with
+engine support.
+
+CARLE_SSL_ENGINE_INITFAILED - Engine found but initialization failed.
+
+CARLE_NOT_BUILT_IN - Option not built in, OpenSSL is not the SSL backend.
+
+CARLE_UNKNOWN_OPTION - Option not recognized.
+
+CARLE_OUT_OF_MEMORY - Insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_SSLENGINE_DEFAULT "(3), " CARLOPT_SSLKEY "(3), "

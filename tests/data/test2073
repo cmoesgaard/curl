@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/2073 -F 'name=a;filename=a.pdf' --next http://%HOSTIP:%
 <protocol>
 POST /2073 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 189
 
@@ -57,7 +57,7 @@ Content-Type: application/pdf
 a
 POST /2073 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 184
 

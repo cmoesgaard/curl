@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 #
 ###########################################################################
 #
-# libcurl Makefile for AmigaOS ...
+# libcarl Makefile for AmigaOS ...
 #
 
 # change the follow to where you have the AmiTCP SDK v4.3 includes:
@@ -35,8 +35,8 @@ include Makefile.inc
 OBJS = $(CSOURCES:.c=.o)
 
 all: $(OBJS)
-	ar cru libcurl.a $(OBJS)
-	ranlib libcurl.a
+	ar cru libcarl.a $(OBJS)
+	ranlib libcarl.a
 
 install:
-	$(INSTALL) -c ./libcurl.a /lib/libcurl.a
+	$(INSTALL) -c ./libcarl.a /lib/libcarl.a

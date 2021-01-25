@@ -32,9 +32,9 @@ body
 imap
 </server>
  <name>
-IMAP multi transfer error without curl_multi_remove_handle
+IMAP multi transfer error without carl_multi_remove_handle
  </name>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib1552
 </tool>

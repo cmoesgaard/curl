@@ -68,7 +68,7 @@ HTTP with proxy using NTLM authorization
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -76,7 +76,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://%HOSTIP:%HTTPPORT/81 --proxy-user testuser:testpass -x http://%HOSTIP:%HTTPPORT --proxy-ntlm
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 
@@ -86,14 +86,14 @@ chkhostname curlhost
 GET http://%HOSTIP:%HTTPPORT/81 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 
 GET http://%HOSTIP:%HTTPPORT/81 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAADAAAAGAAYAEAAAAAYABgAWAAAAAAAAABwAAAACAAIAHAAAAAIAAgAeAAAAAAAAAAAAAAAhoIBADQzMjE1MzIxAAAAAAAAAAAAAAAAAAAAADj3hs3u3j0kgJqCrLM+74BmaoNHDfIJjHRlc3R1c2VyY3VybGhvc3Q=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,26 +26,26 @@
 int test(char *URL)
 {
   int res = 0;
-  CURLcode easyret;
-  CURLMcode multiret;
-  CURLSHcode shareret;
+  CARLcode easyret;
+  CARLMcode multiret;
+  CARLSHcode shareret;
   (void)URL;
 
-  curl_easy_strerror((CURLcode)INT_MAX);
-  curl_multi_strerror((CURLMcode)INT_MAX);
-  curl_share_strerror((CURLSHcode)INT_MAX);
-  curl_easy_strerror((CURLcode)-INT_MAX);
-  curl_multi_strerror((CURLMcode)-INT_MAX);
-  curl_share_strerror((CURLSHcode)-INT_MAX);
-  for(easyret = CURLE_OK; easyret <= CURL_LAST; easyret++) {
-    printf("e%d: %s\n", (int)easyret, curl_easy_strerror(easyret));
+  carl_easy_strerror((CARLcode)INT_MAX);
+  carl_multi_strerror((CARLMcode)INT_MAX);
+  carl_share_strerror((CARLSHcode)INT_MAX);
+  carl_easy_strerror((CARLcode)-INT_MAX);
+  carl_multi_strerror((CARLMcode)-INT_MAX);
+  carl_share_strerror((CARLSHcode)-INT_MAX);
+  for(easyret = CARLE_OK; easyret <= CARL_LAST; easyret++) {
+    printf("e%d: %s\n", (int)easyret, carl_easy_strerror(easyret));
   }
-  for(multiret = CURLM_CALL_MULTI_PERFORM; multiret <= CURLM_LAST;
+  for(multiret = CARLM_CALL_MULTI_PERFORM; multiret <= CARLM_LAST;
       multiret++) {
-    printf("m%d: %s\n", (int)multiret, curl_multi_strerror(multiret));
+    printf("m%d: %s\n", (int)multiret, carl_multi_strerror(multiret));
   }
-  for(shareret = CURLSHE_OK; shareret <= CURLSHE_LAST; shareret++) {
-    printf("s%d: %s\n", (int)shareret, curl_share_strerror(shareret));
+  for(shareret = CARLSHE_OK; shareret <= CARLSHE_LAST; shareret++) {
+    printf("s%d: %s\n", (int)shareret, carl_share_strerror(shareret));
   }
 
   return (int)res;

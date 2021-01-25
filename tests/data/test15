@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/want/15 200 26
 <protocol>
 GET /want/15 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

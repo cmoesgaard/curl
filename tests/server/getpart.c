@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,18 +23,18 @@
 
 #include "getpart.h"
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 
-/* just to please curl_base64.h we create a fake struct */
+/* just to please carl_base64.h we create a fake struct */
 struct Curl_easy {
   int fake;
 };
 
-#include "curl_base64.h"
-#include "curl_memory.h"
+#include "carl_base64.h"
+#include "carl_memory.h"
 
 /* include memdebug.h last */
 #include "memdebug.h"
@@ -53,13 +53,13 @@ struct Curl_easy {
 #  pragma warning(disable:4232) /* MSVC extension, dllimport identity */
 #endif
 
-curl_malloc_callback Curl_cmalloc = (curl_malloc_callback)malloc;
-curl_free_callback Curl_cfree = (curl_free_callback)free;
-curl_realloc_callback Curl_crealloc = (curl_realloc_callback)realloc;
-curl_strdup_callback Curl_cstrdup = (curl_strdup_callback)strdup;
-curl_calloc_callback Curl_ccalloc = (curl_calloc_callback)calloc;
+carl_malloc_callback Curl_cmalloc = (carl_malloc_callback)malloc;
+carl_free_callback Curl_cfree = (carl_free_callback)free;
+carl_realloc_callback Curl_crealloc = (carl_realloc_callback)realloc;
+carl_strdup_callback Curl_cstrdup = (carl_strdup_callback)strdup;
+carl_calloc_callback Curl_ccalloc = (carl_calloc_callback)calloc;
 #if defined(WIN32) && defined(UNICODE)
-curl_wcsdup_callback Curl_cwcsdup = (curl_wcsdup_callback)_wcsdup;
+carl_wcsdup_callback Curl_cwcsdup = (carl_wcsdup_callback)_wcsdup;
 #endif
 
 #if defined(_MSC_VER) && defined(_DLL)
@@ -69,16 +69,16 @@ curl_wcsdup_callback Curl_cwcsdup = (curl_wcsdup_callback)_wcsdup;
 
 /*
  * Curl_convert_clone() returns a malloced copy of the source string (if
- * returning CURLE_OK), with the data converted to network format. This
- * function is used by base64 code in libcurl built to support data
+ * returning CARLE_OK), with the data converted to network format. This
+ * function is used by base64 code in libcarl built to support data
  * conversion. This is a DUMMY VERSION that returns data unmodified - for
  * use by the test server only.
  */
-CURLcode Curl_convert_clone(struct Curl_easy *data,
+CARLcode Curl_convert_clone(struct Curl_easy *data,
                             const char *indata,
                             size_t insize,
                             char **outbuf);
-CURLcode Curl_convert_clone(struct Curl_easy *data,
+CARLcode Curl_convert_clone(struct Curl_easy *data,
                             const char *indata,
                             size_t insize,
                             char **outbuf)
@@ -88,11 +88,11 @@ CURLcode Curl_convert_clone(struct Curl_easy *data,
 
   convbuf = malloc(insize);
   if(!convbuf)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   memcpy(convbuf, indata, insize);
   *outbuf = convbuf;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -127,7 +127,7 @@ static int readline(char **buffer, size_t *bufsize, FILE *stream)
 
   for(;;) {
     size_t length;
-    int bytestoread = curlx_uztosi(*bufsize - offset);
+    int bytestoread = carlx_uztosi(*bufsize - offset);
 
     if(!fgets(*buffer + offset, bytestoread, stream))
       return (offset != 0) ? GPE_OK : GPE_END_OF_FILE;
@@ -219,7 +219,7 @@ static int appenddata(char  **dst_buf,   /* dest buffer */
 static int decodedata(char  **buf,   /* dest buffer */
                       size_t *len)   /* dest buffer data length */
 {
-  CURLcode error = CURLE_OK;
+  CARLcode error = CARLE_OK;
   unsigned char *buf64 = NULL;
   size_t src_len = 0;
 

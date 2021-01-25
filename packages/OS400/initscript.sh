@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -63,16 +63,16 @@ export SONAME
 #
 ################################################################################
 
-setenv TARGETLIB        'CURL'                  # Target OS/400 program library.
-setenv STATBNDDIR       'CURL_A'                # Static binding directory.
-setenv DYNBNDDIR        'CURL'                  # Dynamic binding directory.
-setenv SRVPGM           "CURL.${SONAME}"        # Service program.
+setenv TARGETLIB        'CARL'                  # Target OS/400 program library.
+setenv STATBNDDIR       'CARL_A'                # Static binding directory.
+setenv DYNBNDDIR        'CARL'                  # Dynamic binding directory.
+setenv SRVPGM           "CARL.${SONAME}"        # Service program.
 setenv TGTCCSID         '500'                   # Target CCSID of objects.
 setenv DEBUG            '*ALL'                  # Debug level.
 setenv OPTIMIZE         '10'                    # Optimisation level
 setenv OUTPUT           '*NONE'                 # Compilation output option.
 setenv TGTRLS           'V6R1M0'                # Target OS release.
-setenv IFSDIR           '/curl'                 # Installation IFS directory.
+setenv IFSDIR           '/carl'                 # Installation IFS directory.
 
 #       Define ZLIB availability and locations.
 
@@ -93,27 +93,27 @@ setenv LIBSSH2_BNDDIR   'LIBSSH2_A'             # LIBSSH2 binding directory.
 
 #       Need to get the version definitions.
 
-LIBCURL_VERSION=`grep '^#define  *LIBCURL_VERSION '                     \
-                        "${TOPDIR}/include/curl/curlver.h"              |
+LIBCARL_VERSION=`grep '^#define  *LIBCARL_VERSION '                     \
+                        "${TOPDIR}/include/carl/carlver.h"              |
                 sed 's/.*"\(.*\)".*/\1/'`
-LIBCURL_VERSION_MAJOR=`grep '^#define  *LIBCURL_VERSION_MAJOR '         \
-                        "${TOPDIR}/include/curl/curlver.h"              |
-                sed 's/^#define  *LIBCURL_VERSION_MAJOR  *\([^ ]*\).*/\1/'`
-LIBCURL_VERSION_MINOR=`grep '^#define  *LIBCURL_VERSION_MINOR '         \
-                        "${TOPDIR}/include/curl/curlver.h"              |
-                sed 's/^#define  *LIBCURL_VERSION_MINOR  *\([^ ]*\).*/\1/'`
-LIBCURL_VERSION_PATCH=`grep '^#define  *LIBCURL_VERSION_PATCH '         \
-                        "${TOPDIR}/include/curl/curlver.h"              |
-                sed 's/^#define  *LIBCURL_VERSION_PATCH  *\([^ ]*\).*/\1/'`
-LIBCURL_VERSION_NUM=`grep '^#define  *LIBCURL_VERSION_NUM '             \
-                        "${TOPDIR}/include/curl/curlver.h"              |
-                sed 's/^#define  *LIBCURL_VERSION_NUM  *0x\([^ ]*\).*/\1/'`
-LIBCURL_TIMESTAMP=`grep '^#define  *LIBCURL_TIMESTAMP '                 \
-                        "${TOPDIR}/include/curl/curlver.h"              |
+LIBCARL_VERSION_MAJOR=`grep '^#define  *LIBCARL_VERSION_MAJOR '         \
+                        "${TOPDIR}/include/carl/carlver.h"              |
+                sed 's/^#define  *LIBCARL_VERSION_MAJOR  *\([^ ]*\).*/\1/'`
+LIBCARL_VERSION_MINOR=`grep '^#define  *LIBCARL_VERSION_MINOR '         \
+                        "${TOPDIR}/include/carl/carlver.h"              |
+                sed 's/^#define  *LIBCARL_VERSION_MINOR  *\([^ ]*\).*/\1/'`
+LIBCARL_VERSION_PATCH=`grep '^#define  *LIBCARL_VERSION_PATCH '         \
+                        "${TOPDIR}/include/carl/carlver.h"              |
+                sed 's/^#define  *LIBCARL_VERSION_PATCH  *\([^ ]*\).*/\1/'`
+LIBCARL_VERSION_NUM=`grep '^#define  *LIBCARL_VERSION_NUM '             \
+                        "${TOPDIR}/include/carl/carlver.h"              |
+                sed 's/^#define  *LIBCARL_VERSION_NUM  *0x\([^ ]*\).*/\1/'`
+LIBCARL_TIMESTAMP=`grep '^#define  *LIBCARL_TIMESTAMP '                 \
+                        "${TOPDIR}/include/carl/carlver.h"              |
                 sed 's/.*"\(.*\)".*/\1/'`
-export LIBCURL_VERSION
-export LIBCURL_VERSION_MAJOR LIBCURL_VERSION_MINOR LIBCURL_VERSION_PATCH
-export LIBCURL_VERSION_NUM LIBCURL_TIMESTAMP
+export LIBCARL_VERSION
+export LIBCARL_VERSION_MAJOR LIBCARL_VERSION_MINOR LIBCARL_VERSION_PATCH
+export LIBCARL_VERSION_NUM LIBCARL_TIMESTAMP
 
 ################################################################################
 #
@@ -211,7 +211,7 @@ make_module()
         CMD="${CMD} SYSIFCOPT(*IFS64IO) OPTION(*INCDIRFIRST)"
         CMD="${CMD} LOCALETYPE(*LOCALE) FLAG(10)"
         CMD="${CMD} INCDIR('/qibm/proddata/qadrt/include'"
-        CMD="${CMD} '${TOPDIR}/include/curl' '${TOPDIR}/include' '${SRCDIR}'"
+        CMD="${CMD} '${TOPDIR}/include/carl' '${TOPDIR}/include' '${SRCDIR}'"
         CMD="${CMD} '${TOPDIR}/packages/OS400'"
 
         if [ "${WITH_ZLIB}" != "0" ]
@@ -228,7 +228,7 @@ make_module()
         CMD="${CMD} OPTIMIZE(${OPTIMIZE})"
         CMD="${CMD} DBGVIEW(${DEBUG})"
 
-        DEFINES="${3} BUILDING_LIBCURL"
+        DEFINES="${3} BUILDING_LIBCARL"
 
         if [ "${WITH_ZLIB}" != "0" ]
         then    DEFINES="${DEFINES} HAVE_LIBZ HAVE_ZLIB_H"
@@ -261,7 +261,7 @@ db2_name()
         else    basename "${1}"                                         |
                 tr 'a-z-' 'A-Z_'                                        |
                 sed -e 's/\..*//'                                       \
-                    -e 's/^CURL_*/C/'                                   \
+                    -e 's/^CARL_*/C/'                                   \
                     -e 's/^\(.\).*\(.........\)$/\1\2/'
         fi
 }
@@ -272,11 +272,11 @@ db2_name()
 versioned_copy()
 
 {
-        sed -e "s/@LIBCURL_VERSION@/${LIBCURL_VERSION}/g"               \
-            -e "s/@LIBCURL_VERSION_MAJOR@/${LIBCURL_VERSION_MAJOR}/g"   \
-            -e "s/@LIBCURL_VERSION_MINOR@/${LIBCURL_VERSION_MINOR}/g"   \
-            -e "s/@LIBCURL_VERSION_PATCH@/${LIBCURL_VERSION_PATCH}/g"   \
-            -e "s/@LIBCURL_VERSION_NUM@/${LIBCURL_VERSION_NUM}/g"       \
-            -e "s/@LIBCURL_TIMESTAMP@/${LIBCURL_TIMESTAMP}/g"           \
+        sed -e "s/@LIBCARL_VERSION@/${LIBCARL_VERSION}/g"               \
+            -e "s/@LIBCARL_VERSION_MAJOR@/${LIBCARL_VERSION_MAJOR}/g"   \
+            -e "s/@LIBCARL_VERSION_MINOR@/${LIBCARL_VERSION_MINOR}/g"   \
+            -e "s/@LIBCARL_VERSION_PATCH@/${LIBCARL_VERSION_PATCH}/g"   \
+            -e "s/@LIBCARL_VERSION_NUM@/${LIBCARL_VERSION_NUM}/g"       \
+            -e "s/@LIBCARL_TIMESTAMP@/${LIBCARL_TIMESTAMP}/g"           \
                 < "${1}" > "${2}"
 }

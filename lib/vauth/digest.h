@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_DIGEST_H
-#define HEADER_CURL_DIGEST_H
+#ifndef HEADER_CARL_DIGEST_H
+#define HEADER_CARL_DIGEST_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,20 +22,20 @@
  *
  ***************************************************************************/
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if !defined(CARL_DISABLE_CRYPTO_AUTH)
 
 #define DIGEST_MAX_VALUE_LENGTH           256
 #define DIGEST_MAX_CONTENT_LENGTH         1024
 
 enum {
-  CURLDIGESTALGO_MD5,
-  CURLDIGESTALGO_MD5SESS,
-  CURLDIGESTALGO_SHA256,
-  CURLDIGESTALGO_SHA256SESS,
-  CURLDIGESTALGO_SHA512_256,
-  CURLDIGESTALGO_SHA512_256SESS
+  CARLDIGESTALGO_MD5,
+  CARLDIGESTALGO_MD5SESS,
+  CARLDIGESTALGO_SHA256,
+  CARLDIGESTALGO_SHA256SESS,
+  CARLDIGESTALGO_SHA512_256,
+  CARLDIGESTALGO_SHA512_256SESS
 };
 
 /* This is used to extract the realm from a challenge message */
@@ -44,4 +44,4 @@ bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
 
 #endif
 
-#endif /* HEADER_CURL_DIGEST_H */
+#endif /* HEADER_CARL_DIGEST_H */

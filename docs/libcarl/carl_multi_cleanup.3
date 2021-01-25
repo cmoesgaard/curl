@@ -1,0 +1,50 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_multi_cleanup 3 "1 March 2002" "libcarl 7.9.5" "libcarl Manual"
+.SH NAME
+carl_multi_cleanup - close down a multi session
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "CARLMcode carl_multi_cleanup( CARLM *multi_handle );"
+.ad
+.SH DESCRIPTION
+Cleans up and removes a whole multi stack. It does not free or touch any
+individual easy handles in any way - they still need to be closed
+individually, using the usual \fIcarl_easy_cleanup(3)\fP way. The order of
+cleaning up should be:
+
+1 - \fIcarl_multi_remove_handle(3)\fP before any easy handles are cleaned up
+
+2 - \fIcarl_easy_cleanup(3)\fP can now be called independently since the easy
+handle is no longer connected to the multi handle
+
+3 - \fIcarl_multi_cleanup(3)\fP should be called when all easy handles are
+removed
+
+Passing in a NULL pointer in \fImulti_handle\fP will make this function return
+CARLM_BAD_HANDLE immediately with no other action.
+.SH RETURN VALUE
+CARLMcode type, general libcarl multi interface error code. On success,
+CARLM_OK is returned.
+.SH "SEE ALSO"
+.BR carl_multi_init "(3)," carl_easy_cleanup "(3)," carl_easy_init "(3)"

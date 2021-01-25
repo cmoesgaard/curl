@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,9 +30,9 @@
 #include <stdio.h>
 #include <tidy.h>
 #include <tidybuffio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-/* curl write callback, to fill tidy's input buffer...  */
+/* carl write callback, to fill tidy's input buffer...  */
 uint write_cb(char *in, uint size, uint nmemb, TidyBuffer *out)
 {
   uint r;
@@ -75,19 +75,19 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
 int main(int argc, char **argv)
 {
   if(argc == 2) {
-    CURL *curl;
-    char curl_errbuf[CURL_ERROR_SIZE];
+    CARL *carl;
+    char carl_errbuf[CARL_ERROR_SIZE];
     TidyDoc tdoc;
     TidyBuffer docbuf = {0};
     TidyBuffer tidy_errbuf = {0};
     int err;
 
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
-    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_errbuf);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
+    carl = carl_easy_init();
+    carl_easy_setopt(carl, CARLOPT_URL, argv[1]);
+    carl_easy_setopt(carl, CARLOPT_ERRORBUFFER, carl_errbuf);
+    carl_easy_setopt(carl, CARLOPT_NOPROGRESS, 0L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, write_cb);
 
     tdoc = tidyCreate();
     tidyOptSetBool(tdoc, TidyForceOutput, yes); /* try harder */
@@ -95,8 +95,8 @@ int main(int argc, char **argv)
     tidySetErrorBuffer(tdoc, &tidy_errbuf);
     tidyBufInit(&docbuf);
 
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
-    err = curl_easy_perform(curl);
+    carl_easy_setopt(carl, CARLOPT_WRITEDATA, &docbuf);
+    err = carl_easy_perform(carl);
     if(!err) {
       err = tidyParseBuffer(tdoc, &docbuf); /* parse the input */
       if(err >= 0) {
@@ -111,10 +111,10 @@ int main(int argc, char **argv)
       }
     }
     else
-      fprintf(stderr, "%s\n", curl_errbuf);
+      fprintf(stderr, "%s\n", carl_errbuf);
 
     /* clean-up */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
     tidyBufFree(&docbuf);
     tidyBufFree(&tidy_errbuf);
     tidyRelease(tdoc);

@@ -43,45 +43,45 @@ multiple requests using {}{} in the URL
 <protocol>
 GET /12350001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /12350002 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /12350001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /12350002 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>
 <stdout>
---_curl_--%HOSTIP:%HTTPPORT/12350001
+--_carl_--%HOSTIP:%HTTPPORT/12350001
 HTTP/1.1 200 OK
 Funny-head: yesyes
 Content-Length: 15
 
 the number one
---_curl_--%HOSTIP:%HTTPPORT/12350002
+--_carl_--%HOSTIP:%HTTPPORT/12350002
 HTTP/1.1 200 OK
 Funny-head: yesyes
 Content-Length: 16
 
 two is nice too
---_curl_--%HOSTIP:%HTTPPORT/12350001
+--_carl_--%HOSTIP:%HTTPPORT/12350001
 HTTP/1.1 200 OK
 Funny-head: yesyes
 Content-Length: 15
 
 the number one
---_curl_--%HOSTIP:%HTTPPORT/12350002
+--_carl_--%HOSTIP:%HTTPPORT/12350002
 HTTP/1.1 200 OK
 Funny-head: yesyes
 Content-Length: 16

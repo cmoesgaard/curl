@@ -1,0 +1,60 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_NETRC_FILE 3 "19 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_NETRC_FILE \- file name to read .netrc info from
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_NETRC_FILE, char *file);
+.SH DESCRIPTION
+Pass a char * as parameter, pointing to a null-terminated string containing
+the full path name to the \fIfile\fP you want libcarl to use as .netrc
+file. If this option is omitted, and \fICARLOPT_NETRC(3)\fP is set, libcarl
+will attempt to find a .netrc file in the current user's home
+directory.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/");
+  carl_easy_setopt(carl, CARLOPT_NETRC, CARL_NETRC_OPTIONAL);
+  carl_easy_setopt(carl, CARLOPT_NETRC_FILE, "/tmp/magic-netrc");
+  ret = carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.10.9
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_NETRC "(3), " CARLOPT_USERNAME "(3), "

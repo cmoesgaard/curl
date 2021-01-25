@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -83,7 +83,7 @@ void dump(const char *text,
 }
 
 static
-int my_trace(CURL *handle, curl_infotype type,
+int my_trace(CARL *handle, carl_infotype type,
              char *data, size_t size,
              void *userp)
 {
@@ -92,28 +92,28 @@ int my_trace(CURL *handle, curl_infotype type,
   (void)handle; /* prevent compiler warning */
 
   switch(type) {
-  case CURLINFO_TEXT:
+  case CARLINFO_TEXT:
     fprintf(stderr, "== Info: %s", (char *)data);
     /* FALLTHROUGH */
   default: /* in case a new one is introduced to shock us */
     return 0;
 
-  case CURLINFO_HEADER_OUT:
+  case CARLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
-  case CURLINFO_DATA_OUT:
+  case CARLINFO_DATA_OUT:
     text = "=> Send data";
     break;
-  case CURLINFO_SSL_DATA_OUT:
+  case CARLINFO_SSL_DATA_OUT:
     text = "=> Send SSL data";
     break;
-  case CURLINFO_HEADER_IN:
+  case CARLINFO_HEADER_IN:
     text = "<= Recv header";
     break;
-  case CURLINFO_DATA_IN:
+  case CARLINFO_DATA_IN:
     text = "<= Recv data";
     break;
-  case CURLINFO_SSL_DATA_IN:
+  case CARLINFO_SSL_DATA_IN:
     text = "<= Recv SSL data";
     break;
   }
@@ -129,7 +129,7 @@ static char databuf[70000]; /* MUST be more than 64k OR
 
 static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
-  size_t  amount = nmemb * size; /* Total bytes curl wants */
+  size_t  amount = nmemb * size; /* Total bytes carl wants */
   size_t  available = sizeof(databuf) - current_offset; /* What we have to
                                                            give */
   size_t  given = amount < available ? amount : available; /* What is given */
@@ -143,82 +143,82 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 static size_t write_callback(void *ptr, size_t size, size_t nmemb,
                              void *stream)
 {
-  int amount = curlx_uztosi(size * nmemb);
+  int amount = carlx_uztosi(size * nmemb);
   printf("%.*s", amount, (char *)ptr);
   (void)stream;
   return size * nmemb;
 }
 
 
-static curlioerr ioctl_callback(CURL *handle, int cmd, void *clientp)
+static carlioerr ioctl_callback(CARL *handle, int cmd, void *clientp)
 {
   (void)clientp;
-  if(cmd == CURLIOCMD_RESTARTREAD) {
-    printf("APPLICATION: received a CURLIOCMD_RESTARTREAD request\n");
+  if(cmd == CARLIOCMD_RESTARTREAD) {
+    printf("APPLICATION: received a CARLIOCMD_RESTARTREAD request\n");
     printf("APPLICATION: ** REWINDING! **\n");
     current_offset = 0;
-    return CURLIOE_OK;
+    return CARLIOE_OK;
   }
   (void)handle;
-  return CURLIOE_UNKNOWNCMD;
+  return CARLIOE_UNKNOWNCMD;
 }
 
 
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
   struct data config;
   size_t i;
   static const char fill[] = "test data";
 
   config.trace_ascii = 1; /* enable ascii tracing */
 
-  global_init(CURL_GLOBAL_ALL);
-  easy_init(curl);
+  global_init(CARL_GLOBAL_ALL);
+  easy_init(carl);
 
-  test_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-  test_setopt(curl, CURLOPT_DEBUGDATA, &config);
+  test_setopt(carl, CARLOPT_DEBUGFUNCTION, my_trace);
+  test_setopt(carl, CARLOPT_DEBUGDATA, &config);
   /* the DEBUGFUNCTION has no effect until we enable VERBOSE */
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
   /* setup repeated data string */
   for(i = 0; i < sizeof(databuf); ++i)
     databuf[i] = fill[i % sizeof(fill)];
 
   /* Post */
-  test_setopt(curl, CURLOPT_POST, 1L);
+  test_setopt(carl, CARLOPT_POST, 1L);
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
   /* Convert the POST data to ASCII */
-  test_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
+  test_setopt(carl, CARLOPT_TRANSFERTEXT, 1L);
 #endif
 
   /* Setup read callback */
-  test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long) sizeof(databuf));
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+  test_setopt(carl, CARLOPT_POSTFIELDSIZE, (long) sizeof(databuf));
+  test_setopt(carl, CARLOPT_READFUNCTION, read_callback);
 
   /* Write callback */
-  test_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+  test_setopt(carl, CARLOPT_WRITEFUNCTION, write_callback);
 
   /* Ioctl function */
-  test_setopt(curl, CURLOPT_IOCTLFUNCTION, ioctl_callback);
+  test_setopt(carl, CARLOPT_IOCTLFUNCTION, ioctl_callback);
 
-  test_setopt(curl, CURLOPT_PROXY, libtest_arg2);
+  test_setopt(carl, CARLOPT_PROXY, libtest_arg2);
 
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
   /* Accept any auth. But for this bug configure proxy with DIGEST, basic
      might work too, not NTLM */
-  test_setopt(curl, CURLOPT_PROXYAUTH, (long)CURLAUTH_ANY);
+  test_setopt(carl, CARLOPT_PROXYAUTH, (long)CARLAUTH_ANY);
 
-  res = curl_easy_perform(curl);
-  fprintf(stderr, "curl_easy_perform = %d\n", (int)res);
+  res = carl_easy_perform(carl);
+  fprintf(stderr, "carl_easy_perform = %d\n", (int)res);
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
   return (int)res;
 }

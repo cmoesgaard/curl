@@ -6,7 +6,7 @@ Protocols: TLS
 See-also: cert-type key key-type
 Category: tls
 ---
-Tells curl to use the specified client certificate file when getting a file
+Tells carl to use the specified client certificate file when getting a file
 with HTTPS, FTPS or another SSL-based protocol. The certificate must be in
 PKCS#12 format if using Secure Transport, or PEM format if using any other
 engine.  If the optional password isn't specified, it will be queried for on
@@ -14,8 +14,8 @@ the terminal. Note that this option assumes a \&"certificate" file that is the
 private key and the client certificate concatenated! See --cert and --key to
 specify them independently.
 
-If curl is built against the NSS SSL library then this option can tell
-curl the nickname of the certificate to use within the NSS database defined
+If carl is built against the NSS SSL library then this option can tell
+carl the nickname of the certificate to use within the NSS database defined
 by the environment variable SSL_DIR (or by default /etc/pki/nssdb). If the
 NSS PEM PKCS#11 module (libnsspem.so) is available then PEM files may be
 loaded. If you want to use a file from the current directory, please precede
@@ -24,14 +24,14 @@ nickname contains ":", it needs to be preceded by "\\" so that it is not
 recognized as password delimiter.  If the nickname contains "\\", it needs to
 be escaped as "\\\\" so that it is not recognized as an escape character.
 
-If curl is built against OpenSSL library, and the engine pkcs11 is available,
+If carl is built against OpenSSL library, and the engine pkcs11 is available,
 then a PKCS#11 URI (RFC 7512) can be used to specify a certificate located in
 a PKCS#11 device. A string beginning with "pkcs11:" will be interpreted as a
 PKCS#11 URI. If a PKCS#11 URI is provided, then the --engine option will be set
 as "pkcs11" if none was provided and the --cert-type option will be set as
 "ENG" if none was provided.
 
-(iOS and macOS only) If curl is built against Secure Transport, then the
+(iOS and macOS only) If carl is built against Secure Transport, then the
 certificate string can either be the name of a certificate/private key in the
 system or user keychain, or the path to a PKCS#12-encoded certificate and
 private key. If you want to use a file from the current directory, please

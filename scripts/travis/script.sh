@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -74,9 +74,9 @@ fi
 
 if [ "$T" = "normal" ]; then
   if [ $TRAVIS_OS_NAME = linux ]; then
-    # Remove system curl to make sure we don't rely on it.
+    # Remove system carl to make sure we don't rely on it.
     # Only done on Linux since we're not permitted to on mac.
-    sudo rm -f /usr/bin/curl
+    sudo rm -f /usr/bin/carl
   fi
   ./configure --enable-warnings --enable-werror $C
   make
@@ -104,7 +104,7 @@ if [ "$T" = "iconv" ]; then
 fi
 
 if [ "$T" = "cmake" ]; then
-  cmake -H. -Bbuild -DCURL_WERROR=ON $C
+  cmake -H. -Bbuild -DCARL_WERROR=ON $C
   cmake --build build
   env TFLAGS="!1139 $TFLAGS" cmake --build build --target test-nonflaky
 fi
@@ -116,8 +116,8 @@ if [ "$T" = "distcheck" ]; then
   make
   ./maketgz 99.98.97
   # verify in-tree build - and install it
-  tar xf curl-99.98.97.tar.gz
-  cd curl-99.98.97
+  tar xf carl-99.98.97.tar.gz
+  cd carl-99.98.97
   ./configure --prefix=$HOME/temp
   make
   make TFLAGS=1 test
@@ -125,20 +125,20 @@ if [ "$T" = "distcheck" ]; then
   # basic check of the installed files
   cd ..
   bash scripts/installcheck.sh $HOME/temp
-  rm -rf curl-99.98.97
+  rm -rf carl-99.98.97
   # verify out-of-tree build
-  tar xf curl-99.98.97.tar.gz
-  touch curl-99.98.97/docs/{cmdline-opts,libcurl}/Makefile.inc
+  tar xf carl-99.98.97.tar.gz
+  touch carl-99.98.97/docs/{cmdline-opts,libcarl}/Makefile.inc
   mkdir build
   cd build
-  ../curl-99.98.97/configure
+  ../carl-99.98.97/configure
   make
   make TFLAGS='-p 1 1139' test
   # verify cmake build
   cd ..
-  rm -rf curl-99.98.97
-  tar xf curl-99.98.97.tar.gz
-  cd curl-99.98.97
+  rm -rf carl-99.98.97
+  tar xf carl-99.98.97.tar.gz
+  cd carl-99.98.97
   mkdir build
   cd build
   cmake ..
@@ -148,13 +148,13 @@ fi
 
 if [ "$T" = "fuzzer" ]; then
   # Download the fuzzer to a temporary folder
-  ./tests/fuzz/download_fuzzer.sh /tmp/curl_fuzzer
+  ./tests/fuzz/download_fuzzer.sh /tmp/carl_fuzzer
 
-  export CURLSRC=$PWD
+  export CARLSRC=$PWD
 
   # Run the mainline fuzzer test
-  pushd /tmp/curl_fuzzer
-  ./mainline.sh ${CURLSRC}
+  pushd /tmp/carl_fuzzer
+  ./mainline.sh ${CARLSRC}
   popd
 fi
 

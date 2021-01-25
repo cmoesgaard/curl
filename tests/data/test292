@@ -46,7 +46,7 @@ http://%HOSTIP:%HTTPPORT/292 --max-filesize 1000
 <protocol>
 GET /292 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

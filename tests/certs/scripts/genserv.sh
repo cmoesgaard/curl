@@ -3,7 +3,7 @@
 # (c) CopyRight 2000 - 2020, EdelWeb for EdelKey and OpenEvidence
 # Author: Peter Sylvester
 
-# "libre" for integration with curl
+# "libre" for integration with carl
 
 OPENSSL=openssl
 if [ -f /usr/local/ssl/bin/openssl ] ; then

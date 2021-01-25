@@ -1,0 +1,89 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SEEKFUNCTION 3 "16 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SEEKFUNCTION \- user callback for seeking in input stream
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+/* These are the return codes for the seek callbacks */
+#define CARL_SEEKFUNC_OK       0
+#define CARL_SEEKFUNC_FAIL     1 /* fail the entire transfer */
+#define CARL_SEEKFUNC_CANTSEEK 2 /* tell libcarl seeking can't be done, so
+                                    libcarl might try other means instead */
+
+int seek_callback(void *userp, carl_off_t offset, int origin);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SEEKFUNCTION, seek_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+This function gets called by libcarl to seek to a certain position in the
+input stream and can be used to fast forward a file in a resumed upload
+(instead of reading all uploaded bytes with the normal read
+function/callback). It is also called to rewind a stream when data has already
+been sent to the server and needs to be sent again. This may happen when doing
+an HTTP PUT or POST with a multi-pass authentication method, or when an
+existing HTTP connection is reused too late and the server closes the
+connection. The function shall work like fseek(3) or lseek(3) and it gets
+SEEK_SET, SEEK_CUR or SEEK_END as argument for \fIorigin\fP, although libcarl
+currently only passes SEEK_SET.
+
+\fIuserp\fP is the pointer you set with \fICARLOPT_SEEKDATA(3)\fP.
+
+The callback function must return \fICARL_SEEKFUNC_OK\fP on success,
+\fICARL_SEEKFUNC_FAIL\fP to cause the upload operation to fail or
+\fICARL_SEEKFUNC_CANTSEEK\fP to indicate that while the seek failed, libcarl
+is free to work around the problem if possible. The latter can sometimes be
+done by instead reading from the input or similar.
+
+If you forward the input arguments directly to fseek(3) or lseek(3), note that
+the data type for \fIoffset\fP is not the same as defined for carl_off_t on
+many systems!
+.SH DEFAULT
+By default, this is NULL and unused.
+.SH PROTOCOLS
+HTTP, FTP, SFTP
+.SH EXAMPLE
+.nf
+static int seek_cb(void *userp, carl_off_t offset, int origin)
+{
+  struct data *d = (struct data *)userp;
+  lseek(our_fd, offset, origin);
+  return CARL_SEEKFUNC_OK;
+}
+
+{
+  struct data seek_data;
+  carl_easy_setopt(CARL *handle, CARLOPT_SEEKFUNCTION, seek_cb);
+  carl_easy_setopt(CARL *handle, CARLOPT_SEEKDATA, &seek_data);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.18.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_SEEKDATA "(3), " CARLOPT_IOCTLFUNCTION "(3), "

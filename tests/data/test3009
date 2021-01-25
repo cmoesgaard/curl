@@ -46,7 +46,7 @@ http://%HOSTIP:%HTTPPORT/this/is/the/3009 -O --output-dir %PWD/not-there
 <protocol>
 GET /this/is/the/3009 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

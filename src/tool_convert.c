@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
 
 #ifdef HAVE_ICONV
 #  include <iconv.h>
@@ -33,20 +33,20 @@
 
 #ifdef HAVE_ICONV
 
-/* curl tool iconv conversion descriptors */
+/* carl tool iconv conversion descriptors */
 static iconv_t inbound_cd  = (iconv_t)-1;
 static iconv_t outbound_cd = (iconv_t)-1;
 
 /* set default codesets for iconv */
-#ifndef CURL_ICONV_CODESET_OF_NETWORK
-#  define CURL_ICONV_CODESET_OF_NETWORK "ISO8859-1"
+#ifndef CARL_ICONV_CODESET_OF_NETWORK
+#  define CARL_ICONV_CODESET_OF_NETWORK "ISO8859-1"
 #endif
 
 /*
- * convert_to_network() is a curl tool function to convert
+ * convert_to_network() is a carl tool function to convert
  * from the host encoding to ASCII on non-ASCII platforms.
  */
-CURLcode convert_to_network(char *buffer, size_t length)
+CARLcode convert_to_network(char *buffer, size_t length)
 {
   /* translate from the host encoding to the network encoding */
   char *input_ptr, *output_ptr;
@@ -54,10 +54,10 @@ CURLcode convert_to_network(char *buffer, size_t length)
 
   /* open an iconv conversion descriptor if necessary */
   if(outbound_cd == (iconv_t)-1) {
-    outbound_cd = iconv_open(CURL_ICONV_CODESET_OF_NETWORK,
-                             CURL_ICONV_CODESET_OF_HOST);
+    outbound_cd = iconv_open(CARL_ICONV_CODESET_OF_NETWORK,
+                             CARL_ICONV_CODESET_OF_HOST);
     if(outbound_cd == (iconv_t)-1) {
-      return CURLE_CONV_FAILED;
+      return CARLE_CONV_FAILED;
     }
   }
   /* call iconv */
@@ -66,17 +66,17 @@ CURLcode convert_to_network(char *buffer, size_t length)
   res = iconv(outbound_cd, &input_ptr,  &in_bytes,
               &output_ptr, &out_bytes);
   if((res == (size_t)-1) || (in_bytes != 0)) {
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
- * convert_from_network() is a curl tool function
+ * convert_from_network() is a carl tool function
  * for performing ASCII conversions on non-ASCII platforms.
  */
-CURLcode convert_from_network(char *buffer, size_t length)
+CARLcode convert_from_network(char *buffer, size_t length)
 {
   /* translate from the network encoding to the host encoding */
   char *input_ptr, *output_ptr;
@@ -84,10 +84,10 @@ CURLcode convert_from_network(char *buffer, size_t length)
 
   /* open an iconv conversion descriptor if necessary */
   if(inbound_cd == (iconv_t)-1) {
-    inbound_cd = iconv_open(CURL_ICONV_CODESET_OF_HOST,
-                            CURL_ICONV_CODESET_OF_NETWORK);
+    inbound_cd = iconv_open(CARL_ICONV_CODESET_OF_HOST,
+                            CARL_ICONV_CODESET_OF_NETWORK);
     if(inbound_cd == (iconv_t)-1) {
-      return CURLE_CONV_FAILED;
+      return CARLE_CONV_FAILED;
     }
   }
   /* call iconv */
@@ -96,10 +96,10 @@ CURLcode convert_from_network(char *buffer, size_t length)
   res = iconv(inbound_cd, &input_ptr,  &in_bytes,
               &output_ptr, &out_bytes);
   if((res == (size_t)-1) || (in_bytes != 0)) {
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 void convert_cleanup(void)
@@ -113,14 +113,14 @@ void convert_cleanup(void)
 
 #endif /* HAVE_ICONV */
 
-char convert_char(curl_infotype infotype, char this_char)
+char convert_char(carl_infotype infotype, char this_char)
 {
 /* determine how this specific character should be displayed */
   switch(infotype) {
-  case CURLINFO_DATA_IN:
-  case CURLINFO_DATA_OUT:
-  case CURLINFO_SSL_DATA_IN:
-  case CURLINFO_SSL_DATA_OUT:
+  case CARLINFO_DATA_IN:
+  case CARLINFO_DATA_OUT:
+  case CARLINFO_SSL_DATA_IN:
+  case CARLINFO_SSL_DATA_OUT:
     /* data, treat as ASCII */
     if(this_char < 0x20 || this_char >= 0x7f) {
       /* non-printable ASCII, use a replacement character */
@@ -144,4 +144,4 @@ char convert_char(curl_infotype infotype, char this_char)
   return UNPRINTABLE_CHAR;
 }
 
-#endif /* CURL_DOES_CONVERSIONS */
+#endif /* CARL_DOES_CONVERSIONS */

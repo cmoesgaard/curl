@@ -1,12 +1,12 @@
 # Unit tests
 
-The goal is to add tests for *all* functions in libcurl. If functions are too
+The goal is to add tests for *all* functions in libcarl. If functions are too
 big and complicated, we should split them into smaller and testable ones.
 
 ## Build Unit Tests
 
 `./configure --enable-debug` is required for the unit tests to build. To
-enable unit tests, there will be a separate static libcurl built that will be
+enable unit tests, there will be a separate static libcarl built that will be
 used exclusively for linking unit test programs. Just build everything as
 normal, and then you can run the unit test cases as well.
 
@@ -39,14 +39,14 @@ and the `tests/FILEFORMAT.md` documentation.
 
 For the actual C file, here's a very simple example:
 ~~~c
-#include "curlcheck.h"
+#include "carlcheck.h"
 
-#include "a libcurl header.h" /* from the lib dir */
+#include "a libcarl header.h" /* from the lib dir */
 
-static CURLcode unit_setup( void )
+static CARLcode unit_setup( void )
 {
   /* whatever you want done first */
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop( void )

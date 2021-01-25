@@ -1,4 +1,4 @@
-# MQTT in curl
+# MQTT in carl
 
 ## Usage
 
@@ -7,13 +7,13 @@ Doing a "POST" publishes the post data to the topic and exits.
 
 Example subscribe:
 
-    curl mqtt://host/home/bedroom/temp
+    carl mqtt://host/home/bedroom/temp
 
 Example publish:
 
-    curl -d 75 mqtt://host/home/bedroom/dimmer
+    carl -d 75 mqtt://host/home/bedroom/dimmer
 
-## What does curl deliver as a response to a subscribe
+## What does carl deliver as a response to a subscribe
 
 It outputs two bytes topic length (MSB | LSB), the topic followed by the
 payload.

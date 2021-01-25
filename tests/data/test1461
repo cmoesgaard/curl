@@ -17,7 +17,7 @@
 none
 </server>
  <name>
-curl important --help
+carl important --help
  </name>
  <command>
 --help
@@ -31,7 +31,7 @@ curl important --help
 0
 </errorcode>
 <stdout mode="text">
-Usage: curl [options...] <url>
+Usage: carl [options...] <url>
  -d, --data <data>   HTTP POST data
  -f, --fail          Fail silently (no output at all) on HTTP errors
  -h, --help <category> Get help for commands

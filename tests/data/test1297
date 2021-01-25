@@ -46,14 +46,14 @@ proxy
 <proxy>
 CONNECT %HOSTIP.1297:%HTTPPORT HTTP/1.1
 Host: %HOSTIP.1297:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>
 <protocol>
 GET /we/want/that/page/1297 HTTP/1.1
 Host: %HOSTIP.1297:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

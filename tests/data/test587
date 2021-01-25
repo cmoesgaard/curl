@@ -19,7 +19,7 @@ flaky
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib587
 </tool>
@@ -50,7 +50,7 @@ Content-Type: multipart/form-data; boundary=----------------------------
 Content-Disposition: form-data; name="sendfile"; filename="postit2.c"
 
 </protocol>
-# CURLE_ABORTED_BY_CALLBACK (42)
+# CARLE_ABORTED_BY_CALLBACK (42)
 <errorcode>
 42
 </errorcode>

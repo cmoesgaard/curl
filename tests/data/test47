@@ -38,7 +38,7 @@ http://%HOSTIP:%HTTPPORT/47 -0
 <protocol>
 GET /47 HTTP/1.0
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

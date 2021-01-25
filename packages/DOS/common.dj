@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
 #
 ###########################################################################
 #
-# Common defines for curl (djgpp/Watt-32)
+# Common defines for carl (djgpp/Watt-32)
 #
-# Assumes you've unpacked curl with long-file names
+# Assumes you've unpacked carl with long-file names
 # I.e use "set LFN=y" before untaring on Win9x/XP.
 # Requires sed, yacc, rm and the usual stuff.
 #
@@ -64,7 +64,7 @@ endif
 #
 # OpenSSL is available from www.openssl.org and builds okay
 # with djgpp/Watt-32. Set to 0 if you don't need https URLs
-# (reduces curl.exe with approx 700 kB)
+# (reduces carl.exe with approx 700 kB)
 #
 USE_SSL = 0
 
@@ -89,14 +89,14 @@ USE_IPV6 = 0
 USE_ARES = 0
 
 #
-# Enable debug code in libcurl/curl
+# Enable debug code in libcarl/carl
 #
 USE_DEBUG = 0
 
 #
-# Enable memory tracking code in libcurl/curl
+# Enable memory tracking code in libcarl/carl
 #
-USE_CURLDEBUG = 0
+USE_CARLDEBUG = 0
 
 default: all
 
@@ -141,8 +141,8 @@ ifeq ($(USE_DEBUG),1)
   CFLAGS += -DDEBUG=1 -DDEBUGBUILD
 endif
 
-ifeq ($(USE_CURLDEBUG),1)
-  CFLAGS += -DCURLDEBUG
+ifeq ($(USE_CARLDEBUG),1)
+  CFLAGS += -DCARLDEBUG
 endif
 
 $(OBJ_DIR):

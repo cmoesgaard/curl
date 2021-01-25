@@ -3,7 +3,7 @@
 <keywords>
 FTP
 PASV
-CURLOPT_PORT
+CARLOPT_PORT
 </keywords>
 </info>
 #
@@ -36,7 +36,7 @@ ftp
 lib521
 </tool>
  <name>
-FTP dir list PASV with CURLOPT_PORT
+FTP dir list PASV with CARLOPT_PORT
  </name>
  <command>
 ftp://%HOSTIP/521/ %FTPPORT

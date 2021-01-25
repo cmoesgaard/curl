@@ -1,0 +1,64 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_TIMEVALUE_LARGE 3 "25 Jan 2018" "libcarl 7.59.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_TIMEVALUE_LARGE \- set time value for conditional
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_TIMEVALUE_LARGE, carl_off_t val);
+.SH DESCRIPTION
+Pass a carl_off_t \fIval\fP as parameter. This should be the time counted as
+seconds since 1 Jan 1970, and the time will be used in a condition as
+specified with \fICARLOPT_TIMECONDITION(3)\fP.
+
+The difference between this option and \fICARLOPT_TIMEVALUE(3)\fP is the type
+of the argument. On systems where 'long' is only 32 bit wide, this option has
+to be used to set dates beyond the year 2038.
+.SH DEFAULT
+0
+.SH PROTOCOLS
+HTTP, FTP, RTSP, and FILE
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* January 1, 2020 is 1577833200 */
+  carl_easy_setopt(carl, CARLOPT_TIMEVALUE_LARGE, (carl_off_t)1577833200);
+
+  /* If-Modified-Since the above time stamp */
+  carl_easy_setopt(carl, CARLOPT_TIMECONDITION, CARL_TIMECOND_IFMODSINCE);
+
+  /* Perform the request */
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.59.0.
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_TIMECONDITION "(3), "
+.BR CARLOPT_TIMEVALUE_LARGE "(3), "

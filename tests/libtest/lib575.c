@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,34 +37,34 @@
 
 int test(char *URL)
 {
-  CURL *handle = NULL;
-  CURL *duphandle = NULL;
-  CURLM *mhandle = NULL;
+  CARL *handle = NULL;
+  CARL *duphandle = NULL;
+  CARLM *mhandle = NULL;
   int res = 0;
   int still_running = 0;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   easy_init(handle);
 
-  easy_setopt(handle, CURLOPT_URL, URL);
-  easy_setopt(handle, CURLOPT_WILDCARDMATCH, 1L);
-  easy_setopt(handle, CURLOPT_VERBOSE, 1L);
+  easy_setopt(handle, CARLOPT_URL, URL);
+  easy_setopt(handle, CARLOPT_WILDCARDMATCH, 1L);
+  easy_setopt(handle, CARLOPT_VERBOSE, 1L);
 
-  res = curl_easy_perform(handle);
+  res = carl_easy_perform(handle);
   if(res)
     goto test_cleanup;
 
-  res = curl_easy_perform(handle);
+  res = carl_easy_perform(handle);
   if(res)
     goto test_cleanup;
 
-  duphandle = curl_easy_duphandle(handle);
+  duphandle = carl_easy_duphandle(handle);
   if(!duphandle)
     goto test_cleanup;
-  curl_easy_cleanup(handle);
+  carl_easy_cleanup(handle);
   handle = duphandle;
 
   multi_init(mhandle);
@@ -106,9 +106,9 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UA */
 
-  curl_multi_cleanup(mhandle);
-  curl_easy_cleanup(handle);
-  curl_global_cleanup();
+  carl_multi_cleanup(mhandle);
+  carl_easy_cleanup(handle);
+  carl_global_cleanup();
 
   return res;
 }

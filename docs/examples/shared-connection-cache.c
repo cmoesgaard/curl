@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,10 +24,10 @@
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-static void my_lock(CURL *handle, curl_lock_data data,
-                    curl_lock_access laccess, void *useptr)
+static void my_lock(CARL *handle, carl_lock_data data,
+                    carl_lock_access laccess, void *useptr)
 {
   (void)handle;
   (void)data;
@@ -36,7 +36,7 @@ static void my_lock(CURL *handle, curl_lock_data data,
   fprintf(stderr, "-> Mutex lock\n");
 }
 
-static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
+static void my_unlock(CARL *handle, carl_lock_data data, void *useptr)
 {
   (void)handle;
   (void)data;
@@ -46,40 +46,40 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
 
 int main(void)
 {
-  CURLSH *share;
+  CARLSH *share;
   int i;
 
-  share = curl_share_init();
-  curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
+  share = carl_share_init();
+  carl_share_setopt(share, CARLSHOPT_SHARE, CARL_LOCK_DATA_CONNECT);
 
-  curl_share_setopt(share, CURLSHOPT_LOCKFUNC, my_lock);
-  curl_share_setopt(share, CURLSHOPT_UNLOCKFUNC, my_unlock);
+  carl_share_setopt(share, CARLSHOPT_LOCKFUNC, my_lock);
+  carl_share_setopt(share, CARLSHOPT_UNLOCKFUNC, my_unlock);
 
   /* Loop the transfer and cleanup the handle properly every lap. This will
      still reuse connections since the pool is in the shared object! */
 
   for(i = 0; i < 3; i++) {
-    CURL *curl = curl_easy_init();
-    if(curl) {
-      CURLcode res;
+    CARL *carl = carl_easy_init();
+    if(carl) {
+      CARLcode res;
 
-      curl_easy_setopt(curl, CURLOPT_URL, "https://curl.se/");
+      carl_easy_setopt(carl, CARLOPT_URL, "https://carl.se/");
 
       /* use the share object */
-      curl_easy_setopt(curl, CURLOPT_SHARE, share);
+      carl_easy_setopt(carl, CARLOPT_SHARE, share);
 
       /* Perform the request, res will get the return code */
-      res = curl_easy_perform(curl);
+      res = carl_easy_perform(carl);
       /* Check for errors */
-      if(res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                curl_easy_strerror(res));
+      if(res != CARLE_OK)
+        fprintf(stderr, "carl_easy_perform() failed: %s\n",
+                carl_easy_strerror(res));
 
       /* always cleanup */
-      curl_easy_cleanup(curl);
+      carl_easy_cleanup(carl);
     }
   }
 
-  curl_share_cleanup(share);
+  carl_share_cleanup(share);
   return 0;
 }

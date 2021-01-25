@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_URLGLOB_H
-#define HEADER_CURL_TOOL_URLGLOB_H
+#ifndef HEADER_CARL_TOOL_URLGLOB_H
+#define HEADER_CARL_TOOL_URLGLOB_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -68,9 +68,9 @@ struct URLGlob {
   size_t pos;        /* column position of error or 0 */
 };
 
-CURLcode glob_url(struct URLGlob**, char *, unsigned long *, FILE *);
-CURLcode glob_next_url(char **, struct URLGlob *);
-CURLcode glob_match_url(char **, char *, struct URLGlob *);
+CARLcode glob_url(struct URLGlob**, char *, unsigned long *, FILE *);
+CARLcode glob_next_url(char **, struct URLGlob *);
+CARLcode glob_match_url(char **, char *, struct URLGlob *);
 void glob_cleanup(struct URLGlob *glob);
 
-#endif /* HEADER_CURL_TOOL_URLGLOB_H */
+#endif /* HEADER_CARL_TOOL_URLGLOB_H */

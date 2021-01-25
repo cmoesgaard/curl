@@ -44,12 +44,12 @@ http://%HOSTIP:%HTTPPORT/want/1066 http://%HOSTIP:%HTTPPORT/want/10660001 --dump
 <protocol>
 GET /want/1066 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /want/10660001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

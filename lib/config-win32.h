@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_WIN32_H
-#define HEADER_CURL_CONFIG_WIN32_H
+#ifndef HEADER_CARL_CONFIG_WIN32_H
+#define HEADER_CARL_CONFIG_WIN32_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -412,8 +412,8 @@
 #  define SIZEOF_SIZE_T 4
 #endif
 
-/* Define to the size of `curl_off_t', as computed by sizeof. */
-#define SIZEOF_CURL_OFF_T 8
+/* Define to the size of `carl_off_t', as computed by sizeof. */
+#define SIZEOF_CARL_OFF_T 8
 
 /* ---------------------------------------------------------------- */
 /*               BSD-style lwIP TCP/IP stack SPECIFIC               */
@@ -689,11 +689,11 @@ Vista
 /*                           LDAP SUPPORT                           */
 /* ---------------------------------------------------------------- */
 
-#if defined(CURL_HAS_NOVELL_LDAPSDK) || defined(CURL_HAS_MOZILLA_LDAPSDK)
+#if defined(CARL_HAS_NOVELL_LDAPSDK) || defined(CARL_HAS_MOZILLA_LDAPSDK)
 #undef USE_WIN32_LDAP
 #define HAVE_LDAP_SSL_H 1
 #define HAVE_LDAP_URL_PARSE 1
-#elif defined(CURL_HAS_OPENLDAP_LDAPSDK)
+#elif defined(CARL_HAS_OPENLDAP_LDAPSDK)
 #undef USE_WIN32_LDAP
 #define HAVE_LDAP_URL_PARSE 1
 #else
@@ -710,11 +710,11 @@ Vista
 #endif
 
 #if defined(__POCC__) && defined(USE_WIN32_LDAP)
-#  define CURL_DISABLE_LDAP 1
+#  define CARL_DISABLE_LDAP 1
 #endif
 
 /* Define to use the Windows crypto library. */
-#if !defined(CURL_WINDOWS_APP)
+#if !defined(CARL_WINDOWS_APP)
 #define USE_WIN32_CRYPTO
 #endif
 
@@ -756,13 +756,13 @@ Vista
 #endif
 
 /* Name of package */
-#define PACKAGE "curl"
+#define PACKAGE "carl"
 
-/* If you want to build curl with the built-in manual */
+/* If you want to build carl with the built-in manual */
 #define USE_MANUAL 1
 
 #if defined(__POCC__) || defined(USE_IPV6)
 #  define ENABLE_IPV6 1
 #endif
 
-#endif /* HEADER_CURL_CONFIG_WIN32_H */
+#endif /* HEADER_CARL_CONFIG_WIN32_H */

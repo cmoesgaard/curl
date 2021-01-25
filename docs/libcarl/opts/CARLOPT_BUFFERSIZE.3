@@ -1,0 +1,65 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_BUFFERSIZE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_BUFFERSIZE \- set preferred receive buffer size
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_BUFFERSIZE, long size);
+.SH DESCRIPTION
+Pass a long specifying your preferred \fIsize\fP (in bytes) for the receive
+buffer in libcarl.  The main point of this would be that the write callback
+gets called more often and with smaller chunks. Secondly, for some protocols,
+there's a benefit of having a larger buffer for performance.
+
+This is just treated as a request, not an order. You cannot be guaranteed to
+actually get the given size.
+
+This buffer size is by default \fICARL_MAX_WRITE_SIZE\fP (16kB). The maximum
+buffer size allowed to be set is \fICARL_MAX_READ_SIZE\fP (512kB). The minimum
+buffer size allowed to be set is 1024.
+.SH DEFAULT
+CARL_MAX_WRITE_SIZE (16kB)
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "sftp://example.com/foo.bin");
+
+  /* ask libcarl to allocate a larger receive buffer */
+  carl_easy_setopt(carl, CARLOPT_BUFFERSIZE, 120000L);
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.10.  Growing the buffer was added in 7.53.0.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_MAX_RECV_SPEED_LARGE "(3), " CARLOPT_WRITEFUNCTION "(3), "

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,12 +20,12 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_RTSP) && !defined(USE_HYPER)
+#if !defined(CARL_DISABLE_RTSP) && !defined(USE_HYPER)
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "transfer.h"
 #include "sendf.h"
 #include "multiif.h"
@@ -38,8 +38,8 @@
 #include "connect.h"
 #include "strdup.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define RTP_PKT_CHANNEL(p)   ((int)((unsigned char)((p)[1])))
@@ -48,13 +48,13 @@
                              ((int)((unsigned char)((p)[3]))))
 
 /* protocol-specific functions set up to be called by the main engine */
-static CURLcode rtsp_do(struct Curl_easy *data, bool *done);
-static CURLcode rtsp_done(struct Curl_easy *data, CURLcode, bool premature);
-static CURLcode rtsp_connect(struct Curl_easy *data, bool *done);
-static CURLcode rtsp_disconnect(struct Curl_easy *data,
+static CARLcode rtsp_do(struct Curl_easy *data, bool *done);
+static CARLcode rtsp_done(struct Curl_easy *data, CARLcode, bool premature);
+static CARLcode rtsp_connect(struct Curl_easy *data, bool *done);
+static CARLcode rtsp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead);
 static int rtsp_getsock_do(struct Curl_easy *data,
-                           struct connectdata *conn, curl_socket_t *socks);
+                           struct connectdata *conn, carl_socket_t *socks);
 
 /*
  * Parse and write out any available RTP data.
@@ -63,12 +63,12 @@ static int rtsp_getsock_do(struct Curl_easy *data,
  *        data is parsed and k->str is moved up
  * readmore: whether or not the RTP parser needs more data right away
  */
-static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
+static CARLcode rtsp_rtp_readwrite(struct Curl_easy *data,
                                    struct connectdata *conn,
                                    ssize_t *nread,
                                    bool *readmore);
 
-static CURLcode rtsp_setup_connection(struct Curl_easy *data,
+static CARLcode rtsp_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
 static unsigned int rtsp_conncheck(struct Curl_easy *data,
                                    struct connectdata *check,
@@ -78,7 +78,7 @@ static unsigned int rtsp_conncheck(struct Curl_easy *data,
    interface and then we're always _sending_ a request and thus we wait for
    the single socket to become writable only */
 static int rtsp_getsock_do(struct Curl_easy *data, struct connectdata *conn,
-                           curl_socket_t *socks)
+                           carl_socket_t *socks)
 {
   /* write mode */
   (void)data;
@@ -87,7 +87,7 @@ static int rtsp_getsock_do(struct Curl_easy *data, struct connectdata *conn,
 }
 
 static
-CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len);
+CARLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len);
 
 
 /*
@@ -110,13 +110,13 @@ const struct Curl_handler Curl_handler_rtsp = {
   rtsp_rtp_readwrite,                   /* readwrite */
   rtsp_conncheck,                       /* connection_check */
   PORT_RTSP,                            /* defport */
-  CURLPROTO_RTSP,                       /* protocol */
-  CURLPROTO_RTSP,                       /* family */
+  CARLPROTO_RTSP,                       /* protocol */
+  CARLPROTO_RTSP,                       /* family */
   PROTOPT_NONE                          /* flags */
 };
 
 
-static CURLcode rtsp_setup_connection(struct Curl_easy *data,
+static CARLcode rtsp_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
   struct RTSP *rtsp;
@@ -124,9 +124,9 @@ static CURLcode rtsp_setup_connection(struct Curl_easy *data,
 
   data->req.p.rtsp = rtsp = calloc(1, sizeof(struct RTSP));
   if(!rtsp)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
@@ -148,11 +148,11 @@ static bool rtsp_connisdead(struct connectdata *check)
     /* timeout */
     ret_val = FALSE;
   }
-  else if(sval & CURL_CSELECT_ERR) {
+  else if(sval & CARL_CSELECT_ERR) {
     /* socket is in an error state */
     ret_val = TRUE;
   }
-  else if(sval & CURL_CSELECT_IN) {
+  else if(sval & CARL_CSELECT_IN) {
     /* readable with no error. could still be closed */
     ret_val = !Curl_connalive(check);
   }
@@ -179,9 +179,9 @@ static unsigned int rtsp_conncheck(struct Curl_easy *data,
 }
 
 
-static CURLcode rtsp_connect(struct Curl_easy *data, bool *done)
+static CARLcode rtsp_connect(struct Curl_easy *data, bool *done)
 {
-  CURLcode httpStatus;
+  CARLcode httpStatus;
 
   httpStatus = Curl_http_connect(data, done);
 
@@ -196,21 +196,21 @@ static CURLcode rtsp_connect(struct Curl_easy *data, bool *done)
   return httpStatus;
 }
 
-static CURLcode rtsp_disconnect(struct Curl_easy *data,
+static CARLcode rtsp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead)
 {
   (void) dead;
   (void) data;
   Curl_safefree(conn->proto.rtspc.rtp_buf);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
-static CURLcode rtsp_done(struct Curl_easy *data,
-                          CURLcode status, bool premature)
+static CARLcode rtsp_done(struct Curl_easy *data,
+                          CARLcode status, bool premature)
 {
   struct RTSP *rtsp = data->req.p.rtsp;
-  CURLcode httpStatus;
+  CARLcode httpStatus;
 
   /* Bypass HTTP empty-reply checks on receive */
   if(data->set.rtspreq == RTSPREQ_RECEIVE)
@@ -226,7 +226,7 @@ static CURLcode rtsp_done(struct Curl_easy *data,
       failf(data,
             "The CSeq of this request %ld did not match the response %ld",
             CSeq_sent, CSeq_recv);
-      return CURLE_RTSP_CSEQ_ERROR;
+      return CARLE_RTSP_CSEQ_ERROR;
     }
     if(data->set.rtspreq == RTSPREQ_RECEIVE &&
             (data->conn->proto.rtspc.rtp_channel == -1)) {
@@ -237,15 +237,15 @@ static CURLcode rtsp_done(struct Curl_easy *data,
   return httpStatus;
 }
 
-static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
+static CARLcode rtsp_do(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   Curl_RtspReq rtspreq = data->set.rtspreq;
   struct RTSP *rtsp = data->req.p.rtsp;
   struct dynbuf req_buffer;
-  curl_off_t postsize = 0; /* for ANNOUNCE and SET_PARAMETER */
-  curl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
+  carl_off_t postsize = 0; /* for ANNOUNCE and SET_PARAMETER */
+  carl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
 
   const char *p_request = NULL;
   const char *p_session_id = NULL;
@@ -272,7 +272,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   switch(rtspreq) {
   default:
     failf(data, "Got invalid RTSP request");
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   case RTSPREQ_OPTIONS:
     p_request = "OPTIONS";
     break;
@@ -313,7 +313,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     break;
   case RTSPREQ_LAST:
     failf(data, "Got invalid RTSP request: RTSPREQ_LAST");
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
   if(rtspreq == RTSPREQ_RECEIVE) {
@@ -327,7 +327,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
      (rtspreq & ~(RTSPREQ_OPTIONS | RTSPREQ_DESCRIBE | RTSPREQ_SETUP))) {
     failf(data, "Refusing to issue an RTSP request [%s] without a session ID.",
           p_request);
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
   /* Stream URI. Default to server '*' if not specified */
@@ -349,12 +349,12 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
         aprintf("Transport: %s\r\n",
                 data->set.str[STRING_RTSP_TRANSPORT]);
       if(!data->state.aptr.rtsp_transport)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
     }
     else {
       failf(data,
             "Refusing to issue an RTSP SETUP without a Transport: header.");
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      return CARLE_BAD_FUNCTION_ARGUMENT;
     }
 
     p_transport = data->state.aptr.rtsp_transport;
@@ -374,7 +374,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
         aprintf("Accept-Encoding: %s\r\n", data->set.str[STRING_ENCODING]);
 
       if(!data->state.aptr.accept_encoding)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
 
       p_accept_encoding = data->state.aptr.accept_encoding;
     }
@@ -433,11 +433,11 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
    */
   if(Curl_checkheaders(data, "CSeq")) {
     failf(data, "CSeq cannot be set as a custom header.");
-    return CURLE_RTSP_CSEQ_ERROR;
+    return CARLE_RTSP_CSEQ_ERROR;
   }
   if(Curl_checkheaders(data, "Session")) {
     failf(data, "Session ID cannot be set as a custom header.");
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
   /* Initialize a dynamic send buffer */
@@ -515,7 +515,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     else {
       postsize = (data->state.infilesize != -1)?
         data->state.infilesize:
-        (data->set.postfields? (curl_off_t)strlen(data->set.postfields):0);
+        (data->set.postfields? (carl_off_t)strlen(data->set.postfields):0);
       data->state.httpreq = HTTPREQ_POST;
     }
 
@@ -525,7 +525,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
       if(!Curl_checkheaders(data, "Content-Length")) {
         result =
           Curl_dyn_addf(&req_buffer,
-                        "Content-Length: %" CURL_FORMAT_CURL_OFF_T"\r\n",
+                        "Content-Length: %" CARL_FORMAT_CARL_OFF_T"\r\n",
                         (data->set.upload ? putsize : postsize));
         if(result)
           return result;
@@ -591,14 +591,14 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
        noted properly */
     Curl_pgrsSetUploadCounter(data, data->req.writebytecount);
     if(Curl_pgrsUpdate(data))
-      result = CURLE_ABORTED_BY_CALLBACK;
+      result = CARLE_ABORTED_BY_CALLBACK;
   }
 
   return result;
 }
 
 
-static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
+static CARLcode rtsp_rtp_readwrite(struct Curl_easy *data,
                                    struct connectdata *conn,
                                    ssize_t *nread,
                                    bool *readmore) {
@@ -608,7 +608,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
   char *rtp; /* moving pointer to rtp data */
   ssize_t rtp_dataleft; /* how much data left to parse in this round */
   char *scratch;
-  CURLcode result;
+  CARLcode result;
 
   if(rtspc->rtp_buf) {
     /* There was some leftover data the last time. Merge buffers */
@@ -617,7 +617,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
     if(!newptr) {
       rtspc->rtp_buf = NULL;
       rtspc->rtp_bufsize = 0;
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
     rtspc->rtp_buf = newptr;
     memcpy(rtspc->rtp_buf + rtspc->rtp_bufsize, k->str, *nread);
@@ -690,7 +690,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
       Curl_safefree(rtspc->rtp_buf);
       rtspc->rtp_buf = NULL;
       rtspc->rtp_bufsize = 0;
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
     memcpy(scratch, rtp, rtp_dataleft);
     Curl_safefree(rtspc->rtp_buf);
@@ -699,7 +699,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
 
     /* As far as the transfer is concerned, this data is consumed */
     *nread = 0;
-    return CURLE_OK;
+    return CARLE_OK;
   }
   /* Fix up k->str to point just after the last RTP packet */
   k->str += *nread - rtp_dataleft;
@@ -719,24 +719,24 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
   rtspc->rtp_buf = NULL;
   rtspc->rtp_bufsize = 0;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static
-CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
+CARLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
 {
   size_t wrote;
-  curl_write_callback writeit;
+  carl_write_callback writeit;
   void *user_ptr;
 
   if(len == 0) {
     failf(data, "Cannot write a 0 size RTP packet.");
-    return CURLE_WRITE_ERROR;
+    return CARLE_WRITE_ERROR;
   }
 
-  /* If the user has configured CURLOPT_INTERLEAVEFUNCTION then use that
-     function and any configured CURLOPT_INTERLEAVEDATA to write out the RTP
-     data. Otherwise, use the CURLOPT_WRITEFUNCTION with the CURLOPT_WRITEDATA
+  /* If the user has configured CARLOPT_INTERLEAVEFUNCTION then use that
+     function and any configured CARLOPT_INTERLEAVEDATA to write out the RTP
+     data. Otherwise, use the CARLOPT_WRITEFUNCTION with the CARLOPT_WRITEDATA
      pointer to write out the RTP data. */
   if(data->set.fwrite_rtp) {
     writeit = data->set.fwrite_rtp;
@@ -751,20 +751,20 @@ CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
   wrote = writeit(ptr, 1, len, user_ptr);
   Curl_set_in_callback(data, false);
 
-  if(CURL_WRITEFUNC_PAUSE == wrote) {
+  if(CARL_WRITEFUNC_PAUSE == wrote) {
     failf(data, "Cannot pause RTP");
-    return CURLE_WRITE_ERROR;
+    return CARLE_WRITE_ERROR;
   }
 
   if(wrote != len) {
     failf(data, "Failed writing RTP data");
-    return CURLE_WRITE_ERROR;
+    return CARLE_WRITE_ERROR;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
+CARLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
 {
   long CSeq = 0;
 
@@ -778,7 +778,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
     }
     else {
       failf(data, "Unable to read the CSeq header: [%s]", header);
-      return CURLE_RTSP_CSEQ_ERROR;
+      return CARLE_RTSP_CSEQ_ERROR;
     }
   }
   else if(checkprefix("Session:", header)) {
@@ -793,7 +793,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
 
     if(!*start) {
       failf(data, "Got a blank Session ID");
-      return CURLE_RTSP_SESSION_ERROR;
+      return CARLE_RTSP_SESSION_ERROR;
     }
 
     /* Find the end of Session ID
@@ -814,7 +814,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
          strncmp(start, data->set.str[STRING_RTSP_SESSION_ID], idlen) != 0) {
         failf(data, "Got RTSP Session ID Line [%s], but wanted ID [%s]",
               start, data->set.str[STRING_RTSP_SESSION_ID]);
-        return CURLE_RTSP_SESSION_ERROR;
+        return CARLE_RTSP_SESSION_ERROR;
       }
     }
     else {
@@ -825,12 +825,12 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
       /* Copy the id substring into a new buffer */
       data->set.str[STRING_RTSP_SESSION_ID] = malloc(idlen + 1);
       if(data->set.str[STRING_RTSP_SESSION_ID] == NULL)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
       memcpy(data->set.str[STRING_RTSP_SESSION_ID], start, idlen);
       (data->set.str[STRING_RTSP_SESSION_ID])[idlen] = '\0';
     }
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-#endif /* CURL_DISABLE_RTSP or using Hyper */
+#endif /* CARL_DISABLE_RTSP or using Hyper */

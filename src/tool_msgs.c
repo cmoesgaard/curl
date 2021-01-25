@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_msgs.h"
@@ -32,7 +32,7 @@
 
 #define WARN_PREFIX "Warning: "
 #define NOTE_PREFIX "Note: "
-#define ERROR_PREFIX "curl: "
+#define ERROR_PREFIX "carl: "
 
 static void voutf(struct GlobalConfig *config,
                   const char *prefix,
@@ -45,7 +45,7 @@ static void voutf(struct GlobalConfig *config,
     char *ptr;
     char *print_buffer;
 
-    print_buffer = curlx_mvaprintf(fmt, ap);
+    print_buffer = carlx_mvaprintf(fmt, ap);
     if(!print_buffer)
       return;
     len = strlen(print_buffer);
@@ -75,7 +75,7 @@ static void voutf(struct GlobalConfig *config,
         len = 0;
       }
     }
-    curl_free(print_buffer);
+    carl_free(print_buffer);
   }
 }
 
@@ -113,13 +113,13 @@ void helpf(FILE *errors, const char *fmt, ...)
   if(fmt) {
     va_list ap;
     va_start(ap, fmt);
-    fputs("curl: ", errors); /* prefix it */
+    fputs("carl: ", errors); /* prefix it */
     vfprintf(errors, fmt, ap);
     va_end(ap);
   }
-  fprintf(errors, "curl: try 'curl --help' "
+  fprintf(errors, "carl: try 'carl --help' "
 #ifdef USE_MANUAL
-          "or 'curl --manual' "
+          "or 'carl --manual' "
 #endif
           "for more information\n");
 }

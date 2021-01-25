@@ -2,10 +2,10 @@ Long: config
 Arg: <file>
 Help: Read config from a file
 Short: K
-Category: curl
+Category: carl
 ---
 
-Specify a text file to read curl arguments from. The command line arguments
+Specify a text file to read carl arguments from. The command line arguments
 found in the text file will be used as if they were provided on the command
 line.
 
@@ -23,19 +23,19 @@ preceding any other letter is ignored. If the first column of a config line is
 a '#' character, the rest of the line will be treated as a comment. Only write
 one option per physical line in the config file.
 
-Specify the filename to --config as '-' to make curl read the file from stdin.
+Specify the filename to --config as '-' to make carl read the file from stdin.
 
 Note that to be able to specify a URL in the config file, you need to specify
 it using the --url option, and not by simply writing the URL on its own
 line. So, it could look similar to this:
 
-url = "https://curl.se/docs/"
+url = "https://carl.se/docs/"
 
-When curl is invoked, it (unless --disable is used) checks for a default
+When carl is invoked, it (unless --disable is used) checks for a default
 config file and uses it if found. The default config file is checked for in
 the following places in this order:
 
-1) Use the CURL_HOME environment variable if set
+1) Use the CARL_HOME environment variable if set
 
 2) Use the XDG_CONFIG_HOME environment variable if set (Added in 7.73.0)
 
@@ -47,15 +47,15 @@ the following places in this order:
 
 6) Windows: use "USERPROFILE\Application Data" if set
 
-7) On windows, if there is no .curlrc file in the home dir, it checks for one
-in the same dir the curl executable is placed. On Unix-like systems, it will
-simply try to load .curlrc from the determined home dir.
+7) On windows, if there is no .carlrc file in the home dir, it checks for one
+in the same dir the carl executable is placed. On Unix-like systems, it will
+simply try to load .carlrc from the determined home dir.
 
 .nf
 # --- Example file ---
 # this is a comment
 url = "example.com"
-output = "curlhere.html"
+output = "carlhere.html"
 user-agent = "superagent/1.0"
 
 # and fetch another URL too

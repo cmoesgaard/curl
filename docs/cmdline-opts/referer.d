@@ -8,7 +8,7 @@ Category: http
 ---
 Sends the "Referrer Page" information to the HTTP server. This can also be set
 with the --header flag of course.  When used with --location you can append
-";auto" to the --referer URL to make curl automatically set the previous URL
+";auto" to the --referer URL to make carl automatically set the previous URL
 when it follows a Location: header. The \&";auto" string can be used alone,
 even if you don't set an initial --referer.
 

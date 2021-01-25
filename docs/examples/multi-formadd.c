@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,72 +28,72 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(void)
 {
-  CURL *curl;
+  CARL *carl;
 
-  CURLM *multi_handle;
+  CARLM *multi_handle;
   int still_running = 0;
 
-  struct curl_httppost *formpost = NULL;
-  struct curl_httppost *lastptr = NULL;
-  struct curl_slist *headerlist = NULL;
+  struct carl_httppost *formpost = NULL;
+  struct carl_httppost *lastptr = NULL;
+  struct carl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
 
-  /* Fill in the file upload field. This makes libcurl load data from
-     the given file name when curl_easy_perform() is called. */
-  curl_formadd(&formpost,
+  /* Fill in the file upload field. This makes libcarl load data from
+     the given file name when carl_easy_perform() is called. */
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "sendfile",
-               CURLFORM_FILE, "postit2.c",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "sendfile",
+               CARLFORM_FILE, "postit2.c",
+               CARLFORM_END);
 
   /* Fill in the filename field */
-  curl_formadd(&formpost,
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "filename",
-               CURLFORM_COPYCONTENTS, "postit2.c",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "filename",
+               CARLFORM_COPYCONTENTS, "postit2.c",
+               CARLFORM_END);
 
   /* Fill in the submit field too, even if this is rarely needed */
-  curl_formadd(&formpost,
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "submit",
-               CURLFORM_COPYCONTENTS, "send",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "submit",
+               CARLFORM_COPYCONTENTS, "send",
+               CARLFORM_END);
 
-  curl = curl_easy_init();
-  multi_handle = curl_multi_init();
+  carl = carl_easy_init();
+  multi_handle = carl_multi_init();
 
   /* initialize custom header list (stating that Expect: 100-continue is not
      wanted */
-  headerlist = curl_slist_append(headerlist, buf);
-  if(curl && multi_handle) {
+  headerlist = carl_slist_append(headerlist, buf);
+  if(carl && multi_handle) {
 
     /* what URL that receives this POST */
-    curl_easy_setopt(curl, CURLOPT_URL, "https://www.example.com/upload.cgi");
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_URL, "https://www.example.com/upload.cgi");
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+    carl_easy_setopt(carl, CARLOPT_HTTPHEADER, headerlist);
+    carl_easy_setopt(carl, CARLOPT_HTTPPOST, formpost);
 
-    curl_multi_add_handle(multi_handle, curl);
+    carl_multi_add_handle(multi_handle, carl);
 
-    curl_multi_perform(multi_handle, &still_running);
+    carl_multi_perform(multi_handle, &still_running);
 
     while(still_running) {
       struct timeval timeout;
       int rc; /* select() return code */
-      CURLMcode mc; /* curl_multi_fdset() return code */
+      CARLMcode mc; /* carl_multi_fdset() return code */
 
       fd_set fdread;
       fd_set fdwrite;
       fd_set fdexcep;
       int maxfd = -1;
 
-      long curl_timeo = -1;
+      long carl_timeo = -1;
 
       FD_ZERO(&fdread);
       FD_ZERO(&fdwrite);
@@ -103,20 +103,20 @@ int main(void)
       timeout.tv_sec = 1;
       timeout.tv_usec = 0;
 
-      curl_multi_timeout(multi_handle, &curl_timeo);
-      if(curl_timeo >= 0) {
-        timeout.tv_sec = curl_timeo / 1000;
+      carl_multi_timeout(multi_handle, &carl_timeo);
+      if(carl_timeo >= 0) {
+        timeout.tv_sec = carl_timeo / 1000;
         if(timeout.tv_sec > 1)
           timeout.tv_sec = 1;
         else
-          timeout.tv_usec = (curl_timeo % 1000) * 1000;
+          timeout.tv_usec = (carl_timeo % 1000) * 1000;
       }
 
       /* get file descriptors from the transfers */
-      mc = curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+      mc = carl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-      if(mc != CURLM_OK) {
-        fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+      if(mc != CARLM_OK) {
+        fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
         break;
       }
 
@@ -124,7 +124,7 @@ int main(void)
          select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
          no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
          to sleep 100ms, which is the minimum suggested value in the
-         curl_multi_fdset() doc. */
+         carl_multi_fdset() doc. */
 
       if(maxfd == -1) {
 #ifdef _WIN32
@@ -150,22 +150,22 @@ int main(void)
       default:
         /* timeout or readable/writable sockets */
         printf("perform!\n");
-        curl_multi_perform(multi_handle, &still_running);
+        carl_multi_perform(multi_handle, &still_running);
         printf("running: %d!\n", still_running);
         break;
       }
     }
 
-    curl_multi_cleanup(multi_handle);
+    carl_multi_cleanup(multi_handle);
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
 
     /* then cleanup the formpost chain */
-    curl_formfree(formpost);
+    carl_formfree(formpost);
 
     /* free slist */
-    curl_slist_free_all(headerlist);
+    carl_slist_free_all(headerlist);
   }
   return 0;
 }

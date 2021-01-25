@@ -1,20 +1,20 @@
 # Ciphers
 
-With curl's options
-[`CURLOPT_SSL_CIPHER_LIST`](https://curl.se/libcurl/c/CURLOPT_SSL_CIPHER_LIST.html)
+With carl's options
+[`CARLOPT_SSL_CIPHER_LIST`](https://carl.se/libcarl/c/CARLOPT_SSL_CIPHER_LIST.html)
 and
-[`--ciphers`](https://curl.se/docs/manpage.html#--ciphers)
+[`--ciphers`](https://carl.se/docs/manpage.html#--ciphers)
 users can control which ciphers to consider when negotiating TLS connections.
 
-TLS 1.3 ciphers are supported since curl 7.61 for OpenSSL 1.1.1+ with options
-[`CURLOPT_TLS13_CIPHERS`](https://curl.se/libcurl/c/CURLOPT_TLS13_CIPHERS.html)
+TLS 1.3 ciphers are supported since carl 7.61 for OpenSSL 1.1.1+ with options
+[`CARLOPT_TLS13_CIPHERS`](https://carl.se/libcarl/c/CARLOPT_TLS13_CIPHERS.html)
 and
-[`--tls13-ciphers`](https://curl.se/docs/manpage.html#--tls13-ciphers)
+[`--tls13-ciphers`](https://carl.se/docs/manpage.html#--tls13-ciphers)
 . If you are using a different SSL backend you can try setting TLS 1.3 cipher
 suites by using the respective regular cipher option.
 
 The names of the known ciphers differ depending on which TLS backend that
-libcurl was built to use. This is an attempt to list known cipher names.
+libcarl was built to use. This is an attempt to list known cipher names.
 
 ## OpenSSL
 
@@ -156,7 +156,7 @@ When specifying multiple cipher names, separate them with colon (`:`).
 
 ### TLS 1.3 cipher suites
 
-(Note these ciphers are set with `CURLOPT_TLS13_CIPHERS` and `--tls13-ciphers`)
+(Note these ciphers are set with `CARLOPT_TLS13_CIPHERS` and `--tls13-ciphers`)
 
 `TLS_AES_256_GCM_SHA384`
 `TLS_CHACHA20_POLY1305_SHA256`
@@ -280,7 +280,7 @@ When specifying multiple cipher names, separate them with colon (`:`).
 
 Ciphers are internally defined as
 [numeric codes](https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_73/apis/gsk_attribute_set_buffer.htm),
-but libcurl maps them to the following case-insensitive names.
+but libcarl maps them to the following case-insensitive names.
 
 ### SSL2 cipher suites (insecure: disabled by default)
 
@@ -463,8 +463,8 @@ Microsoft.
 
 There is also the case that the selected algorithm is not supported by the
 protocol or does not match the ciphers offered by the server during the SSL
-negotiation. In this case curl will return error
-`CURLE_SSL_CONNECT_ERROR (35) SEC_E_ALGORITHM_MISMATCH`
+negotiation. In this case carl will return error
+`CARLE_SSL_CONNECT_ERROR (35) SEC_E_ALGORITHM_MISMATCH`
 and the request will fail.
 
 `CALG_MD2`,

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,16 +20,16 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "vauth.h"
-#include "curl_multibyte.h"
-#include "curl_printf.h"
+#include "carl_multibyte.h"
+#include "carl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -89,7 +89,7 @@ TCHAR *Curl_auth_build_spn(const char *service, const char *host,
   }
 
   /* Allocate our TCHAR based SPN */
-  tchar_spn = curlx_convert_UTF8_to_tchar(utf8_spn);
+  tchar_spn = carlx_convert_UTF8_to_tchar(utf8_spn);
   if(!tchar_spn) {
     free(utf8_spn);
 
@@ -97,7 +97,7 @@ TCHAR *Curl_auth_build_spn(const char *service, const char *host,
   }
 
   /* Release the UTF8 variant when operating with Unicode */
-  curlx_unicodefree(utf8_spn);
+  carlx_unicodefree(utf8_spn);
 
   /* Return our newly allocated SPN */
   return tchar_spn;
@@ -111,7 +111,7 @@ TCHAR *Curl_auth_build_spn(const char *service, const char *host,
  * follows:
  *
  * Domain\User (Down-level Logon Name)
- * Domain/User (curl Down-level format - for compatibility with existing code)
+ * Domain/User (carl Down-level format - for compatibility with existing code)
  * User@Domain (User Principal Name)
  *
  * Note: The user name may be empty when using a GSS-API library or Windows

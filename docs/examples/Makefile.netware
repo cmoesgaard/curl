@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 ###########################################################################
 #################################################################
 #
-## Makefile for building curl.nlm (NetWare version - gnu make)
+## Makefile for building carl.nlm (NetWare version - gnu make)
 ## Use: make -f Makefile.netware
 ##
 ## Comments to: Guenter Knauf
@@ -69,14 +69,14 @@ LIBCARES_PATH = ../../ares
 endif
 
 ifndef INSTDIR
-INSTDIR = ..$(DS)..$(DS)curl-$(LIBCURL_VERSION_STR)-bin-nw
+INSTDIR = ..$(DS)..$(DS)carl-$(LIBCARL_VERSION_STR)-bin-nw
 endif
 
 # Edit the vars below to change NLM target settings.
 TARGET  = examples
-VERSION = $(LIBCURL_VERSION)
-COPYR   = Copyright (C) $(LIBCURL_COPYRIGHT_STR)
-DESCR   = curl ($(LIBARCH))
+VERSION = $(LIBCARL_VERSION)
+COPYR   = Copyright (C) $(LIBCARL_COPYRIGHT_STR)
+DESCR   = carl ($(LIBARCH))
 MTSAFE  = YES
 STACK   = 8192
 SCREEN  = Example Program
@@ -91,7 +91,7 @@ ifndef LIBARCH
 LIBARCH = LIBC
 endif
 
-# must be equal to NDEBUG or DEBUG, CURLDEBUG
+# must be equal to NDEBUG or DEBUG, CARLDEBUG
 ifndef DB
 DB = NDEBUG
 endif
@@ -130,7 +130,7 @@ MPKXDC = mkxdc
 # LIBARCH_U = $(shell $(AWK) 'BEGIN {print toupper(ARGV[1])}' $(LIBARCH))
 LIBARCH_L = $(shell $(AWK) 'BEGIN {print tolower(ARGV[1])}' $(LIBARCH))
 
-# Include the version info retrieved from curlver.h
+# Include the version info retrieved from carlver.h
 -include $(OBJDIR)/version.inc
 
 # Global flags for all compilers
@@ -192,10 +192,10 @@ endif
 ifndef NDK_LDAP
 NDK_LDAP = $(NDK_ROOT)/cldapsdk/netware
 endif
-CURL_INC = ../../include
-CURL_LIB = ../../lib
+CARL_INC = ../../include
+CARL_LIB = ../../lib
 
-INCLUDES = -I$(CURL_INC)
+INCLUDES = -I$(CARL_INC)
 
 ifeq ($(findstring -static,$(CFG)),-static)
 LINK_STATIC = 1
@@ -227,13 +227,13 @@ ENABLE_IPV6 = 1
 endif
 
 ifdef LINK_STATIC
-  LDLIBS = $(CURL_LIB)/libcurl.$(LIBEXT)
+  LDLIBS = $(CARL_LIB)/libcarl.$(LIBEXT)
 ifdef WITH_ARES
   LDLIBS += $(LIBCARES_PATH)/libcares.$(LIBEXT)
 endif
 else
-  MODULES = libcurl.nlm
-  IMPORTS = @$(CURL_LIB)/libcurl.imp
+  MODULES = libcarl.nlm
+  IMPORTS = @$(CARL_LIB)/libcarl.imp
 endif
 ifdef WITH_SSH2
   # INCLUDES += -I$(LIBSSH2_PATH)/include
@@ -321,7 +321,7 @@ $(OBJDIR)/%.o: %.c
 	@echo Compiling $<
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/version.inc: $(CURL_INC)/curl/curlver.h $(OBJDIR)
+$(OBJDIR)/version.inc: $(CARL_INC)/carl/carlver.h $(OBJDIR)
 	@echo Creating $@
 	@$(AWK) -f ../../packages/NetWare/get_ver.awk $< > $@
 

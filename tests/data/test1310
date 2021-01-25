@@ -66,21 +66,21 @@ HTTP with NTLM delegation to winbind helper
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 # set path to fake_auth instead of real ntlm_auth to generate NTLM type1 and type 3 messages
-CURL_NTLM_WB_FILE=%PWD/server/fake_ntlm
+CARL_NTLM_WB_FILE=%PWD/server/fake_ntlm
 # set source directory so fake_ntlm can find the test files
-CURL_NTLM_AUTH_SRCDIR=%SRCDIR
+CARL_NTLM_AUTH_SRCDIR=%SRCDIR
 # set the test number
-CURL_NTLM_AUTH_TESTNUM=1310
+CARL_NTLM_AUTH_TESTNUM=1310
  </setenv>
  <command>
 http://%HOSTIP:%HTTPPORT/1310 -u testuser:anypasswd --ntlm-wb
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 
@@ -90,13 +90,13 @@ chkhostname curlhost
 GET /1310 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAA
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /1310 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: NTLM TlRMTVNTUAADAAAAGAAYAE8AAAAYABgAZwAAAAAAAABAAAAACAAIAEAAAAAHAAcASAAAAAAAAAAAAAAAggEAAHRlc3R1c2VyVU5LTk9XTlpkQwKRCZFMhjj0tw47wEjKHRHlvzfxQamFcheMuv8v+xeqphEO5V41xRd7R9deOQ==
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

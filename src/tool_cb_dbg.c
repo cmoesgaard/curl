@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_convert.h"
@@ -35,13 +35,13 @@
 
 static void dump(const char *timebuf, const char *text,
                  FILE *stream, const unsigned char *ptr, size_t size,
-                 trace tracetype, curl_infotype infotype);
+                 trace tracetype, carl_infotype infotype);
 
 /*
-** callback for CURLOPT_DEBUGFUNCTION
+** callback for CARLOPT_DEBUGFUNCTION
 */
 
-int tool_debug_cb(CURL *handle, curl_infotype type,
+int tool_debug_cb(CARL *handle, carl_infotype type,
                   char *data, size_t size,
                   void *userdata)
 {
@@ -96,7 +96,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
 
   if(config->tracetype == TRACE_PLAIN) {
     /*
-     * This is the trace look that is similar to what libcurl makes on its
+     * This is the trace look that is similar to what libcarl makes on its
      * own.
      */
     static const char * const s_infotype[] = {
@@ -106,7 +106,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
     static bool traced_data = FALSE;
 
     switch(type) {
-    case CURLINFO_HEADER_OUT:
+    case CARLINFO_HEADER_OUT:
       if(size > 0) {
         size_t st = 0;
         size_t i;
@@ -127,18 +127,18 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
       newl = (size && (data[size - 1] != '\n')) ? TRUE : FALSE;
       traced_data = FALSE;
       break;
-    case CURLINFO_TEXT:
-    case CURLINFO_HEADER_IN:
+    case CARLINFO_TEXT:
+    case CARLINFO_HEADER_IN:
       if(!newl)
         fprintf(output, "%s%s ", timebuf, s_infotype[type]);
       (void)fwrite(data, size, 1, output);
       newl = (size && (data[size - 1] != '\n')) ? TRUE : FALSE;
       traced_data = FALSE;
       break;
-    case CURLINFO_DATA_OUT:
-    case CURLINFO_DATA_IN:
-    case CURLINFO_SSL_DATA_IN:
-    case CURLINFO_SSL_DATA_OUT:
+    case CARLINFO_DATA_OUT:
+    case CARLINFO_DATA_IN:
+    case CARLINFO_SSL_DATA_IN:
+    case CARLINFO_SSL_DATA_OUT:
       if(!traced_data) {
         /* if the data is output to a tty and we're sending this debug trace
            to stderr or stdout, we don't display the alert about the data not
@@ -162,12 +162,12 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
     return 0;
   }
 
-#ifdef CURL_DOES_CONVERSIONS
-  /* Special processing is needed for CURLINFO_HEADER_OUT blocks
+#ifdef CARL_DOES_CONVERSIONS
+  /* Special processing is needed for CARLINFO_HEADER_OUT blocks
    * if they contain both headers and data (separated by CRLFCRLF).
-   * We dump the header text and then switch type to CURLINFO_DATA_OUT.
+   * We dump the header text and then switch type to CARLINFO_DATA_OUT.
    */
-  if((type == CURLINFO_HEADER_OUT) && (size > 4)) {
+  if((type == CARLINFO_HEADER_OUT) && (size > 4)) {
     size_t i;
     for(i = 0; i < size - 4; i++) {
       if(memcmp(&data[i], "\r\n\r\n", 4) == 0) {
@@ -177,37 +177,37 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
              config->tracetype, type);
         data += i + 3;
         size -= i + 4;
-        type = CURLINFO_DATA_OUT;
+        type = CARLINFO_DATA_OUT;
         data += 1;
         break;
       }
     }
   }
-#endif /* CURL_DOES_CONVERSIONS */
+#endif /* CARL_DOES_CONVERSIONS */
 
   switch(type) {
-  case CURLINFO_TEXT:
+  case CARLINFO_TEXT:
     fprintf(output, "%s== Info: %.*s", timebuf, (int)size, data);
     /* FALLTHROUGH */
   default: /* in case a new one is introduced to shock us */
     return 0;
 
-  case CURLINFO_HEADER_OUT:
+  case CARLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
-  case CURLINFO_DATA_OUT:
+  case CARLINFO_DATA_OUT:
     text = "=> Send data";
     break;
-  case CURLINFO_HEADER_IN:
+  case CARLINFO_HEADER_IN:
     text = "<= Recv header";
     break;
-  case CURLINFO_DATA_IN:
+  case CARLINFO_DATA_IN:
     text = "<= Recv data";
     break;
-  case CURLINFO_SSL_DATA_IN:
+  case CARLINFO_SSL_DATA_IN:
     text = "<= Recv SSL data";
     break;
-  case CURLINFO_SSL_DATA_OUT:
+  case CARLINFO_SSL_DATA_OUT:
     text = "=> Send SSL data";
     break;
   }
@@ -219,7 +219,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
 
 static void dump(const char *timebuf, const char *text,
                  FILE *stream, const unsigned char *ptr, size_t size,
-                 trace tracetype, curl_infotype infotype)
+                 trace tracetype, carl_infotype infotype)
 {
   size_t i;
   size_t c;
@@ -253,7 +253,7 @@ static void dump(const char *timebuf, const char *text,
         i += (c + 2 - width);
         break;
       }
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
       /* repeat the 0D0A check above but use the host encoding for CRLF */
       if((tracetype == TRACE_ASCII) &&
          (i + c + 1 < size) && (ptr[i + c] == '\r') &&
@@ -267,7 +267,7 @@ static void dump(const char *timebuf, const char *text,
       (void)infotype;
       fprintf(stream, "%c", ((ptr[i + c] >= 0x20) && (ptr[i + c] < 0x80)) ?
               ptr[i + c] : UNPRINTABLE_CHAR);
-#endif /* CURL_DOES_CONVERSIONS */
+#endif /* CARL_DOES_CONVERSIONS */
       /* check again for 0D0A, to avoid an extra \n if it's at width */
       if((tracetype == TRACE_ASCII) &&
          (i + c + 2 < size) && (ptr[i + c + 1] == 0x0D) &&

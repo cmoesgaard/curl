@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,38 +26,38 @@
 int test(char *URL)
 {
   long unmet;
-  CURL *curl = NULL;
+  CARL *carl = NULL;
   int res = 0;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_HEADER, 1L);
-  easy_setopt(curl, CURLOPT_TIMECONDITION, (long)CURL_TIMECOND_IFMODSINCE);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_HEADER, 1L);
+  easy_setopt(carl, CARLOPT_TIMECONDITION, (long)CARL_TIMECOND_IFMODSINCE);
 
   /* TIMEVALUE in the future */
-  easy_setopt(curl, CURLOPT_TIMEVALUE, 1566210680L);
+  easy_setopt(carl, CARLOPT_TIMEVALUE, 1566210680L);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
-  curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &unmet);
+  carl_easy_getinfo(carl, CARLINFO_CONDITION_UNMET, &unmet);
   if(unmet != 1L) {
     res = TEST_ERR_FAILURE; /* not correct */
     goto test_cleanup;
   }
 
   /* TIMEVALUE in the past */
-  easy_setopt(curl, CURLOPT_TIMEVALUE, 1L);
+  easy_setopt(carl, CARLOPT_TIMEVALUE, 1L);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
-  curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &unmet);
+  carl_easy_getinfo(carl, CARLINFO_CONDITION_UNMET, &unmet);
   if(unmet != 0L) {
     res = TEST_ERR_FAILURE; /* not correct */
     goto test_cleanup;
@@ -68,8 +68,8 @@ int test(char *URL)
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

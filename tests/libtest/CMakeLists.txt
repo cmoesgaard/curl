@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -27,16 +27,16 @@ function(setup_test TEST_NAME)          # ARGN are the files in the test
   string(TOUPPER ${TEST_NAME} UPPER_TEST_NAME)
 
   include_directories(
-    ${CURL_SOURCE_DIR}/lib          # To be able to reach "curl_setup_once.h"
-    ${CURL_BINARY_DIR}/lib          # To be able to reach "curl_config.h"
-    ${CURL_BINARY_DIR}/include      # To be able to reach "curl/curl.h"
-    ${CURL_SOURCE_DIR}/tests/libtest # To be able to build generated tests
+    ${CARL_SOURCE_DIR}/lib          # To be able to reach "carl_setup_once.h"
+    ${CARL_BINARY_DIR}/lib          # To be able to reach "carl_config.h"
+    ${CARL_BINARY_DIR}/include      # To be able to reach "carl/carl.h"
+    ${CARL_SOURCE_DIR}/tests/libtest # To be able to build generated tests
     )
   if(USE_ARES)
     include_directories(${CARES_INCLUDE_DIR})
   endif()
 
-  target_link_libraries(${TEST_NAME} libcurl ${CURL_LIBS})
+  target_link_libraries(${TEST_NAME} libcarl ${CARL_LIBS})
 
   set_target_properties(${TEST_NAME}
     PROPERTIES COMPILE_DEFINITIONS ${UPPER_TEST_NAME})
@@ -65,19 +65,19 @@ if(NOT WIN32)
   # library at (tests)/libtest/.libs/libhostname.so
   set_target_properties(hostname PROPERTIES
       LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/.libs)
-  if(HIDES_CURL_PRIVATE_SYMBOLS)
-    set_property(TARGET hostname APPEND PROPERTY COMPILE_DEFINITIONS "CURL_HIDDEN_SYMBOLS")
-    set_property(TARGET hostname APPEND PROPERTY COMPILE_FLAGS ${CURL_CFLAG_SYMBOLS_HIDE})
+  if(HIDES_CARL_PRIVATE_SYMBOLS)
+    set_property(TARGET hostname APPEND PROPERTY COMPILE_DEFINITIONS "CARL_HIDDEN_SYMBOLS")
+    set_property(TARGET hostname APPEND PROPERTY COMPILE_FLAGS ${CARL_CFLAG_SYMBOLS_HIDE})
   endif()
 endif()
 
 add_custom_command(
   OUTPUT lib1521.c
-  COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/mk-lib1521.pl < ${CURL_SOURCE_DIR}/include/curl/curl.h > lib1521.c
+  COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/mk-lib1521.pl < ${CARL_SOURCE_DIR}/include/carl/carl.h > lib1521.c
   DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/mk-lib1521.pl"
-    "${CURL_SOURCE_DIR}/include/curl/curl.h"
+    "${CARL_SOURCE_DIR}/include/carl/carl.h"
   VERBATIM)
 
 set_property(TARGET chkdecimalpoint
-  APPEND PROPERTY COMPILE_DEFINITIONS "CURLX_NO_MEMORY_CALLBACKS;CURL_STATICLIB")
+  APPEND PROPERTY COMPILE_DEFINITIONS "CARLX_NO_MEMORY_CALLBACKS;CARL_STATICLIB")

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,36 +20,36 @@
  *
  ***************************************************************************/
 /* <DESC>
- * Uses the CURLINFO_TLS_SESSION data.
+ * Uses the CARLINFO_TLS_SESSION data.
  * </DESC>
  */
 
-/* Note that this example currently requires curl to be linked against
+/* Note that this example currently requires carl to be linked against
    GnuTLS (and this program must also be linked against -lgnutls). */
 
 #include <stdio.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-static CURL *curl;
+static CARL *carl;
 
 static size_t wrfu(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-  const struct curl_tlssessioninfo *info;
+  const struct carl_tlssessioninfo *info;
   unsigned int cert_list_size;
   const gnutls_datum_t *chainp;
-  CURLcode res;
+  CARLcode res;
 
   (void)stream;
   (void)ptr;
 
-  res = curl_easy_getinfo(curl, CURLINFO_TLS_SESSION, &info);
+  res = carl_easy_getinfo(carl, CARLINFO_TLS_SESSION, &info);
 
   if(!res) {
     switch(info->backend) {
-    case CURLSSLBACKEND_GNUTLS:
+    case CARLSSLBACKEND_GNUTLS:
       /* info->internals is now the gnutls_session_t */
       chainp = gnutls_certificate_get_peers(info->internals, &cert_list_size);
       if((chainp) && (cert_list_size)) {
@@ -75,7 +75,7 @@ static size_t wrfu(void *ptr, size_t size, size_t nmemb, void *stream)
         }
       }
       break;
-    case CURLSSLBACKEND_NONE:
+    case CARLSSLBACKEND_NONE:
     default:
       break;
     }
@@ -86,25 +86,25 @@ static size_t wrfu(void *ptr, size_t size, size_t nmemb, void *stream)
 
 int main(void)
 {
-  curl_global_init(CURL_GLOBAL_DEFAULT);
+  carl_global_init(CARL_GLOBAL_DEFAULT);
 
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://www.example.com/");
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_URL, "https://www.example.com/");
 
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, wrfu);
+    carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, wrfu);
 
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    carl_easy_setopt(carl, CARLOPT_SSL_VERIFYPEER, 0L);
+    carl_easy_setopt(carl, CARLOPT_SSL_VERIFYHOST, 0L);
 
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 0L);
 
-    (void) curl_easy_perform(curl);
+    (void) carl_easy_perform(carl);
 
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return 0;
 }

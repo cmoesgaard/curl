@@ -1,0 +1,74 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_easy_perform 3 "5 Mar 2001" "libcarl 7.7" "libcarl Manual"
+.SH NAME
+carl_easy_perform - perform a blocking file transfer
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "CARLcode carl_easy_perform(CARL *" easy_handle ");"
+.ad
+.SH DESCRIPTION
+Invoke this function after \fIcarl_easy_init(3)\fP and all the
+\fIcarl_easy_setopt(3)\fP calls are made, and will perform the transfer as
+described in the options. It must be called with the same \fBeasy_handle\fP as
+input as the \fIcarl_easy_init(3)\fP call returned.
+
+\fIcarl_easy_perform(3)\fP performs the entire request in a blocking manner
+and returns when done, or if it failed. For non-blocking behavior, see
+\fIcarl_multi_perform(3)\fP.
+
+You can do any amount of calls to \fIcarl_easy_perform(3)\fP while using the
+same \fBeasy_handle\fP. If you intend to transfer more than one file, you are
+even encouraged to do so. libcarl will then attempt to re-use the same
+connection for the following transfers, thus making the operations faster,
+less CPU intense and using less network resources. Just note that you will
+have to use \fIcarl_easy_setopt(3)\fP between the invokes to set options for
+the following carl_easy_perform.
+
+You must never call this function simultaneously from two places using the
+same \fBeasy_handle\fP. Let the function return first before invoking it
+another time. If you want parallel transfers, you must use several carl
+easy_handles.
+
+While the \fBeasy_handle\fP is added to a multi handle, it cannot be used by
+\fIcarl_easy_perform(3)\fP.
+.SH RETURN VALUE
+CARLE_OK (0) means everything was ok, non-zero means an error occurred as
+.I <carl/carl.h>
+defines - see \fIlibcarl-errors(3)\fP. If the \fICARLOPT_ERRORBUFFER(3)\fP was
+set with \fIcarl_easy_setopt(3)\fP there will be a readable error message in
+the error buffer when non-zero is returned.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode res;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+  res = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH "SEE ALSO"
+.BR carl_easy_init "(3), " carl_easy_setopt "(3), "
+.BR carl_multi_add_handle "(3), " carl_multi_perform "(3), "
+.BR libcarl-errors "(3), "

@@ -1,7 +1,7 @@
 <testcase>
 <info>
 <keywords>
-CURLINFO_SIZE_UPLOAD
+CARLINFO_SIZE_UPLOAD
 </keywords>
 </info>
 
@@ -33,7 +33,7 @@ lib1522
 </tool>
 
 <name>
-CURLINFO_SIZE_UPLOAD with small SO_SNDBUF
+CARLINFO_SIZE_UPLOAD with small SO_SNDBUF
 </name>
 
 <command>

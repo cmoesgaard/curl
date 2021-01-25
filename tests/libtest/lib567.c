@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,42 +28,42 @@
  */
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
-  struct curl_slist *custom_headers = NULL;
+  CARLcode res;
+  CARL *carl;
+  struct carl_slist *custom_headers = NULL;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* Dump data to stdout for protocol verification */
-  test_setopt(curl, CURLOPT_HEADERDATA, stdout);
-  test_setopt(curl, CURLOPT_WRITEDATA, stdout);
+  test_setopt(carl, CARLOPT_HEADERDATA, stdout);
+  test_setopt(carl, CARLOPT_WRITEDATA, stdout);
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_RTSP_STREAM_URI, URL);
-  test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_OPTIONS);
-  test_setopt(curl, CURLOPT_USERAGENT, "test567");
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_RTSP_STREAM_URI, URL);
+  test_setopt(carl, CARLOPT_RTSP_REQUEST, CARL_RTSPREQ_OPTIONS);
+  test_setopt(carl, CARLOPT_USERAGENT, "test567");
 
-  custom_headers = curl_slist_append(custom_headers, "Test-Number: 567");
-  test_setopt(curl, CURLOPT_RTSPHEADER, custom_headers);
+  custom_headers = carl_slist_append(custom_headers, "Test-Number: 567");
+  test_setopt(carl, CARLOPT_RTSPHEADER, custom_headers);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   if(custom_headers)
-    curl_slist_free_all(custom_headers);
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+    carl_slist_free_all(custom_headers);
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

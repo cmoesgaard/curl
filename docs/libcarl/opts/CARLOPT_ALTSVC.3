@@ -1,0 +1,58 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_ALTSVC 3 "5 Feb 2019" "libcarl 7.64.1" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_ALTSVC \- set alt-svc cache file name
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_ALTSVC, char *filename);
+.fi
+.SH DESCRIPTION
+Pass in a pointer to a \fIfilename\fP to instruct libcarl to use that file as
+the Alt-Svc cache to read existing cache contents from and possibly also write
+it back to a after a transfer, unless \fBCARLALTSVC_READONLYFILE\fP is set in
+\fICARLOPT_ALTSVC_CTRL(3)\fP.
+
+Specify a blank file name ("") to make libcarl not load from a file at all.
+.SH DEFAULT
+NULL. The alt-svc cache is not read nor written to file.
+.SH PROTOCOLS
+HTTPS
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_ALTSVC_CTRL, CARLALTSVC_H1);
+  carl_easy_setopt(carl, CARLOPT_ALTSVC, "altsvc-cache.txt");
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.64.1
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_ALTSVC_CTRL "(3), " CARLOPT_CONNECT_TO "(3), " CARLOPT_RESOLVE "(3), "
+.BR CARLOPT_COOKIEFILE "(3), "

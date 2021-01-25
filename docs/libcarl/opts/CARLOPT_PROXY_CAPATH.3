@@ -1,0 +1,71 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_PROXY_CAPATH 3 "16 Nov 2016" "libcarl 7.52.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_PROXY_CAPATH \- specify directory holding proxy CA certificates
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_PROXY_CAPATH, char *capath);
+.SH DESCRIPTION
+Pass a char * to a null-terminated string naming a directory holding multiple
+CA certificates to verify the HTTPS proxy with. If libcarl is built against
+OpenSSL, the certificate directory must be prepared using the openssl c_rehash
+utility. This makes sense only when \fICARLOPT_PROXY_SSL_VERIFYPEER(3)\fP is
+enabled (which it is by default).
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+Everything used over an HTTPS proxy
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  /* using an HTTPS proxy */
+  carl_easy_setopt(carl, CARLOPT_PROXY, "https://localhost:443");
+  carl_easy_setopt(carl, CARLOPT_PROXY_CAPATH, "/etc/cert-dir");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.52.0
+
+This option is supported by the OpenSSL, GnuTLS, and mbedTLS (since 7.56.0)
+backends. The NSS backend provides the option only for backward compatibility.
+.SH RETURN VALUE
+CARLE_OK if supported; or an error such as:
+
+CARLE_NOT_BUILT_IN - Not supported by the SSL backend
+
+CARLE_UNKNOWN_OPTION
+
+CARLE_OUT_OF_MEMORY
+.SH "SEE ALSO"
+.BR CARLOPT_PROXY_CAINFO "(3), "
+.BR CARLOPT_CAINFO "(3), " CARLOPT_PROXY_SSL_VERIFYHOST "(3), "
+.BR CARLOPT_STDERR "(3), " CARLOPT_DEBUGFUNCTION "(3), "

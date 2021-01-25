@@ -1,9 +1,9 @@
 <testcase>
 <info>
 <keywords>
-curl_easy_option
-curl_easy_option_by_name
-curl_easy_option_by_id
+carl_easy_option
+carl_easy_option_by_name
+carl_easy_option_by_id
 </keywords>
 </info>
 
@@ -17,7 +17,7 @@ curl_easy_option_by_id
 none
 </server>
 <name>
-curl_easy_option_by_name() and curl_easy_option_by_id()
+carl_easy_option_by_name() and carl_easy_option_by_id()
 </name>
 <tool>
 lib1918

@@ -1,0 +1,56 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLMOPT_MAX_CONCURRENT_STREAMS 3 "06 Nov 2019" "libcarl 7.67.0" "carl_multi_setopt options"
+.SH NAME
+CARLMOPT_MAX_CONCURRENT_STREAMS \- set max concurrent streams for http2
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLMcode carl_multi_setopt(CARLM *handle, CARLMOPT_MAX_CONCURRENT_STREAMS,
+                            long max);
+.fi
+.SH DESCRIPTION
+Pass a long indicating the \fBmax\fP. The set number will be used as the
+maximum number of concurrent streams for a connections that libcarl should
+support on connections done using HTTP/2.
+
+Valid values range from 1 to 2147483647 (2^31 - 1) and defaults to 100.  The
+value passed here would be honoured based on other system resources
+properties.
+.SH DEFAULT
+100
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+  CARLM *m = carl_multi_init();
+  /* max concurrent streams 200 */
+  carl_multi_setopt(m, CARLMOPT_MAX_CONCURRENT_STREAMS, 200L);
+.fi
+.SH AVAILABILITY
+Added in 7.67.0
+.SH RETURN VALUE
+Returns CARLM_OK if the option is supported, and CARLM_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_MAXCONNECTS "(3), " CARLMOPT_MAXCONNECTS "(3), "

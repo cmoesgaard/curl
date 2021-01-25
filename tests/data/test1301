@@ -2,7 +2,7 @@
 <info>
 <keywords>
 unittest
-curl_strcasecompare
+carl_strcasecompare
 </keywords>
 </info>
 
@@ -16,7 +16,7 @@ none
 unittest
 </features>
  <name>
-curl_strcasecompare unit tests
+carl_strcasecompare unit tests
  </name>
 </client>
 </testcase>

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,13 +20,13 @@
  *
  ***************************************************************************/
 /* <DESC>
- * HTTP PUT using CURLOPT_POSTFIELDS
+ * HTTP PUT using CARLOPT_POSTFIELDS
  * </DESC>
  */
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 static const char olivertwist[]=
   "Among other public buildings in a certain town, which for many reasons "
@@ -40,13 +40,13 @@ static const char olivertwist[]=
 
 /*
  * This example shows a HTTP PUT operation that sends a fixed buffer with
- * CURLOPT_POSTFIELDS to the URL given as an argument.
+ * CARLOPT_POSTFIELDS to the URL given as an argument.
  */
 
 int main(int argc, char **argv)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   char *url;
 
   if(argc < 2)
@@ -55,47 +55,47 @@ int main(int argc, char **argv)
   url = argv[1];
 
   /* In windows, this will init the winsock stuff */
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  /* get a curl handle */
-  curl = curl_easy_init();
-  if(curl) {
-    struct curl_slist *headers = NULL;
+  /* get a carl handle */
+  carl = carl_easy_init();
+  if(carl) {
+    struct carl_slist *headers = NULL;
 
     /* default type with postfields is application/x-www-form-urlencoded,
        change it if you want */
-    headers = curl_slist_append(headers, "Content-Type: literature/classic");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    headers = carl_slist_append(headers, "Content-Type: literature/classic");
+    carl_easy_setopt(carl, CARLOPT_HTTPHEADER, headers);
 
-    /* pass on content in request body. When CURLOPT_POSTFIELDSIZE isn't used,
-       curl does strlen to get the size. */
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, olivertwist);
+    /* pass on content in request body. When CARLOPT_POSTFIELDSIZE isn't used,
+       carl does strlen to get the size. */
+    carl_easy_setopt(carl, CARLOPT_POSTFIELDS, olivertwist);
 
-    /* override the POST implied by CURLOPT_POSTFIELDS
+    /* override the POST implied by CARLOPT_POSTFIELDS
      *
-     * Warning: CURLOPT_CUSTOMREQUEST is problematic, especially if you want
+     * Warning: CARLOPT_CUSTOMREQUEST is problematic, especially if you want
      * to follow redirects. Be aware.
      */
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    carl_easy_setopt(carl, CARLOPT_CUSTOMREQUEST, "PUT");
 
     /* specify target URL, and note that this URL should include a file
        name, not only a directory */
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    carl_easy_setopt(carl, CARLOPT_URL, url);
 
     /* Now run off and do what you've been told! */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
 
     /* free headers */
-    curl_slist_free_all(headers);
+    carl_slist_free_all(headers);
   }
 
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

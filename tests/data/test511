@@ -19,7 +19,7 @@ REPLY SIZE 550 bluah you f00l!
 <server>
 ftp
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib511
 </tool>
@@ -35,7 +35,7 @@ ftp://%HOSTIP:%FTPPORT/511
 #
 # Verify data after the test has been "shot"
 <verify>
-# CURLE_REMOTE_FILE_NOT_FOUND
+# CARLE_REMOTE_FILE_NOT_FOUND
 <errorcode>
 78
 </errorcode>

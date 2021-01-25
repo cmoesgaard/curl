@@ -9,4 +9,4 @@ Help: Use HTTP 2
 See-also: http1.1 http3
 Category: http
 ---
-Tells curl to use HTTP version 2.
+Tells carl to use HTTP version 2.

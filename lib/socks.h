@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SOCKS_H
-#define HEADER_CURL_SOCKS_H
+#ifndef HEADER_CARL_SOCKS_H
+#define HEADER_CARL_SOCKS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,11 +22,11 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifdef CURL_DISABLE_PROXY
-#define Curl_SOCKS4(a,b,c,d,e) CURLE_NOT_BUILT_IN
-#define Curl_SOCKS5(a,b,c,d,e,f) CURLE_NOT_BUILT_IN
+#ifdef CARL_DISABLE_PROXY
+#define Curl_SOCKS4(a,b,c,d,e) CARLE_NOT_BUILT_IN
+#define Curl_SOCKS5(a,b,c,d,e,f) CARLE_NOT_BUILT_IN
 #define Curl_SOCKS_getsock(x,y,z) 0
 #else
 /*
@@ -36,19 +36,19 @@
  * This is STUPID BLOCKING behavior
  */
 int Curl_blockread_all(struct Curl_easy *data,
-                       curl_socket_t sockfd,
+                       carl_socket_t sockfd,
                        char *buf,
                        ssize_t buffersize,
                        ssize_t *n);
 
 int Curl_SOCKS_getsock(struct connectdata *conn,
-                       curl_socket_t *sock,
+                       carl_socket_t *sock,
                        int sockindex);
 /*
  * This function logs in to a SOCKS4(a) proxy and sends the specifics to the
  * final destination server.
  */
-CURLproxycode Curl_SOCKS4(const char *proxy_name,
+CARLproxycode Curl_SOCKS4(const char *proxy_name,
                           const char *hostname,
                           int remote_port,
                           int sockindex,
@@ -59,7 +59,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_name,
  * This function logs in to a SOCKS5 proxy and sends the specifics to the
  * final destination server.
  */
-CURLproxycode Curl_SOCKS5(const char *proxy_name,
+CARLproxycode Curl_SOCKS5(const char *proxy_name,
                           const char *proxy_password,
                           const char *hostname,
                           int remote_port,
@@ -71,10 +71,10 @@ CURLproxycode Curl_SOCKS5(const char *proxy_name,
 /*
  * This function handles the SOCKS5 GSS-API negotiation and initialisation
  */
-CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
+CARLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
                                       struct Curl_easy *data);
 #endif
 
-#endif /* CURL_DISABLE_PROXY */
+#endif /* CARL_DISABLE_PROXY */
 
-#endif  /* HEADER_CURL_SOCKS_H */
+#endif  /* HEADER_CARL_SOCKS_H */

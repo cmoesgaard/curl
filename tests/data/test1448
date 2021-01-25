@@ -62,12 +62,12 @@ http://åäö.se:%HTTPPORT/1448 --resolve xn--4cab6c.se:%HTTPPORT:%HOSTIP -L --c
 <protocol>
 GET /1448 HTTP/1.1
 Host: xn--4cab6c.se:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /14480001 HTTP/1.1
 Host: xn--4cab6c.se:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

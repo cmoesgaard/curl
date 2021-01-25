@@ -1,0 +1,104 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLINFO_PROXY_ERROR 3 "3 Aug 2020" "libcarl 7.73.0" "carl_easy_getinfo options"
+.SH NAME
+CARLINFO_PROXY_ERROR \- get the detailed (SOCKS) proxy error
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+typedef enum {
+  CARLPX_OK,
+  CARLPX_BAD_ADDRESS_TYPE,
+  CARLPX_BAD_VERSION,
+  CARLPX_CLOSED,
+  CARLPX_GSSAPI,
+  CARLPX_GSSAPI_PERMSG,
+  CARLPX_GSSAPI_PROTECTION,
+  CARLPX_IDENTD,
+  CARLPX_IDENTD_DIFFER,
+  CARLPX_LONG_HOSTNAME,
+  CARLPX_LONG_PASSWD,
+  CARLPX_LONG_USER,
+  CARLPX_NO_AUTH,
+  CARLPX_RECV_ADDRESS,
+  CARLPX_RECV_AUTH,
+  CARLPX_RECV_CONNECT,
+  CARLPX_RECV_REQACK,
+  CARLPX_REPLY_ADDRESS_TYPE_NOT_SUPPORTED,
+  CARLPX_REPLY_COMMAND_NOT_SUPPORTED,
+  CARLPX_REPLY_CONNECTION_REFUSED,
+  CARLPX_REPLY_GENERAL_SERVER_FAILURE,
+  CARLPX_REPLY_HOST_UNREACHABLE,
+  CARLPX_REPLY_NETWORK_UNREACHABLE,
+  CARLPX_REPLY_NOT_ALLOWED,
+  CARLPX_REPLY_TTL_EXPIRED,
+  CARLPX_REPLY_UNASSIGNED,
+  CARLPX_REQUEST_FAILED,
+  CARLPX_RESOLVE_HOST,
+  CARLPX_SEND_AUTH,
+  CARLPX_SEND_CONNECT,
+  CARLPX_SEND_REQUEST,
+  CARLPX_UNKNOWN_FAIL,
+  CARLPX_UNKNOWN_MODE,
+  CARLPX_USER_REJECTED,
+  CARLPX_LAST /* never use */
+} CARLproxycode;
+
+CARLcode carl_easy_getinfo(CARL *handle, CARLINFO_PROXY_ERROR, long *detail);
+.fi
+.SH DESCRIPTION
+Pass a pointer to a long to receive a detailed error code when the most recent
+transfer returned a CARLE_PROXY error.
+
+The return value will match the CARLproxycode set.
+
+The returned value will be zero (equal to CARLPX_OK) if no such response code
+was available.
+.SH PROTOCOLS
+All that can be done over SOCKS
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode res;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  carl_easy_setopt(carl, CARLOPT_PROXY, "socks5://127.0.0.1");
+  res = carl_easy_perform(carl);
+  if(res == CARLE_PROXY) {
+    long proxycode;
+    res = carl_easy_getinfo(carl, CARLINFO_PROXY_ERROR, &proxycode);
+    if(!res && proxycode)
+      printf("The detailed proxy error: %ld\\n", proxycode);
+  }
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.73.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLINFO_RESPONSE_CODE "(3), " libcarl-errors "(3), "
+.BR carl_easy_getinfo "(3), " carl_easy_setopt "(3), "

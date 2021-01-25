@@ -61,13 +61,13 @@ http://%HOSTIP:%HTTPPORT/188 -C 50 -L
 GET /188 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=50-
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /188 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=50-
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

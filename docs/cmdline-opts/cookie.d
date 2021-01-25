@@ -11,9 +11,9 @@ data should be in the format "NAME1=VALUE1; NAME2=VALUE2".
 
 If no '=' symbol is used in the argument, it is instead treated as a filename
 to read previously stored cookie from. This option also activates the cookie
-engine which will make curl record incoming cookies, which may be handy if
+engine which will make carl record incoming cookies, which may be handy if
 you're using this in combination with the --location option or do multiple URL
-transfers on the same invoke. If the file name is exactly a minus ("-"), curl
+transfers on the same invoke. If the file name is exactly a minus ("-"), carl
 will instead read the contents from stdin.
 
 The file format of the file to read cookies from should be plain HTTP headers

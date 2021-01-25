@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 /* <DESC>
  * Show the required mutex callback setups for GnuTLS and OpenSSL when using
- * libcurl multi-threaded.
+ * libcarl multi-threaded.
  * </DESC>
  */
 /* A multi-threaded example that uses pthreads and fetches 4 remote files at
@@ -38,7 +38,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #define NUMT 4
 
@@ -117,16 +117,16 @@ const char * const urls[]= {
 
 static void *pull_one_url(void *url)
 {
-  CURL *curl;
+  CARL *carl;
 
-  curl = curl_easy_init();
-  curl_easy_setopt(curl, CURLOPT_URL, url);
+  carl = carl_easy_init();
+  carl_easy_setopt(carl, CARLOPT_URL, url);
   /* this example doesn't verify the server's certificate, which means we
      might be downloading stuff from an impostor */
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-  curl_easy_perform(curl); /* ignores error */
-  curl_easy_cleanup(curl);
+  carl_easy_setopt(carl, CARLOPT_SSL_VERIFYPEER, 0L);
+  carl_easy_setopt(carl, CARLOPT_SSL_VERIFYHOST, 0L);
+  carl_easy_perform(carl); /* ignores error */
+  carl_easy_cleanup(carl);
 
   return NULL;
 }
@@ -138,8 +138,8 @@ int main(int argc, char **argv)
   (void)argc; /* we don't use any arguments in this example */
   (void)argv;
 
-  /* Must initialize libcurl before any threads are started */
-  curl_global_init(CURL_GLOBAL_ALL);
+  /* Must initialize libcarl before any threads are started */
+  carl_global_init(CARL_GLOBAL_ALL);
 
   init_locks();
 

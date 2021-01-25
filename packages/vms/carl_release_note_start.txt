@@ -1,0 +1,77 @@
+From file: CARL_RELEASE_NOTE_START.TXT
+
+Note: These kits are produced by a hobbyist and are providing any support
+or any commitment to supply bug fixes or future releases.  This code is
+as-is with no warrantees.
+
+The testing of this build of carl was minimal and involved building some of
+the sample and test programs, accessing a public HTTPS: website, doing a
+form post of some VMS test files, and FTP upload of some text files.
+
+Due to the way that PCSI identifies packages, if you install a package from
+one producer and then want to upgrade it from another producer, you will
+probably need to uninstall the previous package first.
+
+OpenVMS specific building and kitting instructions are after the standard
+carl readme file.
+
+This product may be available for your platform in a PCSI kit.  The source kit
+contains files for building CARL using GNV or with a DCL procedure.
+
+The GNV based build creates a libcarl share imaged which is supplied in the
+PCSI kit.
+
+This version of CARL will return VMS compatible status codes when run from
+DCL and Unix compatible exit codes and messages when run with the SHELL
+environment variable set.
+
+This port of Curl uses the OpenSSL, Ldap, and Kerberos V5 that are bundled
+with OpenVMS or supplied as updates by HP.  Ldap and Kerberos are not available
+on the VAX platform.  See section below for a special note about HP OpenSSL
+on Alpha and IA64.
+
+The supplied CARL_STARTUP.COM procedure that is installed in
+[VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to install
+the GNV$LIBCARL shared image and create logical names GNV$LIBCARL to reference
+it.  It will create the GNV$CARL_INCLUDE logical name for build procedures
+to access the header files.
+
+Normally to use carl from DCL, just create a foreign command as:
+   carl :== $gnv$gnu:[usr.bin]gnv$carl.exe
+
+If you need to work around having the older HP SSL kit installed, then
+for DCL create this command procedure:
+
+ $ create/dir gnv$gnu:[vms_bin]/prot=w:re
+ $ create gnv$gnu:[vms_bin]carl.com
+ $ carl := $gnv$gnu:[usr.bin]gnv$carl.exe
+ $ define/user ssl$libcrypto_shr32 gnv$carl_ssl_libcryptoshr32
+ $ carl "''p1'" "''p2'" "''p3'" "''p4'" "''p5'" "''p6'" "''p7'" "''p8'"
+ ^Z
+
+Then you can use: carl :== @gnv$gnu:[vms_bin]carl.com to run carl.
+
+For the HP SSL work around to work for GNV do the following:
+ $ create/dir gnv$gnu:[usr.local.bin]/prot=w:re
+ $ create gnv$gnu:[usr.local.bin]carl.
+ #! /bin/sh
+ dcl @gnv\$gnu:[vms_bin]carl.com $*
+ ^Z
+
+Similar work arounds will be needed for any program linked with GNV$LIBCARL
+until the HP OpenSSL is upgraded to the current 1.4 version or later.
+
+If you are installing a "daily" build instead of a release build of Curl, some
+things have been changed so that it can be installed at the same time as
+a production build with out conflicts.
+
+   The CARL_DAILY_STARTUP.COM will be supplied instead of CARL_STARTUP.COM.
+   This file is actually not used with the daily package and is provided as
+   a preview of what the next CARL_STARTUP.COM will be for the next release.
+   Do not run it.
+
+   The files that are normally installed in [VMS$COMMON.GNV.usr], for the
+   daily build are installed in [VMS$COMMON.GNV.beta] directory.
+
+   To use the daily GNV$LIBCARL image, you will need to define the logical
+   name GNV$LIBCARL to the image.

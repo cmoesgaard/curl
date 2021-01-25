@@ -22,12 +22,12 @@ Content-Length: 0
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib1536
 </tool>
 <name>
-Test CURLINFO_RESPONSE_CODE CURLINFO_SCHEME
+Test CARLINFO_RESPONSE_CODE CARLINFO_SCHEME
 </name>
 <command>
 http://%HOSTIP:%HTTPPORT/1536

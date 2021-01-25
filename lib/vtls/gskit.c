@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_GSKIT
 
@@ -65,7 +65,7 @@
 
 #include <limits.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "urldata.h"
 #include "sendf.h"
 #include "gskit.h"
@@ -74,9 +74,9 @@
 #include "select.h"
 #include "strcase.h"
 #include "x509asn1.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -86,17 +86,17 @@
 #define SOS_WRITE       0x02
 
 /* SSL version flags. */
-#define CURL_GSKPROTO_SSLV2     0
-#define CURL_GSKPROTO_SSLV2_MASK        (1 << CURL_GSKPROTO_SSLV2)
-#define CURL_GSKPROTO_SSLV3     1
-#define CURL_GSKPROTO_SSLV3_MASK        (1 << CURL_GSKPROTO_SSLV3)
-#define CURL_GSKPROTO_TLSV10    2
-#define CURL_GSKPROTO_TLSV10_MASK        (1 << CURL_GSKPROTO_TLSV10)
-#define CURL_GSKPROTO_TLSV11    3
-#define CURL_GSKPROTO_TLSV11_MASK        (1 << CURL_GSKPROTO_TLSV11)
-#define CURL_GSKPROTO_TLSV12    4
-#define CURL_GSKPROTO_TLSV12_MASK        (1 << CURL_GSKPROTO_TLSV12)
-#define CURL_GSKPROTO_LAST      5
+#define CARL_GSKPROTO_SSLV2     0
+#define CARL_GSKPROTO_SSLV2_MASK        (1 << CARL_GSKPROTO_SSLV2)
+#define CARL_GSKPROTO_SSLV3     1
+#define CARL_GSKPROTO_SSLV3_MASK        (1 << CARL_GSKPROTO_SSLV3)
+#define CARL_GSKPROTO_TLSV10    2
+#define CARL_GSKPROTO_TLSV10_MASK        (1 << CARL_GSKPROTO_TLSV10)
+#define CARL_GSKPROTO_TLSV11    3
+#define CARL_GSKPROTO_TLSV11_MASK        (1 << CARL_GSKPROTO_TLSV11)
+#define CARL_GSKPROTO_TLSV12    4
+#define CARL_GSKPROTO_TLSV12_MASK        (1 << CARL_GSKPROTO_TLSV12)
+#define CARL_GSKPROTO_LAST      5
 
 struct ssl_backend_data {
   gsk_handle handle;
@@ -116,46 +116,46 @@ struct gskit_cipher {
 
 static const struct gskit_cipher  ciphertable[] = {
   { "null-md5",         "01",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK },
   { "null-sha",         "02",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK },
   { "exp-rc4-md5",      "03",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK },
   { "rc4-md5",          "04",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK },
   { "rc4-sha",          "05",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK },
   { "exp-rc2-cbc-md5",  "06",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK },
   { "exp-des-cbc-sha",  "09",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK },
   { "des-cbc3-sha",     "0A",
-      CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-      CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK |
+      CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK },
   { "aes128-sha",       "2F",
-      CURL_GSKPROTO_TLSV10_MASK | CURL_GSKPROTO_TLSV11_MASK |
-      CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_TLSV10_MASK | CARL_GSKPROTO_TLSV11_MASK |
+      CARL_GSKPROTO_TLSV12_MASK },
   { "aes256-sha",       "35",
-      CURL_GSKPROTO_TLSV10_MASK | CURL_GSKPROTO_TLSV11_MASK |
-      CURL_GSKPROTO_TLSV12_MASK },
-  { "null-sha256",      "3B",   CURL_GSKPROTO_TLSV12_MASK },
-  { "aes128-sha256",    "3C",   CURL_GSKPROTO_TLSV12_MASK },
-  { "aes256-sha256",    "3D",   CURL_GSKPROTO_TLSV12_MASK },
+      CARL_GSKPROTO_TLSV10_MASK | CARL_GSKPROTO_TLSV11_MASK |
+      CARL_GSKPROTO_TLSV12_MASK },
+  { "null-sha256",      "3B",   CARL_GSKPROTO_TLSV12_MASK },
+  { "aes128-sha256",    "3C",   CARL_GSKPROTO_TLSV12_MASK },
+  { "aes256-sha256",    "3D",   CARL_GSKPROTO_TLSV12_MASK },
   { "aes128-gcm-sha256",
-                        "9C",   CURL_GSKPROTO_TLSV12_MASK },
+                        "9C",   CARL_GSKPROTO_TLSV12_MASK },
   { "aes256-gcm-sha384",
-                        "9D",   CURL_GSKPROTO_TLSV12_MASK },
-  { "rc4-md5",          "1",    CURL_GSKPROTO_SSLV2_MASK },
-  { "exp-rc4-md5",      "2",    CURL_GSKPROTO_SSLV2_MASK },
-  { "rc2-md5",          "3",    CURL_GSKPROTO_SSLV2_MASK },
-  { "exp-rc2-md5",      "4",    CURL_GSKPROTO_SSLV2_MASK },
-  { "des-cbc-md5",      "6",    CURL_GSKPROTO_SSLV2_MASK },
-  { "des-cbc3-md5",     "7",    CURL_GSKPROTO_SSLV2_MASK },
+                        "9D",   CARL_GSKPROTO_TLSV12_MASK },
+  { "rc4-md5",          "1",    CARL_GSKPROTO_SSLV2_MASK },
+  { "exp-rc4-md5",      "2",    CARL_GSKPROTO_SSLV2_MASK },
+  { "rc2-md5",          "3",    CARL_GSKPROTO_SSLV2_MASK },
+  { "exp-rc2-md5",      "4",    CARL_GSKPROTO_SSLV2_MASK },
+  { "des-cbc-md5",      "6",    CARL_GSKPROTO_SSLV2_MASK },
+  { "des-cbc3-md5",     "7",    CARL_GSKPROTO_SSLV2_MASK },
   { (const char *) NULL, (const char *) NULL, 0       }
 };
 
@@ -175,36 +175,36 @@ static bool is_separator(char c)
 }
 
 
-static CURLcode gskit_status(struct Curl_easy *data, int rc,
-                             const char *procname, CURLcode defcode)
+static CARLcode gskit_status(struct Curl_easy *data, int rc,
+                             const char *procname, CARLcode defcode)
 {
-  /* Process GSKit status and map it to a CURLcode. */
+  /* Process GSKit status and map it to a CARLcode. */
   switch(rc) {
   case GSK_OK:
   case GSK_OS400_ASYNCHRONOUS_SOC_INIT:
-    return CURLE_OK;
+    return CARLE_OK;
   case GSK_KEYRING_OPEN_ERROR:
   case GSK_OS400_ERROR_NO_ACCESS:
-    return CURLE_SSL_CACERT_BADFILE;
+    return CARLE_SSL_CACERT_BADFILE;
   case GSK_INSUFFICIENT_STORAGE:
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   case GSK_ERROR_BAD_V2_CIPHER:
   case GSK_ERROR_BAD_V3_CIPHER:
   case GSK_ERROR_NO_CIPHERS:
-    return CURLE_SSL_CIPHER;
+    return CARLE_SSL_CIPHER;
   case GSK_OS400_ERROR_NOT_TRUSTED_ROOT:
   case GSK_ERROR_CERT_VALIDATION:
-    return CURLE_PEER_FAILED_VERIFICATION;
+    return CARLE_PEER_FAILED_VERIFICATION;
   case GSK_OS400_ERROR_TIMED_OUT:
-    return CURLE_OPERATION_TIMEDOUT;
+    return CARLE_OPERATION_TIMEDOUT;
   case GSK_WOULD_BLOCK:
-    return CURLE_AGAIN;
+    return CARLE_AGAIN;
   case GSK_OS400_ERROR_NOT_REGISTERED:
     break;
   case GSK_ERROR_IO:
     switch(errno) {
     case ENOMEM:
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     default:
       failf(data, "%s I/O error: %s", procname, strerror(errno));
       break;
@@ -218,58 +218,58 @@ static CURLcode gskit_status(struct Curl_easy *data, int rc,
 }
 
 
-static CURLcode set_enum(struct Curl_easy *data, gsk_handle h,
+static CARLcode set_enum(struct Curl_easy *data, gsk_handle h,
                 GSK_ENUM_ID id, GSK_ENUM_VALUE value, bool unsupported_ok)
 {
   int rc = gsk_attribute_set_enum(h, id, value);
 
   switch(rc) {
   case GSK_OK:
-    return CURLE_OK;
+    return CARLE_OK;
   case GSK_ERROR_IO:
     failf(data, "gsk_attribute_set_enum() I/O error: %s", strerror(errno));
     break;
   case GSK_ATTRIBUTE_INVALID_ID:
     if(unsupported_ok)
-      return CURLE_UNSUPPORTED_PROTOCOL;
+      return CARLE_UNSUPPORTED_PROTOCOL;
   default:
     failf(data, "gsk_attribute_set_enum(): %s", gsk_strerror(rc));
     break;
   }
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 
 
-static CURLcode set_buffer(struct Curl_easy *data, gsk_handle h,
+static CARLcode set_buffer(struct Curl_easy *data, gsk_handle h,
                         GSK_BUF_ID id, const char *buffer, bool unsupported_ok)
 {
   int rc = gsk_attribute_set_buffer(h, id, buffer, 0);
 
   switch(rc) {
   case GSK_OK:
-    return CURLE_OK;
+    return CARLE_OK;
   case GSK_ERROR_IO:
     failf(data, "gsk_attribute_set_buffer() I/O error: %s", strerror(errno));
     break;
   case GSK_ATTRIBUTE_INVALID_ID:
     if(unsupported_ok)
-      return CURLE_UNSUPPORTED_PROTOCOL;
+      return CARLE_UNSUPPORTED_PROTOCOL;
   default:
     failf(data, "gsk_attribute_set_buffer(): %s", gsk_strerror(rc));
     break;
   }
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 
 
-static CURLcode set_numeric(struct Curl_easy *data,
+static CARLcode set_numeric(struct Curl_easy *data,
                             gsk_handle h, GSK_NUM_ID id, int value)
 {
   int rc = gsk_attribute_set_numeric_value(h, id, value);
 
   switch(rc) {
   case GSK_OK:
-    return CURLE_OK;
+    return CARLE_OK;
   case GSK_ERROR_IO:
     failf(data, "gsk_attribute_set_numeric_value() I/O error: %s",
           strerror(errno));
@@ -278,18 +278,18 @@ static CURLcode set_numeric(struct Curl_easy *data,
     failf(data, "gsk_attribute_set_numeric_value(): %s", gsk_strerror(rc));
     break;
   }
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 
 
-static CURLcode set_callback(struct Curl_easy *data,
+static CARLcode set_callback(struct Curl_easy *data,
                              gsk_handle h, GSK_CALLBACK_ID id, void *info)
 {
   int rc = gsk_attribute_set_callback(h, id, info);
 
   switch(rc) {
   case GSK_OK:
-    return CURLE_OK;
+    return CARLE_OK;
   case GSK_ERROR_IO:
     failf(data, "gsk_attribute_set_callback() I/O error: %s", strerror(errno));
     break;
@@ -297,11 +297,11 @@ static CURLcode set_callback(struct Curl_easy *data,
     failf(data, "gsk_attribute_set_callback(): %s", gsk_strerror(rc));
     break;
   }
-  return CURLE_SSL_CONNECT_ERROR;
+  return CARLE_SSL_CONNECT_ERROR;
 }
 
 
-static CURLcode set_ciphers(struct Curl_easy *data,
+static CARLcode set_ciphers(struct Curl_easy *data,
                                         gsk_handle h, unsigned int *protoflags)
 {
   const char *cipherlist = SSL_CONN_CONFIG(cipher_list);
@@ -310,32 +310,32 @@ static CURLcode set_ciphers(struct Curl_easy *data,
   int i;
   int l;
   bool unsupported;
-  CURLcode result;
+  CARLcode result;
   struct {
     char *buf;
     char *ptr;
-  } ciphers[CURL_GSKPROTO_LAST];
+  } ciphers[CARL_GSKPROTO_LAST];
 
   /* Compile cipher list into GSKit-compatible cipher lists. */
 
   if(!cipherlist)
-    return CURLE_OK;
+    return CARLE_OK;
   while(is_separator(*cipherlist))     /* Skip initial separators. */
     cipherlist++;
   if(!*cipherlist)
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* We allocate GSKit buffers of the same size as the input string: since
      GSKit tokens are always shorter than their cipher names, allocated buffers
      will always be large enough to accommodate the result. */
   l = strlen(cipherlist) + 1;
   memset((char *) ciphers, 0, sizeof(ciphers));
-  for(i = 0; i < CURL_GSKPROTO_LAST; i++) {
+  for(i = 0; i < CARL_GSKPROTO_LAST; i++) {
     ciphers[i].buf = malloc(l);
     if(!ciphers[i].buf) {
       while(i--)
         free(ciphers[i].buf);
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
     }
     ciphers[i].ptr = ciphers[i].buf;
     *ciphers[i].ptr = '\0';
@@ -343,7 +343,7 @@ static CURLcode set_ciphers(struct Curl_easy *data,
 
   /* Process each cipher in input string. */
   unsupported = FALSE;
-  result = CURLE_OK;
+  result = CARLE_OK;
   for(;;) {
     for(clp = cipherlist; *cipherlist && !is_separator(*cipherlist);)
       cipherlist++;
@@ -356,12 +356,12 @@ static CURLcode set_ciphers(struct Curl_easy *data,
         break;
     if(!ctp->name) {
       failf(data, "Unknown cipher %.*s", l, clp);
-      result = CURLE_SSL_CIPHER;
+      result = CARLE_SSL_CIPHER;
     }
     else {
-      unsupported |= !(ctp->versions & (CURL_GSKPROTO_SSLV2_MASK |
-                        CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK));
-      for(i = 0; i < CURL_GSKPROTO_LAST; i++) {
+      unsupported |= !(ctp->versions & (CARL_GSKPROTO_SSLV2_MASK |
+                        CARL_GSKPROTO_SSLV3_MASK | CARL_GSKPROTO_TLSV10_MASK));
+      for(i = 0; i < CARL_GSKPROTO_LAST; i++) {
         if(ctp->versions & (1 << i)) {
           strcpy(ciphers[i].ptr, ctp->gsktoken);
           ciphers[i].ptr += strlen(ctp->gsktoken);
@@ -375,7 +375,7 @@ static CURLcode set_ciphers(struct Curl_easy *data,
   }
 
   /* Disable protocols with empty cipher lists. */
-  for(i = 0; i < CURL_GSKPROTO_LAST; i++) {
+  for(i = 0; i < CARL_GSKPROTO_LAST; i++) {
     if(!(*protoflags & (1 << i)) || !ciphers[i].buf[0]) {
       *protoflags &= ~(1 << i);
       ciphers[i].buf[0] = '\0';
@@ -383,51 +383,51 @@ static CURLcode set_ciphers(struct Curl_easy *data,
   }
 
   /* Try to set-up TLSv1.1 and TLSv2.1 ciphers. */
-  if(*protoflags & CURL_GSKPROTO_TLSV11_MASK) {
+  if(*protoflags & CARL_GSKPROTO_TLSV11_MASK) {
     result = set_buffer(data, h, GSK_TLSV11_CIPHER_SPECS,
-                        ciphers[CURL_GSKPROTO_TLSV11].buf, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
-      result = CURLE_OK;
+                        ciphers[CARL_GSKPROTO_TLSV11].buf, TRUE);
+    if(result == CARLE_UNSUPPORTED_PROTOCOL) {
+      result = CARLE_OK;
       if(unsupported) {
         failf(data, "TLSv1.1-only ciphers are not yet supported");
-        result = CURLE_SSL_CIPHER;
+        result = CARLE_SSL_CIPHER;
       }
     }
   }
-  if(!result && (*protoflags & CURL_GSKPROTO_TLSV12_MASK)) {
+  if(!result && (*protoflags & CARL_GSKPROTO_TLSV12_MASK)) {
     result = set_buffer(data, h, GSK_TLSV12_CIPHER_SPECS,
-                        ciphers[CURL_GSKPROTO_TLSV12].buf, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
-      result = CURLE_OK;
+                        ciphers[CARL_GSKPROTO_TLSV12].buf, TRUE);
+    if(result == CARLE_UNSUPPORTED_PROTOCOL) {
+      result = CARLE_OK;
       if(unsupported) {
         failf(data, "TLSv1.2-only ciphers are not yet supported");
-        result = CURLE_SSL_CIPHER;
+        result = CARLE_SSL_CIPHER;
       }
     }
   }
 
   /* Try to set-up TLSv1.0 ciphers. If not successful, concatenate them to
      the SSLv3 ciphers. OS/400 prior to version 7.1 will understand it. */
-  if(!result && (*protoflags & CURL_GSKPROTO_TLSV10_MASK)) {
+  if(!result && (*protoflags & CARL_GSKPROTO_TLSV10_MASK)) {
     result = set_buffer(data, h, GSK_TLSV10_CIPHER_SPECS,
-                        ciphers[CURL_GSKPROTO_TLSV10].buf, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
-      result = CURLE_OK;
-      strcpy(ciphers[CURL_GSKPROTO_SSLV3].ptr,
-             ciphers[CURL_GSKPROTO_TLSV10].ptr);
+                        ciphers[CARL_GSKPROTO_TLSV10].buf, TRUE);
+    if(result == CARLE_UNSUPPORTED_PROTOCOL) {
+      result = CARLE_OK;
+      strcpy(ciphers[CARL_GSKPROTO_SSLV3].ptr,
+             ciphers[CARL_GSKPROTO_TLSV10].ptr);
     }
   }
 
   /* Set-up other ciphers. */
-  if(!result && (*protoflags & CURL_GSKPROTO_SSLV3_MASK))
+  if(!result && (*protoflags & CARL_GSKPROTO_SSLV3_MASK))
     result = set_buffer(data, h, GSK_V3_CIPHER_SPECS,
-                        ciphers[CURL_GSKPROTO_SSLV3].buf, FALSE);
-  if(!result && (*protoflags & CURL_GSKPROTO_SSLV2_MASK))
+                        ciphers[CARL_GSKPROTO_SSLV3].buf, FALSE);
+  if(!result && (*protoflags & CARL_GSKPROTO_SSLV2_MASK))
     result = set_buffer(data, h, GSK_V2_CIPHER_SPECS,
-                        ciphers[CURL_GSKPROTO_SSLV2].buf, FALSE);
+                        ciphers[CARL_GSKPROTO_SSLV2].buf, FALSE);
 
   /* Clean-up. */
-  for(i = 0; i < CURL_GSKPROTO_LAST; i++)
+  for(i = 0; i < CARL_GSKPROTO_LAST; i++)
     free(ciphers[i].buf);
 
   return result;
@@ -448,13 +448,13 @@ static void gskit_cleanup(void)
 }
 
 
-static CURLcode init_environment(struct Curl_easy *data,
+static CARLcode init_environment(struct Curl_easy *data,
                                  gsk_handle *envir, const char *appid,
                                  const char *file, const char *label,
                                  const char *password)
 {
   int rc;
-  CURLcode result;
+  CARLcode result;
   gsk_handle h;
 
   /* Creates the GSKit environment. */
@@ -464,10 +464,10 @@ static CURLcode init_environment(struct Curl_easy *data,
   case GSK_OK:
     break;
   case GSK_INSUFFICIENT_STORAGE:
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   default:
     failf(data, "gsk_environment_open(): %s", gsk_strerror(rc));
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   result = set_enum(data, h, GSK_SESSION_TYPE, GSK_CLIENT_SESSION, FALSE);
@@ -484,7 +484,7 @@ static CURLcode init_environment(struct Curl_easy *data,
     /* Locate CAs, Client certificate and key according to our settings.
        Note: this call may be blocking for some tenths of seconds. */
     result = gskit_status(data, gsk_environment_init(h),
-                          "gsk_environment_init()", CURLE_SSL_CERTPROBLEM);
+                          "gsk_environment_init()", CARLE_SSL_CERTPROBLEM);
     if(!result) {
       *envir = h;
       return result;
@@ -523,7 +523,7 @@ static int pipe_ssloverssl(struct connectdata *conn, int sockindex,
   int m;
   int i;
   int ret = 0;
-  char buf[CURL_MAX_WRITE_SIZE];
+  char buf[CARL_MAX_WRITE_SIZE];
 
   if(!connssl->use || !connproxyssl->use)
     return 0;   /* No SSL over SSL: OK. */
@@ -611,24 +611,24 @@ static void close_one(struct ssl_connect_data *connssl, struct Curl_easy *data,
 
 
 static ssize_t gskit_send(struct connectdata *conn, int sockindex,
-                          const void *mem, size_t len, CURLcode *curlcode)
+                          const void *mem, size_t len, CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  CURLcode cc = CURLE_SEND_ERROR;
+  CARLcode cc = CARLE_SEND_ERROR;
   int written;
 
   if(pipe_ssloverssl(conn, sockindex, SOS_WRITE) >= 0) {
     cc = gskit_status(data,
                       gsk_secure_soc_write(BACKEND->handle,
                                            (char *) mem, (int) len, &written),
-                      "gsk_secure_soc_write()", CURLE_SEND_ERROR);
-    if(cc == CURLE_OK)
+                      "gsk_secure_soc_write()", CARLE_SEND_ERROR);
+    if(cc == CARLE_OK)
       if(pipe_ssloverssl(conn, sockindex, SOS_WRITE) < 0)
-        cc = CURLE_SEND_ERROR;
+        cc = CARLE_SEND_ERROR;
   }
-  if(cc != CURLE_OK) {
-    *curlcode = cc;
+  if(cc != CARLE_OK) {
+    *carlcode = cc;
     written = -1;
   }
   return (ssize_t) written; /* number of bytes */
@@ -636,70 +636,70 @@ static ssize_t gskit_send(struct connectdata *conn, int sockindex,
 
 
 static ssize_t gskit_recv(struct Curl_easy *data, int num, char *buf,
-                               size_t buffersize, CURLcode *curlcode)
+                               size_t buffersize, CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[num];
   int nread;
-  CURLcode cc = CURLE_RECV_ERROR;
+  CARLcode cc = CARLE_RECV_ERROR;
 
   if(pipe_ssloverssl(conn, num, SOS_READ) >= 0) {
     int buffsize = buffersize > (size_t) INT_MAX? INT_MAX: (int) buffersize;
     cc = gskit_status(data, gsk_secure_soc_read(BACKEND->handle,
                                                 buf, buffsize, &nread),
-                      "gsk_secure_soc_read()", CURLE_RECV_ERROR);
+                      "gsk_secure_soc_read()", CARLE_RECV_ERROR);
   }
   switch(cc) {
-  case CURLE_OK:
+  case CARLE_OK:
     break;
-  case CURLE_OPERATION_TIMEDOUT:
-    cc = CURLE_AGAIN;
+  case CARLE_OPERATION_TIMEDOUT:
+    cc = CARLE_AGAIN;
   default:
-    *curlcode = cc;
+    *carlcode = cc;
     nread = -1;
     break;
   }
   return (ssize_t) nread;
 }
 
-static CURLcode
+static CARLcode
 set_ssl_version_min_max(unsigned int *protoflags, struct Curl_easy *data)
 {
   long ssl_version = SSL_CONN_CONFIG(version);
   long ssl_version_max = SSL_CONN_CONFIG(version_max);
   long i = ssl_version;
   switch(ssl_version_max) {
-    case CURL_SSLVERSION_MAX_NONE:
-    case CURL_SSLVERSION_MAX_DEFAULT:
-      ssl_version_max = CURL_SSLVERSION_TLSv1_2;
+    case CARL_SSLVERSION_MAX_NONE:
+    case CARL_SSLVERSION_MAX_DEFAULT:
+      ssl_version_max = CARL_SSLVERSION_TLSv1_2;
       break;
   }
   for(; i <= (ssl_version_max >> 16); ++i) {
     switch(i) {
-      case CURL_SSLVERSION_TLSv1_0:
-        *protoflags |= CURL_GSKPROTO_TLSV10_MASK;
+      case CARL_SSLVERSION_TLSv1_0:
+        *protoflags |= CARL_GSKPROTO_TLSV10_MASK;
         break;
-      case CURL_SSLVERSION_TLSv1_1:
-        *protoflags |= CURL_GSKPROTO_TLSV11_MASK;
+      case CARL_SSLVERSION_TLSv1_1:
+        *protoflags |= CARL_GSKPROTO_TLSV11_MASK;
         break;
-      case CURL_SSLVERSION_TLSv1_2:
-        *protoflags |= CURL_GSKPROTO_TLSV11_MASK;
+      case CARL_SSLVERSION_TLSv1_2:
+        *protoflags |= CARL_GSKPROTO_TLSV11_MASK;
         break;
-      case CURL_SSLVERSION_TLSv1_3:
+      case CARL_SSLVERSION_TLSv1_3:
         failf(data, "GSKit: TLS 1.3 is not yet supported");
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
     }
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode gskit_connect_step1(struct Curl_easy *data,
+static CARLcode gskit_connect_step1(struct Curl_easy *data,
                                     struct connectdata *conn, int sockindex)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   gsk_handle envir;
-  CURLcode result;
+  CARLcode result;
   int rc;
   const char * const keyringfile = SSL_CONN_CONFIG(CAfile);
   const char * const keyringpwd = SSL_SET_OPTION(key_passwd);
@@ -712,7 +712,7 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
   unsigned int protoflags = 0;
   Qso_OverlappedIO_t commarea;
   int sockpair[2];
-  static const int sobufsize = CURL_MAX_WRITE_SIZE;
+  static const int sobufsize = CARL_MAX_WRITE_SIZE;
 
   /* Create SSL environment, start (preferably asynchronous) handshake. */
 
@@ -724,11 +724,11 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
   /* GSKit supports two ways of specifying an SSL context: either by
    *  application identifier (that should have been defined at the system
    *  level) or by keyring file, password and certificate label.
-   * Local certificate name (CURLOPT_SSLCERT) is used to hold either the
+   * Local certificate name (CARLOPT_SSLCERT) is used to hold either the
    *  application identifier of the certificate label.
-   * Key password (CURLOPT_KEYPASSWD) holds the keyring password.
+   * Key password (CARLOPT_KEYPASSWD) holds the keyring password.
    * It is not possible to have different keyrings for the CAs and the
-   *  local certificate. We thus use the CA file (CURLOPT_CAINFO) to identify
+   *  local certificate. We thus use the CA file (CARLOPT_CAINFO) to identify
    *  the keyring file.
    * If no key password is given and the keyring is the system keyring,
    *  application identifier mode is tried first, as recommended in IBM doc.
@@ -737,7 +737,7 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
   envir = (gsk_handle) NULL;
 
   if(keyringlabel && *keyringlabel && !keyringpwd &&
-      !strcmp(keyringfile, CURL_CA_BUNDLE)) {
+      !strcmp(keyringfile, CARL_CA_BUNDLE)) {
     /* Try application identifier mode. */
     init_environment(data, &envir, keyringlabel, (const char *) NULL,
                      (const char *) NULL, (const char *) NULL);
@@ -753,7 +753,7 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
 
   /* Create secure session. */
   result = gskit_status(data, gsk_secure_soc_open(envir, &BACKEND->handle),
-                        "gsk_secure_soc_open()", CURLE_SSL_CONNECT_ERROR);
+                        "gsk_secure_soc_open()", CARLE_SSL_CONNECT_ERROR);
   gsk_environment_close(&envir);
   if(result)
     return result;
@@ -761,7 +761,7 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
   /* Establish a pipelining socket pair for SSL over SSL. */
   if(conn->proxy_ssl[sockindex].use) {
     if(Curl_socketpair(0, 0, 0, sockpair))
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     BACKEND->localfd = sockpair[0];
     BACKEND->remotefd = sockpair[1];
     setsockopt(BACKEND->localfd, SOL_SOCKET, SO_RCVBUF,
@@ -772,45 +772,45 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
                (void *) sobufsize, sizeof(sobufsize));
     setsockopt(BACKEND->remotefd, SOL_SOCKET, SO_SNDBUF,
                (void *) sobufsize, sizeof(sobufsize));
-    curlx_nonblock(BACKEND->localfd, TRUE);
-    curlx_nonblock(BACKEND->remotefd, TRUE);
+    carlx_nonblock(BACKEND->localfd, TRUE);
+    carlx_nonblock(BACKEND->remotefd, TRUE);
   }
 
   /* Determine which SSL/TLS version should be enabled. */
   sni = hostname;
   switch(ssl_version) {
-  case CURL_SSLVERSION_SSLv2:
-    protoflags = CURL_GSKPROTO_SSLV2_MASK;
+  case CARL_SSLVERSION_SSLv2:
+    protoflags = CARL_GSKPROTO_SSLV2_MASK;
     sni = NULL;
     break;
-  case CURL_SSLVERSION_SSLv3:
-    protoflags = CURL_GSKPROTO_SSLV3_MASK;
+  case CARL_SSLVERSION_SSLv3:
+    protoflags = CARL_GSKPROTO_SSLV3_MASK;
     sni = NULL;
     break;
-  case CURL_SSLVERSION_DEFAULT:
-  case CURL_SSLVERSION_TLSv1:
-    protoflags = CURL_GSKPROTO_TLSV10_MASK |
-                 CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK;
+  case CARL_SSLVERSION_DEFAULT:
+  case CARL_SSLVERSION_TLSv1:
+    protoflags = CARL_GSKPROTO_TLSV10_MASK |
+                 CARL_GSKPROTO_TLSV11_MASK | CARL_GSKPROTO_TLSV12_MASK;
     break;
-  case CURL_SSLVERSION_TLSv1_0:
-  case CURL_SSLVERSION_TLSv1_1:
-  case CURL_SSLVERSION_TLSv1_2:
-  case CURL_SSLVERSION_TLSv1_3:
+  case CARL_SSLVERSION_TLSv1_0:
+  case CARL_SSLVERSION_TLSv1_1:
+  case CARL_SSLVERSION_TLSv1_2:
+  case CARL_SSLVERSION_TLSv1_3:
     result = set_ssl_version_min_max(&protoflags, data);
-    if(result != CURLE_OK)
+    if(result != CARLE_OK)
       return result;
     break;
   default:
-    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
-    return CURLE_SSL_CONNECT_ERROR;
+    failf(data, "Unrecognized parameter passed via CARLOPT_SSLVERSION");
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   /* Process SNI. Ignore if not supported (on OS400 < V7R1). */
   if(sni) {
     result = set_buffer(data, BACKEND->handle,
                         GSK_SSL_EXTN_SERVERNAME_REQUEST, sni, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL)
-      result = CURLE_OK;
+    if(result == CARLE_UNSUPPORTED_PROTOCOL)
+      result = CARLE_OK;
   }
 
   /* Set session parameters. */
@@ -819,7 +819,7 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
        we round up the required value. */
     timediff_t timeout = Curl_timeleft(data, NULL, TRUE);
     if(timeout < 0)
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
     else
       result = set_numeric(data, BACKEND->handle, GSK_HANDSHAKE_TIMEOUT,
                            (timeout + 999) / 1000);
@@ -833,41 +833,41 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
     result = set_ciphers(data, BACKEND->handle, &protoflags);
   if(!protoflags) {
     failf(data, "No SSL protocol/cipher combination enabled");
-    result = CURLE_SSL_CIPHER;
+    result = CARLE_SSL_CIPHER;
   }
   if(!result)
     result = set_enum(data, BACKEND->handle, GSK_PROTOCOL_SSLV2,
-                      (protoflags & CURL_GSKPROTO_SSLV2_MASK)?
+                      (protoflags & CARL_GSKPROTO_SSLV2_MASK)?
                       GSK_PROTOCOL_SSLV2_ON: GSK_PROTOCOL_SSLV2_OFF, FALSE);
   if(!result)
     result = set_enum(data, BACKEND->handle, GSK_PROTOCOL_SSLV3,
-                      (protoflags & CURL_GSKPROTO_SSLV3_MASK)?
+                      (protoflags & CARL_GSKPROTO_SSLV3_MASK)?
                       GSK_PROTOCOL_SSLV3_ON: GSK_PROTOCOL_SSLV3_OFF, FALSE);
   if(!result)
     result = set_enum(data, BACKEND->handle, GSK_PROTOCOL_TLSV1,
-                      (protoflags & CURL_GSKPROTO_TLSV10_MASK)?
+                      (protoflags & CARL_GSKPROTO_TLSV10_MASK)?
                       GSK_PROTOCOL_TLSV1_ON: GSK_PROTOCOL_TLSV1_OFF, FALSE);
   if(!result) {
     result = set_enum(data, BACKEND->handle, GSK_PROTOCOL_TLSV11,
-                      (protoflags & CURL_GSKPROTO_TLSV11_MASK)?
+                      (protoflags & CARL_GSKPROTO_TLSV11_MASK)?
                       GSK_TRUE: GSK_FALSE, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
-      result = CURLE_OK;
-      if(protoflags == CURL_GSKPROTO_TLSV11_MASK) {
+    if(result == CARLE_UNSUPPORTED_PROTOCOL) {
+      result = CARLE_OK;
+      if(protoflags == CARL_GSKPROTO_TLSV11_MASK) {
         failf(data, "TLS 1.1 not yet supported");
-        result = CURLE_SSL_CIPHER;
+        result = CARLE_SSL_CIPHER;
       }
     }
   }
   if(!result) {
     result = set_enum(data, BACKEND->handle, GSK_PROTOCOL_TLSV12,
-                      (protoflags & CURL_GSKPROTO_TLSV12_MASK)?
+                      (protoflags & CARL_GSKPROTO_TLSV12_MASK)?
                       GSK_TRUE: GSK_FALSE, TRUE);
-    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
-      result = CURLE_OK;
-      if(protoflags == CURL_GSKPROTO_TLSV12_MASK) {
+    if(result == CARLE_UNSUPPORTED_PROTOCOL) {
+      result = CARLE_OK;
+      if(protoflags == CARL_GSKPROTO_TLSV12_MASK) {
         failf(data, "TLS 1.2 not yet supported");
-        result = CURLE_SSL_CIPHER;
+        result = CARLE_SSL_CIPHER;
       }
     }
   }
@@ -886,10 +886,10 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
                                                      BACKEND->iocport,
                                                      &commarea),
                             "gsk_secure_soc_startInit()",
-                            CURLE_SSL_CONNECT_ERROR);
+                            CARLE_SSL_CONNECT_ERROR);
       if(!result) {
         connssl->connecting_state = ssl_connect_2;
-        return CURLE_OK;
+        return CARLE_OK;
       }
       else
         close_async_handshake(connssl);
@@ -899,15 +899,15 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
                             "QsoCreateIOCompletionPort()", 0);
     else if(conn->proxy_ssl[sockindex].use) {
       /* Cannot pipeline while handshaking synchronously. */
-      result = CURLE_SSL_CONNECT_ERROR;
+      result = CARLE_SSL_CONNECT_ERROR;
     }
     else {
       /* No more completion port available. Use synchronous IO. */
       result = gskit_status(data, gsk_secure_soc_init(BACKEND->handle),
-                            "gsk_secure_soc_init()", CURLE_SSL_CONNECT_ERROR);
+                            "gsk_secure_soc_init()", CARLE_SSL_CONNECT_ERROR);
       if(!result) {
         connssl->connecting_state = ssl_connect_3;
-        return CURLE_OK;
+        return CARLE_OK;
       }
     }
   }
@@ -918,14 +918,14 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
 }
 
 
-static CURLcode gskit_connect_step2(struct Curl_easy *data,
+static CARLcode gskit_connect_step2(struct Curl_easy *data,
                                     struct connectdata *conn, int sockindex,
                                     bool nonblocking)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   Qso_OverlappedIO_t cstat;
   struct timeval stmv;
-  CURLcode result;
+  CARLcode result;
 
   /* Poll or wait for end of SSL asynchronous handshake. */
 
@@ -941,27 +941,27 @@ static CURLcode gskit_connect_step2(struct Curl_easy *data,
     case -1:            /* An error occurred: handshake still in progress. */
       if(errno == EINTR) {
         if(nonblocking)
-          return CURLE_OK;
+          return CARLE_OK;
         continue;       /* Retry. */
       }
       if(errno != ETIME) {
         failf(data, "QsoWaitForIOCompletion() I/O error: %s", strerror(errno));
         cancel_async_handshake(conn, sockindex);
         close_async_handshake(connssl);
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       /* FALL INTO... */
     case 0:             /* Handshake in progress, timeout occurred. */
       if(nonblocking)
-        return CURLE_OK;
+        return CARLE_OK;
       cancel_async_handshake(conn, sockindex);
       close_async_handshake(connssl);
-      return CURLE_OPERATION_TIMEDOUT;
+      return CARLE_OPERATION_TIMEDOUT;
     }
     break;
   }
   result = gskit_status(data, cstat.returnValue, "SSL handshake",
-                        CURLE_SSL_CONNECT_ERROR);
+                        CARLE_SSL_CONNECT_ERROR);
   if(!result)
     connssl->connecting_state = ssl_connect_3;
   close_async_handshake(connssl);
@@ -969,7 +969,7 @@ static CURLcode gskit_connect_step2(struct Curl_easy *data,
 }
 
 
-static CURLcode gskit_connect_step3(struct Curl_easy *data,
+static CARLcode gskit_connect_step3(struct Curl_easy *data,
                                     struct connectdata *conn, int sockindex)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
@@ -979,15 +979,15 @@ static CURLcode gskit_connect_step3(struct Curl_easy *data,
   const char *cert = (const char *) NULL;
   const char *certend;
   const char *ptr;
-  CURLcode result;
+  CARLcode result;
 
   /* SSL handshake done: gather certificate info and verify host. */
 
   if(gskit_status(data, gsk_attribute_get_cert_info(BACKEND->handle,
                                                     GSK_PARTNER_CERT_INFO,
                                                     &cdev, &cdec),
-                  "gsk_attribute_get_cert_info()", CURLE_SSL_CONNECT_ERROR) ==
-     CURLE_OK) {
+                  "gsk_attribute_get_cert_info()", CARLE_SSL_CONNECT_ERROR) ==
+     CARLE_OK) {
     int i;
 
     infof(data, "Server certificate:\n");
@@ -1039,11 +1039,11 @@ static CURLcode gskit_connect_step3(struct Curl_easy *data,
   ptr = SSL_IS_PROXY() ? data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY] :
                          data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG];
   if(!result && ptr) {
-    curl_X509certificate x509;
-    curl_asn1Element *p;
+    carl_X509certificate x509;
+    carl_asn1Element *p;
 
     if(Curl_parseX509(&x509, cert, certend))
-      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+      return CARLE_SSL_PINNEDPUBKEYNOTMATCH;
     p = &x509.subjectPublicKeyInfo;
     result = Curl_pin_peer_pubkey(data, ptr, p->header, p->end - p->header);
     if(result) {
@@ -1053,21 +1053,21 @@ static CURLcode gskit_connect_step3(struct Curl_easy *data,
   }
 
   connssl->connecting_state = ssl_connect_done;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
-static CURLcode gskit_connect_common(struct Curl_easy *data,
+static CARLcode gskit_connect_common(struct Curl_easy *data,
                                      struct connectdata *conn, int sockindex,
                                      bool nonblocking, bool *done)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   timediff_t timeout_ms;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
   *done = connssl->state == ssl_connection_complete;
   if(*done)
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* Step 1: create session, start handshake. */
   if(connssl->connecting_state == ssl_connect_1) {
@@ -1077,7 +1077,7 @@ static CURLcode gskit_connect_common(struct Curl_easy *data,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
     }
     else
       result = gskit_connect_step1(data, conn, sockindex);
@@ -1086,7 +1086,7 @@ static CURLcode gskit_connect_common(struct Curl_easy *data,
   /* Handle handshake pipelining. */
   if(!result)
     if(pipe_ssloverssl(conn, sockindex, SOS_READ | SOS_WRITE) < 0)
-      result = CURLE_SSL_CONNECT_ERROR;
+      result = CARLE_SSL_CONNECT_ERROR;
 
   /* Step 2: check if handshake is over. */
   if(!result && connssl->connecting_state == ssl_connect_2) {
@@ -1096,7 +1096,7 @@ static CURLcode gskit_connect_common(struct Curl_easy *data,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      result = CURLE_OPERATION_TIMEDOUT;
+      result = CARLE_OPERATION_TIMEDOUT;
     }
     else
       result = gskit_connect_step2(data, conn, sockindex, nonblocking);
@@ -1105,7 +1105,7 @@ static CURLcode gskit_connect_common(struct Curl_easy *data,
   /* Handle handshake pipelining. */
   if(!result)
     if(pipe_ssloverssl(conn, sockindex, SOS_READ | SOS_WRITE) < 0)
-      result = CURLE_SSL_CONNECT_ERROR;
+      result = CARLE_SSL_CONNECT_ERROR;
 
   /* Step 3: gather certificate info, verify host. */
   if(!result && connssl->connecting_state == ssl_connect_3)
@@ -1125,11 +1125,11 @@ static CURLcode gskit_connect_common(struct Curl_easy *data,
 }
 
 
-static CURLcode gskit_connect_nonblocking(struct Curl_easy *data,
+static CARLcode gskit_connect_nonblocking(struct Curl_easy *data,
                                           struct connectdata *conn,
                                           int sockindex, bool *done)
 {
-  CURLcode result;
+  CARLcode result;
 
   result = gskit_connect_common(data, conn, sockindex, TRUE, done);
   if(*done || result)
@@ -1138,10 +1138,10 @@ static CURLcode gskit_connect_nonblocking(struct Curl_easy *data,
 }
 
 
-static CURLcode gskit_connect(struct Curl_easy *data,
+static CARLcode gskit_connect(struct Curl_easy *data,
                               struct connectdata *conn, int sockindex)
 {
-  CURLcode result;
+  CARLcode result;
   bool done;
 
   conn->ssl[sockindex].connecting_state = ssl_connect_1;
@@ -1151,7 +1151,7 @@ static CURLcode gskit_connect(struct Curl_easy *data,
 
   DEBUGASSERT(done);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
@@ -1174,8 +1174,8 @@ static int gskit_shutdown(struct Curl_easy *data,
   if(!BACKEND->handle)
     return 0;
 
-#ifndef CURL_DISABLE_FTP
-  if(data->set.ftp_ccc != CURLFTPSSL_CCC_ACTIVE)
+#ifndef CARL_DISABLE_FTP
+  if(data->set.ftp_ccc != CARLFTPSSL_CCC_ACTIVE)
     return 0;
 #endif
 
@@ -1249,14 +1249,14 @@ static int gskit_check_cxn(struct connectdata *cxn)
 }
 
 static void *gskit_get_internals(struct ssl_connect_data *connssl,
-                                 CURLINFO info UNUSED_PARAM)
+                                 CARLINFO info UNUSED_PARAM)
 {
   (void)info;
   return BACKEND->handle;
 }
 
 const struct Curl_ssl Curl_ssl_gskit = {
-  { CURLSSLBACKEND_GSKIT, "gskit" }, /* info */
+  { CARLSSLBACKEND_GSKIT, "gskit" }, /* info */
 
   SSLSUPP_CERTINFO |
   SSLSUPP_PINNEDPUBKEY,

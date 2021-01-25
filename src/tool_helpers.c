@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_msgs.h"
@@ -56,10 +56,10 @@ const char *param2text(int res)
     return "expected a proper numerical parameter";
   case PARAM_NEGATIVE_NUMERIC:
     return "expected a positive numerical parameter";
-  case PARAM_LIBCURL_DOESNT_SUPPORT:
-    return "the installed libcurl version doesn't support this";
-  case PARAM_LIBCURL_UNSUPPORTED_PROTOCOL:
-    return "a specified protocol is unsupported by libcurl";
+  case PARAM_LIBCARL_DOESNT_SUPPORT:
+    return "the installed libcarl version doesn't support this";
+  case PARAM_LIBCARL_UNSUPPORTED_PROTOCOL:
+    return "a specified protocol is unsupported by libcarl";
   case PARAM_NO_MEM:
     return "out of memory";
   case PARAM_NO_PREFIX:
@@ -110,11 +110,11 @@ void customrequest_helper(struct OperationConfig *config, HttpReq req,
 
   if(!method)
     ;
-  else if(curl_strequal(method, dflt[req])) {
+  else if(carl_strequal(method, dflt[req])) {
     notef(config->global, "Unnecessary use of -X or --request, %s is already "
           "inferred.\n", dflt[req]);
   }
-  else if(curl_strequal(method, "head")) {
+  else if(carl_strequal(method, "head")) {
     warnf(config->global,
           "Setting custom HTTP method to HEAD with -X/--request may not work "
           "the way you want. Consider using -I/--head instead.\n");

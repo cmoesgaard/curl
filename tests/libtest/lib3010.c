@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,41 +25,41 @@
 
 int test(char *URL)
 {
-  CURLcode ret = CURLE_OK;
-  CURL *curl = NULL;
-  curl_off_t retry_after;
+  CARLcode ret = CARLE_OK;
+  CARL *carl = NULL;
+  carl_off_t retry_after;
   char *follow_url = NULL;
 
-  curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
+  carl_global_init(CARL_GLOBAL_ALL);
+  carl = carl_easy_init();
 
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, URL);
-    ret = curl_easy_perform(curl);
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_URL, URL);
+    ret = carl_easy_perform(carl);
     if(ret) {
-      fprintf(stderr, "%s:%d curl_easy_perform() failed with code %d (%s)\n",
-          __FILE__, __LINE__, ret, curl_easy_strerror(ret));
+      fprintf(stderr, "%s:%d carl_easy_perform() failed with code %d (%s)\n",
+          __FILE__, __LINE__, ret, carl_easy_strerror(ret));
       goto test_cleanup;
     }
-    curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &follow_url);
-    curl_easy_getinfo(curl, CURLINFO_RETRY_AFTER, &retry_after);
-    printf("Retry-After: %" CURL_FORMAT_CURL_OFF_T "\n", retry_after);
-    curl_easy_setopt(curl, CURLOPT_URL, follow_url);
-    ret = curl_easy_perform(curl);
+    carl_easy_getinfo(carl, CARLINFO_REDIRECT_URL, &follow_url);
+    carl_easy_getinfo(carl, CARLINFO_RETRY_AFTER, &retry_after);
+    printf("Retry-After: %" CARL_FORMAT_CARL_OFF_T "\n", retry_after);
+    carl_easy_setopt(carl, CARLOPT_URL, follow_url);
+    ret = carl_easy_perform(carl);
     if(ret) {
-      fprintf(stderr, "%s:%d curl_easy_perform() failed with code %d (%s)\n",
-          __FILE__, __LINE__, ret, curl_easy_strerror(ret));
+      fprintf(stderr, "%s:%d carl_easy_perform() failed with code %d (%s)\n",
+          __FILE__, __LINE__, ret, carl_easy_strerror(ret));
       goto test_cleanup;
     }
 
-    curl_easy_reset(curl);
-    curl_easy_getinfo(curl, CURLINFO_RETRY_AFTER, &retry_after);
-    printf("Retry-After: %" CURL_FORMAT_CURL_OFF_T "\n", retry_after);
+    carl_easy_reset(carl);
+    carl_easy_getinfo(carl, CARLINFO_RETRY_AFTER, &retry_after);
+    printf("Retry-After: %" CARL_FORMAT_CARL_OFF_T "\n", retry_after);
   }
 
 test_cleanup:
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return ret;
 }

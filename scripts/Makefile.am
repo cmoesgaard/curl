@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -23,8 +23,8 @@ ZSH_FUNCTIONS_DIR = @ZSH_FUNCTIONS_DIR@
 FISH_FUNCTIONS_DIR = @FISH_FUNCTIONS_DIR@
 PERL = @PERL@
 
-ZSH_COMPLETION_FUNCTION_FILENAME = _curl
-FISH_COMPLETION_FUNCTION_FILENAME = curl.fish
+ZSH_COMPLETION_FUNCTION_FILENAME = _carl
+FISH_COMPLETION_FUNCTION_FILENAME = carl.fish
 
 CLEANFILES = $(ZSH_COMPLETION_FUNCTION_FILENAME) $(FISH_COMPLETION_FUNCTION_FILENAME)
 
@@ -35,7 +35,7 @@ if CROSSCOMPILING
 	@echo "NOTICE: we can't generate zsh completion when cross-compiling!"
 else # if not cross-compiling:
 	@if ! test -x "$(PERL)"; then echo "No perl: can't install completion.pl"; exit 0; fi
-	$(PERL) $(srcdir)/completion.pl --curl $(top_builddir)/src/curl$(EXEEXT) --shell zsh > $@
+	$(PERL) $(srcdir)/completion.pl --carl $(top_builddir)/src/carl$(EXEEXT) --shell zsh > $@
 endif
 
 $(FISH_COMPLETION_FUNCTION_FILENAME): completion.pl
@@ -43,7 +43,7 @@ if CROSSCOMPILING
 	@echo "NOTICE: we can't generate fish completion when cross-compiling!"
 else # if not cross-compiling:
 	@if ! test -x "$(PERL)"; then echo "No perl: can't install completion.pl"; exit 0; fi
-	$(PERL) $(srcdir)/completion.pl --curl $(top_builddir)/src/curl$(EXEEXT) --shell fish > $@
+	$(PERL) $(srcdir)/completion.pl --carl $(top_builddir)/src/carl$(EXEEXT) --shell fish > $@
 endif
 
 install-data-local:

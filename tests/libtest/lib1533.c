@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 /*
- * This test sends data with CURLOPT_KEEP_SENDING_ON_ERROR.
+ * This test sends data with CARLOPT_KEEP_SENDING_ON_ERROR.
  * The server responds with an early error response.
  * The test is successful if the connection can be reused for the next request,
  * because this implies that the data has been sent completely to the server.
@@ -32,16 +32,16 @@
 #include "memdebug.h"
 
 struct cb_data {
-  CURL *easy_handle;
+  CARL *easy_handle;
   int response_received;
   int paused;
   size_t remaining_bytes;
 };
 
 
-static void reset_data(struct cb_data *data, CURL *curl)
+static void reset_data(struct cb_data *data, CARL *carl)
 {
-  data->easy_handle = curl;
+  data->easy_handle = carl;
   data->response_received = 0;
   data->paused = 0;
   data->remaining_bytes = 3;
@@ -69,7 +69,7 @@ static size_t read_callback(char *ptr, size_t size, size_t nitems,
   }
   else {
     data->paused = 1;
-    return CURL_READFUNC_PAUSE;
+    return CARL_READFUNC_PAUSE;
   }
 }
 
@@ -89,28 +89,28 @@ static size_t write_callback(char *ptr, size_t size, size_t nmemb,
   if(data->paused) {
     /* continue to send request body data */
     data->paused = 0;
-    curl_easy_pause(data->easy_handle, CURLPAUSE_CONT);
+    carl_easy_pause(data->easy_handle, CARLPAUSE_CONT);
   }
 
   return totalsize;
 }
 
 
-static int perform_and_check_connections(CURL *curl, const char *description,
+static int perform_and_check_connections(CARL *carl, const char *description,
                                          long expected_connections)
 {
-  CURLcode res;
+  CARLcode res;
   long connections = 0;
 
-  res = curl_easy_perform(curl);
-  if(res != CURLE_OK) {
-    fprintf(stderr, "curl_easy_perform() failed\n");
+  res = carl_easy_perform(carl);
+  if(res != CARLE_OK) {
+    fprintf(stderr, "carl_easy_perform() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  res = curl_easy_getinfo(curl, CURLINFO_NUM_CONNECTS, &connections);
-  if(res != CURLE_OK) {
-    fprintf(stderr, "curl_easy_getinfo() failed\n");
+  res = carl_easy_getinfo(carl, CARLINFO_NUM_CONNECTS, &connections);
+  if(res != CARLE_OK) {
+    fprintf(stderr, "carl_easy_getinfo() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
@@ -128,61 +128,61 @@ static int perform_and_check_connections(CURL *curl, const char *description,
 int test(char *URL)
 {
   struct cb_data data;
-  CURL *curl = NULL;
-  CURLcode res = CURLE_FAILED_INIT;
+  CARL *carl = NULL;
+  CARLcode res = CARLE_FAILED_INIT;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(curl == NULL) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(carl == NULL) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  reset_data(&data, curl);
+  reset_data(&data, carl);
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_POST, 1L);
-  test_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
-              (curl_off_t)data.remaining_bytes);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
-  test_setopt(curl, CURLOPT_READDATA, &data);
-  test_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-  test_setopt(curl, CURLOPT_WRITEDATA, &data);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_POST, 1L);
+  test_setopt(carl, CARLOPT_POSTFIELDSIZE_LARGE,
+              (carl_off_t)data.remaining_bytes);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_READFUNCTION, read_callback);
+  test_setopt(carl, CARLOPT_READDATA, &data);
+  test_setopt(carl, CARLOPT_WRITEFUNCTION, write_callback);
+  test_setopt(carl, CARLOPT_WRITEDATA, &data);
 
-  res = perform_and_check_connections(curl,
-    "First request without CURLOPT_KEEP_SENDING_ON_ERROR", 1);
+  res = perform_and_check_connections(carl,
+    "First request without CARLOPT_KEEP_SENDING_ON_ERROR", 1);
   if(res != TEST_ERR_SUCCESS) {
     goto test_cleanup;
   }
 
-  reset_data(&data, curl);
+  reset_data(&data, carl);
 
-  res = perform_and_check_connections(curl,
-    "Second request without CURLOPT_KEEP_SENDING_ON_ERROR", 1);
+  res = perform_and_check_connections(carl,
+    "Second request without CARLOPT_KEEP_SENDING_ON_ERROR", 1);
   if(res != TEST_ERR_SUCCESS) {
     goto test_cleanup;
   }
 
-  test_setopt(curl, CURLOPT_KEEP_SENDING_ON_ERROR, 1L);
+  test_setopt(carl, CARLOPT_KEEP_SENDING_ON_ERROR, 1L);
 
-  reset_data(&data, curl);
+  reset_data(&data, carl);
 
-  res = perform_and_check_connections(curl,
-    "First request with CURLOPT_KEEP_SENDING_ON_ERROR", 1);
+  res = perform_and_check_connections(carl,
+    "First request with CARLOPT_KEEP_SENDING_ON_ERROR", 1);
   if(res != TEST_ERR_SUCCESS) {
     goto test_cleanup;
   }
 
-  reset_data(&data, curl);
+  reset_data(&data, carl);
 
-  res = perform_and_check_connections(curl,
-    "Second request with CURLOPT_KEEP_SENDING_ON_ERROR", 0);
+  res = perform_and_check_connections(carl,
+    "Second request with CARLOPT_KEEP_SENDING_ON_ERROR", 0);
   if(res != TEST_ERR_SUCCESS) {
     goto test_cleanup;
   }
@@ -191,9 +191,9 @@ int test(char *URL)
 
 test_cleanup:
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return (int)res;
 }

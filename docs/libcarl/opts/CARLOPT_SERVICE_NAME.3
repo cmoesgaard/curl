@@ -1,0 +1,58 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SERVICE_NAME 3 "17 Jun 2015" "libcarl 7.43.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SERVICE_NAME \- authentication service name
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SERVICE_NAME, char *name);
+.SH DESCRIPTION
+Pass a char * as parameter to a string holding the \fIname\fP of the service
+for DIGEST-MD5, SPNEGO and Kerberos 5 authentication mechanisms. The default
+service names are "ftp", "HTTP", "imap", "pop" and "smtp". This option allows
+you to change them.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+See above
+.SH PROTOCOLS
+HTTP, FTP, IMAP, POP and SMTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_SERVICE_NAME, "custom");
+  ret = carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.43.0 for HTTP, 7.49.0 for FTP, IMAP, POP3 and SMTP.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_PROXY "(3), " CARLOPT_PROXYTYPE "(3), "

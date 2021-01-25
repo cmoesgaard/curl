@@ -1,8 +1,8 @@
 <testcase>
 <info>
 <keywords>
-curl_easy_getinfo
-CURLINFO_PROTOCOL
+carl_easy_getinfo
+CARLINFO_PROTOCOL
 </keywords>
 </info>
 
@@ -21,7 +21,7 @@ lib1558
 </tool>
 
 <name>
-CURLINFO_PROTOCOL for file:// transfer
+CARLINFO_PROTOCOL for file:// transfer
 </name>
 <command>
 file://%FILE_PWD/log/data1558

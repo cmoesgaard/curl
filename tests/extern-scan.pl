@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -30,10 +30,10 @@ use warnings;
 my $root=$ARGV[0] || ".";
 
 my @incs = (
-    "$root/include/curl/curl.h",
-    "$root/include/curl/easy.h",
-    "$root/include/curl/mprintf.h",
-    "$root/include/curl/multi.h",
+    "$root/include/carl/carl.h",
+    "$root/include/carl/easy.h",
+    "$root/include/carl/mprintf.h",
+    "$root/include/carl/multi.h",
     );
 
 my $verbose=0;
@@ -48,7 +48,7 @@ sub scanheader {
     my ($f)=@_;
     open H, "<$f" || die;
     while(<H>) {
-        if (/^(CURL_EXTERN.*)/) {
+        if (/^(CARL_EXTERN.*)/) {
             my $decl = $1;
             $decl =~ s/\r$//;
             print "$decl\n";

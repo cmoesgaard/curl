@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_VXWORKS_H
-#define HEADER_CURL_CONFIG_VXWORKS_H
+#ifndef HEADER_CARL_CONFIG_VXWORKS_H
+#define HEADER_CARL_CONFIG_VXWORKS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,52 +27,52 @@
 /* =============================================================== */
 
 /* Location of default ca bundle */
-/* #undef CURL_CA_BUNDLE */
+/* #undef CARL_CA_BUNDLE */
 
 /* Location of default ca path */
-/* #undef CURL_CA_PATH */
+/* #undef CARL_CA_PATH */
 
 /* to disable cookies support */
-/* #undef CURL_DISABLE_COOKIES */
+/* #undef CARL_DISABLE_COOKIES */
 
 /* to disable cryptographic authentication */
-/* #undef CURL_DISABLE_CRYPTO_AUTH */
+/* #undef CARL_DISABLE_CRYPTO_AUTH */
 
 /* to disable DICT */
-/* #undef CURL_DISABLE_DICT */
+/* #undef CARL_DISABLE_DICT */
 
 /* to disable FILE */
-/* #undef CURL_DISABLE_FILE */
+/* #undef CARL_DISABLE_FILE */
 
 /* to disable FTP */
-#define CURL_DISABLE_FTP 1
+#define CARL_DISABLE_FTP 1
 
 /* to disable HTTP */
-/* #undef CURL_DISABLE_HTTP */
+/* #undef CARL_DISABLE_HTTP */
 
 /* to disable LDAP */
-#define CURL_DISABLE_LDAP 1
+#define CARL_DISABLE_LDAP 1
 
 /* to disable LDAPS */
-#define CURL_DISABLE_LDAPS 1
+#define CARL_DISABLE_LDAPS 1
 
 /* to disable NTLM authentication */
-#define CURL_DISABLE_NTLM 1
+#define CARL_DISABLE_NTLM 1
 
 /* to disable proxies */
-/* #undef CURL_DISABLE_PROXY */
+/* #undef CARL_DISABLE_PROXY */
 
 /* to disable TELNET */
-#define CURL_DISABLE_TELNET 1
+#define CARL_DISABLE_TELNET 1
 
 /* to disable TFTP */
-#define CURL_DISABLE_TFTP 1
+#define CARL_DISABLE_TFTP 1
 
 /* to disable verbose strings */
-/* #undef CURL_DISABLE_VERBOSE_STRINGS */
+/* #undef CARL_DISABLE_VERBOSE_STRINGS */
 
 /* Definition to make a library symbol externally visible. */
-/* #undef CURL_EXTERN_SYMBOL */
+/* #undef CARL_EXTERN_SYMBOL */
 
 /* Use Windows LDAP implementation */
 /* #undef USE_WIN32_LDAP */
@@ -725,7 +725,7 @@
 #define OS "unknown-unknown-vxworks"
 
 /* Name of package */
-#define PACKAGE "curl"
+#define PACKAGE "carl"
 
 /* a suitable file to read random data from */
 #define RANDOM_FILE "/dev/urandom"
@@ -850,7 +850,7 @@
 /* if libSSH2 is in use */
 /* #undef USE_LIBSSH2 */
 
-/* If you want to build curl with the built-in manual */
+/* If you want to build carl with the built-in manual */
 #define USE_MANUAL 1
 
 /* if NSS is enabled */
@@ -901,4 +901,4 @@
 /* the signed version of size_t */
 /* #undef ssize_t */
 
-#endif /* HEADER_CURL_CONFIG_VXWORKS_H */
+#endif /* HEADER_CARL_CONFIG_VXWORKS_H */

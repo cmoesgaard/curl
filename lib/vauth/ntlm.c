@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(USE_NTLM) && !defined(USE_WINDOWS_SSPI)
 
@@ -36,29 +36,29 @@
 #include "urldata.h"
 #include "non-ascii.h"
 #include "sendf.h"
-#include "curl_base64.h"
-#include "curl_ntlm_core.h"
-#include "curl_gethostname.h"
-#include "curl_multibyte.h"
-#include "curl_md5.h"
+#include "carl_base64.h"
+#include "carl_ntlm_core.h"
+#include "carl_gethostname.h"
+#include "carl_multibyte.h"
+#include "carl_md5.h"
 #include "warnless.h"
 #include "rand.h"
 #include "vtls/vtls.h"
 
 /* SSL backend-specific #if branches in this file must be kept in the order
-   documented in curl_ntlm_core. */
+   documented in carl_ntlm_core. */
 #if defined(NTLM_NEEDS_NSS_INIT)
 #include "vtls/nssg.h" /* for Curl_nss_force_init() */
 #endif
 
-#define BUILDING_CURL_NTLM_MSGS_C
+#define BUILDING_CARL_NTLM_MSGS_C
 #include "vauth/vauth.h"
 #include "vauth/ntlm.h"
-#include "curl_endian.h"
-#include "curl_printf.h"
+#include "carl_endian.h"
+#include "carl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* "NTLMSSP" signature is always in ASCII regardless of the platform */
@@ -165,9 +165,9 @@ static void ntlm_print_hex(FILE *handle, const char *buf, size_t len)
  * size      [in]     - The input buffer size, at least 32 bytes.
  * ntlm      [in/out] - The NTLM data struct being used and modified.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
+static CARLcode ntlm_decode_type2_target(struct Curl_easy *data,
                                          unsigned char *buffer,
                                          size_t size,
                                          struct ntlmdata *ntlm)
@@ -175,7 +175,7 @@ static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
   unsigned short target_info_len = 0;
   unsigned int target_info_offset = 0;
 
-#if defined(CURL_DISABLE_VERBOSE_STRINGS)
+#if defined(CARL_DISABLE_VERBOSE_STRINGS)
   (void) data;
 #endif
 
@@ -188,13 +188,13 @@ static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
          (target_info_offset < 48)) {
         infof(data, "NTLM handshake failure (bad type-2 message). "
               "Target Info Offset Len is set incorrect by the peer\n");
-        return CURLE_BAD_CONTENT_ENCODING;
+        return CARLE_BAD_CONTENT_ENCODING;
       }
 
       free(ntlm->target_info); /* replace any previous data */
       ntlm->target_info = malloc(target_info_len);
       if(!ntlm->target_info)
-        return CURLE_OUT_OF_MEMORY;
+        return CARLE_OUT_OF_MEMORY;
 
       memcpy(ntlm->target_info, &buffer[target_info_offset], target_info_len);
     }
@@ -202,7 +202,7 @@ static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
 
   ntlm->target_info_len = target_info_len;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -228,7 +228,7 @@ static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
  *
  * Parameters: None
  *
- * Returns TRUE as NTLM as handled by libcurl.
+ * Returns TRUE as NTLM as handled by libcarl.
  */
 bool Curl_auth_is_ntlm_supported(void)
 {
@@ -249,9 +249,9 @@ bool Curl_auth_is_ntlm_supported(void)
  * type2msg [in]     - The base64 encoded type-2 message.
  * ntlm     [in/out] - The NTLM data struct being used and modified.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
+CARLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
                                              const char *type2msg,
                                              struct ntlmdata *ntlm)
 {
@@ -273,7 +273,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
                                         (*) -> Optional
   */
 
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   unsigned char *type2 = NULL;
   size_t type2_len = 0;
 
@@ -282,7 +282,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
   result = Curl_nss_force_init(data);
   if(result)
     return result;
-#elif defined(CURL_DISABLE_VERBOSE_STRINGS)
+#elif defined(CARL_DISABLE_VERBOSE_STRINGS)
   (void)data;
 #endif
 
@@ -296,7 +296,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
   /* Ensure we have a valid type-2 message */
   if(!type2) {
     infof(data, "NTLM handshake failure (empty type-2 message)\n");
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   ntlm->flags = 0;
@@ -307,7 +307,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
     /* This was not a good enough type-2 message */
     free(type2);
     infof(data, "NTLM handshake failure (bad type-2 message)\n");
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   ntlm->flags = Curl_read32_le(&type2[20]);
@@ -365,9 +365,9 @@ static void unicodecpy(unsigned char *dest, const char *src, size_t length)
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
                                              const char *userp,
                                              const char *passwdp,
                                              const char *service,
@@ -490,9 +490,9 @@ CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
                                              const char *userp,
                                              const char *passwdp,
                                              struct ntlmdata *ntlm,
@@ -516,7 +516,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
                                           (*) -> Optional
   */
 
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t size;
   unsigned char ntlmbuf[NTLM_BUFSIZE];
   int lmrespoff;
@@ -601,13 +601,13 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
 
 #if defined(USE_NTRESPONSES) && defined(USE_NTLM2SESSION)
 
-#define CURL_MD5_DIGEST_LENGTH 16 /* fixed size */
+#define CARL_MD5_DIGEST_LENGTH 16 /* fixed size */
 
   /* We don't support NTLM2 if we don't have USE_NTRESPONSES */
   if(ntlm->flags & NTLMFLAG_NEGOTIATE_NTLM_KEY) {
     unsigned char ntbuffer[0x18];
     unsigned char tmp[0x18];
-    unsigned char md5sum[CURL_MD5_DIGEST_LENGTH];
+    unsigned char md5sum[CARL_MD5_DIGEST_LENGTH];
     unsigned char entropy[8];
 
     /* Need to create 8 bytes random data */
@@ -786,7 +786,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   /* ntresplen + size should not be risking an integer overflow here */
   if(ntresplen + size > sizeof(ntlmbuf)) {
     failf(data, "incoming NTLM message too big");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
   DEBUGASSERT(size == (size_t)ntrespoff);
   memcpy(&ntlmbuf[size], ptr_ntresp, ntresplen);
@@ -812,7 +812,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
      buffer before we copy them there. */
   if(size + userlen + domlen + hostlen >= NTLM_BUFSIZE) {
     failf(data, "user + domain + host name too big");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   DEBUGASSERT(size == domoff);
@@ -843,7 +843,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   result = Curl_convert_to_network(data, (char *)&ntlmbuf[domoff],
                                    size - domoff);
   if(result)
-    return CURLE_CONV_FAILED;
+    return CARLE_CONV_FAILED;
 
   /* Return with binary blob encoded into base64 */
   result = Curl_base64_encode(data, (char *)ntlmbuf, size, outptr, outlen);

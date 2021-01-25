@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,15 +26,15 @@
 /* This example code only builds as-is on Windows.
  *
  * While Unix/Linux user, you do not need this software.
- * You can achieve the same result as synctime using curl, awk and date.
+ * You can achieve the same result as synctime using carl, awk and date.
  * Set proxy as according to your network, but beware of proxy Cache-Control.
  *
  * To set your system clock, root access is required.
- * # date -s "`curl -sI https://nist.time.gov/timezone.cgi?UTC/s/0 \
+ * # date -s "`carl -sI https://nist.time.gov/timezone.cgi?UTC/s/0 \
  *        | awk -F': ' '/Date: / {print $2}'`"
  *
  * To view remote webserver date and time.
- * $ curl -sI https://nist.time.gov/timezone.cgi?UTC/s/0 \
+ * $ carl -sI https://nist.time.gov/timezone.cgi?UTC/s/0 \
  *        | awk -F': ' '/Date: / {print $2}'
  *
  * Synchronising your computer clock via Internet time server usually relies
@@ -72,7 +72,7 @@
  * This software will synchronise your computer clock only when you issue
  * it with --synctime. By default, it only display the webserver's clock.
  *
- * Written by: Frank (contributed to libcurl)
+ * Written by: Frank (contributed to libcarl)
  *
  * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -93,7 +93,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #endif
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 
 #define MAX_STRING              256
@@ -127,14 +127,14 @@ SYSTEMTIME LOCALTime;
 #define HTTP_COMMAND_GET        1
 
 
-size_t SyncTime_CURL_WriteOutput(void *ptr, size_t size, size_t nmemb,
+size_t SyncTime_CARL_WriteOutput(void *ptr, size_t size, size_t nmemb,
                                  void *stream)
 {
   fwrite(ptr, size, nmemb, stream);
   return (nmemb*size);
 }
 
-size_t SyncTime_CURL_WriteHeader(void *ptr, size_t size, size_t nmemb,
+size_t SyncTime_CARL_WriteHeader(void *ptr, size_t size, size_t nmemb,
                                  void *stream)
 {
   char  TmpStr1[26], TmpStr2[26];
@@ -186,41 +186,41 @@ size_t SyncTime_CURL_WriteHeader(void *ptr, size_t size, size_t nmemb,
   return (nmemb*size);
 }
 
-void SyncTime_CURL_Init(CURL *curl, char *proxy_port,
+void SyncTime_CARL_Init(CARL *carl, char *proxy_port,
                         char *proxy_user_password)
 {
   if(strlen(proxy_port) > 0)
-    curl_easy_setopt(curl, CURLOPT_PROXY, proxy_port);
+    carl_easy_setopt(carl, CARLOPT_PROXY, proxy_port);
 
   if(strlen(proxy_user_password) > 0)
-    curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, proxy_user_password);
+    carl_easy_setopt(carl, CARLOPT_PROXYUSERPWD, proxy_user_password);
 
 #ifdef SYNCTIME_UA
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, SYNCTIME_UA);
+  carl_easy_setopt(carl, CARLOPT_USERAGENT, SYNCTIME_UA);
 #endif
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, SyncTime_CURL_WriteOutput);
-  curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, SyncTime_CURL_WriteHeader);
+  carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, SyncTime_CARL_WriteOutput);
+  carl_easy_setopt(carl, CARLOPT_HEADERFUNCTION, SyncTime_CARL_WriteHeader);
 }
 
-int SyncTime_CURL_Fetch(CURL *curl, char *URL_Str, char *OutFileName,
+int SyncTime_CARL_Fetch(CARL *carl, char *URL_Str, char *OutFileName,
                         int HttpGetBody)
 {
   FILE *outfile;
-  CURLcode res;
+  CARLcode res;
 
   outfile = NULL;
   if(HttpGetBody == HTTP_COMMAND_HEAD)
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+    carl_easy_setopt(carl, CARLOPT_NOBODY, 1L);
   else {
     outfile = fopen(OutFileName, "wb");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, outfile);
+    carl_easy_setopt(carl, CARLOPT_WRITEDATA, outfile);
   }
 
-  curl_easy_setopt(curl, CURLOPT_URL, URL_Str);
-  res = curl_easy_perform(curl);
+  carl_easy_setopt(carl, CARLOPT_URL, URL_Str);
+  res = carl_easy_perform(carl);
   if(outfile != NULL)
     fclose(outfile);
-  return res;  /* (CURLE_OK) */
+  return res;  /* (CARLE_OK) */
 }
 
 void showUsage(void)
@@ -256,7 +256,7 @@ int conf_init(conf_t *conf)
 
 int main(int argc, char *argv[])
 {
-  CURL    *curl;
+  CARL    *carl;
   conf_t  conf[1];
   int     RetValue;
 
@@ -295,10 +295,10 @@ int main(int argc, char *argv[])
   if(*conf->timeserver == 0)     /* Use default server for time information */
     snprintf(conf->timeserver, MAX_STRING, "%s", DefaultTimeServer[0]);
 
-  /* Init CURL before usage */
-  curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if(curl) {
+  /* Init CARL before usage */
+  carl_global_init(CARL_GLOBAL_ALL);
+  carl = carl_easy_init();
+  if(carl) {
     struct tm *lt;
     struct tm *gmt;
     time_t tt;
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
     char timeBuf[61];
     char tzoneBuf[16];
 
-    SyncTime_CURL_Init(curl, conf->http_proxy, conf->proxy_user);
+    SyncTime_CARL_Init(carl, conf->http_proxy, conf->proxy_user);
 
     /* Calculating time diff between GMT and localtime */
     tt       = time(0);
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Before HTTP. Date: %s%s\n\n", timeBuf, tzoneBuf);
 
     /* HTTP HEAD command to the Webserver */
-    SyncTime_CURL_Fetch(curl, conf->timeserver, "index.htm",
+    SyncTime_CARL_Fetch(carl, conf->timeserver, "index.htm",
                         HTTP_COMMAND_HEAD);
 
     GetLocalTime(&LOCALTime);
@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
 
     /* Cleanup before exit */
     conf_init(conf);
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   return RetValue;
 }

@@ -1,4 +1,4 @@
-curl release procedure - how to do a release
+carl release procedure - how to do a release
 ============================================
 
 in the source code repo
@@ -12,7 +12,7 @@ in the source code repo
 
 - make sure all relevant changes are committed on the master branch
 
-- tag the git repo in this style: `git tag -a curl-7_34_0`. -a annotates the
+- tag the git repo in this style: `git tag -a carl-7_34_0`. -a annotates the
   tag and we use underscores instead of dots in the version number. Make sure
   the tag is GPG signed (using -s).
 
@@ -27,7 +27,7 @@ in the source code repo
 
 - upload the 8 resulting files to the primary download directory
 
-in the curl-www repo
+in the carl-www repo
 --------------------
 
 - edit `Makefile` (version number and date),
@@ -52,7 +52,7 @@ on github
 inform
 ------
 
-- send an email to curl-users, curl-announce and curl-library. Insert the
+- send an email to carl-users, carl-announce and carl-library. Insert the
   RELEASE-NOTES into the mail.
 
 celebrate
@@ -60,7 +60,7 @@ celebrate
 
 - suitable beverage intake is encouraged for the festivities
 
-curl release scheduling
+carl release scheduling
 =======================
 
 Release Cycle
@@ -73,7 +73,7 @@ this is rare.
 Each 8 week release cycle is split in two 4-week periods.
 
 - During the first 4 weeks after a release, we allow new features and changes
-  to curl and libcurl. If we accept any such changes, we bump the minor number
+  to carl and libcarl. If we accept any such changes, we bump the minor number
   used for the next release.
 
 - During the second 4-week period we do not merge any features or changes, we
@@ -105,6 +105,6 @@ time of this writing):
 - September 15, 2021
 - November 10, 2021
 
-The above (and more) curl-related dates are published in
+The above (and more) carl-related dates are published in
 [iCalendar format](https://calendar.google.com/calendar/ical/c9u5d64odop9js55oltfarjk6g%40group.calendar.google.com/public/basic.ics)
 as well.

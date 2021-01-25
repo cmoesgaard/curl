@@ -63,14 +63,14 @@ proxy
 <proxy>
 CONNECT test.95:%HTTPPORT HTTP/1.1
 Host: test.95:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 </proxy>
 <protocol nonewline="yes">
 POST /we/want/that/page/95 HTTP/1.1
 Host: test.95:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 27
 Content-Type: application/x-www-form-urlencoded

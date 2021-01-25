@@ -1,4 +1,4 @@
-curl internals
+carl internals
 ==============
 
  - [Intro](#intro)
@@ -31,13 +31,13 @@ curl internals
  - [Test Suite](#test)
  - [Asynchronous name resolves](#asyncdns)
    - [c-ares](#cares)
- - [`curl_off_t`](#curl_off_t)
- - [curlx](#curlx)
+ - [`carl_off_t`](#carl_off_t)
+ - [carlx](#carlx)
  - [Content Encoding](#contentencoding)
  - [`hostip.c` explained](#hostip)
  - [Track Down Memory Leaks](#memoryleak)
  - [`multi_socket`](#multi_socket)
- - [Structs in libcurl](#structs)
+ - [Structs in libcarl](#structs)
    - [Curl_easy](#Curl_easy)
    - [connectdata](#connectdata)
    - [Curl_multi](#Curl_multi)
@@ -73,11 +73,11 @@ git
 Portability
 ===========
 
- We write curl and libcurl to compile with C89 compilers.  On 32-bit and up
- machines. Most of libcurl assumes more or less POSIX compliance but that's
+ We write carl and libcarl to compile with C89 compilers.  On 32-bit and up
+ machines. Most of libcarl assumes more or less POSIX compliance but that's
  not a requirement.
 
- We write libcurl to build and work with lots of third party tools, and we
+ We write libcarl to build and work with lots of third party tools, and we
  want it to remain functional and buildable with these and later versions
  (older versions may still work but is not what we work hard to maintain):
 
@@ -104,7 +104,7 @@ Operating Systems
 
  On systems where configure runs, we aim at working on them all - if they have
  a suitable C compiler. On systems that don't run configure, we strive to keep
- curl running correctly on:
+ carl running correctly on:
 
  - Windows      98
  - AS/400       V5R3M0
@@ -132,18 +132,18 @@ Build tools
 Windows vs Unix
 ===============
 
- There are a few differences in how to program curl the Unix way compared to
+ There are a few differences in how to program carl the Unix way compared to
  the Windows way. Perhaps the four most notable details are:
 
  1. Different function names for socket operations.
 
-   In curl, this is solved with defines and macros, so that the source looks
+   In carl, this is solved with defines and macros, so that the source looks
    the same in all places except for the header file that defines them. The
    macros in use are `sclose()`, `sread()` and `swrite()`.
 
  2. Windows requires a couple of init calls for the socket stuff.
 
-   That's taken care of by the `curl_global_init()` call, but if other libs
+   That's taken care of by the `carl_global_init()` call, but if other libs
    also do it etc there might be reasons for applications to alter that
    behavior.
 
@@ -163,8 +163,8 @@ Windows vs Unix
  Inside the source code, We make an effort to avoid `#ifdef [Your OS]`. All
  conditionals that deal with features *should* instead be in the format
  `#ifdef HAVE_THAT_WEIRD_FUNCTION`. Since Windows can't run configure scripts,
- we maintain a `curl_config-win32.h` file in lib directory that is supposed to
- look exactly like a `curl_config.h` file would have looked like on a Windows
+ we maintain a `carl_config-win32.h` file in lib directory that is supposed to
+ look exactly like a `carl_config.h` file would have looked like on a Windows
  machine!
 
  Generally speaking: always remember that this will be compiled on dozens of
@@ -174,37 +174,37 @@ Windows vs Unix
 Library
 =======
 
- (See [Structs in libcurl](#structs) for the separate section describing all
+ (See [Structs in libcarl](#structs) for the separate section describing all
  major internal structs and their purposes.)
 
  There are plenty of entry points to the library, namely each publicly defined
- function that libcurl offers to applications. All of those functions are
- rather small and easy-to-follow. All the ones prefixed with `curl_easy` are
+ function that libcarl offers to applications. All of those functions are
+ rather small and easy-to-follow. All the ones prefixed with `carl_easy` are
  put in the `lib/easy.c` file.
 
- `curl_global_init()` and `curl_global_cleanup()` should be called by the
+ `carl_global_init()` and `carl_global_cleanup()` should be called by the
  application to initialize and clean up global stuff in the library. As of
  today, it can handle the global SSL initialization if SSL is enabled and it
- can initialize the socket layer on Windows machines. libcurl itself has no
+ can initialize the socket layer on Windows machines. libcarl itself has no
  "global" scope.
 
  All printf()-style functions use the supplied clones in `lib/mprintf.c`. This
  makes sure we stay absolutely platform independent.
 
- [ `curl_easy_init()`][2] allocates an internal struct and makes some
+ [ `carl_easy_init()`][2] allocates an internal struct and makes some
  initializations.  The returned handle does not reveal internals. This is the
- `Curl_easy` struct which works as an "anchor" struct for all `curl_easy`
+ `Curl_easy` struct which works as an "anchor" struct for all `carl_easy`
  functions. All connections performed will get connect-specific data allocated
  that should be used for things related to particular connections/requests.
 
- [`curl_easy_setopt()`][1] takes three arguments, where the option stuff must
+ [`carl_easy_setopt()`][1] takes three arguments, where the option stuff must
  be passed in pairs: the parameter-ID and the parameter-value. The list of
  options is documented in the man page. This function mainly sets things in
  the `Curl_easy` struct.
 
- `curl_easy_perform()` is just a wrapper function that makes use of the multi
- API.  It basically calls `curl_multi_init()`, `curl_multi_add_handle()`,
- `curl_multi_wait()`, and `curl_multi_perform()` until the transfer is done
+ `carl_easy_perform()` is just a wrapper function that makes use of the multi
+ API.  It basically calls `carl_multi_init()`, `carl_multi_add_handle()`,
+ `carl_multi_wait()`, and `carl_multi_perform()` until the transfer is done
  and then returns.
 
  Some of the most important key functions in `url.c` are called from
@@ -241,7 +241,7 @@ multi_do()
    transfer they call the `Curl_setup_transfer()` function (in
    `lib/transfer.c`) to setup the transfer and returns.
 
-   If this DO function fails and the connection is being re-used, libcurl will
+   If this DO function fails and the connection is being re-used, libcarl will
    then close this connection, setup a new connection and re-issue the DO
    request on that. This is because there is no way to be perfectly sure that
    we have discovered a dead connection before the DO function and thus we
@@ -273,10 +273,10 @@ Curl_disconnect()
 -----------------
 
    When doing normal connections and transfers, no one ever tries to close any
-   connections so this is not normally called when `curl_easy_perform()` is
+   connections so this is not normally called when `carl_easy_perform()` is
    used. This function is only used when we are certain that no more transfers
    are going to be made on the connection. It can be also closed by force, or
-   it can be called to make sure that libcurl doesn't keep too many
+   it can be called to make sure that libcarl doesn't keep too many
    connections alive at the same time.
 
    This function cleans up all resources that are associated with a single
@@ -286,7 +286,7 @@ Curl_disconnect()
 HTTP(S)
 =======
 
- HTTP offers a lot and is the protocol in curl that uses the most lines of
+ HTTP offers a lot and is the protocol in carl that uses the most lines of
  code. There is a special file `lib/formdata.c` that offers all the
  multipart post functions.
 
@@ -325,8 +325,8 @@ FTP
 Kerberos
 ========
 
- Kerberos support is mainly in `lib/krb5.c` but also `curl_sasl_sspi.c` and
- `curl_sasl_gssapi.c` for the email protocols and `socks_gssapi.c` and
+ Kerberos support is mainly in `lib/krb5.c` but also `carl_sasl_sspi.c` and
+ `carl_sasl_gssapi.c` for the email protocols and `socks_gssapi.c` and
  `socks_sspi.c` for SOCKS5 proxy specifics.
 
 <a name="telnet"></a>
@@ -368,10 +368,10 @@ General
  is found in `lib/escape.c`.
 
  While transferring data in `Transfer()` a few functions might get used.
- `curl_getdate()` in `lib/parsedate.c` is for HTTP date comparisons (and
+ `carl_getdate()` in `lib/parsedate.c` is for HTTP date comparisons (and
  more).
 
- `lib/getenv.c` offers `curl_getenv()` which is for reading environment
+ `lib/getenv.c` offers `carl_getenv()` which is for reading environment
  variables in a neat platform independent way. That's used in the client, but
  also in `lib/url.c` when checking the proxy environment variables. Note that
  contrary to the normal unix `getenv()`, this returns an allocated buffer that
@@ -382,38 +382,38 @@ General
  `lib/timeval.c` features replacement functions for systems that don't have
  `gettimeofday()` and a few support functions for timeval conversions.
 
- A function named `curl_version()` that returns the full curl version string
+ A function named `carl_version()` that returns the full carl version string
  is found in `lib/version.c`.
 
 <a name="persistent"></a>
 Persistent Connections
 ======================
 
- The persistent connection support in libcurl requires some considerations on
+ The persistent connection support in libcarl requires some considerations on
  how to do things inside of the library.
 
- - The `Curl_easy` struct returned in the [`curl_easy_init()`][2] call
+ - The `Curl_easy` struct returned in the [`carl_easy_init()`][2] call
    must never hold connection-oriented data. It is meant to hold the root data
    as well as all the options etc that the library-user may choose.
 
  - The `Curl_easy` struct holds the "connection cache" (an array of
    pointers to `connectdata` structs).
 
- - This enables the 'curl handle' to be reused on subsequent transfers.
+ - This enables the 'carl handle' to be reused on subsequent transfers.
 
- - When libcurl is told to perform a transfer, it first checks for an already
+ - When libcarl is told to perform a transfer, it first checks for an already
    existing connection in the cache that we can use. Otherwise it creates a
    new one and adds that to the cache. If the cache is full already when a new
    connection is added, it will first close the oldest unused one.
 
  - When the transfer operation is complete, the connection is left
-   open. Particular options may tell libcurl not to, and protocols may signal
+   open. Particular options may tell libcarl not to, and protocols may signal
    closure on connections and then they won't be kept open, of course.
 
- - When `curl_easy_cleanup()` is called, we close all still opened connections,
+ - When `carl_easy_cleanup()` is called, we close all still opened connections,
    unless of course the multi interface "owns" the connections.
 
- The curl handle must be re-used in order for the persistent connections to
+ The carl handle must be re-used in order for the persistent connections to
  work.
 
 <a name="multi"></a>
@@ -421,7 +421,7 @@ multi interface/non-blocking
 ============================
 
  The multi interface is a non-blocking interface to the library. To make that
- interface work as well as possible, no low-level functions within libcurl
+ interface work as well as possible, no low-level functions within libcarl
  must be written to work in a blocking manner. (There are still a few spots
  violating this rule.)
 
@@ -433,20 +433,20 @@ multi interface/non-blocking
  response protocols. They are built around state machines that return when
  they would otherwise block waiting for data.  The DICT, LDAP and TELNET
  protocols are crappy examples and they are subject for rewrite in the future
- to better fit the libcurl protocol family.
+ to better fit the libcarl protocol family.
 
 <a name="ssl"></a>
 SSL libraries
 =============
 
- Originally libcurl supported SSLeay for SSL/TLS transports, but that was then
+ Originally libcarl supported SSLeay for SSL/TLS transports, but that was then
  extended to its successor OpenSSL but has since also been extended to several
  other SSL/TLS libraries and we expect and hope to further extend the support
- in future libcurl versions.
+ in future libcarl versions.
 
  To deal with this internally in the best way possible, we have a generic SSL
  function API as provided by the `vtls/vtls.[ch]` system, and they are the only
- SSL functions we must use from within libcurl. vtls is then crafted to use
+ SSL functions we must use from within libcarl. vtls is then crafted to use
  the appropriate lower-level function calls to whatever SSL library that is in
  use. For example `vtls/openssl.[ch]` for the OpenSSL library.
 
@@ -454,24 +454,24 @@ SSL libraries
 Library Symbols
 ===============
 
- All symbols used internally in libcurl must use a `Curl_` prefix if they're
+ All symbols used internally in libcarl must use a `Curl_` prefix if they're
  used in more than a single file. Single-file symbols must be made static.
- Public ("exported") symbols must use a `curl_` prefix. (There are exceptions,
+ Public ("exported") symbols must use a `carl_` prefix. (There are exceptions,
  but they are to be changed to follow this pattern in future versions.) Public
- API functions are marked with `CURL_EXTERN` in the public header files so
+ API functions are marked with `CARL_EXTERN` in the public header files so
  that all others can be hidden on platforms where this is possible.
 
 <a name="returncodes"></a>
 Return Codes and Informationals
 ===============================
 
- I've made things simple. Almost every function in libcurl returns a CURLcode,
- that must be `CURLE_OK` if everything is OK or otherwise a suitable error
- code as the `curl/curl.h` include file defines. The very spot that detects an
+ I've made things simple. Almost every function in libcarl returns a CARLcode,
+ that must be `CARLE_OK` if everything is OK or otherwise a suitable error
+ code as the `carl/carl.h` include file defines. The very spot that detects an
  error must use the `Curl_failf()` function to set the human-readable error
  description.
 
- In aiding the user to understand what's happening and to debug curl usage, we
+ In aiding the user to understand what's happening and to debug carl usage, we
  must supply a fair number of informational messages by using the
  `Curl_infof()` function. Those messages are only displayed when the user
  explicitly asks for them. They are best used when revealing information that
@@ -482,7 +482,7 @@ API/ABI
 =======
 
  We make an effort to not export or show internals or how internals work, as
- that makes it easier to keep a solid API/ABI over time. See docs/libcurl/ABI
+ that makes it easier to keep a solid API/ABI over time. See docs/libcarl/ABI
  for our promise to users.
 
 <a name="client"></a>
@@ -497,13 +497,13 @@ Client
  sense that the `{}` and `[]` expansion stuff is there.
 
  The client mostly sets up its `config` struct properly, then
- it calls the `curl_easy_*()` functions of the library and when it gets back
- control after the `curl_easy_perform()` it cleans up the library, checks
+ it calls the `carl_easy_*()` functions of the library and when it gets back
+ control after the `carl_easy_perform()` it cleans up the library, checks
  status and exits.
 
  When the operation is done, the `ourWriteOut()` function in `src/writeout.c`
  may be called to report about the operation. That function is mostly using the
- `curl_easy_getinfo()` function to extract useful information from the curl
+ `carl_easy_getinfo()` function to extract useful information from the carl
  session.
 
  It may loop and do all this several times if many URLs were specified on the
@@ -526,17 +526,17 @@ Memory Debugging
  management.
 
  Internally, definition of preprocessor symbol `DEBUGBUILD` restricts code
- which is only compiled for debug enabled builds. And symbol `CURLDEBUG` is
+ which is only compiled for debug enabled builds. And symbol `CARLDEBUG` is
  used to differentiate code which is _only_ used for memory
  tracking/debugging.
 
- Use `-DCURLDEBUG` when compiling to enable memory debugging, this is also
- switched on by running configure with `--enable-curldebug`. Use
+ Use `-DCARLDEBUG` when compiling to enable memory debugging, this is also
+ switched on by running configure with `--enable-carldebug`. Use
  `-DDEBUGBUILD` when compiling to enable a debug build or run configure with
  `--enable-debug`.
 
- `curl --version` will list 'Debug' feature for debug enabled builds, and
- will list 'TrackMemory' feature for curl debug memory tracking capable
+ `carl --version` will list 'Debug' feature for debug enabled builds, and
+ will list 'TrackMemory' feature for carl debug memory tracking capable
  builds. These features are independent and can be controlled when running
  the configure script. When `--enable-debug` is given both features will be
  enabled, unless some restriction prevents memory tracking from being used.
@@ -546,7 +546,7 @@ Test Suite
 ==========
 
  The test suite is placed in its own subdirectory directly off the root in the
- curl archive tree, and it contains a bunch of scripts and a lot of test case
+ carl archive tree, and it contains a bunch of scripts and a lot of test case
  data.
 
  The main test script is `runtests.pl` that will invoke test servers like
@@ -556,21 +556,21 @@ Test Suite
  You'll find a description of the test suite in the `tests/README` file, and
  the test case data files in the `tests/FILEFORMAT` file.
 
- The test suite automatically detects if curl was built with the memory
+ The test suite automatically detects if carl was built with the memory
  debugging enabled, and if it was, it will detect memory leaks, too.
 
 <a name="asyncdns"></a>
 Asynchronous name resolves
 ==========================
 
- libcurl can be built to do name resolves asynchronously, using either the
+ libcarl can be built to do name resolves asynchronously, using either the
  normal resolver in a threaded manner or by using c-ares.
 
 <a name="cares"></a>
 [c-ares][3]
 ------
 
-### Build libcurl to use a c-ares
+### Build libcarl to use a c-ares
 
 1. ./configure --enable-ares=/path/to/ares/install
 2. make
@@ -582,69 +582,69 @@ Asynchronous name resolves
  prevent linking errors later on). Then I simply build the areslib project
  (the other projects adig/ahost seem to fail under MSVC).
 
- Next was libcurl. I opened `lib/config-win32.h` and I added a:
+ Next was libcarl. I opened `lib/config-win32.h` and I added a:
  `#define USE_ARES 1`
 
  Next thing I did was I added the path for the ares includes to the include
  path, and the libares.lib to the libraries.
 
- Lastly, I also changed libcurl to be single-threaded rather than
+ Lastly, I also changed libcarl to be single-threaded rather than
  multi-threaded, again this was to prevent some duplicate symbol errors. I'm
  not sure why I needed to change everything to single-threaded, but when I
  didn't I got redefinition errors for several CRT functions (`malloc()`,
  `stricmp()`, etc.)
 
-<a name="curl_off_t"></a>
-`curl_off_t`
+<a name="carl_off_t"></a>
+`carl_off_t`
 ==========
 
- `curl_off_t` is a data type provided by the external libcurl include
- headers. It is the type meant to be used for the [`curl_easy_setopt()`][1]
+ `carl_off_t` is a data type provided by the external libcarl include
+ headers. It is the type meant to be used for the [`carl_easy_setopt()`][1]
  options that end with LARGE. The type is 64-bit large on most modern
  platforms.
 
-<a name="curlx"></a>
-curlx
+<a name="carlx"></a>
+carlx
 =====
 
- The libcurl source code offers a few functions by source only. They are not
- part of the official libcurl API, but the source files might be useful for
+ The libcarl source code offers a few functions by source only. They are not
+ part of the official libcarl API, but the source files might be useful for
  others so apps can optionally compile/build with these sources to gain
  additional functions.
 
  We provide them through a single header file for easy access for apps:
- `curlx.h`
+ `carlx.h`
 
-`curlx_strtoofft()`
+`carlx_strtoofft()`
 -------------------
-   A macro that converts a string containing a number to a `curl_off_t` number.
-   This might use the `curlx_strtoll()` function which is provided as source
+   A macro that converts a string containing a number to a `carl_off_t` number.
+   This might use the `carlx_strtoll()` function which is provided as source
    code in strtoofft.c. Note that the function is only provided if no
-   `strtoll()` (or equivalent) function exist on your platform. If `curl_off_t`
+   `strtoll()` (or equivalent) function exist on your platform. If `carl_off_t`
    is only a 32-bit number on your platform, this macro uses `strtol()`.
 
 Future
 ------
 
- Several functions will be removed from the public `curl_` name space in a
- future libcurl release. They will then only become available as `curlx_`
+ Several functions will be removed from the public `carl_` name space in a
+ future libcarl release. They will then only become available as `carlx_`
  functions instead. To make the transition easier, we already today provide
- these functions with the `curlx_` prefix to allow sources to be built
+ these functions with the `carlx_` prefix to allow sources to be built
  properly with the new function names. The concerned functions are:
 
- - `curlx_getenv`
- - `curlx_strequal`
- - `curlx_strnequal`
- - `curlx_mvsnprintf`
- - `curlx_msnprintf`
- - `curlx_maprintf`
- - `curlx_mvaprintf`
- - `curlx_msprintf`
- - `curlx_mprintf`
- - `curlx_mfprintf`
- - `curlx_mvsprintf`
- - `curlx_mvprintf`
- - `curlx_mvfprintf`
+ - `carlx_getenv`
+ - `carlx_strequal`
+ - `carlx_strnequal`
+ - `carlx_mvsnprintf`
+ - `carlx_msnprintf`
+ - `carlx_maprintf`
+ - `carlx_mvaprintf`
+ - `carlx_msprintf`
+ - `carlx_mprintf`
+ - `carlx_mfprintf`
+ - `carlx_mvsprintf`
+ - `carlx_mvprintf`
+ - `carlx_mvfprintf`
 
 <a name="contentencoding"></a>
 Content Encoding
@@ -673,38 +673,38 @@ Content Encoding
 
 ## Supported content encodings
 
- The `deflate`, `gzip` and `br` content encodings are supported by libcurl.
+ The `deflate`, `gzip` and `br` content encodings are supported by libcarl.
  Both regular and chunked transfers work fine.  The zlib library is required
  for the `deflate` and `gzip` encodings, while the brotli decoding library is
  for the `br` encoding.
 
-## The libcurl interface
+## The libcarl interface
 
- To cause libcurl to request a content encoding use:
+ To cause libcarl to request a content encoding use:
 
-  [`curl_easy_setopt`][1](curl, [`CURLOPT_ACCEPT_ENCODING`][5], string)
+  [`carl_easy_setopt`][1](carl, [`CARLOPT_ACCEPT_ENCODING`][5], string)
 
  where string is the intended value of the `Accept-Encoding` header.
 
- Currently, libcurl does support multiple encodings but only
+ Currently, libcarl does support multiple encodings but only
  understands how to process responses that use the `deflate`, `gzip` and/or
- `br` content encodings, so the only values for [`CURLOPT_ACCEPT_ENCODING`][5]
+ `br` content encodings, so the only values for [`CARLOPT_ACCEPT_ENCODING`][5]
  that will work (besides `identity`, which does nothing) are `deflate`,
  `gzip` and `br`. If a response is encoded using the `compress` or methods,
- libcurl will return an error indicating that the response could
+ libcarl will return an error indicating that the response could
  not be decoded.  If `<string>` is NULL no `Accept-Encoding` header is
  generated. If `<string>` is a zero-length string, then an `Accept-Encoding`
  header containing all supported encodings will be generated.
 
- The [`CURLOPT_ACCEPT_ENCODING`][5] must be set to any non-NULL value for
+ The [`CARLOPT_ACCEPT_ENCODING`][5] must be set to any non-NULL value for
  content to be automatically decoded.  If it is not set and the server still
  sends encoded content (despite not having been asked), the data is returned
  in its raw form and the `Content-Encoding` type is not checked.
 
-## The curl interface
+## The carl interface
 
- Use the [`--compressed`][6] option with curl to cause it to ask servers to
- compress responses using any format supported by curl.
+ Use the [`--compressed`][6] option with carl to cause it to ask servers to
+ compress responses using any format supported by carl.
 
 <a name="hostip"></a>
 `hostip.c` explained
@@ -713,26 +713,26 @@ Content Encoding
  The main compile-time defines to keep in mind when reading the `host*.c`
  source file are these:
 
-## `CURLRES_IPV6`
+## `CARLRES_IPV6`
 
  this host has `getaddrinfo()` and family, and thus we use that. The host may
  not be able to resolve IPv6, but we don't really have to take that into
- account. Hosts that aren't IPv6-enabled have `CURLRES_IPV4` defined.
+ account. Hosts that aren't IPv6-enabled have `CARLRES_IPV4` defined.
 
-## `CURLRES_ARES`
+## `CARLRES_ARES`
 
- is defined if libcurl is built to use c-ares for asynchronous name
+ is defined if libcarl is built to use c-ares for asynchronous name
  resolves. This can be Windows or \*nix.
 
-## `CURLRES_THREADED`
+## `CARLRES_THREADED`
 
- is defined if libcurl is built to use threading for asynchronous name
+ is defined if libcarl is built to use threading for asynchronous name
  resolves. The name resolve will be done in a new thread, and the supported
  asynch API will be the same as for ares-builds. This is the default under
  (native) Windows.
 
- If any of the two previous are defined, `CURLRES_ASYNCH` is defined too. If
- libcurl is not built to use an asynchronous resolver, `CURLRES_SYNCH` is
+ If any of the two previous are defined, `CARLRES_ASYNCH` is defined too. If
+ libcarl is not built to use an asynchronous resolver, `CARLRES_SYNCH` is
  defined.
 
 ## `host*.c` sources
@@ -748,7 +748,7 @@ Content Encoding
  - `hostip6.c`     - IPv6 specific functions
 
  The `hostip.h` is the single united header file for all this. It defines the
- `CURLRES_*` defines based on the `config*.h` and `curl_setup.h` defines.
+ `CARLRES_*` defines based on the `config*.h` and `carl_setup.h` defines.
 
 <a name="memoryleak"></a>
 Track Down Memory Leaks
@@ -762,10 +762,10 @@ Track Down Memory Leaks
 
 ## Build
 
-  Rebuild libcurl with `-DCURLDEBUG` (usually, rerunning configure with
+  Rebuild libcarl with `-DCARLDEBUG` (usually, rerunning configure with
   `--enable-debug` fixes this). `make clean` first, then `make` so that all
   files are actually rebuilt properly. It will also make sense to build
-  libcurl with the debug option (usually `-g` to the compiler) so that
+  libcarl with the debug option (usually `-g` to the compiler) so that
   debugging it will be easier if you actually do find a leak in the library.
 
   This will create a library that has memory debugging enabled.
@@ -775,19 +775,19 @@ Track Down Memory Leaks
   Add a line in your application code:
 
 ```c
-  curl_dbg_memdebug("dump");
+  carl_dbg_memdebug("dump");
 ```
 
   This will make the malloc debug system output a full trace of all resource
   using functions to the given file name. Make sure you rebuild your program
-  and that you link with the same libcurl you built for this purpose as
+  and that you link with the same libcarl you built for this purpose as
   described above.
 
 ## Run Your Application
 
   Run your program as usual. Watch the specified memory trace file grow.
 
-  Make your program exit and use the proper libcurl cleanup functions etc. So
+  Make your program exit and use the proper libcarl cleanup functions etc. So
   that all non-leaks are returned/freed properly.
 
 ## Analyze the Flow
@@ -799,50 +799,50 @@ Track Down Memory Leaks
   This now outputs a report on what resources that were allocated but never
   freed etc. This report is very fine for posting to the list!
 
-  If this doesn't produce any output, no leak was detected in libcurl. Then
+  If this doesn't produce any output, no leak was detected in libcarl. Then
   the leak is mostly likely to be in your code.
 
 <a name="multi_socket"></a>
 `multi_socket`
 ==============
 
- Implementation of the `curl_multi_socket` API
+ Implementation of the `carl_multi_socket` API
 
  The main ideas of this API are simply:
 
  1. The application can use whatever event system it likes as it gets info
-    from libcurl about what file descriptors libcurl waits for what action
+    from libcarl about what file descriptors libcarl waits for what action
     on. (The previous API returns `fd_sets` which is very
     `select()`-centric).
 
  2. When the application discovers action on a single socket, it calls
-    libcurl and informs that there was action on this particular socket and
-    libcurl can then act on that socket/transfer only and not care about
+    libcarl and informs that there was action on this particular socket and
+    libcarl can then act on that socket/transfer only and not care about
     any other transfers. (The previous API always had to scan through all
     the existing transfers.)
 
- The idea is that [`curl_multi_socket_action()`][7] calls a given callback
+ The idea is that [`carl_multi_socket_action()`][7] calls a given callback
  with information about what socket to wait for what action on, and the
  callback only gets called if the status of that socket has changed.
 
- We also added a timer callback that makes libcurl call the application when
- the timeout value changes, and you set that with [`curl_multi_setopt()`][9]
- and the [`CURLMOPT_TIMERFUNCTION`][10] option. To get this to work,
+ We also added a timer callback that makes libcarl call the application when
+ the timeout value changes, and you set that with [`carl_multi_setopt()`][9]
+ and the [`CARLMOPT_TIMERFUNCTION`][10] option. To get this to work,
  Internally, there's an added struct to each easy handle in which we store
  an "expire time" (if any). The structs are then "splay sorted" so that we
  can add and remove times from the linked list and yet somewhat swiftly
  figure out both how long there is until the next nearest timer expires
  and which timer (handle) we should take care of now. Of course, the upside
- of all this is that we get a [`curl_multi_timeout()`][8] that should also
- work with old-style applications that use [`curl_multi_perform()`][11].
+ of all this is that we get a [`carl_multi_timeout()`][8] that should also
+ work with old-style applications that use [`carl_multi_perform()`][11].
 
  We created an internal "socket to easy handles" hash table that given
  a socket (file descriptor) returns the easy handle that waits for action on
  that socket.  This hash is made using the already existing hash code
  (previously only used for the DNS cache).
 
- To make libcurl able to report plain sockets in the socket callback, we had
- to re-organize the internals of the [`curl_multi_fdset()`][12] etc so that
+ To make libcarl able to report plain sockets in the socket callback, we had
+ to re-organize the internals of the [`carl_multi_fdset()`][12] etc so that
  the conversion from sockets to `fd_sets` for that function is only done in
  the last step before the data is returned. I also had to extend c-ares to
  get a function that can return plain sockets, as that library too returned
@@ -850,7 +850,7 @@ Track Down Memory Leaks
  are available in c-ares 1.3.1 and later.
 
 <a name="structs"></a>
-Structs in libcurl
+Structs in libcarl
 ==================
 
 This section should cover 7.32.0 pretty accurately, but will make sense even
@@ -860,11 +860,11 @@ for older and later versions as things don't change drastically that often.
 ## Curl_easy
 
   The `Curl_easy` struct is the one returned to the outside in the external API
-  as a `CURL *`. This is usually known as an easy handle in API documentations
+  as a `CARL *`. This is usually known as an easy handle in API documentations
   and examples.
 
   Information and state that is related to the actual connection is in the
-  `connectdata` struct. When a transfer is about to be made, libcurl will
+  `connectdata` struct. When a transfer is about to be made, libcarl will
   either create a new connection or re-use an existing one. The particular
   connectdata that is used by this handle is pointed out by
   `Curl_easy->easy_conn`.
@@ -876,15 +876,15 @@ for older and later versions as things don't change drastically that often.
   order to do any transfer, the `->multi` member will point to the `Curl_multi`
   struct it belongs to. The `->prev` and `->next` members will then be used by
   the multi code to keep a linked list of `Curl_easy` structs that are added to
-  that same multi handle. libcurl always uses multi so `->multi` *will* point
+  that same multi handle. libcarl always uses multi so `->multi` *will* point
   to a `Curl_multi` when a transfer is in progress.
 
   `->mstate` is the multi state of this particular `Curl_easy`. When
   `multi_runsingle()` is called, it will act on this handle according to which
   state it is in. The mstate is also what tells which sockets to return for a
-  specific `Curl_easy` when [`curl_multi_fdset()`][12] is called etc.
+  specific `Curl_easy` when [`carl_multi_fdset()`][12] is called etc.
 
-  The libcurl source code generally use the name `data` for the variable that
+  The libcarl source code generally use the name `data` for the variable that
   points to the `Curl_easy`.
 
   When doing multiplexed HTTP/2 transfers, each `Curl_easy` is associated with
@@ -894,7 +894,7 @@ for older and later versions as things don't change drastically that often.
 <a name="connectdata"></a>
 ## connectdata
 
-  A general idea in libcurl is to keep connections around in a connection
+  A general idea in libcarl is to keep connections around in a connection
   "cache" after they have been used in case they will be used again and then
   re-use an existing one instead of creating a new as it creates a significant
   performance boost.
@@ -908,22 +908,22 @@ for older and later versions as things don't change drastically that often.
   as it is then important to consider if options or choices are based on the
   connection or the `Curl_easy`.
 
-  Functions in libcurl will assume that `connectdata->data` points to the
+  Functions in libcarl will assume that `connectdata->data` points to the
   `Curl_easy` that uses this connection (for the moment).
 
-  As a special complexity, some protocols supported by libcurl require a
+  As a special complexity, some protocols supported by libcarl require a
   special disconnect procedure that is more than just shutting down the
   socket. It can involve sending one or more commands to the server before
   doing so. Since connections are kept in the connection cache after use, the
   original `Curl_easy` may no longer be around when the time comes to shut down
-  a particular connection. For this purpose, libcurl holds a special dummy
+  a particular connection. For this purpose, libcarl holds a special dummy
   `closure_handle` `Curl_easy` in the `Curl_multi` struct to use when needed.
 
   FTP uses two TCP connections for a typical transfer but it keeps both in
   this single struct and thus can be considered a single connection for most
   internal concerns.
 
-  The libcurl source code generally use the name `conn` for the variable that
+  The libcarl source code generally use the name `conn` for the variable that
   points to the connectdata.
 
 <a name="Curl_multi"></a>
@@ -932,15 +932,15 @@ for older and later versions as things don't change drastically that often.
   Internally, the easy interface is implemented as a wrapper around multi
   interface functions. This makes everything multi interface.
 
-  `Curl_multi` is the multi handle struct exposed as `CURLM *` in external
+  `Curl_multi` is the multi handle struct exposed as `CARLM *` in external
   APIs.
 
   This struct holds a list of `Curl_easy` structs that have been added to this
-  handle with [`curl_multi_add_handle()`][13]. The start of the list is
+  handle with [`carl_multi_add_handle()`][13]. The start of the list is
   `->easyp` and `->num_easy` is a counter of added `Curl_easy`s.
 
   `->msglist` is a linked list of messages to send back when
-  [`curl_multi_info_read()`][14] is called. Basically a node is added to that
+  [`carl_multi_info_read()`][14] is called. Basically a node is added to that
   list when an individual `Curl_easy`'s transfer has completed.
 
   `->hostcache` points to the name cache. It is a hash table for looking up
@@ -961,19 +961,19 @@ for older and later versions as things don't change drastically that often.
 
   `->closure_handle` is described in the `connectdata` section.
 
-  The libcurl source code generally use the name `multi` for the variable that
+  The libcarl source code generally use the name `multi` for the variable that
   points to the `Curl_multi` struct.
 
 <a name="Curl_handler"></a>
 ## Curl_handler
 
-  Each unique protocol that is supported by libcurl needs to provide at least
+  Each unique protocol that is supported by libcarl needs to provide at least
   one `Curl_handler` struct. It defines what the protocol is called and what
   functions the main code should call to deal with protocol specific issues.
   In general, there's a source file named `[protocol].c` in which there's a
   `struct Curl_handler Curl_handler_[protocol]` declared. In `url.c` there's
   then the main array with all individual `Curl_handler` structs pointed to
-  from a single array which is scanned through when a URL is given to libcurl
+  from a single array which is scanned through when a URL is given to libcarl
   to work with.
 
   `->scheme` is the URL scheme name, usually spelled out in uppercase. That's
@@ -1026,7 +1026,7 @@ for older and later versions as things don't change drastically that often.
 
   `->defport` is the default report TCP or UDP port this protocol uses
 
-  `->protocol` is one or more bits in the `CURLPROTO_*` set. The SSL versions
+  `->protocol` is one or more bits in the `CARLPROTO_*` set. The SSL versions
   have their "base" protocol set and then the SSL variation. Like
   "HTTP|HTTPS".
 
@@ -1063,11 +1063,11 @@ for older and later versions as things don't change drastically that often.
 <a name="Curl_share"></a>
 ## Curl_share
 
-  The libcurl share API allocates a `Curl_share` struct, exposed to the
-  external API as `CURLSH *`.
+  The libcarl share API allocates a `Curl_share` struct, exposed to the
+  external API as `CARLSH *`.
 
   The idea is that the struct can have a set of its own versions of caches and
-  pools and then by providing this struct in the `CURLOPT_SHARE` option, those
+  pools and then by providing this struct in the `CARLOPT_SHARE` option, those
   specific `Curl_easy`s will use the caches/pools that this share handle
   holds.
 
@@ -1086,18 +1086,18 @@ for older and later versions as things don't change drastically that often.
   the share API.
 
 
-[1]: https://curl.se/libcurl/c/curl_easy_setopt.html
-[2]: https://curl.se/libcurl/c/curl_easy_init.html
+[1]: https://carl.se/libcarl/c/carl_easy_setopt.html
+[2]: https://carl.se/libcarl/c/carl_easy_init.html
 [3]: https://c-ares.haxx.se/
 [4]: https://tools.ietf.org/html/rfc7230 "RFC 7230"
-[5]: https://curl.se/libcurl/c/CURLOPT_ACCEPT_ENCODING.html
-[6]: https://curl.se/docs/manpage.html#--compressed
-[7]: https://curl.se/libcurl/c/curl_multi_socket_action.html
-[8]: https://curl.se/libcurl/c/curl_multi_timeout.html
-[9]: https://curl.se/libcurl/c/curl_multi_setopt.html
-[10]: https://curl.se/libcurl/c/CURLMOPT_TIMERFUNCTION.html
-[11]: https://curl.se/libcurl/c/curl_multi_perform.html
-[12]: https://curl.se/libcurl/c/curl_multi_fdset.html
-[13]: https://curl.se/libcurl/c/curl_multi_add_handle.html
-[14]: https://curl.se/libcurl/c/curl_multi_info_read.html
+[5]: https://carl.se/libcarl/c/CARLOPT_ACCEPT_ENCODING.html
+[6]: https://carl.se/docs/manpage.html#--compressed
+[7]: https://carl.se/libcarl/c/carl_multi_socket_action.html
+[8]: https://carl.se/libcarl/c/carl_multi_timeout.html
+[9]: https://carl.se/libcarl/c/carl_multi_setopt.html
+[10]: https://carl.se/libcarl/c/CARLMOPT_TIMERFUNCTION.html
+[11]: https://carl.se/libcarl/c/carl_multi_perform.html
+[12]: https://carl.se/libcarl/c/carl_multi_fdset.html
+[13]: https://carl.se/libcarl/c/carl_multi_add_handle.html
+[14]: https://carl.se/libcarl/c/carl_multi_info_read.html
 [15]: https://tools.ietf.org/html/rfc7231#section-3.1.2.2

@@ -37,7 +37,7 @@ http
 HTTP GET with -J, Content-Disposition, uneven quotes
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
 http://%HOSTIP:%HTTPPORT/1313 -J -O
@@ -50,7 +50,7 @@ http://%HOSTIP:%HTTPPORT/1313 -J -O
 <protocol>
 GET /1313 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
  */
 #include <stdio.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /* some requirements for this to work:
    1.   set pCertFile to the file with the client certificate
@@ -41,14 +41,14 @@
 
    !! verify of the server certificate is not implemented here !!
 
-   **** This example only works with libcurl 7.9.3 and later! ****
+   **** This example only works with libcarl 7.9.3 and later! ****
 
 */
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   FILE *headerfile;
   const char *pPassphrase = NULL;
 
@@ -73,69 +73,69 @@ int main(void)
 
   headerfile = fopen(pHeaderFile, "wb");
 
-  curl_global_init(CURL_GLOBAL_DEFAULT);
+  carl_global_init(CARL_GLOBAL_DEFAULT);
 
-  curl = curl_easy_init();
-  if(curl) {
+  carl = carl_easy_init();
+  if(carl) {
     /* what call to write: */
-    curl_easy_setopt(curl, CURLOPT_URL, "HTTPS://your.favourite.ssl.site");
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, headerfile);
+    carl_easy_setopt(carl, CARLOPT_URL, "HTTPS://your.favourite.ssl.site");
+    carl_easy_setopt(carl, CARLOPT_HEADERDATA, headerfile);
 
     do { /* dummy loop, just to break out from */
       if(pEngine) {
         /* use crypto engine */
-        if(curl_easy_setopt(curl, CURLOPT_SSLENGINE, pEngine) != CURLE_OK) {
+        if(carl_easy_setopt(carl, CARLOPT_SSLENGINE, pEngine) != CARLE_OK) {
           /* load the crypto engine */
           fprintf(stderr, "can't set crypto engine\n");
           break;
         }
-        if(curl_easy_setopt(curl, CURLOPT_SSLENGINE_DEFAULT, 1L) != CURLE_OK) {
+        if(carl_easy_setopt(carl, CARLOPT_SSLENGINE_DEFAULT, 1L) != CARLE_OK) {
           /* set the crypto engine as default */
           /* only needed for the first time you load
-             a engine in a curl object... */
+             a engine in a carl object... */
           fprintf(stderr, "can't set crypto engine as default\n");
           break;
         }
       }
       /* cert is stored PEM coded in file... */
       /* since PEM is default, we needn't set it for PEM */
-      curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, "PEM");
+      carl_easy_setopt(carl, CARLOPT_SSLCERTTYPE, "PEM");
 
       /* set the cert for client authentication */
-      curl_easy_setopt(curl, CURLOPT_SSLCERT, pCertFile);
+      carl_easy_setopt(carl, CARLOPT_SSLCERT, pCertFile);
 
       /* sorry, for engine we must set the passphrase
          (if the key has one...) */
       if(pPassphrase)
-        curl_easy_setopt(curl, CURLOPT_KEYPASSWD, pPassphrase);
+        carl_easy_setopt(carl, CARLOPT_KEYPASSWD, pPassphrase);
 
       /* if we use a key stored in a crypto engine,
          we must set the key type to "ENG" */
-      curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, pKeyType);
+      carl_easy_setopt(carl, CARLOPT_SSLKEYTYPE, pKeyType);
 
       /* set the private key (file or ID in engine) */
-      curl_easy_setopt(curl, CURLOPT_SSLKEY, pKeyName);
+      carl_easy_setopt(carl, CARLOPT_SSLKEY, pKeyName);
 
       /* set the file with the certs vaildating the server */
-      curl_easy_setopt(curl, CURLOPT_CAINFO, pCACertFile);
+      carl_easy_setopt(carl, CARLOPT_CAINFO, pCACertFile);
 
       /* disconnect if we can't validate server's cert */
-      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+      carl_easy_setopt(carl, CARLOPT_SSL_VERIFYPEER, 1L);
 
       /* Perform the request, res will get the return code */
-      res = curl_easy_perform(curl);
+      res = carl_easy_perform(carl);
       /* Check for errors */
-      if(res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                curl_easy_strerror(res));
+      if(res != CARLE_OK)
+        fprintf(stderr, "carl_easy_perform() failed: %s\n",
+                carl_easy_strerror(res));
 
       /* we are done... */
     } while(0);
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return 0;
 }

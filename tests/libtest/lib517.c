@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -152,7 +152,7 @@ int test(char *URL)
   (void)URL; /* not used */
 
   for(i = 0; dates[i].input; i++) {
-    time_t out = curl_getdate(dates[i].input, NULL);
+    time_t out = carl_getdate(dates[i].input, NULL);
     if(out != dates[i].output) {
       printf("WRONGLY %s => %ld (instead of %ld)\n",
              dates[i].input, out, dates[i].output);

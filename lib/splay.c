@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include "splay.h"
 
@@ -37,7 +37,7 @@
  * Splay using the key i (which may or may not be in the tree.) The starting
  * root is t.
  */
-struct Curl_tree *Curl_splay(struct curltime i,
+struct Curl_tree *Curl_splay(struct carltime i,
                              struct Curl_tree *t)
 {
   struct Curl_tree N, *l, *r, *y;
@@ -96,11 +96,11 @@ struct Curl_tree *Curl_splay(struct curltime i,
  *
  * @unittest: 1309
  */
-struct Curl_tree *Curl_splayinsert(struct curltime i,
+struct Curl_tree *Curl_splayinsert(struct carltime i,
                                    struct Curl_tree *t,
                                    struct Curl_tree *node)
 {
-  static const struct curltime KEY_NOTUSED = {
+  static const struct carltime KEY_NOTUSED = {
     (time_t)-1, (unsigned int)-1
   }; /* will *NEVER* appear */
 
@@ -150,11 +150,11 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
 /* Finds and deletes the best-fit node from the tree. Return a pointer to the
    resulting tree.  best-fit means the smallest node if it is not larger than
    the key */
-struct Curl_tree *Curl_splaygetbest(struct curltime i,
+struct Curl_tree *Curl_splaygetbest(struct carltime i,
                                     struct Curl_tree *t,
                                     struct Curl_tree **removed)
 {
-  static struct curltime tv_zero = {0, 0};
+  static struct carltime tv_zero = {0, 0};
   struct Curl_tree *x;
 
   if(!t) {
@@ -210,7 +210,7 @@ int Curl_splayremove(struct Curl_tree *t,
                      struct Curl_tree *removenode,
                      struct Curl_tree **newroot)
 {
-  static const struct curltime KEY_NOTUSED = {
+  static const struct carltime KEY_NOTUSED = {
     (time_t)-1, (unsigned int)-1
   }; /* will *NEVER* appear */
   struct Curl_tree *x;

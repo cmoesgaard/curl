@@ -29,13 +29,13 @@ Funny-head: yesyes
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib500
 </tool>
 
  <name>
-simple libcurl HTTP GET tool
+simple libcarl HTTP GET tool
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT/500 log/ip500

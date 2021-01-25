@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_IMAP_H
-#define HEADER_CURL_IMAP_H
+#ifndef HEADER_CARL_IMAP_H
+#define HEADER_CARL_IMAP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 #include "pingpong.h"
-#include "curl_sasl.h"
+#include "carl_sasl.h"
 
 /****************************************************************************
  * IMAP unique setup
@@ -54,7 +54,7 @@ typedef enum {
    perhaps the Curl_easy is changed between the times the connection is
    used. */
 struct IMAP {
-  curl_pp_transfer transfer;
+  carl_pp_transfer transfer;
   char *mailbox;          /* Mailbox to select */
   char *uidvalidity;      /* UIDVALIDITY to check in select */
   char *uid;              /* Message UID to fetch */
@@ -96,4 +96,4 @@ extern const struct Curl_handler Curl_handler_imaps;
 #define IMAP_TYPE_NONE      0
 #define IMAP_TYPE_ANY       ~0U
 
-#endif /* HEADER_CURL_IMAP_H */
+#endif /* HEADER_CARL_IMAP_H */

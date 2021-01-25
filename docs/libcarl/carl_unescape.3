@@ -1,0 +1,48 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_unescape 3 "22 March 2001" "libcarl 7.7" "libcarl Manual"
+.SH NAME
+carl_unescape - URL decodes the given string
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "char *carl_unescape( const char *" url ", int "length " );"
+.ad
+.SH DESCRIPTION
+Obsolete function. Use \fIcarl_easy_unescape(3)\fP instead!
+
+This function will convert the given URL encoded input string to a "plain
+string" and return that as a new allocated string. All input characters that
+are URL encoded (%XX where XX is a two-digit hexadecimal number) will be
+converted to their plain text versions.
+
+If the 'length' argument is set to 0, carl_unescape() will use strlen() on the
+input 'url' string to find out the size.
+
+You must \fIcarl_free(3)\fP the returned string when you're done with it.
+.SH AVAILABILITY
+Since 7.15.4, \fIcarl_easy_unescape(3)\fP should be used. This function will
+be removed in a future release.
+.SH RETURN VALUE
+A pointer to a null-terminated string or NULL if it failed.
+.SH "SEE ALSO"
+.br carl_easy_escape "(3)," carl_easy_unescape "(3)," carl_free "(3)," RFC 2396

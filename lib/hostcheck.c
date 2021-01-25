@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(USE_OPENSSL)                                \
   || defined(USE_GSKIT)                                 \
@@ -38,7 +38,7 @@
 #include "strcase.h"
 #include "inet_pton.h"
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -83,14 +83,14 @@ static int hostmatch(char *hostname, char *pattern)
   pattern_wildcard = strchr(pattern, '*');
   if(pattern_wildcard == NULL)
     return strcasecompare(pattern, hostname) ?
-      CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+      CARL_HOST_MATCH : CARL_HOST_NOMATCH;
 
   /* detect IP address as hostname and fail the match if so */
   if(Curl_inet_pton(AF_INET, hostname, &ignored) > 0)
-    return CURL_HOST_NOMATCH;
+    return CARL_HOST_NOMATCH;
 #ifdef ENABLE_IPV6
   if(Curl_inet_pton(AF_INET6, hostname, &si6.sin6_addr) > 0)
-    return CURL_HOST_NOMATCH;
+    return CARL_HOST_NOMATCH;
 #endif
 
   /* We require at least 2 dots in pattern to avoid too wide wildcard
@@ -104,25 +104,25 @@ static int hostmatch(char *hostname, char *pattern)
   }
   if(!wildcard_enabled)
     return strcasecompare(pattern, hostname) ?
-      CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+      CARL_HOST_MATCH : CARL_HOST_NOMATCH;
 
   hostname_label_end = strchr(hostname, '.');
   if(hostname_label_end == NULL ||
      !strcasecompare(pattern_label_end, hostname_label_end))
-    return CURL_HOST_NOMATCH;
+    return CARL_HOST_NOMATCH;
 
   /* The wildcard must match at least one character, so the left-most
      label of the hostname is at least as large as the left-most label
      of the pattern. */
   if(hostname_label_end - hostname < pattern_label_end - pattern)
-    return CURL_HOST_NOMATCH;
+    return CARL_HOST_NOMATCH;
 
   prefixlen = pattern_wildcard - pattern;
   suffixlen = pattern_label_end - (pattern_wildcard + 1);
   return strncasecompare(pattern, hostname, prefixlen) &&
     strncasecompare(pattern_wildcard + 1, hostname_label_end - suffixlen,
                     suffixlen) ?
-    CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+    CARL_HOST_MATCH : CARL_HOST_NOMATCH;
 }
 
 int Curl_cert_hostcheck(const char *match_pattern, const char *hostname)
@@ -136,7 +136,7 @@ int Curl_cert_hostcheck(const char *match_pattern, const char *hostname)
     if(matchp) {
       char *hostp = strdup(hostname);
       if(hostp) {
-        if(hostmatch(hostp, matchp) == CURL_HOST_MATCH)
+        if(hostmatch(hostp, matchp) == CARL_HOST_MATCH)
           res = 1;
         free(hostp);
       }

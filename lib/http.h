@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HTTP_H
-#define HEADER_CURL_HTTP_H
+#ifndef HEADER_CARL_HTTP_H
+#define HEADER_CARL_HTTP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 typedef enum {
   HTTPREQ_GET,
@@ -32,7 +32,7 @@ typedef enum {
   HTTPREQ_HEAD
 } Curl_HttpReq;
 
-#ifndef CURL_DISABLE_HTTP
+#ifndef CARL_DISABLE_HTTP
 
 #ifdef USE_NGHTTP2
 #include <nghttp2/nghttp2.h>
@@ -55,23 +55,23 @@ char *Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
                              const char *thisheader);
 #ifndef USE_HYPER
-CURLcode Curl_buffer_send(struct dynbuf *in,
+CARLcode Curl_buffer_send(struct dynbuf *in,
                           struct Curl_easy *data,
-                          curl_off_t *bytes_written,
+                          carl_off_t *bytes_written,
                           size_t included_body_bytes,
                           int socketindex);
 #else
-#define Curl_buffer_send(a,b,c,d,e) CURLE_OK
+#define Curl_buffer_send(a,b,c,d,e) CARLE_OK
 #endif
 
-CURLcode Curl_add_timecondition(struct Curl_easy *data,
+CARLcode Curl_add_timecondition(struct Curl_easy *data,
 #ifndef USE_HYPER
                                 struct dynbuf *req
 #else
                                 void *headers
 #endif
   );
-CURLcode Curl_add_custom_headers(struct Curl_easy *data,
+CARLcode Curl_add_custom_headers(struct Curl_easy *data,
                                  bool is_connect,
 #ifndef USE_HYPER
                                  struct dynbuf *req
@@ -79,56 +79,56 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                                  void *headers
 #endif
   );
-CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
+CARLcode Curl_http_compile_trailers(struct carl_slist *trailers,
                                     struct dynbuf *buf,
                                     struct Curl_easy *handle);
 
 void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
                       const char **method, Curl_HttpReq *);
-CURLcode Curl_http_useragent(struct Curl_easy *data);
-CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn);
-CURLcode Curl_http_target(struct Curl_easy *data, struct connectdata *conn,
+CARLcode Curl_http_useragent(struct Curl_easy *data);
+CARLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn);
+CARLcode Curl_http_target(struct Curl_easy *data, struct connectdata *conn,
                           struct dynbuf *req);
-CURLcode Curl_http_statusline(struct Curl_easy *data,
+CARLcode Curl_http_statusline(struct Curl_easy *data,
                               struct connectdata *conn);
-CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
+CARLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
                           char *headp);
-CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
+CARLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq,
                         const char **teep);
-CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
+CARLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
                             struct dynbuf *r, Curl_HttpReq httpreq);
-#ifndef CURL_DISABLE_COOKIES
-CURLcode Curl_http_cookies(struct Curl_easy *data,
+#ifndef CARL_DISABLE_COOKIES
+CARLcode Curl_http_cookies(struct Curl_easy *data,
                            struct connectdata *conn,
                            struct dynbuf *r);
 #else
-#define Curl_http_cookies(a,b,c) CURLE_OK
+#define Curl_http_cookies(a,b,c) CARLE_OK
 #endif
-CURLcode Curl_http_resume(struct Curl_easy *data,
+CARLcode Curl_http_resume(struct Curl_easy *data,
                           struct connectdata *conn,
                           Curl_HttpReq httpreq);
-CURLcode Curl_http_range(struct Curl_easy *data,
+CARLcode Curl_http_range(struct Curl_easy *data,
                          Curl_HttpReq httpreq);
-CURLcode Curl_http_firstwrite(struct Curl_easy *data,
+CARLcode Curl_http_firstwrite(struct Curl_easy *data,
                               struct connectdata *conn,
                               bool *done);
 
 /* protocol-specific functions set up to be called by the main engine */
-CURLcode Curl_http(struct Curl_easy *data, bool *done);
-CURLcode Curl_http_done(struct Curl_easy *data, CURLcode, bool premature);
-CURLcode Curl_http_connect(struct Curl_easy *data, bool *done);
+CARLcode Curl_http(struct Curl_easy *data, bool *done);
+CARLcode Curl_http_done(struct Curl_easy *data, CARLcode, bool premature);
+CARLcode Curl_http_connect(struct Curl_easy *data, bool *done);
 
 /* These functions are in http.c */
-CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
+CARLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
                               const char *auth);
-CURLcode Curl_http_auth_act(struct Curl_easy *data);
+CARLcode Curl_http_auth_act(struct Curl_easy *data);
 
 /* If only the PICKNONE bit is set, there has been a round-trip and we
    selected to use no auth at all. Ie, we actively select no auth, as opposed
-   to not having one selected. The other CURLAUTH_* defines are present in the
-   public curl/curl.h header. */
-#define CURLAUTH_PICKNONE (1<<30) /* don't use auth */
+   to not having one selected. The other CARLAUTH_* defines are present in the
+   public carl/carl.h header. */
+#define CARLAUTH_PICKNONE (1<<30) /* don't use auth */
 
 /* MAX_INITIAL_POST_SIZE indicates the number of bytes that will make the POST
    data get included in the initial data chunk sent to the server. If the
@@ -146,7 +146,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 #define MAX_INITIAL_POST_SIZE (64*1024)
 #endif
 
-/* EXPECT_100_THRESHOLD is the request body size limit for when libcurl will
+/* EXPECT_100_THRESHOLD is the request body size limit for when libcarl will
  * automatically add an "Expect: 100-continue" header in HTTP requests. When
  * the size is unknown, it will always add it.
  *
@@ -155,7 +155,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 #define EXPECT_100_THRESHOLD (1024*1024)
 #endif
 
-#endif /* CURL_DISABLE_HTTP */
+#endif /* CARL_DISABLE_HTTP */
 
 #ifdef USE_NGHTTP3
 struct h3out; /* see ngtcp2 */
@@ -165,20 +165,20 @@ struct h3out; /* see ngtcp2 */
  * HTTP unique setup
  ***************************************************************************/
 struct HTTP {
-  curl_mimepart *sendit;
-  curl_off_t postsize; /* off_t to handle large file sizes */
+  carl_mimepart *sendit;
+  carl_off_t postsize; /* off_t to handle large file sizes */
   const char *postdata;
 
   const char *p_pragma;      /* Pragma: string */
 
   /* For FORM posting */
-  curl_mimepart form;
+  carl_mimepart form;
 
   struct back {
-    curl_read_callback fread_func; /* backup storage for fread pointer */
+    carl_read_callback fread_func; /* backup storage for fread pointer */
     void *fread_in;           /* backup storage for fread_in pointer */
     const char *postdata;
-    curl_off_t postsize;
+    carl_off_t postsize;
   } backup;
 
   enum {
@@ -188,7 +188,7 @@ struct HTTP {
     HTTPSEND_LAST     /* never use this */
   } sending;
 
-#ifndef CURL_DISABLE_HTTP
+#ifndef CARL_DISABLE_HTTP
   struct dynbuf send_buffer; /* used if the request couldn't be sent in one
                                 chunk, points to an allocated send_buffer
                                 struct */
@@ -206,7 +206,7 @@ struct HTTP {
   int status_code; /* HTTP status code */
   const uint8_t *pausedata; /* pointer to data received in on_data_chunk */
   size_t pauselen; /* the number of bytes left in data */
-  bool close_handled; /* TRUE if stream closure is handled by libcurl */
+  bool close_handled; /* TRUE if stream closure is handled by libcarl */
 
   char **push_headers;       /* allocated array */
   size_t push_headers_used;  /* number of entries filled in */
@@ -222,7 +222,7 @@ struct HTTP {
   /* fields used by both HTTP/2 and HTTP/3 */
   const uint8_t *upload_mem; /* points to a buffer to read from */
   size_t upload_len; /* size of the buffer 'upload_mem' points to */
-  curl_off_t upload_left; /* number of bytes left to upload */
+  carl_off_t upload_left; /* number of bytes left to upload */
 #endif
 
 #ifdef ENABLE_QUIC
@@ -280,7 +280,7 @@ struct http_conn {
 #endif
 };
 
-CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
+CARLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,
                                      ssize_t *nread,
                                      bool *stop_reading);
@@ -298,9 +298,9 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
  * @param proxytunnel boolean if this is the request setting up a "proxy
  * tunnel"
  *
- * @returns CURLcode
+ * @returns CARLcode
  */
-CURLcode
+CARLcode
 Curl_http_output_auth(struct Curl_easy *data,
                       struct connectdata *conn,
                       const char *request,
@@ -309,4 +309,4 @@ Curl_http_output_auth(struct Curl_easy *data,
                       bool proxytunnel); /* TRUE if this is the request setting
                                             up the proxy tunnel */
 
-#endif /* HEADER_CURL_HTTP_H */
+#endif /* HEADER_CARL_HTTP_H */

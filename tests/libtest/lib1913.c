@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,22 +27,22 @@
 
 int test(char *URL)
 {
-  CURLcode ret = CURLE_OK;
-  CURL *hnd;
+  CARLcode ret = CARLE_OK;
+  CARL *hnd;
   start_test_timing();
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  hnd = curl_easy_init();
+  hnd = carl_easy_init();
   if(hnd) {
-    curl_easy_setopt(hnd, CURLOPT_URL, URL);
-    curl_easy_setopt(hnd, CURLOPT_NOBODY, 1L);
+    carl_easy_setopt(hnd, CARLOPT_URL, URL);
+    carl_easy_setopt(hnd, CARLOPT_NOBODY, 1L);
     if(libtest_arg2)
       /* test1914 sets this extra arg */
-      curl_easy_setopt(hnd, CURLOPT_FILETIME, 1L);
-    ret = curl_easy_perform(hnd);
-    curl_easy_cleanup(hnd);
+      carl_easy_setopt(hnd, CARLOPT_FILETIME, 1L);
+    ret = carl_easy_perform(hnd);
+    carl_easy_cleanup(hnd);
   }
-  curl_global_cleanup();
+  carl_global_cleanup();
   return (int)ret;
 }

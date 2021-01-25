@@ -6,8 +6,8 @@ Protocols: HTTP SMTP IMAP
 Mutexed: data head upload-file
 Category: http upload
 ---
-For HTTP protocol family, this lets curl emulate a filled-in form in which a
-user has pressed the submit button. This causes curl to POST data using the
+For HTTP protocol family, this lets carl emulate a filled-in form in which a
+user has pressed the submit button. This causes carl to POST data using the
 Content-Type multipart/form-data according to RFC 2388.
 
 For SMTP and IMAP protocols, this is the mean to compose a multipart mail
@@ -20,9 +20,9 @@ is then that @ makes a file get attached in the post as a file upload, while
 the < makes a text field and just get the contents for that text field from a
 file.
 
-Tell curl to read content from stdin instead of a file by using - as
+Tell carl to read content from stdin instead of a file by using - as
 filename. This goes for both @ and < constructs. When stdin is used, the
-contents is buffered in memory first by curl to determine its size and allow a
+contents is buffered in memory first by carl to determine its size and allow a
 possible resend.  Defining a part's data from a named non-regular file (such
 as a named pipe or similar) is unfortunately not subject to buffering and will
 be effectively read at transmission time; since the full size is unknown
@@ -32,38 +32,38 @@ by IMAP.
 Example: send an image to an HTTP server, where \&'profile' is the name of the
 form-field to which the file portrait.jpg will be the input:
 
- curl -F profile=@portrait.jpg https://example.com/upload.cgi
+ carl -F profile=@portrait.jpg https://example.com/upload.cgi
 
 Example: send your name and shoe size in two text fields to the server:
 
- curl -F name=John -F shoesize=11 https://example.com/
+ carl -F name=John -F shoesize=11 https://example.com/
 
 Example: send your essay in a text field to the server. Send it as a plain
 text field, but get the contents for it from a local file:
 
- curl -F "story=<hugefile.txt" https://example.com/
+ carl -F "story=<hugefile.txt" https://example.com/
 
-You can also tell curl what Content-Type to use by using 'type=', in a manner
+You can also tell carl what Content-Type to use by using 'type=', in a manner
 similar to:
 
- curl -F "web=@index.html;type=text/html" example.com
+ carl -F "web=@index.html;type=text/html" example.com
 
 or
 
- curl -F "name=daniel;type=text/foo" example.com
+ carl -F "name=daniel;type=text/foo" example.com
 
 You can also explicitly change the name field of a file upload part by setting
 filename=, like this:
 
- curl -F "file=@localfile;filename=nameinpost" example.com
+ carl -F "file=@localfile;filename=nameinpost" example.com
 
 If filename/path contains ',' or ';', it must be quoted by double-quotes like:
 
- curl -F "file=@\\"localfile\\";filename=\\"nameinpost\\"" example.com
+ carl -F "file=@\\"localfile\\";filename=\\"nameinpost\\"" example.com
 
 or
 
- curl -F 'file=@"localfile";filename="nameinpost"' example.com
+ carl -F 'file=@"localfile";filename="nameinpost"' example.com
 
 Note that if a filename/path is quoted by double-quotes, any double-quote
 or backslash within the filename must be escaped by backslash.
@@ -71,15 +71,15 @@ or backslash within the filename must be escaped by backslash.
 Quoting must also be applied to non-file data if it contains semicolons,
 leading/trailing spaces or leading double quotes:
 
- curl -F 'colors="red; green; blue";type=text/x-myapp' example.com
+ carl -F 'colors="red; green; blue";type=text/x-myapp' example.com
 
 You can add custom headers to the field by setting headers=, like
 
-  curl -F "submit=OK;headers=\\"X-submit-type: OK\\"" example.com
+  carl -F "submit=OK;headers=\\"X-submit-type: OK\\"" example.com
 
 or
 
-  curl -F "submit=OK;headers=@headerfile" example.com
+  carl -F "submit=OK;headers=@headerfile" example.com
 
 The headers= keyword may appear more that once and above notes about quoting
 apply. When headers are read from a file, Empty lines and lines starting
@@ -112,7 +112,7 @@ Example: the following command sends an SMTP mime e-mail consisting in an
 inline part in two alternative formats: plain text and HTML. It attaches a
 text file:
 
- curl -F '=(;type=multipart/alternative' \\
+ carl -F '=(;type=multipart/alternative' \\
 .br
          -F '=plain text message' \\
 .br
@@ -130,7 +130,7 @@ data according to the corresponding schemes, limiting lines length to
 Example: send multipart mail with a quoted-printable text message and a
 base64 attached file:
 
- curl -F '=text message;encoder=quoted-printable' \\
+ carl -F '=text message;encoder=quoted-printable' \\
 .br
       -F '=@localfile;encoder=base64' ... smtp://example.com
 

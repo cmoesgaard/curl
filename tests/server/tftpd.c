@@ -11,7 +11,7 @@
  * This code includes many modifications by Jim Guyton <guyton@rand-unix>
  *
  * This source file was started based on netkit-tftpd 0.17
- * Heavily modified for curl's test suite
+ * Heavily modified for carl's test suite
  */
 
 /*
@@ -86,10 +86,10 @@
 #include <pwd.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "util.h"
 #include "server_sockaddr.h"
@@ -198,9 +198,9 @@ static tftphdr_storage_t buf;
 static tftphdr_storage_t ackbuf;
 
 static srvr_sockaddr_union_t from;
-static curl_socklen_t fromlen;
+static carl_socklen_t fromlen;
 
-static curl_socket_t peer = CURL_SOCKET_BAD;
+static carl_socket_t peer = CARL_SOCKET_BAD;
 
 static unsigned int timeout;
 static unsigned int maxtimeout = 5 * TIMEOUT;
@@ -238,7 +238,7 @@ static void read_ahead(struct testcase *test, int convert);
 
 static ssize_t write_behind(struct testcase *test, int convert);
 
-static int synchnet(curl_socket_t);
+static int synchnet(carl_socket_t);
 
 static int do_tftp(struct testcase *test, struct tftphdr *tp, ssize_t size);
 
@@ -506,7 +506,7 @@ static ssize_t write_behind(struct testcase *test, int convert)
  * is active).
  */
 
-static int synchnet(curl_socket_t f /* socket to flush */)
+static int synchnet(carl_socket_t f /* socket to flush */)
 {
 
 #if defined(HAVE_IOCTLSOCKET)
@@ -517,7 +517,7 @@ static int synchnet(curl_socket_t f /* socket to flush */)
   int j = 0;
   char rbuf[PKTSIZE];
   srvr_sockaddr_union_t fromaddr;
-  curl_socklen_t fromaddrlen;
+  carl_socklen_t fromaddrlen;
 
   for(;;) {
 #if defined(HAVE_IOCTLSOCKET)
@@ -551,7 +551,7 @@ int main(int argc, char **argv)
   ssize_t n = 0;
   int arg = 1;
   unsigned short port = DEFAULT_PORT;
-  curl_socket_t sock = CURL_SOCKET_BAD;
+  carl_socket_t sock = CARL_SOCKET_BAD;
   int flag;
   int rc;
   int error;
@@ -606,7 +606,7 @@ int main(int argc, char **argv)
       if(argc>arg) {
         char *endptr;
         unsigned long ulnum = strtoul(argv[arg], &endptr, 10);
-        port = curlx_ultous(ulnum);
+        port = carlx_ultous(ulnum);
         arg++;
       }
     }
@@ -648,7 +648,7 @@ int main(int argc, char **argv)
     sock = socket(AF_INET6, SOCK_DGRAM, 0);
 #endif
 
-  if(CURL_SOCKET_BAD == sock) {
+  if(CARL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
            error, strerror(error));
@@ -695,7 +695,7 @@ int main(int argc, char **argv)
   if(!port) {
     /* The system was supposed to choose a port number, figure out which
        port we actually got and update the listener port value with it. */
-    curl_socklen_t la_size;
+    carl_socklen_t la_size;
     srvr_sockaddr_union_t localaddr;
 #ifdef ENABLE_IPV6
     if(!use_ipv6)
@@ -780,7 +780,7 @@ int main(int argc, char **argv)
 #endif
       from.sa4.sin_family = AF_INET;
       peer = socket(AF_INET, SOCK_DGRAM, 0);
-      if(CURL_SOCKET_BAD == peer) {
+      if(CARL_SOCKET_BAD == peer) {
         logmsg("socket");
         result = 2;
         break;
@@ -795,7 +795,7 @@ int main(int argc, char **argv)
     else {
       from.sa6.sin6_family = AF_INET6;
       peer = socket(AF_INET6, SOCK_DGRAM, 0);
-      if(CURL_SOCKET_BAD == peer) {
+      if(CARL_SOCKET_BAD == peer) {
         logmsg("socket");
         result = 2;
         break;
@@ -819,7 +819,7 @@ int main(int argc, char **argv)
       free(test.buffer);
     }
     sclose(peer);
-    peer = CURL_SOCKET_BAD;
+    peer = CARL_SOCKET_BAD;
 
     if(got_exit_signal)
       break;
@@ -838,10 +838,10 @@ tftpd_cleanup:
   if(test.ofile > 0)
     close(test.ofile);
 
-  if((peer != sock) && (peer != CURL_SOCKET_BAD))
+  if((peer != sock) && (peer != CARL_SOCKET_BAD))
     sclose(peer);
 
-  if(sock != CURL_SOCKET_BAD)
+  if(sock != CARL_SOCKET_BAD)
     sclose(sock);
 
   if(got_exit_signal)

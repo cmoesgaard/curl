@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CB_SEE_H
-#define HEADER_CURL_TOOL_CB_SEE_H
+#ifndef HEADER_CARL_TOOL_CB_SEE_H
+#define HEADER_CARL_TOOL_CB_SEE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
 
 #if defined(WIN32) && !defined(HAVE_FTRUNCATE)
 
-int tool_ftruncate64(int fd, curl_off_t where);
+int tool_ftruncate64(int fd, carl_off_t where);
 
 #undef  ftruncate
 #define ftruncate(fd,where) tool_ftruncate64(fd,where)
@@ -36,9 +36,9 @@ int tool_ftruncate64(int fd, curl_off_t where);
 #endif /* WIN32  && ! HAVE_FTRUNCATE */
 
 /*
-** callback for CURLOPT_SEEKFUNCTION
+** callback for CARLOPT_SEEKFUNCTION
 */
 
-int tool_seek_cb(void *userdata, curl_off_t offset, int whence);
+int tool_seek_cb(void *userdata, carl_off_t offset, int whence);
 
-#endif /* HEADER_CURL_TOOL_CB_SEE_H */
+#endif /* HEADER_CARL_TOOL_CB_SEE_H */

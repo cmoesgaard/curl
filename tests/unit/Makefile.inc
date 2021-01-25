@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 
 # these files are used in every single unit test program
 
-UNITFILES = curlcheck.h \
+UNITFILES = carlcheck.h \
  ../libtest/test.h \
  ../libtest/first.c
 
@@ -72,8 +72,8 @@ unit1330_CPPFLAGS = $(AM_CPPFLAGS)
 
 unit1394_SOURCES = unit1394.c $(UNITFILES)
 unit1394_CPPFLAGS = $(AM_CPPFLAGS) $(LIBMETALINK_CPPFLAGS)
-unit1394_LDADD = @LIBMETALINK_LIBS@ $(top_builddir)/lib/libcurl.la @LIBCURL_LIBS@
-unit1394_LDFLAGS = @LIBMETALINK_LDFLAGS@ $(top_builddir)/src/libcurltool.la
+unit1394_LDADD = @LIBMETALINK_LIBS@ $(top_builddir)/lib/libcarl.la @LIBCARL_LIBS@
+unit1394_LDFLAGS = @LIBMETALINK_LDFLAGS@ $(top_builddir)/src/libcarltool.la
 unit1394_LIBS =
 
 unit1395_SOURCES = unit1395.c $(UNITFILES)
@@ -135,7 +135,7 @@ unit1620_CPPFLAGS = $(AM_CPPFLAGS)
 
 unit1621_SOURCES = unit1621.c $(UNITFILES)
 unit1621_CPPFLAGS = $(AM_CPPFLAGS)
-unit1621_LDADD = $(top_builddir)/src/libcurltool.la $(top_builddir)/lib/libcurl.la
+unit1621_LDADD = $(top_builddir)/src/libcarltool.la $(top_builddir)/lib/libcarl.la
 
 unit1650_SOURCES = unit1650.c $(UNITFILES)
 unit1650_CPPFLAGS = $(AM_CPPFLAGS)

@@ -63,12 +63,12 @@ http://%HOSTIP:%HTTPPORT?oh=what-weird=test/187 -L
 <protocol>
 GET /?oh=what-weird=test/187 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /root/1870002.txt?coolsite=yes HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -44,7 +44,7 @@ perl %SRCDIR/libtest/notexists.pl log/1369
 <protocol>
 GET /1369 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

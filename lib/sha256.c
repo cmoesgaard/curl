@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,13 +21,13 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_CRYPTO_AUTH
+#ifndef CARL_DISABLE_CRYPTO_AUTH
 
 #include "warnless.h"
-#include "curl_sha256.h"
-#include "curl_hmac.h"
+#include "carl_sha256.h"
+#include "carl_hmac.h"
 
 #if defined(USE_OPENSSL)
 
@@ -69,7 +69,7 @@
 
 #include <nettle/sha.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -97,7 +97,7 @@ static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 
 #include <gcrypt.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -126,7 +126,7 @@ static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 
 #include <mbedtls/sha256.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -169,7 +169,7 @@ static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 
 #include <CommonCrypto/CommonDigest.h>
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -288,7 +288,7 @@ struct sha256_state {
 #else
   unsigned __int64 length;
 #endif
-  unsigned long state[8], curlen;
+  unsigned long state[8], carlen;
   unsigned char buf[64];
 };
 typedef struct sha256_state SHA256_CTX;
@@ -370,7 +370,7 @@ static int sha256_compress(struct sha256_state *md,
 /* Initialize the hash state */
 static void SHA256_Init(struct sha256_state *md)
 {
-  md->curlen = 0;
+  md->carlen = 0;
   md->length = 0;
   md->state[0] = 0x6A09E667UL;
   md->state[1] = 0xBB67AE85UL;
@@ -396,10 +396,10 @@ static int SHA256_Update(struct sha256_state *md,
   unsigned long n;
 
 #define block_size 64
-  if(md->curlen > sizeof(md->buf))
+  if(md->carlen > sizeof(md->buf))
     return -1;
   while(inlen > 0) {
-    if(md->curlen == 0 && inlen >= block_size) {
+    if(md->carlen == 0 && inlen >= block_size) {
       if(sha256_compress(md, (unsigned char *)in) < 0)
         return -1;
       md->length += block_size * 8;
@@ -407,16 +407,16 @@ static int SHA256_Update(struct sha256_state *md,
       inlen -= block_size;
     }
     else {
-      n = CURLMIN(inlen, (block_size - md->curlen));
-      memcpy(md->buf + md->curlen, in, n);
-      md->curlen += n;
+      n = CARLMIN(inlen, (block_size - md->carlen));
+      memcpy(md->buf + md->carlen, in, n);
+      md->carlen += n;
       in += n;
       inlen -= n;
-      if(md->curlen == block_size) {
+      if(md->carlen == block_size) {
         if(sha256_compress(md, md->buf) < 0)
           return -1;
         md->length += 8 * block_size;
-        md->curlen = 0;
+        md->carlen = 0;
       }
     }
   }
@@ -435,30 +435,30 @@ static int SHA256_Final(unsigned char *out,
 {
   int i;
 
-  if(md->curlen >= sizeof(md->buf))
+  if(md->carlen >= sizeof(md->buf))
     return -1;
 
   /* Increase the length of the message */
-  md->length += md->curlen * 8;
+  md->length += md->carlen * 8;
 
   /* Append the '1' bit */
-  md->buf[md->curlen++] = (unsigned char)0x80;
+  md->buf[md->carlen++] = (unsigned char)0x80;
 
   /* If the length is currently above 56 bytes we append zeros
    * then compress.  Then we can fall back to padding zeros and length
    * encoding like normal.
    */
-  if(md->curlen > 56) {
-    while(md->curlen < 64) {
-      md->buf[md->curlen++] = (unsigned char)0;
+  if(md->carlen > 56) {
+    while(md->carlen < 64) {
+      md->buf[md->carlen++] = (unsigned char)0;
     }
     sha256_compress(md, md->buf);
-    md->curlen = 0;
+    md->carlen = 0;
   }
 
   /* Pad up to 56 bytes of zeroes */
-  while(md->curlen < 56) {
-    md->buf[md->curlen++] = (unsigned char)0;
+  while(md->carlen < 56) {
+    md->buf[md->carlen++] = (unsigned char)0;
   }
 
   /* Store length */
@@ -491,7 +491,7 @@ void Curl_sha256it(unsigned char *output, const unsigned char *input,
   SHA256_CTX ctx;
 
   SHA256_Init(&ctx);
-  SHA256_Update(&ctx, input, curlx_uztoui(length));
+  SHA256_Update(&ctx, input, carlx_uztoui(length));
   SHA256_Final(output, &ctx);
 }
 
@@ -499,11 +499,11 @@ void Curl_sha256it(unsigned char *output, const unsigned char *input,
 const struct HMAC_params Curl_HMAC_SHA256[] = {
   {
     /* Hash initialization function. */
-    CURLX_FUNCTION_CAST(HMAC_hinit_func, SHA256_Init),
+    CARLX_FUNCTION_CAST(HMAC_hinit_func, SHA256_Init),
     /* Hash update function. */
-    CURLX_FUNCTION_CAST(HMAC_hupdate_func, SHA256_Update),
+    CARLX_FUNCTION_CAST(HMAC_hupdate_func, SHA256_Update),
     /* Hash computation end function. */
-    CURLX_FUNCTION_CAST(HMAC_hfinal_func, SHA256_Final),
+    CARLX_FUNCTION_CAST(HMAC_hfinal_func, SHA256_Final),
     /* Size of hash context structure. */
     sizeof(SHA256_CTX),
     /* Maximum key length. */
@@ -514,4 +514,4 @@ const struct HMAC_params Curl_HMAC_SHA256[] = {
 };
 
 
-#endif /* CURL_DISABLE_CRYPTO_AUTH */
+#endif /* CARL_DISABLE_CRYPTO_AUTH */

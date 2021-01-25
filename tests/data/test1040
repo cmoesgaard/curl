@@ -49,7 +49,7 @@ HTTP GET with resume from end of entirely-downloaded file
  <command>
 http://%HOSTIP:%HTTPPORT/1040 -C -
 </command>
-<file name="log/curl1040.out">
+<file name="log/carl1040.out">
 012345678
 012345678
 012345678
@@ -69,7 +69,7 @@ http://%HOSTIP:%HTTPPORT/1040 -C -
 GET /1040 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=100-
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

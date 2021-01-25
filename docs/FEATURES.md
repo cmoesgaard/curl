@@ -1,6 +1,6 @@
-# Features -- what curl can do
+# Features -- what carl can do
 
-## curl tool
+## carl tool
 
  - config file support
  - multiple URLs in a single command line
@@ -11,7 +11,7 @@
  - metalink support (13)
  - parallel transfers
 
-## libcurl
+## libcarl
 
  - full URL syntax with no length limit
  - custom maximum download time

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,14 +23,14 @@
  * The Strict-Transport-Security header is defined in RFC 6797:
  * https://tools.ietf.org/html/rfc6797
  */
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_HSTS)
-#include <curl/curl.h>
+#if !defined(CARL_DISABLE_HTTP) && defined(USE_HSTS)
+#include <carl/carl.h>
 #include "urldata.h"
 #include "llist.h"
 #include "hsts.h"
-#include "curl_get_line.h"
+#include "carl_get_line.h"
 #include "strcase.h"
 #include "sendf.h"
 #include "strtoofft.h"
@@ -39,8 +39,8 @@
 #include "rename.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define MAX_HSTS_LINE 4095
@@ -57,7 +57,7 @@
 time_t deltatime; /* allow for "adjustments" for unit test purposes */
 static time_t debugtime(void *unused)
 {
-  char *timestr = getenv("CURL_TIME");
+  char *timestr = getenv("CARL_TIME");
   (void)unused;
   if(timestr) {
     unsigned long val = strtol(timestr, NULL, 10) + deltatime;
@@ -105,31 +105,31 @@ static struct stsentry *hsts_entry(void)
   return calloc(sizeof(struct stsentry), 1);
 }
 
-static CURLcode hsts_create(struct hsts *h,
+static CARLcode hsts_create(struct hsts *h,
                             const char *hostname,
                             bool subdomains,
-                            curl_off_t expires)
+                            carl_off_t expires)
 {
   struct stsentry *sts = hsts_entry();
   if(!sts)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   sts->expires = expires;
   sts->includeSubDomains = subdomains;
   sts->host = strdup(hostname);
   if(!sts->host) {
     free(sts);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
   Curl_llist_insert_next(&h->list, h->list.tail, sts, &sts->node);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
+CARLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
                          const char *header)
 {
   const char *p = header;
-  curl_off_t expires = 0;
+  carl_off_t expires = 0;
   bool gotma = FALSE;
   bool gotinc = FALSE;
   bool subdomains = FALSE;
@@ -141,11 +141,11 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
       p++;
     if(Curl_strncasecompare("max-age=", p, 8)) {
       bool quoted = FALSE;
-      CURLofft offt;
+      CARLofft offt;
       char *endp;
 
       if(gotma)
-        return CURLE_BAD_FUNCTION_ARGUMENT;
+        return CARLE_BAD_FUNCTION_ARGUMENT;
 
       p += 8;
       while(*p && ISSPACE(*p))
@@ -154,23 +154,23 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
         p++;
         quoted = TRUE;
       }
-      offt = curlx_strtoofft(p, &endp, 10, &expires);
-      if(offt == CURL_OFFT_FLOW)
-        expires = CURL_OFF_T_MAX;
+      offt = carlx_strtoofft(p, &endp, 10, &expires);
+      if(offt == CARL_OFFT_FLOW)
+        expires = CARL_OFF_T_MAX;
       else if(offt)
         /* invalid max-age */
-        return CURLE_BAD_FUNCTION_ARGUMENT;
+        return CARLE_BAD_FUNCTION_ARGUMENT;
       p = endp;
       if(quoted) {
         if(*p != '\"')
-          return CURLE_BAD_FUNCTION_ARGUMENT;
+          return CARLE_BAD_FUNCTION_ARGUMENT;
         p++;
       }
       gotma = TRUE;
     }
     else if(Curl_strncasecompare("includesubdomains", p, 17)) {
       if(gotinc)
-        return CURLE_BAD_FUNCTION_ARGUMENT;
+        return CARLE_BAD_FUNCTION_ARGUMENT;
       subdomains = TRUE;
       p += 17;
       gotinc = TRUE;
@@ -189,7 +189,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
 
   if(!gotma)
     /* max-age is mandatory */
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
 
   if(!expires) {
     /* remove the entry if present verbatim (without subdomain match) */
@@ -198,12 +198,12 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
       Curl_llist_remove(&h->list, &sts->node, NULL);
       hsts_free(sts);
     }
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
-  if(CURL_OFF_T_MAX - now < expires)
+  if(CARL_OFF_T_MAX - now < expires)
     /* would overflow, use maximum value */
-    expires = CURL_OFF_T_MAX;
+    expires = CARL_OFF_T_MAX;
   else
     expires += now;
 
@@ -217,7 +217,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
   else
     return hsts_create(h, hostname, subdomains, expires);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -262,15 +262,15 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
 /*
  * Send this HSTS entry to the write callback.
  */
-static CURLcode hsts_push(struct Curl_easy *data,
-                          struct curl_index *i,
+static CARLcode hsts_push(struct Curl_easy *data,
+                          struct carl_index *i,
                           struct stsentry *sts,
                           bool *stop)
 {
-  struct curl_hstsentry e;
-  CURLSTScode sc;
+  struct carl_hstsentry e;
+  CARLSTScode sc;
   struct tm stamp;
-  CURLcode result;
+  CARLcode result;
 
   e.name = (char *)sts->host;
   e.namelen = strlen(sts->host);
@@ -286,17 +286,17 @@ static CURLcode hsts_push(struct Curl_easy *data,
 
   sc = data->set.hsts_write(data, &e, i,
                             data->set.hsts_write_userp);
-  *stop = (sc != CURLSTS_OK);
-  return sc == CURLSTS_FAIL ? CURLE_BAD_FUNCTION_ARGUMENT : CURLE_OK;
+  *stop = (sc != CARLSTS_OK);
+  return sc == CARLSTS_FAIL ? CARLE_BAD_FUNCTION_ARGUMENT : CARLE_OK;
 }
 
 /*
  * Write this single hsts entry to a single output line
  */
-static CURLcode hsts_out(struct stsentry *sts, FILE *fp)
+static CARLcode hsts_out(struct stsentry *sts, FILE *fp)
 {
   struct tm stamp;
-  CURLcode result = Curl_gmtime(sts->expires, &stamp);
+  CARLcode result = Curl_gmtime(sts->expires, &stamp);
   if(result)
     return result;
 
@@ -304,48 +304,48 @@ static CURLcode hsts_out(struct stsentry *sts, FILE *fp)
           sts->includeSubDomains ? ".": "", sts->host,
           stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
           stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 
 /*
  * Curl_https_save() writes the HSTS cache to file and callback.
  */
-CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
+CARLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
                         const char *file)
 {
   struct Curl_llist_element *e;
   struct Curl_llist_element *n;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   FILE *out;
   char *tempstore;
   unsigned char randsuffix[9];
 
   if(!h)
     /* no cache activated */
-    return CURLE_OK;
+    return CARLE_OK;
 
   /* if no new name is given, use the one we stored from the load */
   if(!file && h->filename)
     file = h->filename;
 
-  if((h->flags & CURLHSTS_READONLYFILE) || !file || !file[0])
+  if((h->flags & CARLHSTS_READONLYFILE) || !file || !file[0])
     /* marked as read-only, no file or zero length file name */
     goto skipsave;
 
   if(Curl_rand_hex(data, randsuffix, sizeof(randsuffix)))
-    return CURLE_FAILED_INIT;
+    return CARLE_FAILED_INIT;
 
   tempstore = aprintf("%s.%s.tmp", file, randsuffix);
   if(!tempstore)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   out = fopen(tempstore, FOPEN_WRITETEXT);
   if(!out)
-    result = CURLE_WRITE_ERROR;
+    result = CARLE_WRITE_ERROR;
   else {
-    fputs("# Your HSTS cache. https://curl.se/docs/hsts.html\n"
-          "# This file was generated by libcurl! Edit at your own risk.\n",
+    fputs("# Your HSTS cache. https://carl.se/docs/hsts.html\n"
+          "# This file was generated by libcarl! Edit at your own risk.\n",
           out);
     for(e = h->list.head; e; e = n) {
       struct stsentry *sts = e->ptr;
@@ -356,7 +356,7 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
     }
     fclose(out);
     if(!result && Curl_rename(tempstore, file))
-      result = CURLE_WRITE_ERROR;
+      result = CARLE_WRITE_ERROR;
 
     if(result)
       unlink(tempstore);
@@ -365,7 +365,7 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
   skipsave:
   if(data->set.hsts_write) {
     /* if there's a write callback */
-    struct curl_index i; /* count */
+    struct carl_index i; /* count */
     i.total = h->list.size;
     i.index = 0;
     for(e = h->list.head; e; e = n) {
@@ -382,7 +382,7 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
 }
 
 /* only returns SERIOUS errors */
-static CURLcode hsts_add(struct hsts *h, char *line)
+static CARLcode hsts_add(struct hsts *h, char *line)
 {
   /* Example lines:
      example.com "20191231 10:00:00"
@@ -397,7 +397,7 @@ static CURLcode hsts_add(struct hsts *h, char *line)
               host, date);
   if(2 == rc) {
     time_t expires = Curl_getdate_capped(date);
-    CURLcode result;
+    CARLcode result;
     char *p = host;
     bool subdomain = FALSE;
     if(p[0] == '.') {
@@ -409,34 +409,34 @@ static CURLcode hsts_add(struct hsts *h, char *line)
       return result;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Load HSTS data from callback.
  *
  */
-static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
+static CARLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
 {
   /* if the HSTS read callback is set, use it */
   if(data->set.hsts_read) {
-    CURLSTScode sc;
+    CARLSTScode sc;
     DEBUGASSERT(h);
     do {
       char buffer[257];
-      struct curl_hstsentry e;
+      struct carl_hstsentry e;
       e.name = buffer;
       e.namelen = sizeof(buffer)-1;
       e.includeSubDomains = FALSE; /* default */
       e.expire[0] = 0;
       e.name[0] = 0; /* just to make it clean */
       sc = data->set.hsts_read(data, &e, data->set.hsts_read_userp);
-      if(sc == CURLSTS_OK) {
+      if(sc == CARLSTS_OK) {
         time_t expires;
-        CURLcode result;
+        CARLcode result;
         if(!e.name[0])
           /* bail out if no name was stored */
-          return CURLE_BAD_FUNCTION_ARGUMENT;
+          return CARLE_BAD_FUNCTION_ARGUMENT;
         if(e.expire[0])
           expires = Curl_getdate_capped(e.expire);
         else
@@ -445,25 +445,25 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
         if(result)
           return result;
       }
-      else if(sc == CURLSTS_FAIL)
-        return CURLE_BAD_FUNCTION_ARGUMENT;
-    } while(sc == CURLSTS_OK);
+      else if(sc == CARLSTS_FAIL)
+        return CARLE_BAD_FUNCTION_ARGUMENT;
+    } while(sc == CARLSTS_OK);
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Load the HSTS cache from the given file. The text based line-oriented file
  * format is documented here:
- * https://github.com/curl/curl/wiki/HSTS
+ * https://github.com/carl/carl/wiki/HSTS
  *
  * This function only returns error on major problems that prevent hsts
  * handling to work completely. It will ignore individual syntactical errors
  * etc.
  */
-static CURLcode hsts_load(struct hsts *h, const char *file)
+static CARLcode hsts_load(struct hsts *h, const char *file)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   char *line = NULL;
   FILE *fp;
 
@@ -472,7 +472,7 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
   free(h->filename);
   h->filename = strdup(file);
   if(!h->filename)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   fp = fopen(file, FOPEN_READTEXT);
   if(fp) {
@@ -497,13 +497,13 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
   fail:
   Curl_safefree(h->filename);
   fclose(fp);
-  return CURLE_OUT_OF_MEMORY;
+  return CARLE_OUT_OF_MEMORY;
 }
 
 /*
  * Curl_hsts_loadfile() loads HSTS from file
  */
-CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
+CARLcode Curl_hsts_loadfile(struct Curl_easy *data,
                             struct hsts *h, const char *file)
 {
   DEBUGASSERT(h);
@@ -514,9 +514,9 @@ CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
 /*
  * Curl_hsts_loadcb() loads HSTS from callback
  */
-CURLcode Curl_hsts_loadcb(struct Curl_easy *data, struct hsts *h)
+CARLcode Curl_hsts_loadcb(struct Curl_easy *data, struct hsts *h)
 {
   return hsts_pull(data, h);
 }
 
-#endif /* CURL_DISABLE_HTTP || USE_HSTS */
+#endif /* CARL_DISABLE_HTTP || USE_HSTS */

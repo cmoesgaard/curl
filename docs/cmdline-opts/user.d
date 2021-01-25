@@ -7,13 +7,13 @@ Category: important auth
 Specify the user name and password to use for server authentication. Overrides
 --netrc and --netrc-optional.
 
-If you simply specify the user name, curl will prompt for a password.
+If you simply specify the user name, carl will prompt for a password.
 
 The user name and passwords are split up on the first colon, which makes it
 impossible to use a colon in the user name with this option. The password can,
 still.
 
-On systems where it works, curl will hide the given option argument from
+On systems where it works, carl will hide the given option argument from
 process listings. This is not enough to protect credentials from possibly
 getting seen by other users on the same system as they will still be visible
 for a brief moment before cleared. Such sensitive data should be retrieved
@@ -32,8 +32,8 @@ To specify the domain name use either Down-Level Logon Name or UPN (User
 Principal Name) formats. For example, EXAMPLE\\user and user@example.com
 respectively.
 
-If you use a Windows SSPI-enabled curl binary and perform Kerberos V5,
-Negotiate, NTLM or Digest authentication then you can tell curl to select
+If you use a Windows SSPI-enabled carl binary and perform Kerberos V5,
+Negotiate, NTLM or Digest authentication then you can tell carl to select
 the user name and password from your environment by specifying a single colon
 with this option: "-u :".
 

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,7 +24,7 @@
 #include "memdebug.h"
 
 static char data[]=
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
   /* ASCII representation with escape sequences for non-ASCII platforms */
   "\x74\x68\x69\x73\x20\x69\x73\x20\x77\x68\x61\x74\x20\x77\x65\x20\x70"
   "\x6f\x73\x74\x20\x74\x6f\x20\x74\x68\x65\x20\x73\x69\x6c\x6c\x79\x20"
@@ -45,7 +45,7 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
   (void)size;
   (void)nmemb;
   (void)userp;
-  return CURL_READFUNC_ABORT;
+  return CARL_READFUNC_ABORT;
 #else
 
   struct WriteThis *pooh = (struct WriteThis *)userp;
@@ -66,12 +66,12 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 
 static int once(char *URL, bool oldstyle)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
-  CURLFORMcode formrc;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
+  CARLFORMcode formrc;
 
-  struct curl_httppost *formpost = NULL;
-  struct curl_httppost *lastptr = NULL;
+  struct carl_httppost *formpost = NULL;
+  struct carl_httppost *lastptr = NULL;
   struct WriteThis pooh;
   struct WriteThis pooh2;
 
@@ -80,27 +80,27 @@ static int once(char *URL, bool oldstyle)
 
   /* Fill in the file upload field */
   if(oldstyle) {
-    formrc = curl_formadd(&formpost,
+    formrc = carl_formadd(&formpost,
                           &lastptr,
-                          CURLFORM_COPYNAME, "sendfile",
-                          CURLFORM_STREAM, &pooh,
-                          CURLFORM_CONTENTSLENGTH, (long)pooh.sizeleft,
-                          CURLFORM_FILENAME, "postit2.c",
-                          CURLFORM_END);
+                          CARLFORM_COPYNAME, "sendfile",
+                          CARLFORM_STREAM, &pooh,
+                          CARLFORM_CONTENTSLENGTH, (long)pooh.sizeleft,
+                          CARLFORM_FILENAME, "postit2.c",
+                          CARLFORM_END);
   }
   else {
     /* new style */
-    formrc = curl_formadd(&formpost,
+    formrc = carl_formadd(&formpost,
                           &lastptr,
-                          CURLFORM_COPYNAME, "sendfile alternative",
-                          CURLFORM_STREAM, &pooh,
-                          CURLFORM_CONTENTLEN, (curl_off_t)pooh.sizeleft,
-                          CURLFORM_FILENAME, "file name 2",
-                          CURLFORM_END);
+                          CARLFORM_COPYNAME, "sendfile alternative",
+                          CARLFORM_STREAM, &pooh,
+                          CARLFORM_CONTENTLEN, (carl_off_t)pooh.sizeleft,
+                          CARLFORM_FILENAME, "file name 2",
+                          CARLFORM_END);
   }
 
   if(formrc)
-    printf("curl_formadd(1) = %d\n", (int)formrc);
+    printf("carl_formadd(1) = %d\n", (int)formrc);
 
   /* Now add the same data with another name and make it not look like
      a file upload but still using the callback */
@@ -109,99 +109,99 @@ static int once(char *URL, bool oldstyle)
   pooh2.sizeleft = strlen(data);
 
   /* Fill in the file upload field */
-  formrc = curl_formadd(&formpost,
+  formrc = carl_formadd(&formpost,
                         &lastptr,
-                        CURLFORM_COPYNAME, "callbackdata",
-                        CURLFORM_STREAM, &pooh2,
-                        CURLFORM_CONTENTSLENGTH, (long)pooh2.sizeleft,
-                        CURLFORM_END);
+                        CARLFORM_COPYNAME, "callbackdata",
+                        CARLFORM_STREAM, &pooh2,
+                        CARLFORM_CONTENTSLENGTH, (long)pooh2.sizeleft,
+                        CARLFORM_END);
 
   if(formrc)
-    printf("curl_formadd(2) = %d\n", (int)formrc);
+    printf("carl_formadd(2) = %d\n", (int)formrc);
 
   /* Fill in the filename field */
-  formrc = curl_formadd(&formpost,
+  formrc = carl_formadd(&formpost,
                         &lastptr,
-                        CURLFORM_COPYNAME, "filename",
-#ifdef CURL_DOES_CONVERSIONS
+                        CARLFORM_COPYNAME, "filename",
+#ifdef CARL_DOES_CONVERSIONS
                         /* ASCII representation with escape
                            sequences for non-ASCII platforms */
-                        CURLFORM_COPYCONTENTS,
+                        CARLFORM_COPYCONTENTS,
                            "\x70\x6f\x73\x74\x69\x74\x32\x2e\x63",
 #else
-                        CURLFORM_COPYCONTENTS, "postit2.c",
+                        CARLFORM_COPYCONTENTS, "postit2.c",
 #endif
-                        CURLFORM_END);
+                        CARLFORM_END);
 
   if(formrc)
-    printf("curl_formadd(3) = %d\n", (int)formrc);
+    printf("carl_formadd(3) = %d\n", (int)formrc);
 
   /* Fill in a submit field too */
-  formrc = curl_formadd(&formpost,
+  formrc = carl_formadd(&formpost,
                         &lastptr,
-                        CURLFORM_COPYNAME, "submit",
-#ifdef CURL_DOES_CONVERSIONS
+                        CARLFORM_COPYNAME, "submit",
+#ifdef CARL_DOES_CONVERSIONS
                         /* ASCII representation with escape
                            sequences for non-ASCII platforms */
-                        CURLFORM_COPYCONTENTS, "\x73\x65\x6e\x64",
+                        CARLFORM_COPYCONTENTS, "\x73\x65\x6e\x64",
 #else
-                        CURLFORM_COPYCONTENTS, "send",
+                        CARLFORM_COPYCONTENTS, "send",
 #endif
-                        CURLFORM_CONTENTTYPE, "text/plain",
-                        CURLFORM_END);
+                        CARLFORM_CONTENTTYPE, "text/plain",
+                        CARLFORM_END);
 
   if(formrc)
-    printf("curl_formadd(4) = %d\n", (int)formrc);
+    printf("carl_formadd(4) = %d\n", (int)formrc);
 
-  formrc = curl_formadd(&formpost, &lastptr,
-                        CURLFORM_COPYNAME, "somename",
-                        CURLFORM_BUFFER, "somefile.txt",
-                        CURLFORM_BUFFERPTR, "blah blah",
-                        CURLFORM_BUFFERLENGTH, (long)9,
-                        CURLFORM_END);
+  formrc = carl_formadd(&formpost, &lastptr,
+                        CARLFORM_COPYNAME, "somename",
+                        CARLFORM_BUFFER, "somefile.txt",
+                        CARLFORM_BUFFERPTR, "blah blah",
+                        CARLFORM_BUFFERLENGTH, (long)9,
+                        CARLFORM_END);
 
   if(formrc)
-    printf("curl_formadd(5) = %d\n", (int)formrc);
+    printf("carl_formadd(5) = %d\n", (int)formrc);
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_formfree(formpost);
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_formfree(formpost);
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* First set the URL that is about to receive our POST. */
-  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_URL, URL);
 
   /* Now specify we want to POST data */
-  test_setopt(curl, CURLOPT_POST, 1L);
+  test_setopt(carl, CARLOPT_POST, 1L);
 
   /* Set the expected POST size */
-  test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)pooh.sizeleft);
+  test_setopt(carl, CARLOPT_POSTFIELDSIZE, (long)pooh.sizeleft);
 
   /* we want to use our own read function */
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+  test_setopt(carl, CARLOPT_READFUNCTION, read_callback);
 
   /* send a multi-part formpost */
-  test_setopt(curl, CURLOPT_HTTPPOST, formpost);
+  test_setopt(carl, CARLOPT_HTTPPOST, formpost);
 
   /* get verbose debug output please */
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
   /* include headers in the output */
-  test_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(carl, CARLOPT_HEADER, 1L);
 
   /* Perform the request, res will get the return code */
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   /* now cleanup the formpost chain */
-  curl_formfree(formpost);
+  carl_formfree(formpost);
 
   return res;
 }
@@ -210,8 +210,8 @@ int test(char *URL)
 {
   int res;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
@@ -219,7 +219,7 @@ int test(char *URL)
   if(!res)
     res = once(URL, FALSE); /* new */
 
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return res;
 }

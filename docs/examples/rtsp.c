@@ -56,42 +56,42 @@ static int _getch(void)
 }
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #define VERSION_STR  "V1.0"
 
 /* error handling macros */
-#define my_curl_easy_setopt(A, B, C)                               \
+#define my_carl_easy_setopt(A, B, C)                               \
   do {                                                             \
-    res = curl_easy_setopt((A), (B), (C));                         \
-    if(res != CURLE_OK)                                            \
-      fprintf(stderr, "curl_easy_setopt(%s, %s, %s) failed: %d\n", \
+    res = carl_easy_setopt((A), (B), (C));                         \
+    if(res != CARLE_OK)                                            \
+      fprintf(stderr, "carl_easy_setopt(%s, %s, %s) failed: %d\n", \
               #A, #B, #C, res);                                    \
   } while(0)
 
-#define my_curl_easy_perform(A)                                         \
+#define my_carl_easy_perform(A)                                         \
   do {                                                                  \
-    res = curl_easy_perform(A);                                         \
-    if(res != CURLE_OK)                                                 \
-      fprintf(stderr, "curl_easy_perform(%s) failed: %d\n", #A, res);   \
+    res = carl_easy_perform(A);                                         \
+    if(res != CARLE_OK)                                                 \
+      fprintf(stderr, "carl_easy_perform(%s) failed: %d\n", #A, res);   \
   } while(0)
 
 /* send RTSP OPTIONS request */
-static void rtsp_options(CURL *curl, const char *uri)
+static void rtsp_options(CARL *carl, const char *uri)
 {
-  CURLcode res = CURLE_OK;
+  CARLcode res = CARLE_OK;
   printf("\nRTSP: OPTIONS %s\n", uri);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_STREAM_URI, uri);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_OPTIONS);
-  my_curl_easy_perform(curl);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_STREAM_URI, uri);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_REQUEST, (long)CARL_RTSPREQ_OPTIONS);
+  my_carl_easy_perform(carl);
 }
 
 
 /* send RTSP DESCRIBE request and write sdp response to a file */
-static void rtsp_describe(CURL *curl, const char *uri,
+static void rtsp_describe(CARL *carl, const char *uri,
                           const char *sdp_filename)
 {
-  CURLcode res = CURLE_OK;
+  CARLcode res = CARLE_OK;
   FILE *sdp_fp = fopen(sdp_filename, "wb");
   printf("\nRTSP: DESCRIBE %s\n", uri);
   if(sdp_fp == NULL) {
@@ -101,50 +101,50 @@ static void rtsp_describe(CURL *curl, const char *uri,
   else {
     printf("Writing SDP to '%s'\n", sdp_filename);
   }
-  my_curl_easy_setopt(curl, CURLOPT_WRITEDATA, sdp_fp);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_DESCRIBE);
-  my_curl_easy_perform(curl);
-  my_curl_easy_setopt(curl, CURLOPT_WRITEDATA, stdout);
+  my_carl_easy_setopt(carl, CARLOPT_WRITEDATA, sdp_fp);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_REQUEST, (long)CARL_RTSPREQ_DESCRIBE);
+  my_carl_easy_perform(carl);
+  my_carl_easy_setopt(carl, CARLOPT_WRITEDATA, stdout);
   if(sdp_fp != stdout) {
     fclose(sdp_fp);
   }
 }
 
 /* send RTSP SETUP request */
-static void rtsp_setup(CURL *curl, const char *uri, const char *transport)
+static void rtsp_setup(CARL *carl, const char *uri, const char *transport)
 {
-  CURLcode res = CURLE_OK;
+  CARLcode res = CARLE_OK;
   printf("\nRTSP: SETUP %s\n", uri);
   printf("      TRANSPORT %s\n", transport);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_STREAM_URI, uri);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_TRANSPORT, transport);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_SETUP);
-  my_curl_easy_perform(curl);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_STREAM_URI, uri);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_TRANSPORT, transport);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_REQUEST, (long)CARL_RTSPREQ_SETUP);
+  my_carl_easy_perform(carl);
 }
 
 
 /* send RTSP PLAY request */
-static void rtsp_play(CURL *curl, const char *uri, const char *range)
+static void rtsp_play(CARL *carl, const char *uri, const char *range)
 {
-  CURLcode res = CURLE_OK;
+  CARLcode res = CARLE_OK;
   printf("\nRTSP: PLAY %s\n", uri);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_STREAM_URI, uri);
-  my_curl_easy_setopt(curl, CURLOPT_RANGE, range);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_PLAY);
-  my_curl_easy_perform(curl);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_STREAM_URI, uri);
+  my_carl_easy_setopt(carl, CARLOPT_RANGE, range);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_REQUEST, (long)CARL_RTSPREQ_PLAY);
+  my_carl_easy_perform(carl);
 
   /* switch off using range again */
-  my_curl_easy_setopt(curl, CURLOPT_RANGE, NULL);
+  my_carl_easy_setopt(carl, CARLOPT_RANGE, NULL);
 }
 
 
 /* send RTSP TEARDOWN request */
-static void rtsp_teardown(CURL *curl, const char *uri)
+static void rtsp_teardown(CARL *carl, const char *uri)
 {
-  CURLcode res = CURLE_OK;
+  CARLcode res = CARLE_OK;
   printf("\nRTSP: TEARDOWN %s\n", uri);
-  my_curl_easy_setopt(curl, CURLOPT_RTSP_REQUEST, (long)CURL_RTSPREQ_TEARDOWN);
-  my_curl_easy_perform(curl);
+  my_carl_easy_setopt(carl, CARLOPT_RTSP_REQUEST, (long)CARL_RTSPREQ_TEARDOWN);
+  my_carl_easy_perform(carl);
 }
 
 
@@ -197,7 +197,7 @@ int main(int argc, char * const argv[])
   printf("\nRTSP request %s\n", VERSION_STR);
   printf("    Project website: "
     "https://github.com/BackupGGCode/rtsprequest\n");
-  printf("    Requires curl V7.20 or greater\n\n");
+  printf("    Requires carl V7.20 or greater\n\n");
 
   /* check command line */
   if((argc != 2) && (argc != 3)) {
@@ -224,63 +224,63 @@ int main(int argc, char * const argv[])
     char *uri = malloc(strlen(url) + 32);
     char *sdp_filename = malloc(strlen(url) + 32);
     char *control = malloc(strlen(url) + 32);
-    CURLcode res;
+    CARLcode res;
     get_sdp_filename(url, sdp_filename, strlen(url) + 32);
     if(argc == 3) {
       transport = argv[2];
     }
 
-    /* initialize curl */
-    res = curl_global_init(CURL_GLOBAL_ALL);
-    if(res == CURLE_OK) {
-      curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
-      CURL *curl;
-      fprintf(stderr, "    curl V%s loaded\n", data->version);
+    /* initialize carl */
+    res = carl_global_init(CARL_GLOBAL_ALL);
+    if(res == CARLE_OK) {
+      carl_version_info_data *data = carl_version_info(CARLVERSION_NOW);
+      CARL *carl;
+      fprintf(stderr, "    carl V%s loaded\n", data->version);
 
-      /* initialize this curl session */
-      curl = curl_easy_init();
-      if(curl != NULL) {
-        my_curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
-        my_curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-        my_curl_easy_setopt(curl, CURLOPT_HEADERDATA, stdout);
-        my_curl_easy_setopt(curl, CURLOPT_URL, url);
+      /* initialize this carl session */
+      carl = carl_easy_init();
+      if(carl != NULL) {
+        my_carl_easy_setopt(carl, CARLOPT_VERBOSE, 0L);
+        my_carl_easy_setopt(carl, CARLOPT_NOPROGRESS, 1L);
+        my_carl_easy_setopt(carl, CARLOPT_HEADERDATA, stdout);
+        my_carl_easy_setopt(carl, CARLOPT_URL, url);
 
         /* request server options */
         snprintf(uri, strlen(url) + 32, "%s", url);
-        rtsp_options(curl, uri);
+        rtsp_options(carl, uri);
 
         /* request session description and write response to sdp file */
-        rtsp_describe(curl, uri, sdp_filename);
+        rtsp_describe(carl, uri, sdp_filename);
 
         /* get media control attribute from sdp file */
         get_media_control_attribute(sdp_filename, control);
 
         /* setup media stream */
         snprintf(uri, strlen(url) + 32, "%s/%s", url, control);
-        rtsp_setup(curl, uri, transport);
+        rtsp_setup(carl, uri, transport);
 
         /* start playing media stream */
         snprintf(uri, strlen(url) + 32, "%s/", url);
-        rtsp_play(curl, uri, range);
+        rtsp_play(carl, uri, range);
         printf("Playing video, press any key to stop ...");
         _getch();
         printf("\n");
 
         /* teardown session */
-        rtsp_teardown(curl, uri);
+        rtsp_teardown(carl, uri);
 
         /* cleanup */
-        curl_easy_cleanup(curl);
-        curl = NULL;
+        carl_easy_cleanup(carl);
+        carl = NULL;
       }
       else {
-        fprintf(stderr, "curl_easy_init() failed\n");
+        fprintf(stderr, "carl_easy_init() failed\n");
       }
-      curl_global_cleanup();
+      carl_global_cleanup();
     }
     else {
-      fprintf(stderr, "curl_global_init(%s) failed: %d\n",
-              "CURL_GLOBAL_ALL", res);
+      fprintf(stderr, "carl_global_init(%s) failed: %d\n",
+              "CARL_GLOBAL_ALL", res);
     }
     free(control);
     free(sdp_filename);

@@ -84,19 +84,19 @@ http://%HOSTIP:%HTTPPORT/want/1025 -L -c log/jar1025 -b forcedcookie=yes
 <protocol>
 GET /want/1025 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Cookie: forcedcookie=yes
 
 GET /data/10250002.txt HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Cookie: forcedcookie=yes
 
 GET /want/10250003.txt HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Cookie: firstcookie=want; forcedcookie=yes
 

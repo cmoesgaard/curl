@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SIGPIPE_H
-#define HEADER_CURL_SIGPIPE_H
+#ifndef HEADER_CARL_SIGPIPE_H
+#define HEADER_CARL_SIGPIPE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(HAVE_SIGNAL_H) && defined(HAVE_SIGACTION) &&        \
   (defined(USE_OPENSSL) || defined(USE_MBEDTLS))
@@ -35,9 +35,9 @@ struct sigpipe_ignore {
 #define SIGPIPE_VARIABLE(x) struct sigpipe_ignore x
 
 /*
- * sigpipe_ignore() makes sure we ignore SIGPIPE while running libcurl
+ * sigpipe_ignore() makes sure we ignore SIGPIPE while running libcarl
  * internals, and then sigpipe_restore() will restore the situation when we
- * return from libcurl again.
+ * return from libcarl again.
  */
 static void sigpipe_ignore(struct Curl_easy *data,
                            struct sigpipe_ignore *ig)
@@ -76,4 +76,4 @@ static void sigpipe_restore(struct sigpipe_ignore *ig)
 #define SIGPIPE_VARIABLE(x)
 #endif
 
-#endif /* HEADER_CURL_SIGPIPE_H */
+#endif /* HEADER_CARL_SIGPIPE_H */

@@ -36,8 +36,8 @@ error when using unknown command line option
 2
 </errorcode>
 <stderr mode="text">
-curl: option --never-implemented: is unknown
-curl: try 'curl --help' or 'curl --manual' for more information
+carl: option --never-implemented: is unknown
+carl: try 'carl --help' or 'carl --manual' for more information
 </stderr>
 </verify>
 </testcase>

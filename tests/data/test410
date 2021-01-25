@@ -43,7 +43,7 @@ HTTPS GET with very long request header
 <protocol>
 GET /410 HTTP/1.1
 Host: %HOSTIP:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Long: %repeat[3500 x header content]%
 

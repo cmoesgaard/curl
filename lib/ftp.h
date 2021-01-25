@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_FTP_H
-#define HEADER_CURL_FTP_H
+#ifndef HEADER_CARL_FTP_H
+#define HEADER_CARL_FTP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,16 +24,16 @@
 
 #include "pingpong.h"
 
-#ifndef CURL_DISABLE_FTP
+#ifndef CARL_DISABLE_FTP
 extern const struct Curl_handler Curl_handler_ftp;
 
 #ifdef USE_SSL
 extern const struct Curl_handler Curl_handler_ftps;
 #endif
 
-CURLcode Curl_GetFTPResponse(struct Curl_easy *data, ssize_t *nread,
+CARLcode Curl_GetFTPResponse(struct Curl_easy *data, ssize_t *nread,
                              int *ftpcode);
-#endif /* CURL_DISABLE_FTP */
+#endif /* CARL_DISABLE_FTP */
 
 /****************************************************************************
  * FTP unique setup
@@ -84,7 +84,7 @@ struct ftp_wc {
   struct ftp_parselist_data *parser;
 
   struct {
-    curl_write_callback write_function;
+    carl_write_callback write_function;
     FILE *file_descriptor;
   } backup;
 };
@@ -94,7 +94,7 @@ typedef enum {
   FTPFILE_NOCWD     = 2, /* use SIZE / RETR / STOR on the full path */
   FTPFILE_SINGLECWD = 3  /* make one CWD, then SIZE / RETR / STOR on the
                             file */
-} curl_ftpfile;
+} carl_ftpfile;
 
 /* This FTP struct is used in the Curl_easy. All FTP data that is
    connection-oriented must be in FTP_conn to properly deal with the fact that
@@ -106,8 +106,8 @@ struct FTP {
 
   /* transfer a file/body or not, done as a typedefed enum just to make
      debuggers display the full symbol and not just the numerical value */
-  curl_pp_transfer transfer;
-  curl_off_t downloadsize;
+  carl_pp_transfer transfer;
+  carl_off_t downloadsize;
 };
 
 
@@ -144,13 +144,13 @@ struct ftp_conn {
   ftpstate state; /* always use ftp.c:state() to change state! */
   ftpstate state_saved; /* transfer type saved to be reloaded after
                            data connection is established */
-  curl_off_t retr_size_saved; /* Size of retrieved file saved */
+  carl_off_t retr_size_saved; /* Size of retrieved file saved */
   char *server_os;     /* The target server operating system. */
-  curl_off_t known_filesize; /* file size is different from -1, if wildcard
+  carl_off_t known_filesize; /* file size is different from -1, if wildcard
                                 LIST parsing was done and wc_statemach set
                                 it */
 };
 
 #define DEFAULT_ACCEPT_TIMEOUT   60000 /* milliseconds == one minute */
 
-#endif /* HEADER_CURL_FTP_H */
+#endif /* HEADER_CARL_FTP_H */

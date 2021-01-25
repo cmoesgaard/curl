@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -29,43 +29,43 @@ static int new_fnmatch(void *ptr,
   (void)ptr;
   (void)pattern;
   (void)string;
-  return CURL_FNMATCHFUNC_MATCH;
+  return CARL_FNMATCHFUNC_MATCH;
 }
 
 int test(char *URL)
 {
   int res;
-  CURL *curl;
+  CARL *carl;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_WILDCARDMATCH, 1L);
-  test_setopt(curl, CURLOPT_FNMATCH_FUNCTION, new_fnmatch);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_WILDCARDMATCH, 1L);
+  test_setopt(carl, CARLOPT_FNMATCH_FUNCTION, new_fnmatch);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res) {
-    fprintf(stderr, "curl_easy_perform() failed %d\n", res);
+    fprintf(stderr, "carl_easy_perform() failed %d\n", res);
     goto test_cleanup;
   }
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res) {
-    fprintf(stderr, "curl_easy_perform() failed %d\n", res);
+    fprintf(stderr, "carl_easy_perform() failed %d\n", res);
     goto test_cleanup;
   }
 
 test_cleanup:
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
   return res;
 }

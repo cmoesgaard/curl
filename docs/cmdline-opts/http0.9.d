@@ -5,10 +5,10 @@ Added:
 Help: Allow HTTP 0.9 responses
 Category: http
 ---
-Tells curl to be fine with HTTP version 0.9 response.
+Tells carl to be fine with HTTP version 0.9 response.
 
 HTTP/0.9 is a completely headerless response and therefore you can also
-connect with this to non-HTTP servers and still get a response since curl will
+connect with this to non-HTTP servers and still get a response since carl will
 simply transparently downgrade - if allowed.
 
-Since curl 7.66.0, HTTP/0.9 is disabled by default.
+Since carl 7.66.0, HTTP/0.9 is disabled by default.

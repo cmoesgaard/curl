@@ -1,4 +1,4 @@
-# Decision making in the curl project
+# Decision making in the carl project
 
 A rough guide to how we make decisions and who does what.
 
@@ -16,7 +16,7 @@ expects from us.
 
 ## Legal entity
 
-There is no legal entity. The curl project is just a bunch of people scattered
+There is no legal entity. The carl project is just a bunch of people scattered
 around the globe with the common goal to produce source code that creates
 great products. We are not part of any umbrella organization and we are not
 located in any specific country. We are totally independent.
@@ -26,7 +26,7 @@ that wrote those parts of the code.
 
 ## Decisions
 
-The curl project is not a democracy, but everyone is entitled to state their
+The carl project is not a democracy, but everyone is entitled to state their
 opinion and may argue for their sake within the community.
 
 All and any changes that have been done or will be done are eligible to bring
@@ -39,31 +39,31 @@ for the project.
 
 ## Donations
 
-Donating plain money to curl is best done to curl's [Open Collective
-fund](https://opencollective.com/curl). Open Collective is a US based
+Donating plain money to carl is best done to carl's [Open Collective
+fund](https://opencollective.com/carl). Open Collective is a US based
 non-profit organization that holds on to funds for us. This fund is then used
-for paying the curl security bug bounties, to reimburse project related
+for paying the carl security bug bounties, to reimburse project related
 expenses etc.
 
 Donations to the project can also come in form of server hosting, providing
-services and paying for people to work on curl related code etc. Usually, such
+services and paying for people to work on carl related code etc. Usually, such
 donations are services paid for directly by the sponsors.
 
 We grade sponsors in a few different levels and if they meet the criteria,
-they can be mentioned on the Sponsors page on the curl website.
+they can be mentioned on the Sponsors page on the carl website.
 
 ## Commercial Support
 
-The curl project does not do or offer commercial support. It only hosts
+The carl project does not do or offer commercial support. It only hosts
 mailing lists, runs bug trackers etc to facilitate communication and work.
 
-However, Daniel works for wolfSSL and we offer commercial curl support there.
+However, Daniel works for wolfSSL and we offer commercial carl support there.
 
 ## Key roles
 
 ### Maintainers
 
-A maintainer in the curl project is an individual who has been given
+A maintainer in the carl project is an individual who has been given
 permissions to push commits to one of the git repositories.
 
 Maintainers are free to push commits to the repositories at their own will.
@@ -76,17 +76,17 @@ project as a PR to allow others to comment/object before merge.
 A maintainer who stops being active in the project will at some point get
 their push permissions removed. We do this for security reasons but also to
 make sure that we always have the list of maintainers as "the team that push
-stuff to curl".
+stuff to carl".
 
 Getting push permissions removed is not a punishment. Everyone who ever worked
-on maintaining curl is considered a hero, for all time hereafter.
+on maintaining carl is considered a hero, for all time hereafter.
 
 ### Security team members
 
 We have a security team. That's the team of people who are subscribed to the
-curl-security mailing list; the receivers of security reports from users and
+carl-security mailing list; the receivers of security reports from users and
 developers. This list of people will vary over time but should be skilled
-developers familiar with the curl project.
+developers familiar with the carl project.
 
 The security team works best when it consists of a small set of active
 persons. We invite new members when the team seems to need it, and we also
@@ -95,16 +95,16 @@ just find themselves unable to perform their duties there.
 
 ### Server admins
 
-We run a web server, a mailing list and more on the curl project's primary
+We run a web server, a mailing list and more on the carl project's primary
 server. That physical machine is owned and run by Haxx. Daniel is the primary
-admin of all things curl related server stuff, but Björn Stenberg and Linus
+admin of all things carl related server stuff, but Björn Stenberg and Linus
 Feltzing serve as backup admins for when Daniel is gone or unable.
 
 The primary server is paid for by Haxx. The machine is physically located in a
 server bunker in Stockholm Sweden, operated by the company Portlane.
 
 The website contents are served to the web via Fastly and Daniel is the
-primary curl contact with Fastly.
+primary carl contact with Fastly.
 
 ### BDFL
 
@@ -112,10 +112,10 @@ That's Daniel.
 
 # Maintainers
 
-A curl maintainer is a project volunteer who has the authority and rights to
-merge changes into a git repository in the curl project.
+A carl maintainer is a project volunteer who has the authority and rights to
+merge changes into a git repository in the carl project.
 
-Anyone can aspire to become a curl maintainer.
+Anyone can aspire to become a carl maintainer.
 
 ### Duties
 
@@ -148,7 +148,7 @@ When you're merging patches/PRs...
 
 ## Who are maintainers?
 
-The [list of maintainers](https://github.com/orgs/curl/people). Be aware that
+The [list of maintainers](https://github.com/orgs/carl/people). Be aware that
 the level of presence and activity in the project vary greatly between
 different individuals and over time.
 
@@ -157,7 +157,7 @@ different individuals and over time.
 If you think you can help making the project better by shouldering some
 maintaining responsibilities, then please get in touch.
 
-You will be expected to be familiar with the curl project and its ways of
+You will be expected to be familiar with the carl project and its ways of
 working. You need to have gotten a few quality patches merged as a proof of
 this.
 

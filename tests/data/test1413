@@ -59,12 +59,12 @@ http://%HOSTIP:%HTTPPORT/this/1413 -L
 <protocol>
 GET /this/1413 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /this/moo.html/14130002 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

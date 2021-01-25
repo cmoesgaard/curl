@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_EASYSRC_H
-#define HEADER_CURL_TOOL_EASYSRC_H
+#ifndef HEADER_CARL_TOOL_EASYSRC_H
+#define HEADER_CARL_TOOL_EASYSRC_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 #include "tool_setup.h"
-#ifndef CURL_DISABLE_LIBCURL_OPTION
+#ifndef CARL_DISABLE_LIBCARL_OPTION
 
 /* global variable declarations, for easy-interface source code generation */
 
@@ -32,18 +32,18 @@ extern struct slist_wc *easysrc_code; /* Setopt calls etc. */
 extern struct slist_wc *easysrc_toohard; /* Unconvertible setopt */
 extern struct slist_wc *easysrc_clean;  /* Clean up (reverse order) */
 
-extern int easysrc_mime_count;  /* Number of curl_mime variables */
-extern int easysrc_slist_count; /* Number of curl_slist variables */
+extern int easysrc_mime_count;  /* Number of carl_mime variables */
+extern int easysrc_slist_count; /* Number of carl_slist variables */
 
-extern CURLcode easysrc_init(void);
-extern CURLcode easysrc_add(struct slist_wc **plist, const char *bupf);
-extern CURLcode easysrc_addf(struct slist_wc **plist,
+extern CARLcode easysrc_init(void);
+extern CARLcode easysrc_add(struct slist_wc **plist, const char *bupf);
+extern CARLcode easysrc_addf(struct slist_wc **plist,
                              const char *fmt, ...);
-extern CURLcode easysrc_perform(void);
-extern CURLcode easysrc_cleanup(void);
+extern CARLcode easysrc_perform(void);
+extern CARLcode easysrc_cleanup(void);
 
 void dumpeasysrc(struct GlobalConfig *config);
 
-#endif /* CURL_DISABLE_LIBCURL_OPTION */
+#endif /* CARL_DISABLE_LIBCARL_OPTION */
 
-#endif /* HEADER_CURL_TOOL_EASYSRC_H */
+#endif /* HEADER_CARL_TOOL_EASYSRC_H */

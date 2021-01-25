@@ -7,21 +7,21 @@ assignees: ''
 
 ---
 
-<!-- Only file bugs here! Ask questions on the mailing lists https://curl.se/mail/
+<!-- Only file bugs here! Ask questions on the mailing lists https://carl.se/mail/
 
-     SECURITY RELATED? Post it here: https://hackerone.com/curl
+     SECURITY RELATED? Post it here: https://hackerone.com/carl
 
      There are collections of known issues to be aware of:
-     https://curl.se/docs/knownbugs.html
-     https://curl.se/docs/todo.html       -->
+     https://carl.se/docs/knownbugs.html
+     https://carl.se/docs/todo.html       -->
 
 ### I did this
 
 ### I expected the following
 
-### curl/libcurl version
+### carl/libcarl version
 
-[curl -V output]
+[carl -V output]
 
 ### operating system
 

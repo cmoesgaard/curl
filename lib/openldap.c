@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,13 +21,13 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_LDAP) && defined(USE_OPENLDAP)
+#if !defined(CARL_DISABLE_LDAP) && defined(USE_OPENLDAP)
 
 /*
  * Notice that USE_OPENLDAP is only a source code selection switch. When
- * libcurl is built with USE_OPENLDAP defined the libcurl source code that
+ * libcarl is built with USE_OPENLDAP defined the libcarl source code that
  * gets compiled is the code from openldap.c, otherwise the code that gets
  * compiled is the code from ldap.c.
  *
@@ -39,21 +39,21 @@
 #include <ldap.h>
 
 #include "urldata.h"
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "sendf.h"
 #include "vtls/vtls.h"
 #include "transfer.h"
-#include "curl_ldap.h"
-#include "curl_base64.h"
+#include "carl_ldap.h"
+#include "carl_base64.h"
 #include "connect.h"
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
  * Uncommenting this will enable the built-in debug logging of the openldap
- * library. The debug log level can be set using the CURL_OPENLDAP_TRACE
+ * library. The debug log level can be set using the CARL_OPENLDAP_TRACE
  * environment variable. The debug output is written to stderr.
  *
  * The library supports the following debug flags:
@@ -64,11 +64,11 @@
  * LDAP_DEBUG_PARAMETER    0x0008
  * LDAP_DEBUG_ANY          0xffff
  *
- * For example, use CURL_OPENLDAP_TRACE=0 for no debug,
- * CURL_OPENLDAP_TRACE=2 for LDAP_DEBUG_CONSTRUCT messages only,
- * CURL_OPENLDAP_TRACE=65535 for all debug message levels.
+ * For example, use CARL_OPENLDAP_TRACE=0 for no debug,
+ * CARL_OPENLDAP_TRACE=2 for LDAP_DEBUG_CONSTRUCT messages only,
+ * CARL_OPENLDAP_TRACE=65535 for all debug message levels.
  */
-/* #define CURL_OPENLDAP_DEBUG */
+/* #define CARL_OPENLDAP_DEBUG */
 
 #ifndef _LDAP_PVT_H
 extern int ldap_pvt_url_scheme2proto(const char *);
@@ -76,13 +76,13 @@ extern int ldap_init_fd(ber_socket_t fd, int proto, const char *url,
                         LDAP **ld);
 #endif
 
-static CURLcode ldap_setup_connection(struct Curl_easy *data,
+static CARLcode ldap_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
-static CURLcode ldap_do(struct Curl_easy *data, bool *done);
-static CURLcode ldap_done(struct Curl_easy *data, CURLcode, bool);
-static CURLcode ldap_connect(struct Curl_easy *data, bool *done);
-static CURLcode ldap_connecting(struct Curl_easy *data, bool *done);
-static CURLcode ldap_disconnect(struct Curl_easy *data,
+static CARLcode ldap_do(struct Curl_easy *data, bool *done);
+static CARLcode ldap_done(struct Curl_easy *data, CARLcode, bool);
+static CARLcode ldap_connect(struct Curl_easy *data, bool *done);
+static CARLcode ldap_connecting(struct Curl_easy *data, bool *done);
+static CARLcode ldap_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead);
 
 static Curl_recv ldap_recv;
@@ -108,8 +108,8 @@ const struct Curl_handler Curl_handler_ldap = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_LDAP,                            /* defport */
-  CURLPROTO_LDAP,                       /* protocol */
-  CURLPROTO_LDAP,                       /* family */
+  CARLPROTO_LDAP,                       /* protocol */
+  CARLPROTO_LDAP,                       /* family */
   PROTOPT_NONE                          /* flags */
 };
 
@@ -135,8 +135,8 @@ const struct Curl_handler Curl_handler_ldaps = {
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   PORT_LDAPS,                           /* defport */
-  CURLPROTO_LDAPS,                      /* protocol */
-  CURLPROTO_LDAP,                       /* family */
+  CARLPROTO_LDAPS,                      /* protocol */
+  CARLPROTO_LDAP,                       /* family */
   PROTOPT_SSL                           /* flags */
 };
 #endif
@@ -171,21 +171,21 @@ struct ldapreqinfo {
   int nument;
 };
 
-static CURLcode ldap_setup_connection(struct Curl_easy *data,
+static CARLcode ldap_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
   struct ldapconninfo *li;
   LDAPURLDesc *lud;
   int rc, proto;
-  CURLcode status;
+  CARLcode status;
 
   rc = ldap_url_parse(data->change.url, &lud);
   if(rc != LDAP_URL_SUCCESS) {
     const char *msg = "url parsing problem";
-    status = CURLE_URL_MALFORMAT;
+    status = CARLE_URL_MALFORMAT;
     if(rc > LDAP_URL_SUCCESS && rc <= LDAP_URL_ERR_BADEXTS) {
       if(rc == LDAP_URL_ERR_MEM)
-        status = CURLE_OUT_OF_MEMORY;
+        status = CARLE_OUT_OF_MEMORY;
       msg = url_errs[rc];
     }
     failf(conn->data, "LDAP local: %s", msg);
@@ -196,18 +196,18 @@ static CURLcode ldap_setup_connection(struct Curl_easy *data,
 
   li = calloc(1, sizeof(struct ldapconninfo));
   if(!li)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   li->proto = proto;
   conn->proto.ldapc = li;
   connkeep(conn, "OpenLDAP default");
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 #ifdef USE_SSL
 static Sockbuf_IO ldapsb_tls;
 #endif
 
-static CURLcode ldap_connect(struct Curl_easy *data, bool *done)
+static CARLcode ldap_connect(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
   struct ldapconninfo *li = conn->proto.ldapc;
@@ -224,9 +224,9 @@ static CURLcode ldap_connect(struct Curl_easy *data, bool *done)
   msnprintf(ptr, sizeof(hosturl)-(ptr-hosturl), "://%s:%d",
             conn->host.name, conn->remote_port);
 
-#ifdef CURL_OPENLDAP_DEBUG
+#ifdef CARL_OPENLDAP_DEBUG
   static int do_trace = 0;
-  const char *env = getenv("CURL_OPENLDAP_TRACE");
+  const char *env = getenv("CARL_OPENLDAP_TRACE");
   do_trace = (env && strtol(env, NULL, 10) > 0);
   if(do_trace) {
     ldap_set_option(li->ld, LDAP_OPT_DEBUG_LEVEL, &do_trace);
@@ -237,14 +237,14 @@ static CURLcode ldap_connect(struct Curl_easy *data, bool *done)
   if(rc) {
     failf(data, "LDAP local: Cannot connect to %s, %s",
           hosturl, ldap_err2string(rc));
-    return CURLE_COULDNT_CONNECT;
+    return CARLE_COULDNT_CONNECT;
   }
 
   ldap_set_option(li->ld, LDAP_OPT_PROTOCOL_VERSION, &proto);
 
 #ifdef USE_SSL
   if(conn->handler->flags & PROTOPT_SSL) {
-    CURLcode result;
+    CARLcode result;
     result = Curl_ssl_connect_nonblocking(data, conn,
                                           FIRSTSOCKET, &li->ssldone);
     if(result)
@@ -252,10 +252,10 @@ static CURLcode ldap_connect(struct Curl_easy *data, bool *done)
   }
 #endif
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode ldap_connecting(struct Curl_easy *data, bool *done)
+static CARLcode ldap_connecting(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
   struct ldapconninfo *li = conn->proto.ldapc;
@@ -268,13 +268,13 @@ static CURLcode ldap_connecting(struct Curl_easy *data, bool *done)
   if(conn->handler->flags & PROTOPT_SSL) {
     /* Is the SSL handshake complete yet? */
     if(!li->ssldone) {
-      CURLcode result = Curl_ssl_connect_nonblocking(data, conn, FIRSTSOCKET,
+      CARLcode result = Curl_ssl_connect_nonblocking(data, conn, FIRSTSOCKET,
                                                      &li->ssldone);
       if(result || !li->ssldone)
         return result;
     }
 
-    /* Have we installed the libcurl SSL handlers into the sockbuf yet? */
+    /* Have we installed the libcarl SSL handlers into the sockbuf yet? */
     if(!li->sslinst) {
       Sockbuf *sb;
       ldap_get_option(li->ld, LDAP_OPT_SOCKBUF, &sb);
@@ -306,26 +306,26 @@ static CURLcode ldap_connecting(struct Curl_easy *data, bool *done)
     rc = ldap_sasl_bind(li->ld, binddn, LDAP_SASL_SIMPLE, &passwd,
                         NULL, NULL, &li->msgid);
     if(rc)
-      return CURLE_LDAP_CANNOT_BIND;
+      return CARLE_LDAP_CANNOT_BIND;
     li->didbind = TRUE;
     if(tvp)
-      return CURLE_OK;
+      return CARLE_OK;
   }
 
   rc = ldap_result(li->ld, li->msgid, LDAP_MSG_ONE, tvp, &msg);
   if(rc < 0) {
     failf(data, "LDAP local: bind ldap_result %s", ldap_err2string(rc));
-    return CURLE_LDAP_CANNOT_BIND;
+    return CARLE_LDAP_CANNOT_BIND;
   }
   if(rc == 0) {
     /* timed out */
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   rc = ldap_parse_result(li->ld, msg, &err, NULL, &info, NULL, NULL, 1);
   if(rc) {
     failf(data, "LDAP local: bind ldap_parse_result %s", ldap_err2string(rc));
-    return CURLE_LDAP_CANNOT_BIND;
+    return CARLE_LDAP_CANNOT_BIND;
   }
 
   /* Try to fallback to LDAPv2? */
@@ -349,7 +349,7 @@ static CURLcode ldap_connecting(struct Curl_easy *data, bool *done)
           info ? info : "");
     if(info)
       ldap_memfree(info);
-    return CURLE_LOGIN_DENIED;
+    return CARLE_LOGIN_DENIED;
   }
 
   if(info)
@@ -357,10 +357,10 @@ static CURLcode ldap_connecting(struct Curl_easy *data, bool *done)
   conn->recv[FIRSTSOCKET] = ldap_recv;
   *done = TRUE;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode ldap_disconnect(struct Curl_easy *data,
+static CARLcode ldap_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead_connection)
 {
   struct ldapconninfo *li = conn->proto.ldapc;
@@ -375,15 +375,15 @@ static CURLcode ldap_disconnect(struct Curl_easy *data,
     conn->proto.ldapc = NULL;
     free(li);
   }
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode ldap_do(struct Curl_easy *data, bool *done)
+static CARLcode ldap_do(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
   struct ldapconninfo *li = conn->proto.ldapc;
   struct ldapreqinfo *lr;
-  CURLcode status = CURLE_OK;
+  CARLcode status = CARLE_OK;
   int rc = 0;
   LDAPURLDesc *ludp = NULL;
   int msgid;
@@ -395,10 +395,10 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
   rc = ldap_url_parse(data->change.url, &ludp);
   if(rc != LDAP_URL_SUCCESS) {
     const char *msg = "url parsing problem";
-    status = CURLE_URL_MALFORMAT;
+    status = CARLE_URL_MALFORMAT;
     if(rc > LDAP_URL_SUCCESS && rc <= LDAP_URL_ERR_BADEXTS) {
       if(rc == LDAP_URL_ERR_MEM)
-        status = CURLE_OUT_OF_MEMORY;
+        status = CARLE_OUT_OF_MEMORY;
       msg = url_errs[rc];
     }
     failf(conn->data, "LDAP local: %s", msg);
@@ -411,19 +411,19 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
   ldap_free_urldesc(ludp);
   if(rc != LDAP_SUCCESS) {
     failf(data, "LDAP local: ldap_search_ext %s", ldap_err2string(rc));
-    return CURLE_LDAP_SEARCH_FAILED;
+    return CARLE_LDAP_SEARCH_FAILED;
   }
   lr = calloc(1, sizeof(struct ldapreqinfo));
   if(!lr)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   lr->msgid = msgid;
   data->req.p.ldap = lr;
   Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
   *done = TRUE;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode ldap_done(struct Curl_easy *data, CURLcode res,
+static CARLcode ldap_done(struct Curl_easy *data, CARLcode res,
                           bool premature)
 {
   struct connectdata *conn = data->conn;
@@ -443,11 +443,11 @@ static CURLcode ldap_done(struct Curl_easy *data, CURLcode res,
     free(lr);
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
-                         size_t len, CURLcode *err)
+                         size_t len, CARLcode *err)
 {
   struct connectdata *conn = data->conn;
   struct ldapconninfo *li = conn->proto.ldapc;
@@ -465,11 +465,11 @@ static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
   rc = ldap_result(li->ld, lr->msgid, LDAP_MSG_RECEIVED, &tv, &msg);
   if(rc < 0) {
     failf(data, "LDAP local: search ldap_result %s", ldap_err2string(rc));
-    *err = CURLE_RECV_ERROR;
+    *err = CARLE_RECV_ERROR;
     return -1;
   }
 
-  *err = CURLE_AGAIN;
+  *err = CARLE_AGAIN;
   ret = -1;
 
   /* timed out */
@@ -480,7 +480,7 @@ static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
       ent = ldap_next_message(li->ld, ent)) {
     struct berval bv, *bvals;
     int binary = 0, msgtype;
-    CURLcode writeerr;
+    CARLcode writeerr;
 
     msgtype = ldap_msgtype(ent);
     if(msgtype == LDAP_RES_SEARCH_RESULT) {
@@ -490,19 +490,19 @@ static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
       if(rc) {
         failf(data, "LDAP local: search ldap_parse_result %s",
               ldap_err2string(rc));
-        *err = CURLE_LDAP_SEARCH_FAILED;
+        *err = CARLE_LDAP_SEARCH_FAILED;
       }
       else if(code && code != LDAP_SIZELIMIT_EXCEEDED) {
         failf(data, "LDAP remote: search failed %s %s", ldap_err2string(rc),
               info ? info : "");
-        *err = CURLE_LDAP_SEARCH_FAILED;
+        *err = CARLE_LDAP_SEARCH_FAILED;
       }
       else {
         /* successful */
         if(code == LDAP_SIZELIMIT_EXCEEDED)
           infof(data, "There are more than %d entries\n", lr->nument);
         data->req.size = data->req.bytecount;
-        *err = CURLE_OK;
+        *err = CARLE_OK;
         ret = 0;
       }
       lr->msgid = 0;
@@ -515,7 +515,7 @@ static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
     lr->nument++;
     rc = ldap_get_dn_ber(li->ld, ent, &ber, &bv);
     if(rc < 0) {
-      *err = CURLE_RECV_ERROR;
+      *err = CARLE_RECV_ERROR;
       return -1;
     }
     writeerr = Curl_client_write(data, CLIENTWRITE_BODY, (char *)"DN: ", 4);
@@ -613,7 +613,7 @@ static ssize_t ldap_recv(struct Curl_easy *data, int sockindex, char *buf,
           char *val_b64 = NULL;
           size_t val_b64_sz = 0;
           /* Binary value, encode to base64. */
-          CURLcode error = Curl_base64_encode(data,
+          CARLcode error = Curl_base64_encode(data,
                                               bvals[i].bv_val,
                                               bvals[i].bv_len,
                                               &val_b64,
@@ -703,7 +703,7 @@ ldapsb_tls_remove(Sockbuf_IO_Desc *sbiod)
   return 0;
 }
 
-/* We don't need to do anything because libcurl does it already */
+/* We don't need to do anything because libcarl does it already */
 static int
 ldapsb_tls_close(Sockbuf_IO_Desc *sbiod)
 {
@@ -728,10 +728,10 @@ ldapsb_tls_read(Sockbuf_IO_Desc *sbiod, void *buf, ber_len_t len)
   struct connectdata *conn = sbiod->sbiod_pvt;
   struct ldapconninfo *li = conn->proto.ldapc;
   ber_slen_t ret;
-  CURLcode err = CURLE_RECV_ERROR;
+  CARLcode err = CARLE_RECV_ERROR;
 
   ret = (li->recv)(conn->data, FIRSTSOCKET, buf, len, &err);
-  if(ret < 0 && err == CURLE_AGAIN) {
+  if(ret < 0 && err == CARLE_AGAIN) {
     SET_SOCKERRNO(EWOULDBLOCK);
   }
   return ret;
@@ -743,10 +743,10 @@ ldapsb_tls_write(Sockbuf_IO_Desc *sbiod, void *buf, ber_len_t len)
   struct connectdata *conn = sbiod->sbiod_pvt;
   struct ldapconninfo *li = conn->proto.ldapc;
   ber_slen_t ret;
-  CURLcode err = CURLE_SEND_ERROR;
+  CARLcode err = CARLE_SEND_ERROR;
 
   ret = (li->send)(conn->data, FIRSTSOCKET, buf, len, &err);
-  if(ret < 0 && err == CURLE_AGAIN) {
+  if(ret < 0 && err == CARLE_AGAIN) {
     SET_SOCKERRNO(EWOULDBLOCK);
   }
   return ret;
@@ -763,4 +763,4 @@ static Sockbuf_IO ldapsb_tls =
 };
 #endif /* USE_SSL */
 
-#endif /* !CURL_DISABLE_LDAP && USE_OPENLDAP */
+#endif /* !CARL_DISABLE_LDAP && USE_OPENLDAP */

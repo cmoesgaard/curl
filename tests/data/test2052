@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLOPT_CONNECT_TO
+CARLOPT_CONNECT_TO
 </keywords>
 </info>
 
@@ -41,12 +41,12 @@ http://www.example.com:%HTTPPORT/2052 --resolve www.example.com:%HTTPPORT:%HOSTI
 <protocol>
 GET /2052 HTTP/1.1
 Host: www.example.com:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /2052 HTTP/1.1
 Host: www.example.com:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

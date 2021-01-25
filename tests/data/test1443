@@ -37,7 +37,7 @@ http
 HTTP GET with -O and --remote-time
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
 http://%HOSTIP:%HTTPPORT/1443 -O --remote-time
@@ -55,7 +55,7 @@ perl -e 'exit((stat("log/1443"))[9] != 960898200)'
 <protocol>
 GET /1443 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

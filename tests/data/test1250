@@ -43,7 +43,7 @@ http://user:secret@%HOSTIP:%HTTPPORT/1250 --noproxy %HOSTIP --max-time 5
 GET /1250 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: Basic dXNlcjpzZWNyZXQ=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

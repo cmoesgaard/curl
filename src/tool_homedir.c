@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -33,7 +33,7 @@
 #include <fcntl.h>
 #endif
 
-#include <curl/mprintf.h>
+#include <carl/mprintf.h>
 
 #include "tool_homedir.h"
 
@@ -43,12 +43,12 @@ static char *GetEnv(const char *variable)
 {
   char *dupe, *env;
 
-  env = curl_getenv(variable);
+  env = carl_getenv(variable);
   if(!env)
     return NULL;
 
   dupe = strdup(env);
-  curl_free(env);
+  carl_free(env);
   return dupe;
 }
 
@@ -65,7 +65,7 @@ static char *GetEnv(const char *variable)
  * file name is set to check, then only if that file name exists in that
  * directory will it be returned as a "home directory".
  *
- * 1. use CURL_HOME if set
+ * 1. use CARL_HOME if set
  * 2. use XDG_CONFIG_HOME if set and fname is present
  * 3. use HOME if set
  * 4. Non-windows: use getpwuid
@@ -77,17 +77,17 @@ char *homedir(const char *fname)
 {
   char *home;
 
-  home = GetEnv("CURL_HOME");
+  home = GetEnv("CARL_HOME");
   if(home)
     return home;
 
   if(fname) {
     home = GetEnv("XDG_CONFIG_HOME");
     if(home) {
-      char *c = curl_maprintf("%s" DIR_CHAR "%s", home, fname);
+      char *c = carl_maprintf("%s" DIR_CHAR "%s", home, fname);
       if(c) {
         int fd = open(c, O_RDONLY);
-        curl_free(c);
+        carl_free(c);
         if(fd >= 0) {
           close(fd);
           return home;
@@ -119,10 +119,10 @@ char *homedir(const char *fname)
   if(!home) {
     char *env = GetEnv("USERPROFILE");
     if(env) {
-      char *path = curl_maprintf("%s\\Application Data", env);
+      char *path = carl_maprintf("%s\\Application Data", env);
       if(path) {
         home = strdup(path);
-        curl_free(path);
+        carl_free(path);
       }
       free(env);
     }

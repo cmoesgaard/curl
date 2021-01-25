@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,21 +30,21 @@
 #include <errno.h>
 #include <time.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 static void
-print_cookies(CURL *curl)
+print_cookies(CARL *carl)
 {
-  CURLcode res;
-  struct curl_slist *cookies;
-  struct curl_slist *nc;
+  CARLcode res;
+  struct carl_slist *cookies;
+  struct carl_slist *nc;
   int i;
 
-  printf("Cookies, curl knows:\n");
-  res = curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookies);
-  if(res != CURLE_OK) {
-    fprintf(stderr, "Curl curl_easy_getinfo failed: %s\n",
-            curl_easy_strerror(res));
+  printf("Cookies, carl knows:\n");
+  res = carl_easy_getinfo(carl, CARLINFO_COOKIELIST, &cookies);
+  if(res != CARLE_OK) {
+    fprintf(stderr, "Curl carl_easy_getinfo failed: %s\n",
+            carl_easy_strerror(res));
     exit(1);
   }
   nc = cookies;
@@ -57,35 +57,35 @@ print_cookies(CURL *curl)
   if(i == 1) {
     printf("(none)\n");
   }
-  curl_slist_free_all(cookies);
+  carl_slist_free_all(cookies);
 }
 
 int
 main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
-  curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if(curl) {
+  carl_global_init(CARL_GLOBAL_ALL);
+  carl = carl_easy_init();
+  if(carl) {
     char nline[256];
 
-    curl_easy_setopt(curl, CURLOPT_URL, "https://www.example.com/");
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, ""); /* start cookie engine */
-    res = curl_easy_perform(curl);
-    if(res != CURLE_OK) {
-      fprintf(stderr, "Curl perform failed: %s\n", curl_easy_strerror(res));
+    carl_easy_setopt(carl, CARLOPT_URL, "https://www.example.com/");
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_COOKIEFILE, ""); /* start cookie engine */
+    res = carl_easy_perform(carl);
+    if(res != CARLE_OK) {
+      fprintf(stderr, "Curl perform failed: %s\n", carl_easy_strerror(res));
       return 1;
     }
 
-    print_cookies(curl);
+    print_cookies(carl);
 
-    printf("Erasing curl's knowledge of cookies!\n");
-    curl_easy_setopt(curl, CURLOPT_COOKIELIST, "ALL");
+    printf("Erasing carl's knowledge of cookies!\n");
+    carl_easy_setopt(carl, CARLOPT_COOKIELIST, "ALL");
 
-    print_cookies(curl);
+    print_cookies(carl);
 
     printf("-----------------------------------------------\n"
            "Setting a cookie \"PREF\" via cookie interface:\n");
@@ -97,10 +97,10 @@ main(void)
              ".example.com", "TRUE", "/", "FALSE",
              (unsigned long)time(NULL) + 31337UL,
              "PREF", "hello example, i like you very much!");
-    res = curl_easy_setopt(curl, CURLOPT_COOKIELIST, nline);
-    if(res != CURLE_OK) {
-      fprintf(stderr, "Curl curl_easy_setopt failed: %s\n",
-              curl_easy_strerror(res));
+    res = carl_easy_setopt(carl, CARLOPT_COOKIELIST, nline);
+    if(res != CARLE_OK) {
+      fprintf(stderr, "Curl carl_easy_setopt failed: %s\n",
+              carl_easy_strerror(res));
       return 1;
     }
 
@@ -108,33 +108,33 @@ main(void)
     specify a domain then the cookie is sent for any domain and will not be
     modified, likely not what you intended. Starting in 7.43.0 any-domain
     cookies will not be exported either. For more information refer to the
-    CURLOPT_COOKIELIST documentation.
+    CARLOPT_COOKIELIST documentation.
     */
     snprintf(nline, sizeof(nline),
       "Set-Cookie: OLD_PREF=3d141414bf4209321; "
       "expires=Sun, 17-Jan-2038 19:14:07 GMT; path=/; domain=.example.com");
-    res = curl_easy_setopt(curl, CURLOPT_COOKIELIST, nline);
-    if(res != CURLE_OK) {
-      fprintf(stderr, "Curl curl_easy_setopt failed: %s\n",
-              curl_easy_strerror(res));
+    res = carl_easy_setopt(carl, CARLOPT_COOKIELIST, nline);
+    if(res != CARLE_OK) {
+      fprintf(stderr, "Curl carl_easy_setopt failed: %s\n",
+              carl_easy_strerror(res));
       return 1;
     }
 
-    print_cookies(curl);
+    print_cookies(carl);
 
-    res = curl_easy_perform(curl);
-    if(res != CURLE_OK) {
-      fprintf(stderr, "Curl perform failed: %s\n", curl_easy_strerror(res));
+    res = carl_easy_perform(carl);
+    if(res != CARLE_OK) {
+      fprintf(stderr, "Curl perform failed: %s\n", carl_easy_strerror(res));
       return 1;
     }
 
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   else {
     fprintf(stderr, "Curl init failed!\n");
     return 1;
   }
 
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

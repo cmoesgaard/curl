@@ -20,7 +20,7 @@ lib1537
 </tool>
 
 <name>
-libcurl URL escape/unescape tests
+libcarl URL escape/unescape tests
 </name>
 <command>
 nothing

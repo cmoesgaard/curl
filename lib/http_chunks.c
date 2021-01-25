@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifndef CURL_DISABLE_HTTP
+#ifndef CARL_DISABLE_HTTP
 
 #include "urldata.h" /* it includes http_chunks.h */
 #include "sendf.h"   /* for the client write stuff */
@@ -34,7 +34,7 @@
 #include "warnless.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -74,7 +74,7 @@
 
  */
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
 /* Check for an ASCII hex digit.
    We avoid the use of ISXDIGIT to accommodate non-ASCII hosts. */
 static bool isxdigit_ascii(char digit)
@@ -112,14 +112,14 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
                               char *datap,
                               ssize_t datalen,
                               ssize_t *wrotep,
-                              CURLcode *extrap)
+                              CARLcode *extrap)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct connectdata *conn = data->conn;
   struct Curl_chunker *ch = &conn->chunk;
   struct SingleRequest *k = &data->req;
   size_t piece;
-  curl_off_t length = (curl_off_t)datalen;
+  carl_off_t length = (carl_off_t)datalen;
   size_t *wrote = (size_t *)wrotep;
 
   *wrote = 0; /* nothing's written yet */
@@ -166,7 +166,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
           return CHUNKE_ILLEGAL_HEX;
         }
 
-        if(curlx_strtoofft(ch->hexbuffer, &endptr, 16, &ch->datasize))
+        if(carlx_strtoofft(ch->hexbuffer, &endptr, 16, &ch->datasize))
           return CHUNKE_ILLEGAL_HEX;
         ch->state = CHUNK_LF; /* now wait for the CRLF */
       }
@@ -191,7 +191,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
       /* We expect 'datasize' of data. We have 'length' right now, it can be
          more or less than 'datasize'. Get the smallest piece.
       */
-      piece = curlx_sotouz((ch->datasize >= length)?length:ch->datasize);
+      piece = carlx_sotouz((ch->datasize >= length)?length:ch->datasize);
 
       /* Write the data portion available */
       if(!data->set.http_te_skip && !k->ignorebody) {
@@ -309,7 +309,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
 
         /* Record the length of any data left in the end of the buffer
            even if there's no more chunks to read */
-        ch->dataleft = curlx_sotouz(length);
+        ch->dataleft = carlx_sotouz(length);
 
         return CHUNKE_STOP; /* return stop */
       }
@@ -341,4 +341,4 @@ const char *Curl_chunked_strerror(CHUNKcode code)
   }
 }
 
-#endif /* CURL_DISABLE_HTTP */
+#endif /* CARL_DISABLE_HTTP */

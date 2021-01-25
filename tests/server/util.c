@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -43,10 +43,10 @@
 #include <w32api.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "util.h"
 #include "timeval.h"
@@ -272,9 +272,9 @@ int wait_ms(int timeout_ms)
 int write_pidfile(const char *filename)
 {
   FILE *pidfile;
-  curl_off_t pid;
+  carl_off_t pid;
 
-  pid = (curl_off_t)getpid();
+  pid = (carl_off_t)getpid();
   pidfile = fopen(filename, "wb");
   if(!pidfile) {
     logmsg("Couldn't write pid file: %s %s", filename, strerror(errno));
@@ -289,9 +289,9 @@ int write_pidfile(const char *filename)
    */
   pid += 65536;
 #endif
-  fprintf(pidfile, "%" CURL_FORMAT_CURL_OFF_T "\n", pid);
+  fprintf(pidfile, "%" CARL_FORMAT_CARL_OFF_T "\n", pid);
   fclose(pidfile);
-  logmsg("Wrote pid %" CURL_FORMAT_CURL_OFF_T " to %s", pid, filename);
+  logmsg("Wrote pid %" CARL_FORMAT_CARL_OFF_T " to %s", pid, filename);
   return 1; /* success */
 }
 
@@ -356,7 +356,7 @@ void clear_advisor_read_lock(const char *filename)
    its behavior is altered by the current locale. */
 static char raw_toupper(char in)
 {
-#if !defined(CURL_DOES_CONVERSIONS)
+#if !defined(CARL_DOES_CONVERSIONS)
   if(in >= 'a' && in <= 'z')
     return (char)('A' + in - 'a');
 #else

@@ -1,14 +1,14 @@
 # Experimental
 
-Some features and functionality in curl and libcurl are considered
+Some features and functionality in carl and libcarl are considered
 **EXPERIMENTAL**.
 
-Experimental support in curl means:
+Experimental support in carl means:
 
 1. Experimental features are provided to allow users to try them out and
    provide feedback on functionality and API etc before they ship and get
    "carved in stone".
-2. You must enable the feature when invoking configure as otherwise curl will
+2. You must enable the feature when invoking configure as otherwise carl will
    not be built with the feature present.
 3. We strongly advice against using this feature in production.
 4. **We reserve the right to change behavior** of the feature without sticking
@@ -20,5 +20,5 @@ Experimental support in curl means:
 
  - The Hyper HTTP backend
  - HTTP/3 support and options
- - CURLSSLOPT_NATIVE_CA (No configure option, feature built in when supported)
+ - CARLSSLOPT_NATIVE_CA (No configure option, feature built in when supported)
  - HSTS support and options

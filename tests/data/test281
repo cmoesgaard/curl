@@ -46,7 +46,7 @@ Weird
 <protocol>
 PUT /we/want/281 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 38
 Expect: 100-continue

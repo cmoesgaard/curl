@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,11 +28,11 @@
 int test(char *URL)
 {
   int res = 0;
-  CURLM *m = NULL;
+  CARLM *m = NULL;
 
   (void)URL;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(m);
 
@@ -40,8 +40,8 @@ test_cleanup:
 
   /* proper cleanup sequence - type PB */
 
-  curl_multi_cleanup(m);
-  curl_global_cleanup();
+  carl_multi_cleanup(m);
+  carl_global_cleanup();
 
   printf("We are done\n");
 

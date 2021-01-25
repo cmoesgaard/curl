@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@ include $(TOPDIR)/packages/DOS/common.dj
 
 CFLAGS += -DFALSE=0 -DTRUE=1
 
-LIBS = $(TOPDIR)/lib/libcurl.a
+LIBS = $(TOPDIR)/lib/libcarl.a
 
 ifeq ($(USE_SSL),1)
   LIBS += $(OPENSSL_ROOT)/lib/libssl.a $(OPENSSL_ROOT)/lib/libcrypt.a
@@ -43,7 +43,7 @@ include Makefile.inc
 PROGRAMS = $(patsubst %,%.exe,$(check_PROGRAMS))
 
 all: $(PROGRAMS)
-	@echo Welcome to libcurl example program
+	@echo Welcome to libcarl example program
 
 %.exe: %.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)

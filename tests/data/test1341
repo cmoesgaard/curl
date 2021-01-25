@@ -26,7 +26,7 @@ Content-Disposition: filename=name1341; charset=funny; option=strange
 # Client-side
 <client>
 # this relies on the debug feature to allow us to set directory to store the
-# -O and -J output in, using the CURL_TESTDIR variable
+# -O and -J output in, using the CARL_TESTDIR variable
 <features>
 debug
 </features>
@@ -37,10 +37,10 @@ http
 HTTP GET with -O -J and Content-Disposition, -D stdout
 </name>
 <setenv>
-CURL_TESTDIR=%PWD/log
+CARL_TESTDIR=%PWD/log
 </setenv>
 <command option="no-output,no-include">
-http://%HOSTIP:%HTTPPORT/1341 -J -O -D - -w "curl: Saved to filename %{filename_effective}\n"
+http://%HOSTIP:%HTTPPORT/1341 -J -O -D - -w "carl: Saved to filename %{filename_effective}\n"
 </command>
 </client>
 
@@ -50,7 +50,7 @@ http://%HOSTIP:%HTTPPORT/1341 -J -O -D - -w "curl: Saved to filename %{filename_
 <protocol>
 GET /1341 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>
@@ -68,7 +68,7 @@ Connection: close
 Content-Type: text/html
 Content-Disposition: filename=name1341; charset=funny; option=strange
 
-curl: Saved to filename %PWD/log/name1341
+carl: Saved to filename %PWD/log/name1341
 </file2>
 
 </verify>

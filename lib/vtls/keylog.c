@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,12 +19,12 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include "keylog.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define KEYLOG_LABEL_MAXLEN (sizeof("CLIENT_HANDSHAKE_TRAFFIC_SECRET") - 1)
@@ -48,7 +48,7 @@ Curl_tls_keylog_open(void)
   char *keylog_file_name;
 
   if(!keylog_file_fp) {
-    keylog_file_name = curl_getenv("SSLKEYLOGFILE");
+    keylog_file_name = carl_getenv("SSLKEYLOGFILE");
     if(keylog_file_name) {
       keylog_file_fp = fopen(keylog_file_name, FOPEN_APPENDTEXT);
       if(keylog_file_fp) {
@@ -105,7 +105,7 @@ Curl_tls_keylog_write_line(const char *line)
   }
   buf[linelen] = '\0';
 
-  /* Using fputs here instead of fprintf since libcurl's fprintf replacement
+  /* Using fputs here instead of fprintf since libcarl's fprintf replacement
      may not be thread-safe. */
   fputs(buf, keylog_file_fp);
   return true;
@@ -149,7 +149,7 @@ Curl_tls_keylog_write(const char *label,
   line[pos++] = '\n';
   line[pos] = '\0';
 
-  /* Using fputs here instead of fprintf since libcurl's fprintf replacement
+  /* Using fputs here instead of fprintf since libcarl's fprintf replacement
      may not be thread-safe. */
   fputs(line, keylog_file_fp);
   return true;

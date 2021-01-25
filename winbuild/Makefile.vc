@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -41,14 +41,14 @@ CFGSET=true
 !ENDIF
 
 !INCLUDE "../lib/Makefile.inc"
-LIBCURL_OBJS=$(CSOURCES:.c=.obj)
+LIBCARL_OBJS=$(CSOURCES:.c=.obj)
 
 !INCLUDE "../src/Makefile.inc"
 
 # tool_hugehelp has a special rule
-CURL_OBJS=$(CURL_CFILES:tool_hugehelp.c=)
+CARL_OBJS=$(CARL_CFILES:tool_hugehelp.c=)
 
-CURL_OBJS=$(CURL_OBJS:.c=.obj)
+CARL_OBJS=$(CARL_OBJS:.c=.obj)
 
 
 # backwards compatible check for USE_SSPI
@@ -122,7 +122,7 @@ USE_UNICODE = true
 USE_UNICODE = false
 !ENDIF
 
-CONFIG_NAME_LIB = libcurl
+CONFIG_NAME_LIB = libcarl
 
 !IF "$(WITH_SSL)"=="dll"
 USE_SSL = true
@@ -231,20 +231,20 @@ CONFIG_NAME_LIB = $(CONFIG_NAME_LIB)-nghttp2-$(NGHTTP2)
 !MESSAGE configuration name: $(CONFIG_NAME_LIB)
 
 BUILD_DIR=../builds/$(CONFIG_NAME_LIB)
-LIBCURL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-lib
-CURL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-curl
+LIBCARL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-lib
+CARL_DIROBJ = ..\builds\$(CONFIG_NAME_LIB)-obj-carl
 DIRDIST = ..\builds\$(CONFIG_NAME_LIB)\
 
 $(MODE):
-	@SET DIROBJ=$(LIBCURL_DIROBJ)
-	@SET MACRO_NAME=LIBCURL_OBJS
-	@SET OUTFILE=LIBCURL_OBJS.inc
-	@CALL gen_resp_file.bat $(LIBCURL_OBJS)
+	@SET DIROBJ=$(LIBCARL_DIROBJ)
+	@SET MACRO_NAME=LIBCARL_OBJS
+	@SET OUTFILE=LIBCARL_OBJS.inc
+	@CALL gen_resp_file.bat $(LIBCARL_OBJS)
 
-	@SET DIROBJ=$(CURL_DIROBJ)
-	@SET MACRO_NAME=CURL_OBJS
-	@SET OUTFILE=CURL_OBJS.inc
-	@CALL gen_resp_file.bat $(CURL_OBJS)
+	@SET DIROBJ=$(CARL_DIROBJ)
+	@SET MACRO_NAME=CARL_OBJS
+	@SET OUTFILE=CARL_OBJS.inc
+	@CALL gen_resp_file.bat $(CARL_OBJS)
 
 	@SET CONFIG_NAME_LIB=$(CONFIG_NAME_LIB)
 	@SET MACHINE=$(MACHINE)
@@ -261,7 +261,7 @@ $(MODE):
 
 copy_from_lib:
 	echo copying .c...
-	FOR %%i IN ($(CURLX_CFILES:/=\)) DO copy %%i ..\src\
+	FOR %%i IN ($(CARLX_CFILES:/=\)) DO copy %%i ..\src\
 
 clean:
 	$(MAKE) /NOLOGO /F MakefileBuild.vc $@

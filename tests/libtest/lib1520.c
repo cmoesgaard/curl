@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -71,43 +71,43 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 
 int test(char *URL)
 {
-  CURLcode res;
-  CURL *curl;
-  struct curl_slist *rcpt_list = NULL;
+  CARLcode res;
+  CARL *carl;
+  struct carl_slist *rcpt_list = NULL;
   struct upload_status upload_ctx = {0};
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  rcpt_list = curl_slist_append(rcpt_list, TO);
+  rcpt_list = carl_slist_append(rcpt_list, TO);
   /* more addresses can be added here
-     rcpt_list = curl_slist_append(rcpt_list, "<others@example.com>");
+     rcpt_list = carl_slist_append(rcpt_list, "<others@example.com>");
   */
 
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_UPLOAD, 1L);
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
-  test_setopt(curl, CURLOPT_READDATA, &upload_ctx);
-  test_setopt(curl, CURLOPT_MAIL_FROM, FROM);
-  test_setopt(curl, CURLOPT_MAIL_RCPT, rcpt_list);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_UPLOAD, 1L);
+  test_setopt(carl, CARLOPT_READFUNCTION, read_callback);
+  test_setopt(carl, CARLOPT_READDATA, &upload_ctx);
+  test_setopt(carl, CARLOPT_MAIL_FROM, FROM);
+  test_setopt(carl, CARLOPT_MAIL_RCPT, rcpt_list);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
-  curl_slist_free_all(rcpt_list);
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_slist_free_all(rcpt_list);
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

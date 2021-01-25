@@ -41,7 +41,7 @@ pop3://%HOSTIP:%POP3PORT/876 -u user:secret
 #
 # Verify data after the test has been "shot"
 <verify>
-# 67 - CURLE_LOGIN_DENIED
+# 67 - CARLE_LOGIN_DENIED
 <errorcode>
 67
 </errorcode>

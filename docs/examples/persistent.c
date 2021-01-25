@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,43 +25,43 @@
  */
 #include <stdio.h>
 #include <unistd.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  curl = curl_easy_init();
-  if(curl) {
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+  carl = carl_easy_init();
+  if(carl) {
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_HEADER, 1L);
 
     /* get the first document */
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/");
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
 
     /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* get another document from the same server using the same
        connection */
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/docs/");
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/docs/");
 
     /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
   return 0;

@@ -43,11 +43,11 @@ http://%HOSTIP:%HTTPPORT/1154
 <protocol>
 GET /1154 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>
-# 27 == CURLE_OUT_OF_MEMORY
+# 27 == CARLE_OUT_OF_MEMORY
 <errorcode>
 27
 </errorcode>

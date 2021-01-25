@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -23,7 +23,7 @@
 #
 #
 #Filename   : Makefile.vxworks
-#Description: makefile to be used in order to compile libcurl for VxWoorks 6.3.
+#Description: makefile to be used in order to compile libcarl for VxWoorks 6.3.
 #
 #How to use:
 #             1. Adjust environment variables at the file beginning
@@ -32,7 +32,7 @@
 #             3. Add <CYGWIN>/bin folder to the PATH environment variable
 #                For example type 'set PATH=C:/embedded/cygwin/bin;%PATH%'
 #             4. Build the library by typing 'make -f ./Makefile.vxworks'
-#             As a result the libcurl.a should be created in the 'lib' folder.
+#             As a result the libcarl.a should be created in the 'lib' folder.
 #             To clean package use 'make -f ./Makefile.vxworks clean'
 #Requirements:
 #             1. WinXP machine
@@ -130,7 +130,7 @@ CFLAGS += $(INCLUDE_DIRS:%=$(INCLUDE_FLAG)%)
 LDFLAGS += $(LIB_DIRS:%=$(LIBS_DIRFLAG)%)
 
 # List of targets to make for libs target
-LIBS_TARGET_LIST := libcurl.a
+LIBS_TARGET_LIST := libcarl.a
 
 # List of execuatble applications to make in addition to libs for all target
 EXE_TARGET_LIST :=
@@ -163,7 +163,7 @@ OBJLIST := $(CSOURCES:%.c=$(TMP_DIR)/%$(OBJ_EXTENSION))
 #### default rule
 # It should be first rule in this file
 .PHONY: default
-default: libcurl.a
+default: libcarl.a
 
 #### Compiling C files
 $(TMP_DIR)/%$(OBJ_EXTENSION): %.c $(MAKEFILES)
@@ -195,4 +195,4 @@ all: $(LIBS_TARGET_LIST) $(EXE_TARGET_LIST) $(INCLUDE_TARGET_LIST)
 .PHONY: clean
 clean:
 	$(_@_) rm -rf $(TMP_DIR)
-	@echo libcurl was cleaned.
+	@echo libcarl was cleaned.

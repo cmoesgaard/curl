@@ -58,7 +58,7 @@ proxy
 <protocol>
 GET /717 HTTP/1.1
 Host: %HOSTIP:1
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

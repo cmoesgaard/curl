@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_WOLFSSL_H
-#define HEADER_CURL_WOLFSSL_H
+#ifndef HEADER_CARL_WOLFSSL_H
+#define HEADER_CARL_WOLFSSL_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,11 +21,11 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_WOLFSSL
 
 extern const struct Curl_ssl Curl_ssl_wolfssl;
 
 #endif /* USE_WOLFSSL */
-#endif /* HEADER_CURL_WOLFSSL_H */
+#endif /* HEADER_CARL_WOLFSSL_H */

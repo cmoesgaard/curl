@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,11 +20,11 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "non-ascii.h"
 #include "formdata.h"
@@ -32,37 +32,37 @@
 #include "urldata.h"
 #include "multiif.h"
 
-#include "curl_memory.h"
+#include "carl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
 #ifdef HAVE_ICONV
 #include <iconv.h>
 /* set default codesets for iconv */
-#ifndef CURL_ICONV_CODESET_OF_NETWORK
-#define CURL_ICONV_CODESET_OF_NETWORK "ISO8859-1"
+#ifndef CARL_ICONV_CODESET_OF_NETWORK
+#define CARL_ICONV_CODESET_OF_NETWORK "ISO8859-1"
 #endif
-#ifndef CURL_ICONV_CODESET_FOR_UTF8
-#define CURL_ICONV_CODESET_FOR_UTF8   "UTF-8"
+#ifndef CARL_ICONV_CODESET_FOR_UTF8
+#define CARL_ICONV_CODESET_FOR_UTF8   "UTF-8"
 #endif
 #define ICONV_ERROR  (size_t)-1
 #endif /* HAVE_ICONV */
 
 /*
  * Curl_convert_clone() returns a malloced copy of the source string (if
- * returning CURLE_OK), with the data converted to network format.
+ * returning CARLE_OK), with the data converted to network format.
  */
-CURLcode Curl_convert_clone(struct Curl_easy *data,
+CARLcode Curl_convert_clone(struct Curl_easy *data,
                            const char *indata,
                            size_t insize,
                            char **outbuf)
 {
   char *convbuf;
-  CURLcode result;
+  CARLcode result;
 
   convbuf = malloc(insize);
   if(!convbuf)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   memcpy(convbuf, indata, insize);
   result = Curl_convert_to_network(data, convbuf, insize);
@@ -73,26 +73,26 @@ CURLcode Curl_convert_clone(struct Curl_easy *data,
 
   *outbuf = convbuf; /* return the converted buffer */
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Curl_convert_to_network() is an internal function for performing ASCII
  * conversions on non-ASCII platforms. It converts the buffer _in place_.
  */
-CURLcode Curl_convert_to_network(struct Curl_easy *data,
+CARLcode Curl_convert_to_network(struct Curl_easy *data,
                                  char *buffer, size_t length)
 {
   if(data && data->set.convtonetwork) {
     /* use translation callback */
-    CURLcode result;
+    CARLcode result;
     Curl_set_in_callback(data, true);
     result = data->set.convtonetwork(buffer, length);
     Curl_set_in_callback(data, false);
     if(result) {
       failf(data,
-            "CURLOPT_CONV_TO_NETWORK_FUNCTION callback returned %d: %s",
-            (int)result, curl_easy_strerror(result));
+            "CARLOPT_CONV_TO_NETWORK_FUNCTION callback returned %d: %s",
+            (int)result, carl_easy_strerror(result));
     }
 
     return result;
@@ -109,15 +109,15 @@ CURLcode Curl_convert_to_network(struct Curl_easy *data,
     if(data)
       cd = &data->outbound_cd;
     if(*cd == (iconv_t)-1) {
-      *cd = iconv_open(CURL_ICONV_CODESET_OF_NETWORK,
-                       CURL_ICONV_CODESET_OF_HOST);
+      *cd = iconv_open(CARL_ICONV_CODESET_OF_NETWORK,
+                       CARL_ICONV_CODESET_OF_HOST);
       if(*cd == (iconv_t)-1) {
         failf(data,
               "The iconv_open(\"%s\", \"%s\") call failed with errno %i: %s",
-              CURL_ICONV_CODESET_OF_NETWORK,
-              CURL_ICONV_CODESET_OF_HOST,
+              CARL_ICONV_CODESET_OF_NETWORK,
+              CARL_ICONV_CODESET_OF_HOST,
               errno, strerror(errno));
-        return CURLE_CONV_FAILED;
+        return CARLE_CONV_FAILED;
       }
     }
     /* call iconv */
@@ -131,34 +131,34 @@ CURLcode Curl_convert_to_network(struct Curl_easy *data,
       failf(data,
             "The Curl_convert_to_network iconv call failed with errno %i: %s",
             errno, strerror(errno));
-      return CURLE_CONV_FAILED;
+      return CARLE_CONV_FAILED;
     }
 #else
-    failf(data, "CURLOPT_CONV_TO_NETWORK_FUNCTION callback required");
-    return CURLE_CONV_REQD;
+    failf(data, "CARLOPT_CONV_TO_NETWORK_FUNCTION callback required");
+    return CARLE_CONV_REQD;
 #endif /* HAVE_ICONV */
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Curl_convert_from_network() is an internal function for performing ASCII
  * conversions on non-ASCII platforms. It converts the buffer _in place_.
  */
-CURLcode Curl_convert_from_network(struct Curl_easy *data,
+CARLcode Curl_convert_from_network(struct Curl_easy *data,
                                    char *buffer, size_t length)
 {
   if(data && data->set.convfromnetwork) {
     /* use translation callback */
-    CURLcode result;
+    CARLcode result;
     Curl_set_in_callback(data, true);
     result = data->set.convfromnetwork(buffer, length);
     Curl_set_in_callback(data, false);
     if(result) {
       failf(data,
-            "CURLOPT_CONV_FROM_NETWORK_FUNCTION callback returned %d: %s",
-            (int)result, curl_easy_strerror(result));
+            "CARLOPT_CONV_FROM_NETWORK_FUNCTION callback returned %d: %s",
+            (int)result, carl_easy_strerror(result));
     }
 
     return result;
@@ -175,15 +175,15 @@ CURLcode Curl_convert_from_network(struct Curl_easy *data,
     if(data)
       cd = &data->inbound_cd;
     if(*cd == (iconv_t)-1) {
-      *cd = iconv_open(CURL_ICONV_CODESET_OF_HOST,
-                       CURL_ICONV_CODESET_OF_NETWORK);
+      *cd = iconv_open(CARL_ICONV_CODESET_OF_HOST,
+                       CARL_ICONV_CODESET_OF_NETWORK);
       if(*cd == (iconv_t)-1) {
         failf(data,
               "The iconv_open(\"%s\", \"%s\") call failed with errno %i: %s",
-              CURL_ICONV_CODESET_OF_HOST,
-              CURL_ICONV_CODESET_OF_NETWORK,
+              CARL_ICONV_CODESET_OF_HOST,
+              CARL_ICONV_CODESET_OF_NETWORK,
               errno, strerror(errno));
-        return CURLE_CONV_FAILED;
+        return CARLE_CONV_FAILED;
       }
     }
     /* call iconv */
@@ -197,34 +197,34 @@ CURLcode Curl_convert_from_network(struct Curl_easy *data,
       failf(data,
             "Curl_convert_from_network iconv call failed with errno %i: %s",
             errno, strerror(errno));
-      return CURLE_CONV_FAILED;
+      return CARLE_CONV_FAILED;
     }
 #else
-    failf(data, "CURLOPT_CONV_FROM_NETWORK_FUNCTION callback required");
-    return CURLE_CONV_REQD;
+    failf(data, "CARLOPT_CONV_FROM_NETWORK_FUNCTION callback required");
+    return CARLE_CONV_REQD;
 #endif /* HAVE_ICONV */
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Curl_convert_from_utf8() is an internal function for performing UTF-8
  * conversions on non-ASCII platforms.
  */
-CURLcode Curl_convert_from_utf8(struct Curl_easy *data,
+CARLcode Curl_convert_from_utf8(struct Curl_easy *data,
                                 char *buffer, size_t length)
 {
   if(data && data->set.convfromutf8) {
     /* use translation callback */
-    CURLcode result;
+    CARLcode result;
     Curl_set_in_callback(data, true);
     result = data->set.convfromutf8(buffer, length);
     Curl_set_in_callback(data, false);
     if(result) {
       failf(data,
-            "CURLOPT_CONV_FROM_UTF8_FUNCTION callback returned %d: %s",
-            (int)result, curl_easy_strerror(result));
+            "CARLOPT_CONV_FROM_UTF8_FUNCTION callback returned %d: %s",
+            (int)result, carl_easy_strerror(result));
     }
 
     return result;
@@ -242,15 +242,15 @@ CURLcode Curl_convert_from_utf8(struct Curl_easy *data,
     if(data)
       cd = &data->utf8_cd;
     if(*cd == (iconv_t)-1) {
-      *cd = iconv_open(CURL_ICONV_CODESET_OF_HOST,
-                       CURL_ICONV_CODESET_FOR_UTF8);
+      *cd = iconv_open(CARL_ICONV_CODESET_OF_HOST,
+                       CARL_ICONV_CODESET_FOR_UTF8);
       if(*cd == (iconv_t)-1) {
         failf(data,
               "The iconv_open(\"%s\", \"%s\") call failed with errno %i: %s",
-              CURL_ICONV_CODESET_OF_HOST,
-              CURL_ICONV_CODESET_FOR_UTF8,
+              CARL_ICONV_CODESET_OF_HOST,
+              CARL_ICONV_CODESET_FOR_UTF8,
               errno, strerror(errno));
-        return CURLE_CONV_FAILED;
+        return CARLE_CONV_FAILED;
       }
     }
     /* call iconv */
@@ -264,19 +264,19 @@ CURLcode Curl_convert_from_utf8(struct Curl_easy *data,
       failf(data,
             "The Curl_convert_from_utf8 iconv call failed with errno %i: %s",
             errno, strerror(errno));
-      return CURLE_CONV_FAILED;
+      return CARLE_CONV_FAILED;
     }
     if(output_ptr < input_ptr) {
       /* null terminate the now shorter output string */
       *output_ptr = 0x00;
     }
 #else
-    failf(data, "CURLOPT_CONV_FROM_UTF8_FUNCTION callback required");
-    return CURLE_CONV_REQD;
+    failf(data, "CARLOPT_CONV_FROM_UTF8_FUNCTION callback required");
+    return CARLE_CONV_REQD;
 #endif /* HAVE_ICONV */
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
@@ -284,14 +284,14 @@ CURLcode Curl_convert_from_utf8(struct Curl_easy *data,
  */
 void Curl_convert_init(struct Curl_easy *data)
 {
-#if defined(CURL_DOES_CONVERSIONS) && defined(HAVE_ICONV)
+#if defined(CARL_DOES_CONVERSIONS) && defined(HAVE_ICONV)
   /* conversion descriptors for iconv calls */
   data->outbound_cd = (iconv_t)-1;
   data->inbound_cd  = (iconv_t)-1;
   data->utf8_cd     = (iconv_t)-1;
 #else
   (void)data;
-#endif /* CURL_DOES_CONVERSIONS && HAVE_ICONV */
+#endif /* CARL_DOES_CONVERSIONS && HAVE_ICONV */
 }
 
 /*
@@ -299,12 +299,12 @@ void Curl_convert_init(struct Curl_easy *data)
  */
 void Curl_convert_setup(struct Curl_easy *data)
 {
-  data->inbound_cd = iconv_open(CURL_ICONV_CODESET_OF_HOST,
-                                CURL_ICONV_CODESET_OF_NETWORK);
-  data->outbound_cd = iconv_open(CURL_ICONV_CODESET_OF_NETWORK,
-                                 CURL_ICONV_CODESET_OF_HOST);
-  data->utf8_cd = iconv_open(CURL_ICONV_CODESET_OF_HOST,
-                             CURL_ICONV_CODESET_FOR_UTF8);
+  data->inbound_cd = iconv_open(CARL_ICONV_CODESET_OF_HOST,
+                                CARL_ICONV_CODESET_OF_NETWORK);
+  data->outbound_cd = iconv_open(CARL_ICONV_CODESET_OF_NETWORK,
+                                 CARL_ICONV_CODESET_OF_HOST);
+  data->utf8_cd = iconv_open(CARL_ICONV_CODESET_OF_HOST,
+                             CARL_ICONV_CODESET_FOR_UTF8);
 }
 
 /*
@@ -329,4 +329,4 @@ void Curl_convert_close(struct Curl_easy *data)
 #endif /* HAVE_ICONV */
 }
 
-#endif /* CURL_DOES_CONVERSIONS */
+#endif /* CARL_DOES_CONVERSIONS */

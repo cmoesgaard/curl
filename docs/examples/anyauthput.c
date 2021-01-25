@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 /* <DESC>
- * HTTP PUT upload with authentication using "any" method. libcurl picks the
+ * HTTP PUT upload with authentication using "any" method. libcarl picks the
  * one the server supports/wants.
  * </DESC>
  */
@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #ifdef WIN32
 #  include <io.h>
@@ -39,8 +39,8 @@
 #  define READ_3RD_ARG size_t
 #endif
 
-#if LIBCURL_VERSION_NUM < 0x070c03
-#error "upgrade your libcurl to no less than 7.12.3"
+#if LIBCARL_VERSION_NUM < 0x070c03
+#error "upgrade your libcarl to no less than 7.12.3"
 #endif
 
 /*
@@ -48,14 +48,14 @@
  * type. It PUTs a file given as a command line argument to the URL also given
  * on the command line.
  *
- * Since libcurl 7.12.3, using "any" auth and POST/PUT requires a set ioctl
+ * Since libcarl 7.12.3, using "any" auth and POST/PUT requires a set ioctl
  * function.
  *
  * This example also uses its own read callback.
  */
 
 /* ioctl callback function */
-static curlioerr my_ioctl(CURL *handle, curliocmd cmd, void *userp)
+static carlioerr my_ioctl(CARL *handle, carliocmd cmd, void *userp)
 {
   int *fdp = (int *)userp;
   int fd = *fdp;
@@ -63,34 +63,34 @@ static curlioerr my_ioctl(CURL *handle, curliocmd cmd, void *userp)
   (void)handle; /* not used in here */
 
   switch(cmd) {
-  case CURLIOCMD_RESTARTREAD:
-    /* mr libcurl kindly asks as to rewind the read data stream to start */
+  case CARLIOCMD_RESTARTREAD:
+    /* mr libcarl kindly asks as to rewind the read data stream to start */
     if(-1 == lseek(fd, 0, SEEK_SET))
       /* couldn't rewind */
-      return CURLIOE_FAILRESTART;
+      return CARLIOE_FAILRESTART;
 
     break;
 
   default: /* ignore unknown commands */
-    return CURLIOE_UNKNOWNCMD;
+    return CARLIOE_UNKNOWNCMD;
   }
-  return CURLIOE_OK; /* success! */
+  return CARLIOE_OK; /* success! */
 }
 
 /* read callback function, fread() look alike */
 static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
   ssize_t retcode;
-  curl_off_t nread;
+  carl_off_t nread;
 
   int *fdp = (int *)stream;
   int fd = *fdp;
 
   retcode = read(fd, ptr, (READ_3RD_ARG)(size * nmemb));
 
-  nread = (curl_off_t)retcode;
+  nread = (carl_off_t)retcode;
 
-  fprintf(stderr, "*** We read %" CURL_FORMAT_CURL_OFF_T
+  fprintf(stderr, "*** We read %" CARL_FORMAT_CARL_OFF_T
           " bytes from file\n", nread);
 
   return retcode;
@@ -98,8 +98,8 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 
 int main(int argc, char **argv)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   int hd;
   struct stat file_info;
 
@@ -117,55 +117,55 @@ int main(int argc, char **argv)
   fstat(hd, &file_info);
 
   /* In windows, this will init the winsock stuff */
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  /* get a curl handle */
-  curl = curl_easy_init();
-  if(curl) {
+  /* get a carl handle */
+  carl = carl_easy_init();
+  if(carl) {
     /* we want to use our own read function */
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+    carl_easy_setopt(carl, CARLOPT_READFUNCTION, read_callback);
 
     /* which file to upload */
-    curl_easy_setopt(curl, CURLOPT_READDATA, (void *)&hd);
+    carl_easy_setopt(carl, CARLOPT_READDATA, (void *)&hd);
 
     /* set the ioctl function */
-    curl_easy_setopt(curl, CURLOPT_IOCTLFUNCTION, my_ioctl);
+    carl_easy_setopt(carl, CARLOPT_IOCTLFUNCTION, my_ioctl);
 
     /* pass the file descriptor to the ioctl callback as well */
-    curl_easy_setopt(curl, CURLOPT_IOCTLDATA, (void *)&hd);
+    carl_easy_setopt(carl, CARLOPT_IOCTLDATA, (void *)&hd);
 
     /* enable "uploading" (which means PUT when doing HTTP) */
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
 
     /* specify target URL, and note that this URL should also include a file
        name, not only a directory (as you can do with GTP uploads) */
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    carl_easy_setopt(carl, CARLOPT_URL, url);
 
     /* and give the size of the upload, this supports large file sizes
        on systems that have general support for it */
-    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,
-                     (curl_off_t)file_info.st_size);
+    carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE,
+                     (carl_off_t)file_info.st_size);
 
-    /* tell libcurl we can use "any" auth, which lets the lib pick one, but it
+    /* tell libcarl we can use "any" auth, which lets the lib pick one, but it
        also costs one extra round-trip and possibly sending of all the PUT
        data twice!!! */
-    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_ANY);
+    carl_easy_setopt(carl, CARLOPT_HTTPAUTH, (long)CARLAUTH_ANY);
 
     /* set user name and password for the authentication */
-    curl_easy_setopt(curl, CURLOPT_USERPWD, "user:password");
+    carl_easy_setopt(carl, CARLOPT_USERPWD, "user:password");
 
     /* Now run off and do what you've been told! */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   close(hd); /* close the local file */
 
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

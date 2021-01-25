@@ -4,7 +4,7 @@
 <info>
 <keywords>
 HTTP
-CURLOPT_URL
+CARLOPT_URL
 </keywords>
 </info>
 
@@ -37,7 +37,7 @@ http://%HOSTIP:%HTTPPORT/1110?q=foobar#fragment
 <protocol>
 GET /1110?q=foobar HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

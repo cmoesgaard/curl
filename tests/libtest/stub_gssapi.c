@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-/* Only provides the bare minimum to link with libcurl */
+/* Only provides the bare minimum to link with libcarl */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +100,7 @@ OM_uint32 gss_init_sec_context(OM_uint32 *min,
     return GSS_S_FAILURE;
   }
 
-  creds = getenv("CURL_STUB_GSS_CREDS");
+  creds = getenv("CARL_STUB_GSS_CREDS");
   if(!creds || strlen(creds) >= MAX_CREDS_LENGTH) {
     *min = GSS_INVALID_CREDS;
     return GSS_S_FAILURE;
@@ -204,7 +204,7 @@ OM_uint32 gss_init_sec_context(OM_uint32 *min,
   }
 
   /* Token format: creds:target:type:padding */
-  /* Note: this is using the *real* snprintf() and not the curl provided
+  /* Note: this is using the *real* snprintf() and not the carl provided
      one */
   used = snprintf(token, length, "%s:%s:%d:", creds,
                   (char *) target_name, ctx->sent);

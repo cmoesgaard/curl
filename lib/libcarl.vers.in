@@ -1,0 +1,13 @@
+HIDDEN
+{
+  local:
+    __*;
+    _rest*;
+    _save*;
+};
+
+CARL_@CARL_LT_SHLIB_VERSIONED_FLAVOUR@4
+{
+  global: carl_*;
+  local: *;
+};

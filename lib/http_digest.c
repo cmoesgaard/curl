@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_CRYPTO_AUTH)
 
 #include "urldata.h"
 #include "strcase.h"
@@ -30,8 +30,8 @@
 #include "http_digest.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /* Test example headers:
@@ -41,7 +41,7 @@ Proxy-Authenticate: Digest realm="testrealm", nonce="1053604598"
 
 */
 
-CURLcode Curl_input_digest(struct Curl_easy *data,
+CARLcode Curl_input_digest(struct Curl_easy *data,
                            bool proxy,
                            const char *header) /* rest of the *-authenticate:
                                                   header */
@@ -57,7 +57,7 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
   }
 
   if(!checkprefix("Digest", header))
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
 
   header += strlen("Digest");
   while(*header && ISSPACE(*header))
@@ -66,13 +66,13 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
   return Curl_auth_decode_digest_http_message(header, digest);
 }
 
-CURLcode Curl_output_digest(struct Curl_easy *data,
+CARLcode Curl_output_digest(struct Curl_easy *data,
                             struct connectdata *conn,
                             bool proxy,
                             const unsigned char *request,
                             const unsigned char *uripath)
 {
-  CURLcode result;
+  CARLcode result;
   unsigned char *path = NULL;
   char *tmp = NULL;
   char *response;
@@ -92,8 +92,8 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
   struct auth *authp;
 
   if(proxy) {
-#ifdef CURL_DISABLE_PROXY
-    return CURLE_NOT_BUILT_IN;
+#ifdef CARL_DISABLE_PROXY
+    return CARLE_NOT_BUILT_IN;
 #else
     digest = &data->state.proxydigest;
     allocuserpwd = &data->state.aptr.proxyuserpwd;
@@ -127,7 +127,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
 
   if(!have_chlg) {
     authp->done = FALSE;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   /* So IE browsers < v7 cut off the URI part at the query part when they
@@ -154,7 +154,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
     path = (unsigned char *) strdup((char *) uripath);
 
   if(!path)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   result = Curl_auth_create_digest_http_message(data, userp, passwdp, request,
                                                 path, digest, &response, &len);
@@ -167,11 +167,11 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
                           response);
   free(response);
   if(!*allocuserpwd)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   authp->done = TRUE;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 void Curl_http_auth_cleanup_digest(struct Curl_easy *data)

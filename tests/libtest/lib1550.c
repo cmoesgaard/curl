@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,24 +23,24 @@
 
 #include "memdebug.h"
 
-#include <curl/multi.h>
+#include <carl/multi.h>
 
 int test(char *URL)
 {
-  CURLM *handle;
-  int res = CURLE_OK;
+  CARLM *handle;
+  int res = CARLE_OK;
   static const char * const bl_servers[] =
      {"Microsoft-IIS/6.0", "nginx/0.8.54", NULL};
   static const char * const bl_sites[] =
-     {"curl.se:443", "example.com:80", NULL};
+     {"carl.se:443", "example.com:80", NULL};
 
-  global_init(CURL_GLOBAL_ALL);
-  handle = curl_multi_init();
+  global_init(CARL_GLOBAL_ALL);
+  handle = carl_multi_init();
   (void)URL; /* unused */
 
-  curl_multi_setopt(handle, CURLMOPT_PIPELINING_SERVER_BL, bl_servers);
-  curl_multi_setopt(handle, CURLMOPT_PIPELINING_SITE_BL, bl_sites);
-  curl_multi_cleanup(handle);
-  curl_global_cleanup();
+  carl_multi_setopt(handle, CARLMOPT_PIPELINING_SERVER_BL, bl_servers);
+  carl_multi_setopt(handle, CARLMOPT_PIPELINING_SITE_BL, bl_sites);
+  carl_multi_cleanup(handle);
+  carl_global_cleanup();
   return 0;
 }

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,24 +37,24 @@
 
 int test(char *URL)
 {
-  CURL *c = NULL;
-  CURLM *m = NULL;
+  CARL *c = NULL;
+  CARLM *m = NULL;
   int res = 0;
   int running;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   easy_init(c);
 
-  easy_setopt(c, CURLOPT_PROXY, libtest_arg2); /* set in first.c */
-  easy_setopt(c, CURLOPT_URL, URL);
-  easy_setopt(c, CURLOPT_USERPWD, "test:ing");
-  easy_setopt(c, CURLOPT_PROXYUSERPWD, "test:ing");
-  easy_setopt(c, CURLOPT_HTTPPROXYTUNNEL, 1L);
-  easy_setopt(c, CURLOPT_HEADER, 1L);
-  easy_setopt(c, CURLOPT_VERBOSE, 1L);
+  easy_setopt(c, CARLOPT_PROXY, libtest_arg2); /* set in first.c */
+  easy_setopt(c, CARLOPT_URL, URL);
+  easy_setopt(c, CARLOPT_USERPWD, "test:ing");
+  easy_setopt(c, CARLOPT_PROXYUSERPWD, "test:ing");
+  easy_setopt(c, CARLOPT_HTTPPROXYTUNNEL, 1L);
+  easy_setopt(c, CARLOPT_HEADER, 1L);
+  easy_setopt(c, CARLOPT_VERBOSE, 1L);
 
   multi_init(m);
 
@@ -92,10 +92,10 @@ test_cleanup:
 
   /* proper cleanup sequence - type PA */
 
-  curl_multi_remove_handle(m, c);
-  curl_multi_cleanup(m);
-  curl_easy_cleanup(c);
-  curl_global_cleanup();
+  carl_multi_remove_handle(m, c);
+  carl_multi_cleanup(m);
+  carl_easy_cleanup(c);
+  carl_global_cleanup();
 
   return res;
 }

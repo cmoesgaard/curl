@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_binmode.h"
 #include "tool_cfgable.h"
@@ -158,7 +158,7 @@ static const struct LongShort aliases[]= {
   {"$x", "ftp-ssl-control",          ARG_BOOL},
   {"$y", "ftp-ssl-ccc",              ARG_BOOL},
   {"$j", "ftp-ssl-ccc-mode",         ARG_STRING},
-  {"$z", "libcurl",                  ARG_STRING},
+  {"$z", "libcarl",                  ARG_STRING},
   {"$#", "raw",                      ARG_BOOL},
   {"$0", "post301",                  ARG_BOOL},
   {"$1", "keepalive",                ARG_BOOL},
@@ -339,7 +339,7 @@ static const struct LongShort aliases[]= {
 
 /* Split the argument of -E to 'certname' and 'passphrase' separated by colon.
  * We allow ':' and '\' to be escaped by '\' so that we can use certificate
- * nicknames containing ':'.  See <https://sourceforge.net/p/curl/bugs/1196/>
+ * nicknames containing ':'.  See <https://sourceforge.net/p/carl/bugs/1196/>
  * for details. */
 #ifndef UNITTESTS
 static
@@ -363,7 +363,7 @@ void parse_cert_parameter(const char *cert_parameter,
    * looks like a RFC7512 PKCS#11 URI which can be used as-is.
    * Also if cert_parameter contains no colon nor backslash, this
    * means no passphrase was given and no characters escaped */
-  if(curl_strnequal(cert_parameter, "pkcs11:", 7) ||
+  if(carl_strnequal(cert_parameter, "pkcs11:", 7) ||
      !strpbrk(cert_parameter, ":\\")) {
     *certname = strdup(cert_parameter);
     return;
@@ -459,12 +459,12 @@ GetFileAndPassword(char *nextarg, char **file, char **password)
 static ParameterError GetSizeParameter(struct GlobalConfig *global,
                                        const char *arg,
                                        const char *which,
-                                       curl_off_t *value_out)
+                                       carl_off_t *value_out)
 {
   char *unit;
-  curl_off_t value;
+  carl_off_t value;
 
-  if(curlx_strtoofft(arg, &unit, 0, &value)) {
+  if(carlx_strtoofft(arg, &unit, 0, &value)) {
     warnf(global, "invalid number specified for %s\n", which);
     return PARAM_BAD_USE;
   }
@@ -477,19 +477,19 @@ static ParameterError GetSizeParameter(struct GlobalConfig *global,
   switch(*unit) {
   case 'G':
   case 'g':
-    if(value > (CURL_OFF_T_MAX / (1024*1024*1024)))
+    if(value > (CARL_OFF_T_MAX / (1024*1024*1024)))
       return PARAM_NUMBER_TOO_LARGE;
     value *= 1024*1024*1024;
     break;
   case 'M':
   case 'm':
-    if(value > (CURL_OFF_T_MAX / (1024*1024)))
+    if(value > (CARL_OFF_T_MAX / (1024*1024)))
       return PARAM_NUMBER_TOO_LARGE;
     value *= 1024*1024;
     break;
   case 'K':
   case 'k':
-    if(value > (CURL_OFF_T_MAX / 1024))
+    if(value > (CARL_OFF_T_MAX / 1024))
       return PARAM_NUMBER_TOO_LARGE;
     value *= 1024;
     break;
@@ -542,10 +542,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     }
 
     for(j = 0; j < sizeof(aliases)/sizeof(aliases[0]); j++) {
-      if(curl_strnequal(aliases[j].lname, word, fnam)) {
+      if(carl_strnequal(aliases[j].lname, word, fnam)) {
         longopt = TRUE;
         numhits++;
-        if(curl_strequal(aliases[j].lname, word)) {
+        if(carl_strequal(aliases[j].lname, word)) {
           parse = aliases[j].letter;
           hit = j;
           numhits = 1; /* a single unique hit */
@@ -636,7 +636,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'B': /* OAuth 2.0 bearer token */
         GetStr(&config->oauth_bearer, nextarg);
-        config->authtype |= CURLAUTH_BEARER;
+        config->authtype |= CARLAUTH_BEARER;
         break;
       case 'c': /* connect-timeout */
         err = str2udouble(&config->connecttimeout, nextarg,
@@ -688,7 +688,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'i': /* --limit-rate */
       {
-        curl_off_t value;
+        carl_off_t value;
         ParameterError pe = GetSizeParameter(global, nextarg, "rate", &value);
 
         if(pe != PARAM_OK)
@@ -700,9 +700,9 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 
       case 'j': /* --compressed */
         if(toggle &&
-           !(curlinfo->features & (CURL_VERSION_LIBZ |
-                                   CURL_VERSION_BROTLI | CURL_VERSION_ZSTD)))
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+           !(carlinfo->features & (CARL_VERSION_LIBZ |
+                                   CARL_VERSION_BROTLI | CARL_VERSION_ZSTD)))
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         config->encoding = toggle;
         break;
 
@@ -712,54 +712,54 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 
       case 'k': /* --digest */
         if(toggle)
-          config->authtype |= CURLAUTH_DIGEST;
+          config->authtype |= CARLAUTH_DIGEST;
         else
-          config->authtype &= ~CURLAUTH_DIGEST;
+          config->authtype &= ~CARLAUTH_DIGEST;
         break;
 
       case 'l': /* --negotiate */
         if(toggle) {
-          if(curlinfo->features & CURL_VERSION_SPNEGO)
-            config->authtype |= CURLAUTH_NEGOTIATE;
+          if(carlinfo->features & CARL_VERSION_SPNEGO)
+            config->authtype |= CARLAUTH_NEGOTIATE;
           else
-            return PARAM_LIBCURL_DOESNT_SUPPORT;
+            return PARAM_LIBCARL_DOESNT_SUPPORT;
         }
         else
-          config->authtype &= ~CURLAUTH_NEGOTIATE;
+          config->authtype &= ~CARLAUTH_NEGOTIATE;
         break;
 
       case 'm': /* --ntlm */
         if(toggle) {
-          if(curlinfo->features & CURL_VERSION_NTLM)
-            config->authtype |= CURLAUTH_NTLM;
+          if(carlinfo->features & CARL_VERSION_NTLM)
+            config->authtype |= CARLAUTH_NTLM;
           else
-            return PARAM_LIBCURL_DOESNT_SUPPORT;
+            return PARAM_LIBCARL_DOESNT_SUPPORT;
         }
         else
-          config->authtype &= ~CURLAUTH_NTLM;
+          config->authtype &= ~CARLAUTH_NTLM;
         break;
 
       case 'M': /* --ntlm-wb */
         if(toggle) {
-          if(curlinfo->features & CURL_VERSION_NTLM_WB)
-            config->authtype |= CURLAUTH_NTLM_WB;
+          if(carlinfo->features & CARL_VERSION_NTLM_WB)
+            config->authtype |= CARLAUTH_NTLM_WB;
           else
-            return PARAM_LIBCURL_DOESNT_SUPPORT;
+            return PARAM_LIBCARL_DOESNT_SUPPORT;
         }
         else
-          config->authtype &= ~CURLAUTH_NTLM_WB;
+          config->authtype &= ~CARLAUTH_NTLM_WB;
         break;
 
       case 'n': /* --basic for completeness */
         if(toggle)
-          config->authtype |= CURLAUTH_BASIC;
+          config->authtype |= CARLAUTH_BASIC;
         else
-          config->authtype &= ~CURLAUTH_BASIC;
+          config->authtype &= ~CARLAUTH_BASIC;
         break;
 
-      case 'o': /* --anyauth, let libcurl pick it */
+      case 'o': /* --anyauth, let libcarl pick it */
         if(toggle)
-          config->authtype = CURLAUTH_ANY;
+          config->authtype = CARLAUTH_ANY;
         /* --no-anyauth simply doesn't touch it */
         break;
 
@@ -793,10 +793,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 't': /* --proxy-ntlm */
-        if(curlinfo->features & CURL_VERSION_NTLM)
+        if(carlinfo->features & CARL_VERSION_NTLM)
           config->proxyntlm = toggle;
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
 
       case 'u': /* --crlf */
@@ -805,7 +805,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 'V': /* --aws-sigv4 */
-        config->authtype |= CURLAUTH_AWS_SIGV4;
+        config->authtype |= CARLAUTH_AWS_SIGV4;
         GetStr(&config->aws_sigv4_provider, nextarg);
         break;
       case 'v': /* --stderr */
@@ -829,17 +829,17 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'x': /* --krb */
         /* kerberos level string */
-        if(curlinfo->features & CURL_VERSION_SPNEGO)
+        if(carlinfo->features & CARL_VERSION_SPNEGO)
           GetStr(&config->krblevel, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case 'X': /* --haproxy-protocol */
         config->haproxy_protocol = toggle;
         break;
       case 'y': /* --max-filesize */
         {
-          curl_off_t value;
+          carl_off_t value;
           ParameterError pe =
             GetSizeParameter(global, nextarg, "max-filesize", &value);
 
@@ -892,8 +892,8 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case '$': /* more options without a short option */
       switch(subletter) {
       case 'a': /* --ssl */
-        if(toggle && !(curlinfo->features & CURL_VERSION_SSL))
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+        if(toggle && !(carlinfo->features & CARL_VERSION_SSL))
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         config->ftp_ssl = toggle;
         break;
       case 'b': /* --ftp-pasv */
@@ -902,20 +902,20 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       case 'c': /* --socks5 specifies a socks5 proxy to use, and resolves
                    the name locally and passes on the resolved address */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_SOCKS5;
+        config->proxyver = CARLPROXY_SOCKS5;
         break;
       case 't': /* --socks4 specifies a socks4 proxy to use */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_SOCKS4;
+        config->proxyver = CARLPROXY_SOCKS4;
         break;
       case 'T': /* --socks4a specifies a socks4a proxy to use */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_SOCKS4A;
+        config->proxyver = CARLPROXY_SOCKS4A;
         break;
       case '2': /* --socks5-hostname specifies a socks5 proxy and enables name
                    resolving with the proxy */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_SOCKS5_HOSTNAME;
+        config->proxyver = CARLPROXY_SOCKS5_HOSTNAME;
         break;
       case 'd': /* --tcp-nodelay option */
         config->tcp_nodelay = toggle;
@@ -949,10 +949,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 'k': /* --proxy-negotiate */
-        if(curlinfo->features & CURL_VERSION_SPNEGO)
+        if(carlinfo->features & CARL_VERSION_SPNEGO)
           config->proxynegotiate = toggle;
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
 
       case 'm': /* --ftp-account */
@@ -1006,34 +1006,34 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         GetStr(&config->ftp_alternative_to_user, nextarg);
         break;
       case 'v': /* --ssl-reqd */
-        if(toggle && !(curlinfo->features & CURL_VERSION_SSL))
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+        if(toggle && !(carlinfo->features & CARL_VERSION_SSL))
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         config->ftp_ssl_reqd = toggle;
         break;
       case 'w': /* --no-sessionid */
         config->disable_sessionid = (!toggle)?TRUE:FALSE;
         break;
       case 'x': /* --ftp-ssl-control */
-        if(toggle && !(curlinfo->features & CURL_VERSION_SSL))
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+        if(toggle && !(carlinfo->features & CARL_VERSION_SSL))
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         config->ftp_ssl_control = toggle;
         break;
       case 'y': /* --ftp-ssl-ccc */
         config->ftp_ssl_ccc = toggle;
         if(!config->ftp_ssl_ccc_mode)
-          config->ftp_ssl_ccc_mode = CURLFTPSSL_CCC_PASSIVE;
+          config->ftp_ssl_ccc_mode = CARLFTPSSL_CCC_PASSIVE;
         break;
       case 'j': /* --ftp-ssl-ccc-mode */
         config->ftp_ssl_ccc = TRUE;
         config->ftp_ssl_ccc_mode = ftpcccmethod(config, nextarg);
         break;
-      case 'z': /* --libcurl */
-#ifdef CURL_DISABLE_LIBCURL_OPTION
+      case 'z': /* --libcarl */
+#ifdef CARL_DISABLE_LIBCARL_OPTION
         warnf(global,
-              "--libcurl option was disabled at build-time!\n");
+              "--libcarl option was disabled at build-time!\n");
         return PARAM_OPTION_UNKNOWN;
 #else
-        GetStr(&global->libcurl, nextarg);
+        GetStr(&global->libcarl, nextarg);
         break;
 #endif
       case '#': /* --raw */
@@ -1066,7 +1066,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       case '8': /* --proxy1.0 */
         /* http 1.0 proxy */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_HTTP_1_0;
+        config->proxyver = CARLPROXY_HTTP_1_0;
         break;
       case '9': /* --tftp-blksize */
         err = str2unum(&config->tftp_blksize, nextarg);
@@ -1111,14 +1111,14 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 #ifdef USE_METALINK
           int mlmaj, mlmin, mlpatch;
           metalink_get_version(&mlmaj, &mlmin, &mlpatch);
-          if((mlmaj*10000)+(mlmin*100) + mlpatch < CURL_REQ_LIBMETALINK_VERS) {
+          if((mlmaj*10000)+(mlmin*100) + mlpatch < CARL_REQ_LIBMETALINK_VERS) {
             warnf(global,
                   "--metalink option cannot be used because the version of "
                   "the linked libmetalink library is too old. "
                   "Required: %d.%d.%d, found %d.%d.%d\n",
-                  CURL_REQ_LIBMETALINK_MAJOR,
-                  CURL_REQ_LIBMETALINK_MINOR,
-                  CURL_REQ_LIBMETALINK_PATCH,
+                  CARL_REQ_LIBMETALINK_MAJOR,
+                  CARL_REQ_LIBMETALINK_MINOR,
+                  CARL_REQ_LIBMETALINK_PATCH,
                   mlmaj, mlmin, mlpatch);
             return PARAM_BAD_USE;
           }
@@ -1137,7 +1137,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->sasl_ir = toggle;
         break;
       case 'L': /* --test-event */
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
         global->test_event_based = toggle;
 #else
         warnf(global, "--test-event is ignored unless a debug build!\n");
@@ -1205,7 +1205,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       default:  /* --progress-bar */
         global->progressmode =
-          toggle ? CURL_PROGRESS_BAR : CURL_PROGRESS_STATS;
+          toggle ? CARL_PROGRESS_BAR : CARL_PROGRESS_STATS;
         break;
       }
       break;
@@ -1215,26 +1215,26 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       switch(subletter) {
       case '\0':
         /* HTTP version 1.0 */
-        config->httpversion = CURL_HTTP_VERSION_1_0;
+        config->httpversion = CARL_HTTP_VERSION_1_0;
         break;
       case '1':
         /* HTTP version 1.1 */
-        config->httpversion = CURL_HTTP_VERSION_1_1;
+        config->httpversion = CARL_HTTP_VERSION_1_1;
         break;
       case '2':
         /* HTTP version 2.0 */
-        config->httpversion = CURL_HTTP_VERSION_2_0;
+        config->httpversion = CARL_HTTP_VERSION_2_0;
         break;
       case '3': /* --http2-prior-knowledge */
         /* HTTP version 2.0 over clean TCP*/
-        config->httpversion = CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE;
+        config->httpversion = CARL_HTTP_VERSION_2_PRIOR_KNOWLEDGE;
         break;
       case '4': /* --http3 */
         /* HTTP version 3 go over QUIC - at once */
-        if(curlinfo->features & CURL_VERSION_HTTP3)
-          config->httpversion = CURL_HTTP_VERSION_3;
+        if(carlinfo->features & CARL_VERSION_HTTP3)
+          config->httpversion = CARL_HTTP_VERSION_3;
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case '9':
         /* Allow HTTP/0.9 responses! */
@@ -1246,23 +1246,23 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       switch(subletter) {
       case '\0':
         /* TLS version 1.x */
-        config->ssl_version = CURL_SSLVERSION_TLSv1;
+        config->ssl_version = CARL_SSLVERSION_TLSv1;
         break;
       case '0':
         /* TLS version 1.0 */
-        config->ssl_version = CURL_SSLVERSION_TLSv1_0;
+        config->ssl_version = CARL_SSLVERSION_TLSv1_0;
         break;
       case '1':
         /* TLS version 1.1 */
-        config->ssl_version = CURL_SSLVERSION_TLSv1_1;
+        config->ssl_version = CARL_SSLVERSION_TLSv1_1;
         break;
       case '2':
         /* TLS version 1.2 */
-        config->ssl_version = CURL_SSLVERSION_TLSv1_2;
+        config->ssl_version = CARL_SSLVERSION_TLSv1_2;
         break;
       case '3':
         /* TLS version 1.3 */
-        config->ssl_version = CURL_SSLVERSION_TLSv1_3;
+        config->ssl_version = CARL_SSLVERSION_TLSv1_3;
         break;
       case 'A': /* --tls13-ciphers */
         GetStr(&config->cipher13_list, nextarg);
@@ -1274,19 +1274,19 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       break;
     case '2':
       /* SSL version 2 */
-      config->ssl_version = CURL_SSLVERSION_SSLv2;
+      config->ssl_version = CARL_SSLVERSION_SSLv2;
       break;
     case '3':
       /* SSL version 3 */
-      config->ssl_version = CURL_SSLVERSION_SSLv3;
+      config->ssl_version = CARL_SSLVERSION_SSLv3;
       break;
     case '4':
       /* IPv4 */
-      config->ip_version = CURL_IPRESOLVE_V4;
+      config->ip_version = CARL_IPRESOLVE_V4;
       break;
     case '6':
       /* IPv6 */
-      config->ip_version = CURL_IPRESOLVE_V6;
+      config->ip_version = CARL_IPRESOLVE_V6;
       break;
     case 'a':
       /* This makes the FTP sessions use APPE instead of STOR */
@@ -1299,16 +1299,16 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case 'b':
       switch(subletter) {
       case 'a': /* --alt-svc */
-        if(curlinfo->features & CURL_VERSION_ALTSVC)
+        if(carlinfo->features & CARL_VERSION_ALTSVC)
           GetStr(&config->altsvc, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case 'b': /* --hsts */
-        if(curlinfo->features & CURL_VERSION_HSTS)
+        if(carlinfo->features & CARL_VERSION_HSTS)
           GetStr(&config->hsts, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       default:  /* --cookie string coming up: */
         if(nextarg[0] == '@') {
@@ -1411,7 +1411,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           size = 0;
         }
         else {
-          char *enc = curl_easy_escape(NULL, postdata, (int)size);
+          char *enc = carl_easy_escape(NULL, postdata, (int)size);
           Curl_safefree(postdata); /* no matter if it worked or not */
           if(enc) {
             /* now make a string with the name from above and append the
@@ -1419,7 +1419,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
             size_t outlen = nlen + strlen(enc) + 2;
             char *n = malloc(outlen);
             if(!n) {
-              curl_free(enc);
+              carl_free(enc);
               return PARAM_NO_MEM;
             }
             if(nlen > 0) { /* only append '=' if we have a name */
@@ -1430,7 +1430,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
               strcpy(n, enc);
               size = outlen-2; /* since no '=' was inserted */
             }
-            curl_free(enc);
+            carl_free(enc);
             postdata = n;
           }
           else
@@ -1482,7 +1482,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           size = strlen(postdata);
       }
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
       if(subletter != 'b') {
         /* NOT forced binary, convert to ASCII */
         if(convert_to_network(postdata, strlen(postdata))) {
@@ -1496,8 +1496,8 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         /* we already have a string, we append this one with a separating
            &-letter */
         char *oldpost = config->postfields;
-        curl_off_t oldlen = config->postfieldsize;
-        curl_off_t newlen = oldlen + curlx_uztoso(size) + 2;
+        carl_off_t oldlen = config->postfieldsize;
+        carl_off_t newlen = oldlen + carlx_uztoso(size) + 2;
         config->postfields = malloc((size_t)newlen);
         if(!config->postfields) {
           Curl_safefree(oldpost);
@@ -1515,7 +1515,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       }
       else {
         config->postfields = postdata;
-        config->postfieldsize = curlx_uztoso(size);
+        config->postfieldsize = carlx_uztoso(size);
       }
     }
     /*
@@ -1569,7 +1569,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'f': /* crypto engine */
         GetStr(&config->engine, nextarg);
-        if(config->engine && curl_strequal(config->engine, "list"))
+        if(config->engine && carl_strequal(config->engine, "list"))
           return PARAM_ENGINES_REQUESTED;
         break;
       case 'g': /* CA cert directory */
@@ -1587,28 +1587,28 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         GetStr(&config->crlfile, nextarg);
         break;
       case 'k': /* TLS username */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP)
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP)
           GetStr(&config->tls_username, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case 'l': /* TLS password */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP)
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP)
           GetStr(&config->tls_password, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case 'm': /* TLS authentication type */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP) {
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP) {
           GetStr(&config->tls_authtype, nextarg);
-          if(!curl_strequal(config->tls_authtype, "SRP"))
-            return PARAM_LIBCURL_DOESNT_SUPPORT; /* only support TLS-SRP */
+          if(!carl_strequal(config->tls_authtype, "SRP"))
+            return PARAM_LIBCARL_DOESNT_SUPPORT; /* only support TLS-SRP */
         }
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
       case 'n': /* no empty SSL fragments, --ssl-allow-beast */
-        if(curlinfo->features & CURL_VERSION_SSL)
+        if(carlinfo->features & CARL_VERSION_SSL)
           config->ssl_allow_beast = toggle;
         break;
 
@@ -1629,12 +1629,12 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 's': /* --ssl-no-revoke */
-        if(curlinfo->features & CURL_VERSION_SSL)
+        if(carlinfo->features & CARL_VERSION_SSL)
           config->ssl_no_revoke = TRUE;
         break;
 
       case 'S': /* --ssl-revoke-best-effort */
-        if(curlinfo->features & CURL_VERSION_SSL)
+        if(carlinfo->features & CARL_VERSION_SSL)
           config->ssl_revoke_best_effort = TRUE;
         break;
 
@@ -1643,27 +1643,27 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 'u': /* TLS username for proxy */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP)
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP)
           GetStr(&config->proxy_tls_username, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
 
       case 'v': /* TLS password for proxy */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP)
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP)
           GetStr(&config->proxy_tls_password, nextarg);
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
 
       case 'w': /* TLS authentication type for proxy */
-        if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP) {
+        if(carlinfo->features & CARL_VERSION_TLSAUTH_SRP) {
           GetStr(&config->proxy_tls_authtype, nextarg);
-          if(!curl_strequal(config->proxy_tls_authtype, "SRP"))
-            return PARAM_LIBCURL_DOESNT_SUPPORT; /* only support TLS-SRP */
+          if(!carl_strequal(config->proxy_tls_authtype, "SRP"))
+            return PARAM_LIBCARL_DOESNT_SUPPORT; /* only support TLS-SRP */
         }
         else
-          return PARAM_LIBCURL_DOESNT_SUPPORT;
+          return PARAM_LIBCARL_DOESNT_SUPPORT;
         break;
 
       case 'x': /* certificate file for proxy */
@@ -1697,7 +1697,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case '4': /* no empty SSL fragments for proxy */
-        if(curlinfo->features & CURL_VERSION_SSL)
+        if(carlinfo->features & CARL_VERSION_SSL)
           config->proxy_ssl_allow_beast = toggle;
         break;
 
@@ -1719,23 +1719,23 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 
       case '9': /* --proxy-tlsv1 */
         /* TLS version 1 for proxy */
-        config->proxy_ssl_version = CURL_SSLVERSION_TLSv1;
+        config->proxy_ssl_version = CARL_SSLVERSION_TLSv1;
         break;
 
       case 'A':
         /* --socks5-basic */
         if(toggle)
-          config->socks5_auth |= CURLAUTH_BASIC;
+          config->socks5_auth |= CARLAUTH_BASIC;
         else
-          config->socks5_auth &= ~CURLAUTH_BASIC;
+          config->socks5_auth &= ~CARLAUTH_BASIC;
         break;
 
       case 'B':
         /* --socks5-gssapi */
         if(toggle)
-          config->socks5_auth |= CURLAUTH_GSSAPI;
+          config->socks5_auth |= CARLAUTH_GSSAPI;
         else
-          config->socks5_auth &= ~CURLAUTH_GSSAPI;
+          config->socks5_auth &= ~CARLAUTH_GSSAPI;
         break;
 
       case 'C':
@@ -1922,7 +1922,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         GetStr(&config->netrc_file, nextarg);
         break;
       default:
-        /* pick info from .netrc, if this is used for http, curl will
+        /* pick info from .netrc, if this is used for http, carl will
            automatically enfore user+password with the request */
         config->netrc = toggle;
         break;
@@ -2029,15 +2029,15 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
          it. */
       if(ISDIGIT(*nextarg) && !strchr(nextarg, '-')) {
         char buffer[32];
-        curl_off_t off;
-        if(curlx_strtoofft(nextarg, NULL, 10, &off)) {
+        carl_off_t off;
+        if(carlx_strtoofft(nextarg, NULL, 10, &off)) {
           warnf(global, "unsupported range point\n");
           return PARAM_BAD_USE;
         }
         warnf(global,
               "A specified range MUST include at least one dash (-). "
               "Appending one for you!\n");
-        msnprintf(buffer, sizeof(buffer), "%" CURL_FORMAT_CURL_OFF_T "-", off);
+        msnprintf(buffer, sizeof(buffer), "%" CARL_FORMAT_CARL_OFF_T "-", off);
         Curl_safefree(config->range);
         config->range = strdup(buffer);
         if(!config->range)
@@ -2187,7 +2187,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       default:
         /* --proxy */
         GetStr(&config->proxy, nextarg);
-        config->proxyver = CURLPROXY_HTTP;
+        config->proxyver = CARLPROXY_HTTP;
         break;
       }
       break;
@@ -2236,35 +2236,35 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         /* FALLTHROUGH */
       default:
         /* If-Modified-Since: (section 14.28 in RFC2068) */
-        config->timecond = CURL_TIMECOND_IFMODSINCE;
+        config->timecond = CARL_TIMECOND_IFMODSINCE;
         break;
       case '-':
         /* If-Unmodified-Since:  (section 14.24 in RFC2068) */
-        config->timecond = CURL_TIMECOND_IFUNMODSINCE;
+        config->timecond = CARL_TIMECOND_IFUNMODSINCE;
         nextarg++;
         break;
       case '=':
         /* Last-Modified:  (section 14.29 in RFC2068) */
-        config->timecond = CURL_TIMECOND_LASTMOD;
+        config->timecond = CARL_TIMECOND_LASTMOD;
         nextarg++;
         break;
       }
       now = time(NULL);
-      config->condtime = (curl_off_t)curl_getdate(nextarg, &now);
+      config->condtime = (carl_off_t)carl_getdate(nextarg, &now);
       if(-1 == config->condtime) {
         /* now let's see if it is a file name to get the time from instead! */
-        curl_off_t filetime = getfiletime(nextarg, config->global->errors);
+        carl_off_t filetime = getfiletime(nextarg, config->global->errors);
         if(filetime >= 0) {
           /* pull the time out from the file */
           config->condtime = filetime;
         }
         else {
           /* failed, remove time condition */
-          config->timecond = CURL_TIMECOND_NONE;
+          config->timecond = CARL_TIMECOND_NONE;
           warnf(global,
                 "Illegal date format for -z, --time-cond (and not "
                 "a file name). Disabling time condition. "
-                "See curl_getdate(3) for valid date syntax.\n");
+                "See carl_getdate(3) for valid date syntax.\n");
         }
       }
       break;
@@ -2288,7 +2288,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
   struct OperationConfig *config = global->first;
 
   for(i = 1, stillflags = TRUE; i < argc && !result; i++) {
-    orig_opt = curlx_convert_tchar_to_UTF8(argv[i]);
+    orig_opt = carlx_convert_tchar_to_UTF8(argv[i]);
 
     if(stillflags && ('-' == orig_opt[0])) {
       bool passarg;
@@ -2299,11 +2299,11 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
         stillflags = FALSE;
       else {
         char *nextarg = (i < (argc - 1))
-          ? curlx_convert_tchar_to_UTF8(argv[i + 1])
+          ? carlx_convert_tchar_to_UTF8(argv[i + 1])
           : NULL;
 
         result = getparameter(orig_opt, nextarg, &passarg, global, config);
-        curlx_unicodefree(nextarg);
+        carlx_unicodefree(nextarg);
         config = global->last;
         if(result == PARAM_NEXT_OPERATION) {
           /* Reset result as PARAM_NEXT_OPERATION is only used here and not
@@ -2344,7 +2344,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
     }
 
     if(!result)
-      curlx_unicodefree(orig_opt);
+      carlx_unicodefree(orig_opt);
   }
 
   if(result && result != PARAM_HELP_REQUESTED &&
@@ -2359,6 +2359,6 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
       helpf(global->errors, "%s\n", reason);
   }
 
-  curlx_unicodefree(orig_opt);
+  carlx_unicodefree(orig_opt);
   return result;
 }

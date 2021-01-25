@@ -39,7 +39,7 @@ http://user:secret@%HOSTIP:%HTTPPORT/1248 --proxy http://dummy:%NOLISTENPORT/ --
 GET /1248 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: Basic dXNlcjpzZWNyZXQ=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

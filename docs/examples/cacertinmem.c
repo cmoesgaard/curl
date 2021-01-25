@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <stdio.h>
 
 static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -35,9 +35,9 @@ static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream)
   return (nmemb*size);
 }
 
-static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
+static CARLcode sslctx_function(CARL *carl, void *sslctx, void *parm)
 {
-  CURLcode rv = CURLE_ABORTED_BY_CALLBACK;
+  CARLcode rv = CARLE_ABORTED_BY_CALLBACK;
 
   /** This example uses two (fake) certificates **/
   static const char mypem[] =
@@ -87,7 +87,7 @@ static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
   X509_STORE  *cts = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
   int i;
   STACK_OF(X509_INFO) *inf;
-  (void)curl;
+  (void)carl;
   (void)parm;
 
   if(!cts || !cbio) {
@@ -114,41 +114,41 @@ static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
   sk_X509_INFO_pop_free(inf, X509_INFO_free);
   BIO_free(cbio);
 
-  rv = CURLE_OK;
+  rv = CARLE_OK;
   return rv;
 }
 
 int main(void)
 {
-  CURL *ch;
-  CURLcode rv;
+  CARL *ch;
+  CARLcode rv;
 
-  curl_global_init(CURL_GLOBAL_ALL);
-  ch = curl_easy_init();
-  curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
-  curl_easy_setopt(ch, CURLOPT_HEADER, 0L);
-  curl_easy_setopt(ch, CURLOPT_NOPROGRESS, 1L);
-  curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
-  curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, writefunction);
-  curl_easy_setopt(ch, CURLOPT_WRITEDATA, stdout);
-  curl_easy_setopt(ch, CURLOPT_HEADERFUNCTION, writefunction);
-  curl_easy_setopt(ch, CURLOPT_HEADERDATA, stderr);
-  curl_easy_setopt(ch, CURLOPT_SSLCERTTYPE, "PEM");
-  curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 1L);
-  curl_easy_setopt(ch, CURLOPT_URL, "https://www.example.com/");
+  carl_global_init(CARL_GLOBAL_ALL);
+  ch = carl_easy_init();
+  carl_easy_setopt(ch, CARLOPT_VERBOSE, 0L);
+  carl_easy_setopt(ch, CARLOPT_HEADER, 0L);
+  carl_easy_setopt(ch, CARLOPT_NOPROGRESS, 1L);
+  carl_easy_setopt(ch, CARLOPT_NOSIGNAL, 1L);
+  carl_easy_setopt(ch, CARLOPT_WRITEFUNCTION, writefunction);
+  carl_easy_setopt(ch, CARLOPT_WRITEDATA, stdout);
+  carl_easy_setopt(ch, CARLOPT_HEADERFUNCTION, writefunction);
+  carl_easy_setopt(ch, CARLOPT_HEADERDATA, stderr);
+  carl_easy_setopt(ch, CARLOPT_SSLCERTTYPE, "PEM");
+  carl_easy_setopt(ch, CARLOPT_SSL_VERIFYPEER, 1L);
+  carl_easy_setopt(ch, CARLOPT_URL, "https://www.example.com/");
 
-  /* Turn off the default CA locations, otherwise libcurl will load CA
+  /* Turn off the default CA locations, otherwise libcarl will load CA
    * certificates from the locations that were detected/specified at
    * build-time
    */
-  curl_easy_setopt(ch, CURLOPT_CAINFO, NULL);
-  curl_easy_setopt(ch, CURLOPT_CAPATH, NULL);
+  carl_easy_setopt(ch, CARLOPT_CAINFO, NULL);
+  carl_easy_setopt(ch, CARLOPT_CAPATH, NULL);
 
   /* first try: retrieve page without ca certificates -> should fail
-   * unless libcurl was built --with-ca-fallback enabled at build-time
+   * unless libcarl was built --with-ca-fallback enabled at build-time
    */
-  rv = curl_easy_perform(ch);
-  if(rv == CURLE_OK)
+  rv = carl_easy_perform(ch);
+  if(rv == CARLE_OK)
     printf("*** transfer succeeded ***\n");
   else
     printf("*** transfer failed ***\n");
@@ -162,20 +162,20 @@ int main(void)
    * handle. normally you would set the ssl ctx function before making
    * any transfers, and not use this option.
    */
-  curl_easy_setopt(ch, CURLOPT_FRESH_CONNECT, 1L);
+  carl_easy_setopt(ch, CARLOPT_FRESH_CONNECT, 1L);
 
   /* second try: retrieve page using cacerts' certificate -> will succeed
    * load the certificate by installing a function doing the necessary
    * "modifications" to the SSL CONTEXT just before link init
    */
-  curl_easy_setopt(ch, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
-  rv = curl_easy_perform(ch);
-  if(rv == CURLE_OK)
+  carl_easy_setopt(ch, CARLOPT_SSL_CTX_FUNCTION, sslctx_function);
+  rv = carl_easy_perform(ch);
+  if(rv == CARLE_OK)
     printf("*** transfer succeeded ***\n");
   else
     printf("*** transfer failed ***\n");
 
-  curl_easy_cleanup(ch);
-  curl_global_cleanup();
+  carl_easy_cleanup(ch);
+  carl_global_cleanup();
   return rv;
 }

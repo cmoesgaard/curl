@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,13 +26,13 @@
  */
 
 #include <string.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-/* This is an example showing how to send mail using libcurl's SMTP
+/* This is an example showing how to send mail using libcarl's SMTP
  * capabilities. It builds on the smtp-mail.c example to demonstrate how to use
- * libcurl's multi interface.
+ * libcarl's multi interface.
  *
- * Note that this example requires libcurl 7.20.0 or above.
+ * Note that this example requires libcarl 7.20.0 or above.
  */
 
 #define FROM     "<sender@example.com>"
@@ -102,58 +102,58 @@ static long tvdiff(struct timeval newer, struct timeval older)
 
 int main(void)
 {
-  CURL *curl;
-  CURLM *mcurl;
+  CARL *carl;
+  CARLM *mcarl;
   int still_running = 1;
   struct timeval mp_start;
-  struct curl_slist *recipients = NULL;
+  struct carl_slist *recipients = NULL;
   struct upload_status upload_ctx;
 
   upload_ctx.lines_read = 0;
 
-  curl_global_init(CURL_GLOBAL_DEFAULT);
+  carl_global_init(CARL_GLOBAL_DEFAULT);
 
-  curl = curl_easy_init();
-  if(!curl)
+  carl = carl_easy_init();
+  if(!carl)
     return 1;
 
-  mcurl = curl_multi_init();
-  if(!mcurl)
+  mcarl = carl_multi_init();
+  if(!mcarl)
     return 2;
 
   /* This is the URL for your mailserver */
-  curl_easy_setopt(curl, CURLOPT_URL, "smtp://mail.example.com");
+  carl_easy_setopt(carl, CARLOPT_URL, "smtp://mail.example.com");
 
   /* Note that this option isn't strictly required, omitting it will result in
-   * libcurl sending the MAIL FROM command with empty sender data. All
+   * libcarl sending the MAIL FROM command with empty sender data. All
    * autoresponses should have an empty reverse-path, and should be directed
    * to the address in the reverse-path which triggered them. Otherwise, they
    * could cause an endless loop. See RFC 5321 Section 4.5.5 for more details.
    */
-  curl_easy_setopt(curl, CURLOPT_MAIL_FROM, FROM);
+  carl_easy_setopt(carl, CARLOPT_MAIL_FROM, FROM);
 
   /* Add two recipients, in this particular case they correspond to the
    * To: and Cc: addressees in the header, but they could be any kind of
    * recipient. */
-  recipients = curl_slist_append(recipients, TO);
-  recipients = curl_slist_append(recipients, CC);
-  curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
+  recipients = carl_slist_append(recipients, TO);
+  recipients = carl_slist_append(recipients, CC);
+  carl_easy_setopt(carl, CARLOPT_MAIL_RCPT, recipients);
 
   /* We're using a callback function to specify the payload (the headers and
-   * body of the message). You could just use the CURLOPT_READDATA option to
+   * body of the message). You could just use the CARLOPT_READDATA option to
    * specify a FILE pointer to read from. */
-  curl_easy_setopt(curl, CURLOPT_READFUNCTION, payload_source);
-  curl_easy_setopt(curl, CURLOPT_READDATA, &upload_ctx);
-  curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+  carl_easy_setopt(carl, CARLOPT_READFUNCTION, payload_source);
+  carl_easy_setopt(carl, CARLOPT_READDATA, &upload_ctx);
+  carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
 
   /* Tell the multi stack about our easy handle */
-  curl_multi_add_handle(mcurl, curl);
+  carl_multi_add_handle(mcarl, carl);
 
   /* Record the start time which we can use later */
   mp_start = tvnow();
 
   /* We start some action by calling perform right away */
-  curl_multi_perform(mcurl, &still_running);
+  carl_multi_perform(mcarl, &still_running);
 
   while(still_running) {
     struct timeval timeout;
@@ -162,9 +162,9 @@ int main(void)
     fd_set fdexcep;
     int maxfd = -1;
     int rc;
-    CURLMcode mc; /* curl_multi_fdset() return code */
+    CARLMcode mc; /* carl_multi_fdset() return code */
 
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     /* Initialise the file descriptors */
     FD_ZERO(&fdread);
@@ -175,20 +175,20 @@ int main(void)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(mcurl, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(mcarl, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(mcurl, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(mcarl, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -196,7 +196,7 @@ int main(void)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #ifdef _WIN32
@@ -225,19 +225,19 @@ int main(void)
       break;
     case 0:   /* timeout */
     default:  /* action */
-      curl_multi_perform(mcurl, &still_running);
+      carl_multi_perform(mcarl, &still_running);
       break;
     }
   }
 
   /* Free the list of recipients */
-  curl_slist_free_all(recipients);
+  carl_slist_free_all(recipients);
 
   /* Always cleanup */
-  curl_multi_remove_handle(mcurl, curl);
-  curl_multi_cleanup(mcurl);
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_multi_remove_handle(mcarl, carl);
+  carl_multi_cleanup(mcarl);
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return 0;
 }

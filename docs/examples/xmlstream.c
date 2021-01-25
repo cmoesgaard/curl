@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,7 +27,7 @@
  *
  * Expat => https://libexpat.github.io/
  *
- * gcc -Wall -I/usr/local/include xmlstream.c -lcurl -lexpat -o xmlstream
+ * gcc -Wall -I/usr/local/include xmlstream.c -lcarl -lexpat -o xmlstream
  *
  */
 
@@ -37,7 +37,7 @@
 #include <assert.h>
 
 #include <expat.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 struct MemoryStruct {
   char *memory;
@@ -112,8 +112,8 @@ static size_t parseStreamCallback(void *contents, size_t length, size_t nmemb,
 
 int main(void)
 {
-  CURL *curl_handle;
-  CURLcode res;
+  CARL *carl_handle;
+  CARLcode res;
   XML_Parser parser;
   struct ParserStruct state;
 
@@ -127,21 +127,21 @@ int main(void)
   XML_SetElementHandler(parser, startElement, endElement);
   XML_SetCharacterDataHandler(parser, characterDataHandler);
 
-  /* Initialize a libcurl handle. */
-  curl_global_init(CURL_GLOBAL_DEFAULT);
-  curl_handle = curl_easy_init();
-  curl_easy_setopt(curl_handle, CURLOPT_URL,
+  /* Initialize a libcarl handle. */
+  carl_global_init(CARL_GLOBAL_DEFAULT);
+  carl_handle = carl_easy_init();
+  carl_easy_setopt(carl_handle, CARLOPT_URL,
                    "https://www.w3schools.com/xml/simple.xml");
-  curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, parseStreamCallback);
-  curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)parser);
+  carl_easy_setopt(carl_handle, CARLOPT_WRITEFUNCTION, parseStreamCallback);
+  carl_easy_setopt(carl_handle, CARLOPT_WRITEDATA, (void *)parser);
 
   printf("Depth   Characters   Closing Tag\n");
 
   /* Perform the request and any follow-up parsing. */
-  res = curl_easy_perform(curl_handle);
-  if(res != CURLE_OK) {
-    fprintf(stderr, "curl_easy_perform() failed: %s\n",
-            curl_easy_strerror(res));
+  res = carl_easy_perform(carl_handle);
+  if(res != CARLE_OK) {
+    fprintf(stderr, "carl_easy_perform() failed: %s\n",
+            carl_easy_strerror(res));
   }
   else if(state.ok) {
     /* Expat requires one final call to finalize parsing. */
@@ -159,8 +159,8 @@ int main(void)
   /* Clean up. */
   free(state.characters.memory);
   XML_ParserFree(parser);
-  curl_easy_cleanup(curl_handle);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl_handle);
+  carl_global_cleanup();
 
   return 0;
 }

@@ -33,7 +33,7 @@ FTP download resume from end of empty file
  <command>
 ftp://%HOSTIP:%FTPPORT/1037 -C -
 </command>
-<file name="log/curl1037.out">
+<file name="log/carl1037.out">
 </file>
 </client>
 

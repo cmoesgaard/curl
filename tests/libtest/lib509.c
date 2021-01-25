@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,8 +25,8 @@
 
 /*
  * This test uses these funny custom memory callbacks for the only purpose
- * of verifying that curl_global_init_mem() functionality is present in
- * libcurl and that it works unconditionally no matter how libcurl is built,
+ * of verifying that carl_global_init_mem() functionality is present in
+ * libcarl and that it works unconditionally no matter how libcarl is built,
  * nothing more.
  *
  * Do not include memdebug.h in this source file, and do not use directly
@@ -71,34 +71,34 @@ int test(char *URL)
 {
   unsigned char a[] = {0x2f, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
                        0x91, 0xa2, 0xb3, 0xc4, 0xd5, 0xe6, 0xf7};
-  CURLcode res;
-  CURL *curl;
+  CARLcode res;
+  CARL *carl;
   int asize;
   char *str = NULL;
   (void)URL;
 
-  res = curl_global_init_mem(CURL_GLOBAL_ALL,
+  res = carl_global_init_mem(CARL_GLOBAL_ALL,
                              custom_malloc,
                              custom_free,
                              custom_realloc,
                              custom_strdup,
                              custom_calloc);
-  if(res != CURLE_OK) {
-    fprintf(stderr, "curl_global_init_mem() failed\n");
+  if(res != CARLE_OK) {
+    fprintf(stderr, "carl_global_init_mem() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  test_setopt(curl, CURLOPT_USERAGENT, "test509"); /* uses strdup() */
+  test_setopt(carl, CARLOPT_USERAGENT, "test509"); /* uses strdup() */
 
   asize = (int)sizeof(a);
-  str = curl_easy_escape(curl, (char *)a, asize); /* uses realloc() */
+  str = carl_easy_escape(carl, (char *)a, asize); /* uses realloc() */
 
   if(seen)
     printf("Callbacks were invoked!\n");
@@ -106,10 +106,10 @@ int test(char *URL)
 test_cleanup:
 
   if(str)
-    curl_free(str);
+    carl_free(str);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

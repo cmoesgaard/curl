@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,9 +28,9 @@
 
 #include <sys/stat.h>
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_msgs.h"
@@ -101,7 +101,7 @@ bool tool_create_output_file(struct OutStruct *outs,
 }
 
 /*
-** callback for CURLOPT_WRITEFUNCTION
+** callback for CARLOPT_WRITEFUNCTION
 */
 
 size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
@@ -118,31 +118,31 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
 #endif
 
   /*
-   * Once that libcurl has called back tool_write_cb() the returned value
+   * Once that libcarl has called back tool_write_cb() the returned value
    * is checked against the amount that was intended to be written, if
-   * it does not match then it fails with CURLE_WRITE_ERROR. So at this
+   * it does not match then it fails with CARLE_WRITE_ERROR. So at this
    * point returning a value different from sz*nmemb indicates failure.
    */
   const size_t failure = bytes ? 0 : 1;
 
 #ifdef DEBUGBUILD
   {
-    char *tty = curlx_getenv("CURL_ISATTY");
+    char *tty = carlx_getenv("CARL_ISATTY");
     if(tty) {
       is_tty = TRUE;
-      curl_free(tty);
+      carl_free(tty);
     }
   }
 
   if(config->show_headers) {
-    if(bytes > (size_t)CURL_MAX_HTTP_HEADER) {
+    if(bytes > (size_t)CARL_MAX_HTTP_HEADER) {
       warnf(config->global, "Header data size exceeds single call write "
             "limit!\n");
       return failure;
     }
   }
   else {
-    if(bytes > (size_t)CURL_MAX_WRITE_SIZE) {
+    if(bytes > (size_t)CARL_MAX_WRITE_SIZE) {
       warnf(config->global, "Data size exceeds single call write limit!\n");
       return failure;
     }
@@ -185,7 +185,7 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
     /* binary output to terminal? */
     if(memchr(buffer, 0, bytes)) {
       warnf(config->global, "Binary output can mess up your terminal. "
-            "Use \"--output -\" to tell curl to output it to your terminal "
+            "Use \"--output -\" to tell carl to output it to your terminal "
             "anyway, or consider \"--output <FILE>\" to save to a file.\n");
       config->synthetic_error = ERR_BINARY_TERMINAL;
       return failure;
@@ -235,7 +235,7 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
 
   if(config->readbusy) {
     config->readbusy = FALSE;
-    curl_easy_pause(per->curl, CURLPAUSE_CONT);
+    carl_easy_pause(per->carl, CARLPAUSE_CONT);
   }
 
   if(config->nobuffer) {

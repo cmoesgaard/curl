@@ -1,0 +1,65 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_READDATA 3 "16 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_READDATA \- custom pointer passed to the read callback
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_READDATA, void *pointer);
+.SH DESCRIPTION
+Data \fIpointer\fP to pass to the file read function. If you use the
+\fICARLOPT_READFUNCTION(3)\fP option, this is the pointer you'll get as
+input in the 4th argument to the callback.
+
+If you don't specify a read callback but instead rely on the default internal
+read function, this data must be a valid readable FILE * (cast to 'void *').
+
+If you're using libcarl as a win32 DLL, you \fBMUST\fP use a
+\fICARLOPT_READFUNCTION(3)\fP if you set this option or you will experience
+crashes.
+.SH DEFAULT
+By default, this is a FILE * to stdin.
+.SH PROTOCOLS
+This is used for all protocols when sending data.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+struct MyData this;
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* pass pointer that gets passed in to the
+     CARLOPT_READFUNCTION callback */
+  carl_easy_setopt(carl, CARLOPT_READDATA, &this);
+
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+This option was once known by the older name CARLOPT_INFILE, the name
+\fICARLOPT_READDATA(3)\fP was introduced in 7.9.7.
+.SH RETURN VALUE
+This will return CARLE_OK.
+.SH "SEE ALSO"
+.BR CARLOPT_READFUNCTION "(3), " CARLOPT_WRITEDATA "(3), "

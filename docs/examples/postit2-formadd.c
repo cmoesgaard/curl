@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -39,68 +39,68 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 int main(int argc, char *argv[])
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
 
-  struct curl_httppost *formpost = NULL;
-  struct curl_httppost *lastptr = NULL;
-  struct curl_slist *headerlist = NULL;
+  struct carl_httppost *formpost = NULL;
+  struct carl_httppost *lastptr = NULL;
+  struct carl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
 
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
   /* Fill in the file upload field */
-  curl_formadd(&formpost,
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "sendfile",
-               CURLFORM_FILE, "postit2.c",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "sendfile",
+               CARLFORM_FILE, "postit2.c",
+               CARLFORM_END);
 
   /* Fill in the filename field */
-  curl_formadd(&formpost,
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "filename",
-               CURLFORM_COPYCONTENTS, "postit2.c",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "filename",
+               CARLFORM_COPYCONTENTS, "postit2.c",
+               CARLFORM_END);
 
 
   /* Fill in the submit field too, even if this is rarely needed */
-  curl_formadd(&formpost,
+  carl_formadd(&formpost,
                &lastptr,
-               CURLFORM_COPYNAME, "submit",
-               CURLFORM_COPYCONTENTS, "send",
-               CURLFORM_END);
+               CARLFORM_COPYNAME, "submit",
+               CARLFORM_COPYCONTENTS, "send",
+               CARLFORM_END);
 
-  curl = curl_easy_init();
+  carl = carl_easy_init();
   /* initialize custom header list (stating that Expect: 100-continue is not
      wanted */
-  headerlist = curl_slist_append(headerlist, buf);
-  if(curl) {
+  headerlist = carl_slist_append(headerlist, buf);
+  if(carl) {
     /* what URL that receives this POST */
-    curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/examplepost.cgi");
+    carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/examplepost.cgi");
     if((argc == 2) && (!strcmp(argv[1], "noexpectheader")))
       /* only disable 100-continue header if explicitly requested */
-      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+      carl_easy_setopt(carl, CARLOPT_HTTPHEADER, headerlist);
+    carl_easy_setopt(carl, CARLOPT_HTTPPOST, formpost);
 
     /* Perform the request, res will get the return code */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
 
     /* then cleanup the formpost chain */
-    curl_formfree(formpost);
+    carl_formfree(formpost);
     /* free slist */
-    curl_slist_free_all(headerlist);
+    carl_slist_free_all(headerlist);
   }
   return 0;
 }

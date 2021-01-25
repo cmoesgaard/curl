@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,7 +30,7 @@
 
 int test(char *URL)
 {
-  CURLM *multi = NULL;
+  CARLM *multi = NULL;
   int numfds;
   int i;
   int res = 0;
@@ -40,7 +40,7 @@ int test(char *URL)
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(multi);
 
@@ -51,7 +51,7 @@ int test(char *URL)
   time_after_wait = tutil_tvnow();
 
   if(tutil_tvdiff(time_after_wait, time_before_wait) < 500) {
-    fprintf(stderr, "%s:%d curl_multi_poll returned too early\n",
+    fprintf(stderr, "%s:%d carl_multi_poll returned too early\n",
             __FILE__, __LINE__);
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -68,7 +68,7 @@ int test(char *URL)
   time_after_wait = tutil_tvnow();
 
   if(tutil_tvdiff(time_after_wait, time_before_wait) > 500) {
-    fprintf(stderr, "%s:%d curl_multi_poll returned too late\n",
+    fprintf(stderr, "%s:%d carl_multi_poll returned too late\n",
             __FILE__, __LINE__);
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -83,7 +83,7 @@ int test(char *URL)
   time_after_wait = tutil_tvnow();
 
   if(tutil_tvdiff(time_after_wait, time_before_wait) < 500) {
-    fprintf(stderr, "%s:%d curl_multi_poll returned too early\n",
+    fprintf(stderr, "%s:%d carl_multi_poll returned too early\n",
             __FILE__, __LINE__);
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -101,7 +101,7 @@ int test(char *URL)
   time_after_wait = tutil_tvnow();
 
   if(tutil_tvdiff(time_after_wait, time_before_wait) > 500) {
-    fprintf(stderr, "%s:%d curl_multi_poll returned too late\n",
+    fprintf(stderr, "%s:%d carl_multi_poll returned too late\n",
             __FILE__, __LINE__);
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -114,17 +114,17 @@ int test(char *URL)
   /* Even lots of previous wakeups should not wake up this.
 
      On Windows (particularly when using MinGW), the socketpair
-     used for curl_multi_wakeup() is really asynchronous,
+     used for carl_multi_wakeup() is really asynchronous,
      meaning when it's called a lot, it can take some time
      before all of the data can be read. Sometimes it can wake
-     up more than one curl_multi_poll() call. */
+     up more than one carl_multi_poll() call. */
 
   time_before_wait = tutil_tvnow();
   multi_poll(multi, NULL, 0, 1000, &numfds);
   time_after_wait = tutil_tvnow();
 
   if(tutil_tvdiff(time_after_wait, time_before_wait) < 500) {
-    fprintf(stderr, "%s:%d curl_multi_poll returned too early\n",
+    fprintf(stderr, "%s:%d carl_multi_poll returned too early\n",
             __FILE__, __LINE__);
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -135,8 +135,8 @@ int test(char *URL)
 
 test_cleanup:
 
-  curl_multi_cleanup(multi);
-  curl_global_cleanup();
+  carl_multi_cleanup(multi);
+  carl_global_cleanup();
 
   return res;
 }

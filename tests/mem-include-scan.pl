@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -37,7 +37,7 @@ sub scanfile {
     my ($file) = @_;
     my $memfunc;
     my $memdebug;
-    my $curlmem;
+    my $carlmem;
 
     print STDERR "checking $file...\n";
 
@@ -49,15 +49,15 @@ sub scanfile {
         elsif($_ =~ /^ *# *include \"memdebug.h\"/) {
             $memdebug++;
         }
-        elsif($_ =~ /^ *# *include \"curl_memory.h\"/) {
-            $curlmem++;
+        elsif($_ =~ /^ *# *include \"carl_memory.h\"/) {
+            $carlmem++;
         }
         elsif($_ =~ /mem-include-scan/) {
             # free pass
             close(F);
             return 0;
         }
-        if($memfunc && $memdebug && $curlmem) {
+        if($memfunc && $memdebug && $carlmem) {
             last;
         }
     }
@@ -65,15 +65,15 @@ sub scanfile {
 
 
     if($memfunc) {
-        if($memdebug && $curlmem) {
+        if($memdebug && $carlmem) {
             return 0;
         }
         else {
             if(!$memdebug) {
                 print STDERR "$file doesn't include \"memdebug.h\"!\n";
             }
-            if(!$curlmem) {
-                print STDERR "$file doesn't include \"curl_memory.h\"!\n";
+            if(!$carlmem) {
+                print STDERR "$file doesn't include \"carl_memory.h\"!\n";
             }
             return 1;
         }

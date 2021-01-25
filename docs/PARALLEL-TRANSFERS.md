@@ -1,11 +1,11 @@
 # Parallel transfers
 
-curl 7.66.0 introduces support for doing multiple transfers simultaneously; in
+carl 7.66.0 introduces support for doing multiple transfers simultaneously; in
 parallel.
 
 ## -Z, --parallel
 
-When this command line option is used, curl will perform the transfers given
+When this command line option is used, carl will perform the transfers given
 to it at the same time. It will do up to `--parallel-max` concurrent
 transfers, with a default value of 50.
 

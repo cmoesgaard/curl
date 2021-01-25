@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "urldata.h"
 #include "connect.h"
@@ -29,14 +29,14 @@
 
 static void unit_stop(void)
 {
-  curl_global_cleanup();
+  carl_global_cleanup();
 }
 
-static CURLcode unit_setup(void)
+static CARLcode unit_setup(void)
 {
-  int res = CURLE_OK;
+  int res = CARLE_OK;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   return res;
 }
@@ -57,7 +57,7 @@ struct testcase {
 };
 
 
-/* In builds without IPv6 support CURLOPT_RESOLVE should skip over those
+/* In builds without IPv6 support CARLOPT_RESOLVE should skip over those
    addresses, so we have to do that as well. */
 static const char skip = 0;
 #ifdef ENABLE_IPV6
@@ -66,7 +66,7 @@ static const char skip = 0;
 #define IPV6ONLY(x) &skip
 #endif
 
-/* CURLOPT_RESOLVE address parsing tests */
+/* CARLOPT_RESOLVE address parsing tests */
 static const struct testcase tests[] = {
   /* spaces aren't allowed, for now */
   { "test.com:80:127.0.0.1, 127.0.0.2",
@@ -110,7 +110,7 @@ UNITTEST_START
   int testnum = sizeof(tests) / sizeof(struct testcase);
   struct Curl_multi *multi = NULL;
   struct Curl_easy *easy = NULL;
-  struct curl_slist *list = NULL;
+  struct carl_slist *list = NULL;
 
   for(i = 0; i < testnum; ++i) {
     int j;
@@ -119,19 +119,19 @@ UNITTEST_START
     struct Curl_dns_entry *dns;
     void *entry_id;
     bool problem = false;
-    easy = curl_easy_init();
+    easy = carl_easy_init();
     if(!easy)
       goto error;
 
     /* create a multi handle and add the easy handle to it so that the
        hostcache is setup */
-    multi = curl_multi_init();
-    curl_multi_add_handle(multi, easy);
+    multi = carl_multi_init();
+    carl_multi_add_handle(multi, easy);
 
-    list = curl_slist_append(NULL, tests[i].optval);
+    list = carl_slist_append(NULL, tests[i].optval);
     if(!list)
       goto error;
-    curl_easy_setopt(easy, CURLOPT_RESOLVE, list);
+    carl_easy_setopt(easy, CARLOPT_RESOLVE, list);
 
     Curl_loadhostpairs(easy);
 
@@ -178,7 +178,7 @@ UNITTEST_START
         break;
       }
 
-      if(!curl_strequal(ipaddress, tests[i].address[j])) {
+      if(!carl_strequal(ipaddress, tests[i].address[j])) {
         fprintf(stderr, "%s:%d tests[%d] failed. the retrieved addr "
                 "%s is not equal to tests[%d].address[%d] %s.\n",
                 __FILE__, __LINE__, i, ipaddress, i, j, tests[i].address[j]);
@@ -213,11 +213,11 @@ UNITTEST_START
       addr = addr->ai_next;
     }
 
-    curl_easy_cleanup(easy);
+    carl_easy_cleanup(easy);
     easy = NULL;
-    curl_multi_cleanup(multi);
+    carl_multi_cleanup(multi);
     multi = NULL;
-    curl_slist_free_all(list);
+    carl_slist_free_all(list);
     list = NULL;
 
     if(problem) {
@@ -226,8 +226,8 @@ UNITTEST_START
     }
   }
   error:
-  curl_easy_cleanup(easy);
-  curl_multi_cleanup(multi);
-  curl_slist_free_all(list);
+  carl_easy_cleanup(easy);
+  carl_multi_cleanup(multi);
+  carl_slist_free_all(list);
 }
 UNITTEST_STOP

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SCHANNEL_H
-#define HEADER_CURL_SCHANNEL_H
+#ifndef HEADER_CARL_SCHANNEL_H
+#define HEADER_CARL_SCHANNEL_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -12,7 +12,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,13 +22,13 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_SCHANNEL
 
 #include <schnlsp.h>
 #include <schannel.h>
-#include "curl_sspi.h"
+#include "carl_sspi.h"
 
 #include "urldata.h"
 
@@ -53,7 +53,7 @@
 
 extern const struct Curl_ssl Curl_ssl_schannel;
 
-CURLcode Curl_verify_certificate(struct Curl_easy *data,
+CARLcode Curl_verify_certificate(struct Curl_easy *data,
                                  struct connectdata *conn, int sockindex);
 
 /* structs to expose only in schannel.c and schannel_verify.c */
@@ -95,7 +95,7 @@ struct ssl_backend_data {
      more bytes into encdata then set this back to false. */
   bool encdata_is_incomplete;
   unsigned long req_flags, ret_flags;
-  CURLcode recv_unrecoverable_err; /* schannel_recv had an unrecoverable err */
+  CARLcode recv_unrecoverable_err; /* schannel_recv had an unrecoverable err */
   bool recv_sspi_close_notify; /* true if connection closed by close_notify */
   bool recv_connection_closed; /* true if connection closed, regardless how */
   bool use_alpn; /* true if ALPN is used for this connection */
@@ -106,4 +106,4 @@ struct ssl_backend_data {
 #endif /* EXPOSE_SCHANNEL_INTERNAL_STRUCTS */
 
 #endif /* USE_SCHANNEL */
-#endif /* HEADER_CURL_SCHANNEL_H */
+#endif /* HEADER_CARL_SCHANNEL_H */

@@ -1,6 +1,6 @@
-# curl man page generator
+# carl man page generator
 
-This is the curl man page generator. It generates a single nroff man page
+This is the carl man page generator. It generates a single nroff man page
 output from the set of sources files in this directory.
 
 There is one source file for each supported command line option. The format is
@@ -44,9 +44,9 @@ generated options output for the master man page.
 
 `./gen.pl mainpage`
 
-This command outputs a single huge nroff file, meant to become `curl.1`. The
-full curl man page.
+This command outputs a single huge nroff file, meant to become `carl.1`. The
+full carl man page.
 
 `./gen.pl listhelp`
 
-Generates a full `curl --help` output for all known command line options.
+Generates a full `carl --help` output for all known command line options.

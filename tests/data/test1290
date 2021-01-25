@@ -38,7 +38,7 @@ Verify URL globbing ignores []
 <protocol>
 GET /we/want/[]/page/1290 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

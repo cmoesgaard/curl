@@ -51,13 +51,13 @@ http://%HOSTIP:%HTTPPORT/1128 http://%HOSTIP:%HTTPPORT/11280001 -z "dec 12 12:00
 <protocol>
 GET /1128 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 If-Modified-Since: Sun, 12 Dec 1999 12:00:00 GMT
 
 GET /11280001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 If-Modified-Since: Sun, 12 Dec 1999 12:00:00 GMT
 

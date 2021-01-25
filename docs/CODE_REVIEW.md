@@ -1,13 +1,13 @@
-# How to do code reviews for curl
+# How to do code reviews for carl
 
 Anyone and everyone is encouraged and welcome to review code submissions in
-curl. This is a guide on what to check for and how to perform a successful
+carl. This is a guide on what to check for and how to perform a successful
 code review.
 
 ## All submissions should get reviewed
 
 All pull requests and patches submitted to the project should be reviewed by
-at least one experienced curl maintainer before that code is accepted and
+at least one experienced carl maintainer before that code is accepted and
 merged.
 
 ## Let the tools and tests take the first rounds
@@ -36,7 +36,7 @@ Changing the API and the ABI may be fine in a change but it needs to be done
 deliberately and carefully. If not, a reviewer must help the author to realize
 the mistake.
 
-curl and libcurl are similarly very strict on not modifying existing
+carl and libcarl are similarly very strict on not modifying existing
 behavior. API and ABI stability is not enough, the behavior should also remain
 intact as far as possible.
 
@@ -87,7 +87,7 @@ Write `#ifdef`s to be as little of a "maze" as possible.
 
 ## Does it look portable enough?
 
-curl runs "everywhere". Does the code take a reasonable stance and enough
+carl runs "everywhere". Does the code take a reasonable stance and enough
 precautions to be possible to build and run on most platforms?
 
 Remember that we live by C89 restrictions.
@@ -117,7 +117,7 @@ understand.
 
 A single function should never be large as that makes it hard to follow and
 understand all the exit points and state changes. Some existing functions in
-curl certainly violate this ground rule but when reviewing new code we should
+carl certainly violate this ground rule but when reviewing new code we should
 propose splitting into smaller functions.
 
 ## Duplication is evil

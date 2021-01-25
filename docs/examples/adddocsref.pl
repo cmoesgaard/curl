@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -23,7 +23,7 @@
 
 # pass files as argument(s)
 
-my $docroot="https://curl.se/libcurl/c";
+my $docroot="https://carl.se/libcarl/c";
 
 for $f (@ARGV) {
     open(NEW, ">$f.new");
@@ -33,13 +33,13 @@ for $f (@ARGV) {
         if($l =~ /\/* $docroot/) {
             # just ignore preciously added refs
         }
-        elsif($l =~ /^( *).*curl_easy_setopt\([^,]*, *([^ ,]*) *,/) {
+        elsif($l =~ /^( *).*carl_easy_setopt\([^,]*, *([^ ,]*) *,/) {
             my ($prefix, $anc) = ($1, $2);
             $anc =~ s/_//g;
-            print NEW "$prefix/* $docroot/curl_easy_setopt.html#$anc */\n";
+            print NEW "$prefix/* $docroot/carl_easy_setopt.html#$anc */\n";
             print NEW $l;
         }
-        elsif($l =~ /^( *).*(curl_([^\(]*))\(/) {
+        elsif($l =~ /^( *).*(carl_([^\(]*))\(/) {
             my ($prefix, $func) = ($1, $2);
             print NEW "$prefix/* $docroot/$func.html */\n";
             print NEW $l;

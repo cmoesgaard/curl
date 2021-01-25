@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -34,7 +34,7 @@
  * Thanks for code and inspiration!
  */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_MESALINK
 
@@ -50,14 +50,14 @@
 #include "select.h"
 #include "strcase.h"
 #include "x509asn1.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 #include "mesalink.h"
 #include <mesalink/openssl/ssl.h>
 #include <mesalink/openssl/err.h>
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define MESALINK_MAX_ERROR_SZ 80
@@ -88,7 +88,7 @@ static int do_file_type(const char *type)
  * This function loads all the client/CA certificates and CRLs. Setup the TLS
  * layer and do all necessary magic.
  */
-static CURLcode
+static CARLcode
 mesalink_connect_step1(struct Curl_easy *data,
                        struct connectdata *conn, int sockindex)
 {
@@ -103,41 +103,41 @@ mesalink_connect_step1(struct Curl_easy *data,
   size_t hostname_len = strlen(hostname);
 
   SSL_METHOD *req_method = NULL;
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
 
   if(connssl->state == ssl_connection_complete)
-    return CURLE_OK;
+    return CARLE_OK;
 
-  if(SSL_CONN_CONFIG(version_max) != CURL_SSLVERSION_MAX_NONE) {
+  if(SSL_CONN_CONFIG(version_max) != CARL_SSLVERSION_MAX_NONE) {
     failf(data, "MesaLink does not support to set maximum SSL/TLS version");
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   switch(SSL_CONN_CONFIG(version)) {
-  case CURL_SSLVERSION_SSLv3:
-  case CURL_SSLVERSION_TLSv1:
-  case CURL_SSLVERSION_TLSv1_0:
-  case CURL_SSLVERSION_TLSv1_1:
+  case CARL_SSLVERSION_SSLv3:
+  case CARL_SSLVERSION_TLSv1:
+  case CARL_SSLVERSION_TLSv1_0:
+  case CARL_SSLVERSION_TLSv1_1:
     failf(data, "MesaLink does not support SSL 3.0, TLS 1.0, or TLS 1.1");
-    return CURLE_NOT_BUILT_IN;
-  case CURL_SSLVERSION_DEFAULT:
-  case CURL_SSLVERSION_TLSv1_2:
+    return CARLE_NOT_BUILT_IN;
+  case CARL_SSLVERSION_DEFAULT:
+  case CARL_SSLVERSION_TLSv1_2:
     req_method = TLSv1_2_client_method();
     break;
-  case CURL_SSLVERSION_TLSv1_3:
+  case CARL_SSLVERSION_TLSv1_3:
     req_method = TLSv1_3_client_method();
     break;
-  case CURL_SSLVERSION_SSLv2:
+  case CARL_SSLVERSION_SSLv2:
     failf(data, "MesaLink does not support SSLv2");
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   default:
-    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
-    return CURLE_SSL_CONNECT_ERROR;
+    failf(data, "Unrecognized parameter passed via CARLOPT_SSLVERSION");
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   if(!req_method) {
     failf(data, "SSL: couldn't create a method!");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   if(BACKEND->ctx)
@@ -146,7 +146,7 @@ mesalink_connect_step1(struct Curl_easy *data,
 
   if(!BACKEND->ctx) {
     failf(data, "SSL: couldn't create a context!");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   SSL_CTX_set_verify(
@@ -164,7 +164,7 @@ mesalink_connect_step1(struct Curl_easy *data,
               SSL_CONN_CONFIG(CAfile) : "none",
               SSL_CONN_CONFIG(CApath) ?
               SSL_CONN_CONFIG(CApath) : "none");
-        return CURLE_SSL_CACERT_BADFILE;
+        return CARLE_SSL_CACERT_BADFILE;
       }
       infof(data,
           "error setting certificate verify locations,"
@@ -187,14 +187,14 @@ mesalink_connect_step1(struct Curl_easy *data,
                                           file_type) != 1) {
       failf(data, "unable to use client certificate (no key or wrong pass"
             " phrase?)");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
 
     file_type = do_file_type(SSL_SET_OPTION(key_type));
     if(SSL_CTX_use_PrivateKey_file(BACKEND->ctx, SSL_SET_OPTION(key),
                                     file_type) != 1) {
       failf(data, "unable to set private key");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
     infof(data,
           "client cert: %s\n",
@@ -207,7 +207,7 @@ mesalink_connect_step1(struct Curl_easy *data,
 #ifdef MESALINK_HAVE_CIPHER
     if(!SSL_CTX_set_cipher_list(BACKEND->ctx, ciphers)) {
       failf(data, "failed setting cipher list: %s", ciphers);
-      return CURLE_SSL_CIPHER;
+      return CARLE_SSL_CIPHER;
     }
 #endif
     infof(data, "Cipher selection: %s\n", ciphers);
@@ -218,7 +218,7 @@ mesalink_connect_step1(struct Curl_easy *data,
   BACKEND->handle = SSL_new(BACKEND->ctx);
   if(!BACKEND->handle) {
     failf(data, "SSL: couldn't create a context (handle)!");
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   if((hostname_len < USHRT_MAX) &&
@@ -232,11 +232,11 @@ mesalink_connect_step1(struct Curl_easy *data,
       failf(data,
             "WARNING: failed to configure server name indication (SNI) "
             "TLS extension\n");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
   }
   else {
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
     /* Check if the hostname is 127.0.0.1 or [::1];
      * otherwise reject because MesaLink always wants a valid DNS Name
      * specified in RFC 5280 Section 7.2 */
@@ -252,7 +252,7 @@ mesalink_connect_step1(struct Curl_easy *data,
     {
       failf(data,
             "ERROR: MesaLink does not accept an IP address as a hostname\n");
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
   }
 
@@ -269,7 +269,7 @@ mesalink_connect_step1(struct Curl_easy *data,
           data,
           "SSL: SSL_set_session failed: %s",
           ERR_error_string(SSL_get_error(BACKEND->handle, 0), error_buffer));
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       /* Informational message */
       infof(data, "SSL re-using session ID\n");
@@ -280,14 +280,14 @@ mesalink_connect_step1(struct Curl_easy *data,
 
   if(SSL_set_fd(BACKEND->handle, (int)sockfd) != SSL_SUCCESS) {
     failf(data, "SSL: SSL_set_fd failed");
-    return CURLE_SSL_CONNECT_ERROR;
+    return CARLE_SSL_CONNECT_ERROR;
   }
 
   connssl->connecting_state = ssl_connect_2;
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode
+static CARLcode
 mesalink_connect_step2(struct Curl_easy *data,
                        struct connectdata *conn, int sockindex)
 {
@@ -303,7 +303,7 @@ mesalink_connect_step2(struct Curl_easy *data,
 
     if(SSL_ERROR_WANT_CONNECT == detail || SSL_ERROR_WANT_READ == detail) {
       connssl->connecting_state = ssl_connect_2_reading;
-      return CURLE_OK;
+      return CARLE_OK;
     }
     else {
       char error_buffer[MESALINK_MAX_ERROR_SZ];
@@ -316,10 +316,10 @@ mesalink_connect_step2(struct Curl_easy *data,
         detail &= ~0xFF;
         if(detail == TLS_ERROR_WEBPKI_ERRORS) {
           failf(data, "Cert verify failed");
-          return CURLE_PEER_FAILED_VERIFICATION;
+          return CARLE_PEER_FAILED_VERIFICATION;
         }
       }
-      return CURLE_SSL_CONNECT_ERROR;
+      return CARLE_SSL_CONNECT_ERROR;
     }
   }
 
@@ -329,13 +329,13 @@ mesalink_connect_step2(struct Curl_easy *data,
         SSL_get_version(BACKEND->handle),
         SSL_get_cipher_name(BACKEND->handle));
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode
+static CARLcode
 mesalink_connect_step3(struct connectdata *conn, int sockindex)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
 
   DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
@@ -380,7 +380,7 @@ mesalink_connect_step3(struct connectdata *conn, int sockindex)
 
 static ssize_t
 mesalink_send(struct Curl_easy *data, int sockindex, const void *mem,
-              size_t len, CURLcode *curlcode)
+              size_t len, CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
@@ -394,14 +394,14 @@ mesalink_send(struct Curl_easy *data, int sockindex, const void *mem,
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
       /* there's data pending, re-invoke SSL_write() */
-      *curlcode = CURLE_AGAIN;
+      *carlcode = CARLE_AGAIN;
       return -1;
     default:
       failf(data,
             "SSL write: %s, errno %d",
             ERR_error_string_n(err, error_buffer, sizeof(error_buffer)),
             SOCKERRNO);
-      *curlcode = CURLE_SEND_ERROR;
+      *carlcode = CARLE_SEND_ERROR;
       return -1;
     }
   }
@@ -428,7 +428,7 @@ mesalink_close(struct Curl_easy *data, struct connectdata *conn, int sockindex)
 
 static ssize_t
 mesalink_recv(struct Curl_easy *data, int num, char *buf, size_t buffersize,
-              CURLcode *curlcode)
+              CARLcode *carlcode)
 {
   struct connectdata *conn = data->conn;
   struct ssl_connect_data *connssl = &conn->ssl[num];
@@ -446,14 +446,14 @@ mesalink_recv(struct Curl_easy *data, int num, char *buf, size_t buffersize,
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
       /* there's data pending, re-invoke SSL_read() */
-      *curlcode = CURLE_AGAIN;
+      *carlcode = CARLE_AGAIN;
       return -1;
     default:
       failf(data,
             "SSL read: %s, errno %d",
             ERR_error_string_n(err, error_buffer, sizeof(error_buffer)),
             SOCKERRNO);
-      *curlcode = CURLE_RECV_ERROR;
+      *carlcode = CARLE_RECV_ERROR;
       return -1;
     }
   }
@@ -492,20 +492,20 @@ mesalink_shutdown(struct Curl_easy *data,
   return retval;
 }
 
-static CURLcode
+static CARLcode
 mesalink_connect_common(struct Curl_easy *data, struct connectdata *conn,
                         int sockindex, bool nonblocking, bool *done)
 {
-  CURLcode result;
+  CARLcode result;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  curl_socket_t sockfd = conn->sock[sockindex];
+  carl_socket_t sockfd = conn->sock[sockindex];
   timediff_t timeout_ms;
   int what;
 
   /* check if the connection has already been established */
   if(ssl_connection_complete == connssl->state) {
     *done = TRUE;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   if(ssl_connect_1 == connssl->connecting_state) {
@@ -515,7 +515,7 @@ mesalink_connect_common(struct Curl_easy *data, struct connectdata *conn,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
+      return CARLE_OPERATION_TIMEDOUT;
     }
 
     result = mesalink_connect_step1(data, conn, sockindex);
@@ -533,36 +533,36 @@ mesalink_connect_common(struct Curl_easy *data, struct connectdata *conn,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
+      return CARLE_OPERATION_TIMEDOUT;
     }
 
     /* if ssl is expecting something, check if it's available. */
     if(connssl->connecting_state == ssl_connect_2_reading ||
        connssl->connecting_state == ssl_connect_2_writing) {
 
-      curl_socket_t writefd =
+      carl_socket_t writefd =
         ssl_connect_2_writing == connssl->connecting_state ? sockfd
-                                                           : CURL_SOCKET_BAD;
-      curl_socket_t readfd = ssl_connect_2_reading == connssl->connecting_state
+                                                           : CARL_SOCKET_BAD;
+      carl_socket_t readfd = ssl_connect_2_reading == connssl->connecting_state
                                ? sockfd
-                               : CURL_SOCKET_BAD;
+                               : CARL_SOCKET_BAD;
 
-      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
+      what = Curl_socket_check(readfd, CARL_SOCKET_BAD, writefd,
                                nonblocking ? 0 : timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
-        return CURLE_SSL_CONNECT_ERROR;
+        return CARLE_SSL_CONNECT_ERROR;
       }
       else if(0 == what) {
         if(nonblocking) {
           *done = FALSE;
-          return CURLE_OK;
+          return CARLE_OK;
         }
         else {
           /* timeout */
           failf(data, "SSL connection timeout");
-          return CURLE_OPERATION_TIMEDOUT;
+          return CARLE_OPERATION_TIMEDOUT;
         }
       }
       /* socket is readable or writable */
@@ -603,21 +603,21 @@ mesalink_connect_common(struct Curl_easy *data, struct connectdata *conn,
   /* Reset our connect state machine */
   connssl->connecting_state = ssl_connect_1;
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
-static CURLcode
+static CARLcode
 mesalink_connect_nonblocking(struct Curl_easy *data, struct connectdata *conn,
                              int sockindex, bool *done)
 {
   return mesalink_connect_common(data, conn, sockindex, TRUE, done);
 }
 
-static CURLcode
+static CARLcode
 mesalink_connect(struct Curl_easy *data, struct connectdata *conn,
                  int sockindex)
 {
-  CURLcode result;
+  CARLcode result;
   bool done = FALSE;
 
   result = mesalink_connect_common(data, conn, sockindex, FALSE, &done);
@@ -626,19 +626,19 @@ mesalink_connect(struct Curl_easy *data, struct connectdata *conn,
 
   DEBUGASSERT(done);
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void *
 mesalink_get_internals(struct ssl_connect_data *connssl,
-                       CURLINFO info UNUSED_PARAM)
+                       CARLINFO info UNUSED_PARAM)
 {
   (void)info;
   return BACKEND->handle;
 }
 
 const struct Curl_ssl Curl_ssl_mesalink = {
-  { CURLSSLBACKEND_MESALINK, "MesaLink" }, /* info */
+  { CARLSSLBACKEND_MESALINK, "MesaLink" }, /* info */
 
   SSLSUPP_SSL_CTX,
 

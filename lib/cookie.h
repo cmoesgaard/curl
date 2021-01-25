@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_COOKIE_H
-#define HEADER_CURL_COOKIE_H
+#ifndef HEADER_CARL_COOKIE_H
+#define HEADER_CARL_COOKIE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 struct Cookie {
   struct Cookie *next; /* next in the chain */
@@ -32,7 +32,7 @@ struct Cookie {
   char *path;         /* path = <this> which is in Set-Cookie: */
   char *spath;        /* sanitized cookie path */
   char *domain;      /* domain = <this> */
-  curl_off_t expires;  /* expires = <this> */
+  carl_off_t expires;  /* expires = <this> */
   char *expirestr;   /* the plain text version */
 
   /* RFC 2109 keywords. Version=1 means 2109-compliant cookie sending */
@@ -102,7 +102,7 @@ void Curl_cookie_freelist(struct Cookie *cookies);
 void Curl_cookie_clearall(struct CookieInfo *cookies);
 void Curl_cookie_clearsess(struct CookieInfo *cookies);
 
-#if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
+#if defined(CARL_DISABLE_HTTP) || defined(CARL_DISABLE_COOKIES)
 #define Curl_cookie_list(x) NULL
 #define Curl_cookie_loadfiles(x) Curl_nop_stmt
 #define Curl_cookie_init(x,y,z,w) NULL
@@ -113,8 +113,8 @@ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup);
 void Curl_cookie_cleanup(struct CookieInfo *);
 struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
                                     const char *, struct CookieInfo *, bool);
-struct curl_slist *Curl_cookie_list(struct Curl_easy *data);
+struct carl_slist *Curl_cookie_list(struct Curl_easy *data);
 void Curl_cookie_loadfiles(struct Curl_easy *data);
 #endif
 
-#endif /* HEADER_CURL_COOKIE_H */
+#endif /* HEADER_CARL_COOKIE_H */

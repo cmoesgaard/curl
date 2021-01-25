@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SSH_H
-#define HEADER_CURL_SSH_H
+#ifndef HEADER_CARL_SSH_H
+#define HEADER_CARL_SSH_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(HAVE_LIBSSH2_H)
 #include <libssh2.h>
@@ -127,8 +127,8 @@ struct ssh_conn {
                                  quote command fails) */
   sshstate state;             /* always use ssh.c:state() to change state! */
   sshstate nextstate;         /* the state to goto after stopping */
-  CURLcode actualcode;        /* the actual error code */
-  struct curl_slist *quote_item; /* for the quote option */
+  CARLcode actualcode;        /* the actual error code */
+  struct carl_slist *quote_item; /* for the quote option */
   char *quote_path1;          /* two generic pointers for the QUOTE stuff */
   char *quote_path2;
 
@@ -181,7 +181,7 @@ struct ssh_conn {
   LIBSSH2_SFTP *sftp_session;   /* SFTP handle */
   LIBSSH2_SFTP_HANDLE *sftp_handle;
 
-#ifndef CURL_DISABLE_PROXY
+#ifndef CARL_DISABLE_PROXY
   /* for HTTPS proxy storage */
   Curl_recv *tls_recv;
   Curl_send *tls_send;
@@ -203,13 +203,13 @@ struct ssh_conn {
   WOLFSSH_CTX *ctx;
   word32 handleSz;
   byte handle[WOLFSSH_MAX_HANDLE];
-  curl_off_t offset;
+  carl_off_t offset;
 #endif /* USE_LIBSSH */
 };
 
 #if defined(USE_LIBSSH)
 
-#define CURL_LIBSSH_VERSION ssh_version(0)
+#define CARL_LIBSSH_VERSION ssh_version(0)
 
 #elif defined(USE_LIBSSH2)
 
@@ -244,10 +244,10 @@ struct ssh_conn {
 
 #ifdef HAVE_LIBSSH2_VERSION
 /* get it run-time if possible */
-#define CURL_LIBSSH2_VERSION libssh2_version(0)
+#define CARL_LIBSSH2_VERSION libssh2_version(0)
 #else
 /* use build-time if run-time not possible */
-#define CURL_LIBSSH2_VERSION LIBSSH2_VERSION
+#define CARL_LIBSSH2_VERSION LIBSSH2_VERSION
 #endif
 
 #endif /* USE_LIBSSH2 */
@@ -258,7 +258,7 @@ extern const struct Curl_handler Curl_handler_scp;
 extern const struct Curl_handler Curl_handler_sftp;
 
 /* generic SSH backend functions */
-CURLcode Curl_ssh_init(void);
+CARLcode Curl_ssh_init(void);
 void Curl_ssh_cleanup(void);
 size_t Curl_ssh_version(char *buffer, size_t buflen);
 #else
@@ -266,4 +266,4 @@ size_t Curl_ssh_version(char *buffer, size_t buflen);
 #define Curl_ssh_cleanup()
 #endif
 
-#endif /* HEADER_CURL_SSH_H */
+#endif /* HEADER_CARL_SSH_H */

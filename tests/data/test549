@@ -2,8 +2,8 @@
 <info>
 <keywords>
 FTP
-CURLOPT_PROXY_TRANSFER_MODE
-CURLOPT_PROXY
+CARLOPT_PROXY_TRANSFER_MODE
+CARLOPT_PROXY
 HTTP proxy
 </keywords>
 </info>
@@ -38,7 +38,7 @@ proxy
 lib549
 </tool>
  <name>
-FTP RETR over proxy with CURLOPT_PROXY_TRANSFER_MODE
+FTP RETR over proxy with CARLOPT_PROXY_TRANSFER_MODE
  </name>
 # first URL then proxy
  <command>

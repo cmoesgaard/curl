@@ -21,7 +21,7 @@ lib1538
 </tool>
 
 <name>
-libcurl strerror API call tests
+libcarl strerror API call tests
 </name>
 <command>
 nothing
@@ -36,7 +36,7 @@ e0: No error
 e1: Unsupported protocol
 e2: Failed initialization
 e3: URL using bad/illegal format or missing URL
-e4: A requested feature, protocol or option was not found built-in in this libcurl due to a build-time decision.
+e4: A requested feature, protocol or option was not found built-in in this libcarl due to a build-time decision.
 e5: Couldn't resolve proxy name
 e6: Couldn't resolve host name
 e7: Couldn't connect to server
@@ -75,12 +75,12 @@ e39: LDAP: search failed
 e40: Unknown error
 e41: A required function in the library was not found
 e42: Operation was aborted by an application callback
-e43: A libcurl function was given a bad argument
+e43: A libcarl function was given a bad argument
 e44: Unknown error
 e45: Failed binding local connection end
 e46: Unknown error
 e47: Number of redirects hit maximum amount
-e48: An unknown option was passed in to libcurl
+e48: An unknown option was passed in to libcarl
 e49: Malformed telnet option
 e50: Unknown error
 e51: Unknown error
@@ -108,7 +108,7 @@ e72: TFTP: Unknown transfer ID
 e73: Remote file already exists
 e74: TFTP: No such user
 e75: Conversion failed
-e76: Caller must register CURLOPT_CONV_ callback options
+e76: Caller must register CARLOPT_CONV_ callback options
 e77: Problem with the SSL CA cert (path? access rights?)
 e78: Remote file not found
 e79: Error in the SSH layer
@@ -131,7 +131,7 @@ e95: HTTP/3 error
 e96: QUIC connection error
 e97: proxy handshake error
 e98: Unknown error
-m-1: Please call curl_multi_perform() soon
+m-1: Please call carl_multi_perform() soon
 m0: No error
 m1: Invalid multi handle
 m2: Invalid easy handle
@@ -142,7 +142,7 @@ m6: Unknown option
 m7: The easy handle is already added to a multi handle
 m8: API function called from within callback
 m9: Wakeup is unavailable or failed
-m10: A libcurl function was given a bad argument
+m10: A libcarl function was given a bad argument
 m11: Unknown error
 s0: No error
 s1: Unknown share option
@@ -150,7 +150,7 @@ s2: Share currently in use
 s3: Invalid share handle
 s4: Out of memory
 s5: Feature not enabled in this library
-s6: CURLSHcode unknown
+s6: CARLSHcode unknown
 </stdout>
 </verify>
 

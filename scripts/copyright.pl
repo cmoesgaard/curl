@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -30,7 +30,7 @@
 # regexes of files to not scan
 my @skiplist=(
     '^tests\/data\/test(\d+)$', # test case data
-    '^docs\/cmdline-opts\/[a-z]+(.*)\.d$', # curl.1 pieces
+    '^docs\/cmdline-opts\/[a-z]+(.*)\.d$', # carl.1 pieces
     '(\/|^)[A-Z0-9_.-]+$', # all uppercase file name, possibly with dot and dash
     '(\/|^)[A-Z0-9_-]+\.md$', # all uppercase file name with .md extension
     '.gitignore', # wherever they are
@@ -54,27 +54,27 @@ my @skiplist=(
     'INSTALL.cmake',
     'TheArtOfHttpScripting',
     'page-footer',
-    'curl_multi_socket_all.3',
-    'curl_strnequal.3',
+    'carl_multi_socket_all.3',
+    'carl_strnequal.3',
     'symbols-in-versions',
     'options-in-versions',
 
     # macos-framework files
-    '^lib\/libcurl.plist',
-    '^lib\/libcurl.vers.in',
+    '^lib\/libcarl.plist',
+    '^lib\/libcarl.vers.in',
 
     # vms files
     '^packages\/vms\/build_vms.com',
-    '^packages\/vms\/curl_release_note_start.txt',
-    '^packages\/vms\/curlmsg.sdl',
+    '^packages\/vms\/carl_release_note_start.txt',
+    '^packages\/vms\/carlmsg.sdl',
     '^packages\/vms\/macro32_exactcase.patch',
 
     # XML junk
     '^projects\/wolfssl_override.props',
 
     # macos framework generated files
-    '^src\/macos\/curl.mcp.xml.sit.hqx',
-    '^src\/macos\/src\/curl_GUSIConfig.cpp',
+    '^src\/macos\/carl.mcp.xml.sit.hqx',
+    '^src\/macos\/src\/carl_GUSIConfig.cpp',
 
     # checksrc control files
     '\.checksrc$',

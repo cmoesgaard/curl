@@ -1,4 +1,4 @@
-# URL syntax and their use in curl
+# URL syntax and their use in carl
 
 ## Specifications
 
@@ -8,7 +8,7 @@ specifications:
  - [RFC 3986](https://tools.ietf.org/html/rfc3986) (although URL is called "URI" in there)
  - [The WHATWG URL Specification](https://url.spec.whatwg.org/)
 
-RFC 3986 is the earlier one, and curl has always tried to adhere to that one
+RFC 3986 is the earlier one, and carl has always tried to adhere to that one
 (since it shipped in January 2005).
 
 The WHATWG URL spec was written later, is incompatible with the RFC 3986 and
@@ -32,11 +32,11 @@ the correct auth field, and then pass on that same URL to a *second* parser,
 there will always be a risk it treats the same URL differently. There is no
 right and wrong in URL land, only differences of opinions.
 
-libcurl offers a separate API to its URL parser for this reason, among others.
+libcarl offers a separate API to its URL parser for this reason, among others.
 
 Applications may at times find it convenient to allow users to specify URLs
-for various purposes and that string would then end up fed to curl. Getting a
-URL from an external untrusted party and using it with curl brings several
+for various purposes and that string would then end up fed to carl. Getting a
+URL from an external untrusted party and using it with carl brings several
 security concerns:
 
 1. If you have an application that runs as or in a server application, getting
@@ -53,42 +53,42 @@ security concerns:
 
 ## "RFC3986 plus"
 
-curl recognizes a URL syntax that we call "RFC 3986 plus". It is grounded on
+carl recognizes a URL syntax that we call "RFC 3986 plus". It is grounded on
 the well established RFC 3986 to make sure previously written command lines and
-curl using scripts will remain working.
+carl using scripts will remain working.
 
-curl's URL parser allows a few deviations from the spec in order to
+carl's URL parser allows a few deviations from the spec in order to
 inter-operate better with URLs that appear in the wild.
 
 ### spaces
 
 In particular `Location:` headers that indicate to the client where a resource
 has been redirected to, sometimes contain spaces. This is a violation of RFC
-3986 but is fine in the WHATWG spec. curl handles these by re-encoding them to
+3986 but is fine in the WHATWG spec. carl handles these by re-encoding them to
 `%20`.
 
 ### non-ASCII
 
 Byte values in a provided URL that are outside of the printable ASCII range
-are percent-encoded by curl.
+are percent-encoded by carl.
 
 ### multiple slashes
 
 An absolute URL always starts with a "scheme" followed by a colon. For all the
-schemes curl supports, the colon must be followed by two slashes according to
+schemes carl supports, the colon must be followed by two slashes according to
 RFC 3986 but not according to the WHATWG spec - which allows one to infinity
 amount.
 
-curl allows one, two or three slashes after the colon to still be considered a
+carl allows one, two or three slashes after the colon to still be considered a
 valid URL.
 
 ### "scheme-less"
 
-curl supports "URLs" that do not start with a scheme. This is not supported by
+carl supports "URLs" that do not start with a scheme. This is not supported by
 any of the specifications. This is a shortcut to entering URLs that was
-supported by browsers early on and has been mimicked by curl.
+supported by browsers early on and has been mimicked by carl.
 
-Based on what the host name starts with, curl will "guess" what protocol to
+Based on what the host name starts with, carl will "guess" what protocol to
 use:
 
  - `ftp.` means FTP
@@ -101,7 +101,7 @@ use:
 
 ### globbing letters
 
-The curl command line tool supports "globbing" of URLs. It means that you can
+The carl command line tool supports "globbing" of URLs. It means that you can
 create ranges and lists using `[N-M]` and `{one,two,three}` sequences. The
 letters used for this (`[]{}`) are reserved in RFC 3986 and can therefore not
 legitimately be part of such a URL.
@@ -125,10 +125,10 @@ For example, this could look like:
 
 ## Scheme
 
-The scheme specifies the protocol to use. A curl build can support a few or
-many different schemes. You can limit what schemes curl should accept.
+The scheme specifies the protocol to use. A carl build can support a few or
+many different schemes. You can limit what schemes carl should accept.
 
-curl supports the following schemes on URLs specified to transfer. They are
+carl supports the following schemes on URLs specified to transfer. They are
 matched case insensitively:
 
 `dict`, `file`, `ftp`, `ftps`, `gopher`, `gophers`, `http`, `https`, `imap`,
@@ -136,7 +136,7 @@ matched case insensitively:
 `rtmpt`, `rtmpte`, `rtmpts`, `rtsp`, `smb`, `smbs`, `smtp`, `smtps`, `telnet`,
 `tftp`
 
-When the URL is specified to identify a proxy, curl recognizes the following
+When the URL is specified to identify a proxy, carl recognizes the following
 schemes:
 
 `http`, `https`, `socks4`, `socks4a`, `socks5`, `socks5h`, `socks`
@@ -170,10 +170,10 @@ brackets). For example:
 
 ### IDNA
 
-If curl was built with International Domain Name (IDN) support, it can also
+If carl was built with International Domain Name (IDN) support, it can also
 handle host names using non-ASCII characters.
 
-curl supports IDN host names using the IDNA 2008 standard. This differs from
+carl supports IDN host names using the IDNA 2008 standard. This differs from
 browsers that follow the WHATWG URL spec, which dictates IDNA 2003 to be used.
 The two standards have a huge overlap but differ slightly, perhaps most
 famously in how they deal with the German "double s" (`ß`).
@@ -181,10 +181,10 @@ famously in how they deal with the German "double s" (`ß`).
 ## Port number
 
 If there's a colon after the hostname, that should be followed by the port
-number to use. 1 - 65535. curl also supports a blank port number field - but
+number to use. 1 - 65535. carl also supports a blank port number field - but
 only if the URL starts with a scheme.
 
-If the port number is not specified in the URL, curl will used a default port
+If the port number is not specified in the URL, carl will used a default port
 based on the provide scheme:
 
 DICT 2628, FTP 21, FTPS 990, GOPHER 70, GOPHERS 70, HTTP 80, HTTPS 443,
@@ -197,7 +197,7 @@ SMTP 25, SMTPS 465, TELNET 23, TFTP 69
 ## FTP
 
 The path part of an FTP request specifies the file to retrieve and from which
-directory. If the file part is omitted then libcurl downloads the directory
+directory. If the file part is omitted then libcarl downloads the directory
 listing for the directory specified. If the directory is omitted then the
 directory listing for the root / home directory will be returned.
 
@@ -209,22 +209,22 @@ value of the ascii code for the slash).
 ## FILE
 
 When a `FILE://` URL is accessed on Windows systems, it can be crafted in a
-way so that Windows attempts to connect to a (remote) machine when curl wants
+way so that Windows attempts to connect to a (remote) machine when carl wants
 to read or write such a path.
 
-curl only allows the hostname part of a FILE URL to be one out of these three
+carl only allows the hostname part of a FILE URL to be one out of these three
 alternatives: `localhost`, `127.0.0.1` or blank ("", zero characters).
-Anything else will make curl fail to parse the URL.
+Anything else will make carl fail to parse the URL.
 
 ### Windows-specific FILE details
 
-curl accepts that the FILE URL's path starts with a "drive letter". That's a
+carl accepts that the FILE URL's path starts with a "drive letter". That's a
 single letter `a` to `z` followed by a colon or a pipe character (`|`).
 
 The Windows operating system itself will convert some file accesses to perform
 network accesses over SMB/CIFS, through several different file path patterns.
-This way, a `file://` URL passed to curl *might* be converted into a network
-access inadvertently and unknowingly to curl. This is a Windows feature curl
+This way, a `file://` URL passed to carl *might* be converted into a network
+access inadvertently and unknowingly to carl. This is a Windows feature carl
 cannot control or disable.
 
 ## IMAP
@@ -325,12 +325,12 @@ share and directory or the share to upload to and as such, may not be omitted.
 If the user name is embedded in the URL then it must contain the domain name
 and as such, the backslash must be URL encoded as %2f.
 
-curl supports SMB version 1 (only)
+carl supports SMB version 1 (only)
 
 ## SMTP
 
 The path part of a SMTP request specifies the host name to present during
-communication with the mail server. If the path is omitted, then libcurl will
+communication with the mail server. If the path is omitted, then libcarl will
 attempt to resolve the local computer's host name. However, this may not
 return the fully qualified domain name that is required by some mail servers
 and specifying this path allows you to set an alternative name, such as your
@@ -341,13 +341,13 @@ The default smtp port is 25. Some servers use port 587 as an alternative.
 
 ## RTMP
 
-There's no official URL spec for RTMP so libcurl uses the URL syntax supported
+There's no official URL spec for RTMP so libcarl uses the URL syntax supported
 by the underlying librtmp library. It has a syntax where it wants a
 traditional URL, followed by a space and a series of space-separated
 `name=value` pairs.
 
-While space is not typically a "legal" letter, libcurl accepts them. When a
+While space is not typically a "legal" letter, libcarl accepts them. When a
 user wants to pass in a `#` (hash) character it will be treated as a fragment
-and get cut off by libcurl if provided literally. You will instead have to
+and get cut off by libcarl if provided literally. You will instead have to
 escape it by providing it as backslash and its ASCII value in hexadecimal:
 `\23`.

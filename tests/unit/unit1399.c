@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "urldata.h"
 #include "progress.h"
@@ -28,7 +28,7 @@ static int usec_magnitude = 1000000;
 
 static bool unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void unit_stop(void)
@@ -42,7 +42,7 @@ static void unit_stop(void)
  * of the test.
  */
 static void fake_t_startsingle_time(struct Curl_easy *data,
-                                    struct curltime fake_now,
+                                    struct carltime fake_now,
                                     int seconds_offset)
 {
   Curl_pgrsTime(data, TIMER_STARTSINGLE);
@@ -80,7 +80,7 @@ static void expect_timer_seconds(struct Curl_easy *data, int seconds)
  * be 3 seconds. */
 UNITTEST_START
   struct Curl_easy data;
-  struct curltime now = Curl_now();
+  struct carltime now = Curl_now();
 
   data.progress.t_nslookup = 0;
   data.progress.t_connect = 0;

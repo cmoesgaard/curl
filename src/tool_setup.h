@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_SETUP_H
-#define HEADER_CURL_TOOL_SETUP_H
+#ifndef HEADER_CARL_TOOL_SETUP_H
+#define HEADER_CARL_TOOL_SETUP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,36 +22,36 @@
  *
  ***************************************************************************/
 
-#define CURL_NO_OLDIES
+#define CARL_NO_OLDIES
 
 /*
- * curl_setup.h may define preprocessor macros such as _FILE_OFFSET_BITS and
+ * carl_setup.h may define preprocessor macros such as _FILE_OFFSET_BITS and
  * _LARGE_FILES in order to support files larger than 2 GB. On platforms
  * where this happens it is mandatory that these macros are defined before
  * any system header file is included, otherwise file handling function
- * prototypes will be misdeclared and curl tool may not build properly;
- * therefore we must include curl_setup.h before curl.h when building curl.
+ * prototypes will be misdeclared and carl tool may not build properly;
+ * therefore we must include carl_setup.h before carl.h when building carl.
  */
 
-#include "curl_setup.h" /* from the lib directory */
+#include "carl_setup.h" /* from the lib directory */
 
 /*
- * curl tool certainly uses libcurl's external interface.
+ * carl tool certainly uses libcarl's external interface.
  */
 
-#include <curl/curl.h> /* external interface */
+#include <carl/carl.h> /* external interface */
 
 /*
  * Platform specific stuff.
  */
 
 #if defined(macintosh) && defined(__MRC__)
-#  define main(x,y) curl_main(x,y)
+#  define main(x,y) carl_main(x,y)
 #endif
 
 #ifdef TPF
 #  undef select
-   /* change which select is used for the curl command line tool */
+   /* change which select is used for the carl command line tool */
 #  define select(a,b,c,d,e) tpf_select_bsd(a,b,c,d,e)
    /* and turn off the progress meter */
 #  define CONF_DEFAULT (0|CONF_NOPROGRESS)
@@ -70,4 +70,4 @@
 #  include "tool_strdup.h"
 #endif
 
-#endif /* HEADER_CURL_TOOL_SETUP_H */
+#endif /* HEADER_CARL_TOOL_SETUP_H */

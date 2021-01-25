@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 #
 #***************************************************************************
 
-# This is the HTTPS, FTPS, POP3S, IMAPS, SMTPS, server used for curl test
+# This is the HTTPS, FTPS, POP3S, IMAPS, SMTPS, server used for carl test
 # harness. Actually just a layer that runs stunnel properly using the
 # non-secure test harness servers.
 
@@ -291,7 +291,7 @@ if($stunnel_version >= 400) {
             print STUNCONF "foreground = yes\n";
         }
         print STUNCONF "\n";
-        print STUNCONF "[curltest]\n";
+        print STUNCONF "[carltest]\n";
         print STUNCONF "accept = $accept_port\n";
         print STUNCONF "connect = $target_port\n";
         if(!close(STUNCONF)) {
@@ -319,7 +319,7 @@ if($stunnel_version >= 400) {
             print "foreground = yes\n";
         }
         print "\n";
-        print "[curltest]\n";
+        print "[carltest]\n";
         print "accept = $accept_port\n";
         print "connect = $target_port\n";
     }

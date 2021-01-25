@@ -16,7 +16,7 @@
  * Copyright (c) 2003 - 2019 Simtec Electronics
  *
  * Re-implemented by Vincent Sanders <vince@kyllikki.org> with extensive
- * reference to original curl example code
+ * reference to original carl example code
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,7 +40,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * This example requires libcurl 7.9.7 or later.
+ * This example requires libcarl 7.9.7 or later.
  */
 /* <DESC>
  * implements an fopen() abstraction allowing reading from URLs
@@ -55,19 +55,19 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-enum fcurl_type_e {
+enum fcarl_type_e {
   CFTYPE_NONE = 0,
   CFTYPE_FILE = 1,
-  CFTYPE_CURL = 2
+  CFTYPE_CARL = 2
 };
 
-struct fcurl_data
+struct fcarl_data
 {
-  enum fcurl_type_e type;     /* type of handle */
+  enum fcarl_type_e type;     /* type of handle */
   union {
-    CURL *curl;
+    CARL *carl;
     FILE *file;
   } handle;                   /* handle */
 
@@ -77,7 +77,7 @@ struct fcurl_data
   int still_running;          /* Is background url fetch still in progress */
 };
 
-typedef struct fcurl_data URL_FILE;
+typedef struct fcarl_data URL_FILE;
 
 /* exported functions */
 URL_FILE *url_fopen(const char *url, const char *operation);
@@ -88,9 +88,9 @@ char *url_fgets(char *ptr, size_t size, URL_FILE *file);
 void url_rewind(URL_FILE *file);
 
 /* we use a global one for convenience */
-static CURLM *multi_handle;
+static CARLM *multi_handle;
 
-/* curl calls this routine to get more data */
+/* carl calls this routine to get more data */
 static size_t write_callback(char *buffer,
                              size_t size,
                              size_t nitems,
@@ -132,7 +132,7 @@ static int fill_buffer(URL_FILE *file, size_t want)
   fd_set fdexcep;
   struct timeval timeout;
   int rc;
-  CURLMcode mc; /* curl_multi_fdset() return code */
+  CARLMcode mc; /* carl_multi_fdset() return code */
 
   /* only attempt to fill buffer if transactions still running and buffer
    * doesn't exceed required size already
@@ -143,7 +143,7 @@ static int fill_buffer(URL_FILE *file, size_t want)
   /* attempt to fill buffer */
   do {
     int maxfd = -1;
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     FD_ZERO(&fdread);
     FD_ZERO(&fdwrite);
@@ -153,20 +153,20 @@ static int fill_buffer(URL_FILE *file, size_t want)
     timeout.tv_sec = 60; /* 1 minute */
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(multi_handle, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(multi_handle, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -174,7 +174,7 @@ static int fill_buffer(URL_FILE *file, size_t want)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #ifdef _WIN32
@@ -200,7 +200,7 @@ static int fill_buffer(URL_FILE *file, size_t want)
     case 0:
     default:
       /* timeout or readable/writable sockets */
-      curl_multi_perform(multi_handle, &file->still_running);
+      carl_multi_perform(multi_handle, &file->still_running);
       break;
     }
   } while(file->still_running && (file->buffer_pos < want));
@@ -246,30 +246,30 @@ URL_FILE *url_fopen(const char *url, const char *operation)
     file->type = CFTYPE_FILE; /* marked as URL */
 
   else {
-    file->type = CFTYPE_CURL; /* marked as URL */
-    file->handle.curl = curl_easy_init();
+    file->type = CFTYPE_CARL; /* marked as URL */
+    file->handle.carl = carl_easy_init();
 
-    curl_easy_setopt(file->handle.curl, CURLOPT_URL, url);
-    curl_easy_setopt(file->handle.curl, CURLOPT_WRITEDATA, file);
-    curl_easy_setopt(file->handle.curl, CURLOPT_VERBOSE, 0L);
-    curl_easy_setopt(file->handle.curl, CURLOPT_WRITEFUNCTION, write_callback);
+    carl_easy_setopt(file->handle.carl, CARLOPT_URL, url);
+    carl_easy_setopt(file->handle.carl, CARLOPT_WRITEDATA, file);
+    carl_easy_setopt(file->handle.carl, CARLOPT_VERBOSE, 0L);
+    carl_easy_setopt(file->handle.carl, CARLOPT_WRITEFUNCTION, write_callback);
 
     if(!multi_handle)
-      multi_handle = curl_multi_init();
+      multi_handle = carl_multi_init();
 
-    curl_multi_add_handle(multi_handle, file->handle.curl);
+    carl_multi_add_handle(multi_handle, file->handle.carl);
 
     /* lets start the fetch */
-    curl_multi_perform(multi_handle, &file->still_running);
+    carl_multi_perform(multi_handle, &file->still_running);
 
     if((file->buffer_pos == 0) && (!file->still_running)) {
       /* if still_running is 0 now, we should return NULL */
 
       /* make sure the easy handle is not in the multi handle anymore */
-      curl_multi_remove_handle(multi_handle, file->handle.curl);
+      carl_multi_remove_handle(multi_handle, file->handle.carl);
 
       /* cleanup */
-      curl_easy_cleanup(file->handle.curl);
+      carl_easy_cleanup(file->handle.carl);
 
       free(file);
 
@@ -288,12 +288,12 @@ int url_fclose(URL_FILE *file)
     ret = fclose(file->handle.file); /* passthrough */
     break;
 
-  case CFTYPE_CURL:
+  case CFTYPE_CARL:
     /* make sure the easy handle is not in the multi handle anymore */
-    curl_multi_remove_handle(multi_handle, file->handle.curl);
+    carl_multi_remove_handle(multi_handle, file->handle.carl);
 
     /* cleanup */
-    curl_easy_cleanup(file->handle.curl);
+    carl_easy_cleanup(file->handle.carl);
     break;
 
   default: /* unknown or supported type - oh dear */
@@ -317,7 +317,7 @@ int url_feof(URL_FILE *file)
     ret = feof(file->handle.file);
     break;
 
-  case CFTYPE_CURL:
+  case CFTYPE_CARL:
     if((file->buffer_pos == 0) && (!file->still_running))
       ret = 1;
     break;
@@ -339,7 +339,7 @@ size_t url_fread(void *ptr, size_t size, size_t nmemb, URL_FILE *file)
     want = fread(ptr, size, nmemb, file->handle.file);
     break;
 
-  case CFTYPE_CURL:
+  case CFTYPE_CARL:
     want = nmemb * size;
 
     fill_buffer(file, want);
@@ -380,7 +380,7 @@ char *url_fgets(char *ptr, size_t size, URL_FILE *file)
     ptr = fgets(ptr, (int)size, file->handle.file);
     break;
 
-  case CFTYPE_CURL:
+  case CFTYPE_CARL:
     fill_buffer(file, want);
 
     /* check if there's data in the buffer - if not fill either errored or
@@ -425,12 +425,12 @@ void url_rewind(URL_FILE *file)
     rewind(file->handle.file); /* passthrough */
     break;
 
-  case CFTYPE_CURL:
+  case CFTYPE_CARL:
     /* halt transaction */
-    curl_multi_remove_handle(multi_handle, file->handle.curl);
+    carl_multi_remove_handle(multi_handle, file->handle.carl);
 
     /* restart */
-    curl_multi_add_handle(multi_handle, file->handle.curl);
+    carl_multi_add_handle(multi_handle, file->handle.carl);
 
     /* ditch buffer - write will recreate - resets stream pos*/
     free(file->buffer);

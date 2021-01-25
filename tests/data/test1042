@@ -61,7 +61,7 @@ HTTP GET beyond end of entirely-downloaded file, no server resume
  <command>
 http://%HOSTIP:%HTTPPORT/1042 -C 200
 </command>
-<file name="log/curl1042.out">
+<file name="log/carl1042.out">
 012345678
 012345678
 012345678
@@ -84,7 +84,7 @@ http://%HOSTIP:%HTTPPORT/1042 -C 200
 GET /1042 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=200-
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

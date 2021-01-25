@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -24,21 +24,21 @@ AUTOMAKE_OPTIONS = foreign no-dependencies
 
 # EXTRA_DIST breaks with $(abs_builddir) so build it using this variable
 # but distribute it (using the relative file name) in the next variable
-man_MANS = $(abs_builddir)/curl.1
-noinst_man_MANS = curl.1 mk-ca-bundle.1
-dist_man_MANS = curl-config.1
-GENHTMLPAGES = curl.html curl-config.html mk-ca-bundle.html
-PDFPAGES = curl.pdf curl-config.pdf mk-ca-bundle.pdf
-MANDISTPAGES = curl.1.dist curl-config.1.dist
+man_MANS = $(abs_builddir)/carl.1
+noinst_man_MANS = carl.1 mk-ca-bundle.1
+dist_man_MANS = carl-config.1
+GENHTMLPAGES = carl.html carl-config.html mk-ca-bundle.html
+PDFPAGES = carl.pdf carl-config.pdf mk-ca-bundle.pdf
+MANDISTPAGES = carl.1.dist carl-config.1.dist
 
 HTMLPAGES = $(GENHTMLPAGES) index.html
 
 # Build targets in this file (.) before cmdline-opts to ensure that
-# the curl.1 rule below runs first
+# the carl.1 rule below runs first
 SUBDIRS = . cmdline-opts
-DIST_SUBDIRS = $(SUBDIRS) examples libcurl
+DIST_SUBDIRS = $(SUBDIRS) examples libcarl
 
-CLEANFILES = $(GENHTMLPAGES) $(PDFPAGES) $(MANDISTPAGES) curl.1
+CLEANFILES = $(GENHTMLPAGES) $(PDFPAGES) $(MANDISTPAGES) carl.1
 
 EXTRA_DIST =                                    \
  $(noinst_man_MANS)                             \
@@ -53,7 +53,7 @@ EXTRA_DIST =                                    \
  CODE_REVIEW.md                                 \
  CODE_STYLE.md                                  \
  CONTRIBUTE.md                                  \
- CURL-DISABLE.md                                \
+ CARL-DISABLE.md                                \
  DEPRECATE.md                                   \
  DYNBUF.md                                      \
  ECH.md                                         \
@@ -99,19 +99,19 @@ SUFFIXES = .1 .html .pdf
 # rule in src/Makefile.am in out-of-tree builds that references the file in the
 # build directory.
 #
-# First, seed the used copy of curl.1 with the prebuilt copy (in an out-of-tree
+# First, seed the used copy of carl.1 with the prebuilt copy (in an out-of-tree
 # build), then run make recursively to rebuild it only if its dependencies
 # have changed.
-$(abs_builddir)/curl.1:
-	if test "$(top_builddir)x" != "$(top_srcdir)x" -a -e "$(srcdir)/curl.1"; then \
-		$(INSTALL_DATA) "$(srcdir)/curl.1" $@; fi
+$(abs_builddir)/carl.1:
+	if test "$(top_builddir)x" != "$(top_srcdir)x" -a -e "$(srcdir)/carl.1"; then \
+		$(INSTALL_DATA) "$(srcdir)/carl.1" $@; fi
 	cd cmdline-opts && $(MAKE)
 
 html: $(HTMLPAGES)
-	cd libcurl && $(MAKE) html
+	cd libcarl && $(MAKE) html
 
 pdf: $(PDFPAGES)
-	cd libcurl && $(MAKE) pdf
+	cd libcarl && $(MAKE) pdf
 
 .1.html:
 	$(MAN2HTML)

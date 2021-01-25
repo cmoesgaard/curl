@@ -1,0 +1,72 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_INTERFACE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_INTERFACE \- source interface for outgoing traffic
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_INTERFACE, char *interface);
+.SH DESCRIPTION
+Pass a char * as parameter. This sets the \fIinterface\fP name to use as
+outgoing network interface. The name can be an interface name, an IP address,
+or a host name.
+
+If the parameter starts with "if!" then it is treated as only as interface
+name and no attempt will ever be named to do treat it as an IP address or to
+do name resolution on it.  If the parameter starts with \&"host!" it is
+treated as either an IP address or a hostname.  Hostnames are resolved
+synchronously.  Using the if! format is highly recommended when using the
+multi interfaces to avoid allowing the code to block.  If "if!" is specified
+but the parameter does not match an existing interface, CARLE_INTERFACE_FAILED
+is returned from the libcarl function used to perform the transfer.
+
+libcarl does not support using network interface names for this option on
+Windows.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL, use whatever the TCP stack finds suitable
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/foo.bin");
+
+  carl_easy_setopt(carl, CARLOPT_INTERFACE, "eth0");
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+The "if!" and "host!" syntax was added in 7.24.0.
+.SH RETURN VALUE
+Returns CARLE_OK on success or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_SOCKOPTFUNCTION "(3), " CARLOPT_TCP_NODELAY "(3), "

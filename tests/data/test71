@@ -29,7 +29,7 @@ HTTP and -F upload in config file
  </name>
 <stdin>
 -F name=daniel
--F tool=curl
+-F tool=carl
 -F file=@log/test71.txt
 user-agent = ""
 </stdin>
@@ -63,7 +63,7 @@ daniel
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------9ef8d6205763
 Content-Disposition: form-data; name="file"; filename="test71.txt"
 Content-Type: text/plain

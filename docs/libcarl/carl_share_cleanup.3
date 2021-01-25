@@ -1,0 +1,42 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.TH carl_share_cleanup 3 "8 Aug 2003" "libcarl 7.10.7" "libcarl Manual"
+.SH NAME
+carl_share_cleanup - Clean up a shared object
+.SH SYNOPSIS
+.B #include <carl/carl.h>
+.sp
+.BI "CARLSHcode carl_share_cleanup(CARLSH *" share_handle ");"
+.ad
+.SH DESCRIPTION
+This function deletes a shared object. The share handle cannot be used anymore
+when this function has been called.
+
+Passing in a NULL pointer in \fIshare_handle\fP will make this function return
+immediately with no action.
+.SH RETURN VALUE
+CARLSHE_OK (zero) means that the option was set properly, non-zero means an
+error occurred as \fI<carl/carl.h>\fP defines. See the \fIlibcarl-errors.3\fP
+man page for the full list with descriptions. If an error occurs, then the
+share object will not be deleted.
+.SH "SEE ALSO"
+.BR carl_share_init "(3), " carl_share_setopt "(3)"

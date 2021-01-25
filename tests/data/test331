@@ -51,13 +51,13 @@ proxy
 <protocol>
 GET http://moo/we/want/331 HTTP/1.1
 Host: moo
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 
 GET http://moo/we/want/3310002 HTTP/1.1
 Host: moo
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Cookie: moo=yes

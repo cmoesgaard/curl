@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,16 +20,16 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
-#include "curl_memory.h"
+#include <carl/carl.h>
+#include "carl_memory.h"
 
 #include "memdebug.h"
 
 static char *GetEnv(const char *variable)
 {
-#if defined(_WIN32_WCE) || defined(CURL_WINDOWS_APP)
+#if defined(_WIN32_WCE) || defined(CARL_WINDOWS_APP)
   (void)variable;
   return NULL;
 #elif defined(WIN32)
@@ -71,7 +71,7 @@ static char *GetEnv(const char *variable)
 #endif
 }
 
-char *curl_getenv(const char *v)
+char *carl_getenv(const char *v)
 {
   return GetEnv(v);
 }

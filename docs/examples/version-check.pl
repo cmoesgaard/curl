@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
 # It first loads the 'symbols-in-versions' document and stores a lookup
 # table for all known symbols for which version they were introduced.
 #
-# It then scans the given source file to dig up all symbols starting with CURL.
+# It then scans the given source file to dig up all symbols starting with CARL.
 # Finally, it sorts the internal list of found symbols (using the version
 # number as sort key) and then it outputs the most recent version number and
 # the symbols from that version that are used.
@@ -36,12 +36,12 @@
 #    version-check.pl [source file]
 #
 
-open(S, "<../libcurl/symbols-in-versions") || die;
+open(S, "<../libcarl/symbols-in-versions") || die;
 
 my %doc;
 my %rem;
 while(<S>) {
-    if(/(^CURL[^ \n]*) *(.*)/) {
+    if(/(^CARL[^ \n]*) *(.*)/) {
         my ($sym, $rest)=($1, $2);
         my @a=split(/ +/, $rest);
 
@@ -69,7 +69,7 @@ my %used;
 open(C, "<$ARGV[0]") || die;
 
 while(<C>) {
-    if(/\W(CURL[_A-Z0-9v]+)\W/) {
+    if(/\W(CARL[_A-Z0-9v]+)\W/) {
         #print "$1\n";
         $used{$1}++;
     }

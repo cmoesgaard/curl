@@ -1,7 +1,7 @@
 <testcase>
 <info>
 <keywords>
-CURLOPT_BUFFERSIZE
+CARLOPT_BUFFERSIZE
 </keywords>
 </info>
 
@@ -29,13 +29,13 @@ ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib559
 </tool>
 
 <name>
-use tiny CURLOPT_BUFFERSIZE
+use tiny CARLOPT_BUFFERSIZE
 </name>
 <command>
 http://%HOSTIP:%HTTPPORT/559

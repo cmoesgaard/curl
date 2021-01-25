@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,9 +27,9 @@
 #  include <direct.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_dirhie.h"
 
@@ -87,7 +87,7 @@ static void show_dir_errno(FILE *errors, const char *name)
 /*
  * Create the needed directory hierarchy recursively in order to save
  *  multi-GETs in file output, ie:
- *  curl "http://my.site/dir[1-5]/file[1-5].txt" -o "dir#1/file#2.txt"
+ *  carl "http://my.site/dir[1-5]/file[1-5].txt" -o "dir#1/file#2.txt"
  *  should create all the dir* automagically
  */
 
@@ -99,24 +99,24 @@ static void show_dir_errno(FILE *errors, const char *name)
 #endif
 
 
-CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
+CARLcode create_dir_hierarchy(const char *outfile, FILE *errors)
 {
   char *tempdir;
   char *tempdir2;
   char *outdup;
   char *dirbuildup;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t outlen;
 
   outlen = strlen(outfile);
   outdup = strdup(outfile);
   if(!outdup)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   dirbuildup = malloc(outlen + 1);
   if(!dirbuildup) {
     Curl_safefree(outdup);
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
   dirbuildup[0] = '\0';
 
@@ -156,7 +156,7 @@ CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
       if(!skip && (-1 == mkdir(dirbuildup, (mode_t)0000750)) &&
          (errno != EACCES) && (errno != EEXIST)) {
         show_dir_errno(errors, dirbuildup);
-        result = CURLE_WRITE_ERROR;
+        result = CARLE_WRITE_ERROR;
         break; /* get out of loop */
       }
     }

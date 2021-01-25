@@ -3,7 +3,7 @@ Long: progress-bar
 Help: Display transfer progress as a bar
 Category: verbose
 ---
-Make curl display transfer progress as a simple progress bar instead of the
+Make carl display transfer progress as a simple progress bar instead of the
 standard, more informational, meter.
 
 This progress bar draws a single line of '#' characters across the screen and

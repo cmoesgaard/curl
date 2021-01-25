@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
 #
 ###########################################################################
 #
-#       curl compilation script for the OS/400.
+#       carl compilation script for the OS/400.
 #
 #
 #       This is a shell script since make is not a standard component of OS/400.
@@ -34,7 +34,7 @@ cd "${TOPDIR}"
 #       Create the OS/400 library if it does not exist.
 
 if action_needed "${LIBIFSNAME}"
-then    CMD="CRTLIB LIB(${TARGETLIB}) TEXT('curl: multiprotocol support API')"
+then    CMD="CRTLIB LIB(${TARGETLIB}) TEXT('carl: multiprotocol support API')"
         system "${CMD}"
 fi
 

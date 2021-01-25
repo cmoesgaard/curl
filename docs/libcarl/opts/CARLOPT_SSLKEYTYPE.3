@@ -1,0 +1,64 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SSLKEYTYPE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SSLKEYTYPE \- set type of the private key file
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SSLKEYTYPE, char *type);
+.SH DESCRIPTION
+Pass a pointer to a null-terminated string as parameter. The string should be
+the format of your private key. Supported formats are "PEM", "DER" and "ENG".
+
+The format "ENG" enables you to load the private key from a crypto engine. In
+this case \fICARLOPT_SSLKEY(3)\fP is used as an identifier passed to the
+engine. You have to set the crypto engine with \fICARLOPT_SSLENGINE(3)\fP.
+\&"DER" format key file currently does not work because of a bug in OpenSSL.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+"PEM"
+.SH PROTOCOLS
+All TLS based protocols: HTTPS, FTPS, IMAPS, POP3S, SMTPS etc.
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/");
+  carl_easy_setopt(carl, CARLOPT_SSLCERT, "client.pem");
+  carl_easy_setopt(carl, CARLOPT_SSLKEY, "key.pem");
+  carl_easy_setopt(carl, CARLOPT_SSLKEYTYPE, "PEM");
+  carl_easy_setopt(carl, CARLOPT_KEYPASSWD, "s3cret");
+  ret = carl_easy_perform(carl);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+If built TLS enabled.
+.SH RETURN VALUE
+Returns CARLE_OK if TLS is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_SSLKEY "(3), " CARLOPT_SSLCERT "(3), "

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "strcase.h"
 
@@ -32,7 +32,7 @@ static char raw_tolower(char in);
    its behavior is altered by the current locale. */
 char Curl_raw_toupper(char in)
 {
-#if !defined(CURL_DOES_CONVERSIONS)
+#if !defined(CARL_DOES_CONVERSIONS)
   if(in >= 'a' && in <= 'z')
     return (char)('A' + in - 'a');
 #else
@@ -100,7 +100,7 @@ char Curl_raw_toupper(char in)
    its behavior is altered by the current locale. */
 static char raw_tolower(char in)
 {
-#if !defined(CURL_DOES_CONVERSIONS)
+#if !defined(CARL_DOES_CONVERSIONS)
   if(in >= 'A' && in <= 'Z')
     return (char)('a' + in - 'A');
 #else
@@ -253,11 +253,11 @@ void Curl_strntolower(char *dest, const char *src, size_t n)
 
 /* --- public functions --- */
 
-int curl_strequal(const char *first, const char *second)
+int carl_strequal(const char *first, const char *second)
 {
   return Curl_strcasecompare(first, second);
 }
-int curl_strnequal(const char *first, const char *second, size_t max)
+int carl_strnequal(const char *first, const char *second, size_t max)
 {
   return Curl_strncasecompare(first, second, max);
 }

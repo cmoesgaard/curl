@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_PLAN9_H
-#define HEADER_CURL_CONFIG_PLAN9_H
+#ifndef HEADER_CARL_CONFIG_PLAN9_H
+#define HEADER_CARL_CONFIG_PLAN9_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,20 +22,20 @@
  *
  ***************************************************************************/
 
-#define BUILDING_LIBCURL 1
-#define CURL_CA_BUNDLE "/sys/lib/tls/ca.pem"
-#define CURL_CA_PATH "/sys/lib/tls"
-#define CURL_STATICLIB 1
+#define BUILDING_LIBCARL 1
+#define CARL_CA_BUNDLE "/sys/lib/tls/ca.pem"
+#define CARL_CA_PATH "/sys/lib/tls"
+#define CARL_STATICLIB 1
 #define ENABLE_IPV6 1
-#define CURL_DISABLE_LDAP 1
+#define CARL_DISABLE_LDAP 1
 
 #define NEED_REENTRANT 1
 #define OS "plan9"
-#define PACKAGE "curl"
-#define PACKAGE_NAME "curl"
-#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
-#define PACKAGE_STRING "curl -"
-#define PACKAGE_TARNAME "curl"
+#define PACKAGE "carl"
+#define PACKAGE_NAME "carl"
+#define PACKAGE_BUGREPORT "a suitable mailing list: https://carl.se/mail/"
+#define PACKAGE_STRING "carl -"
+#define PACKAGE_TARNAME "carl"
 #define PACKAGE_VERSION "-"
 #define RANDOM_FILE "/dev/random"
 #define VERSION "0.0.0" /* TODO */
@@ -51,7 +51,7 @@
 #define SIZEOF_SHORT 2
 #define SIZEOF_LONG 4
 #define SIZEOF_OFF_T 8
-#define SIZEOF_CURL_OFF_T 4 /* curl_off_t = timediff_t = int */
+#define SIZEOF_CARL_OFF_T 4 /* carl_off_t = timediff_t = int */
 #define SIZEOF_SIZE_T 4
 #define SIZEOF_TIME_T 4
 #endif
@@ -211,4 +211,4 @@
 #undef inline
 #endif
 
-#endif /* HEADER_CURL_CONFIG_PLAN9_H */
+#endif /* HEADER_CARL_CONFIG_PLAN9_H */

@@ -5,7 +5,7 @@ Protocols: TFTP
 Added: 7.20.0
 Category: tftp
 ---
-Set TFTP BLKSIZE option (must be >512). This is the block size that curl will
+Set TFTP BLKSIZE option (must be >512). This is the block size that carl will
 try to use when transferring data to or from a TFTP server. By default 512
 bytes will be used.
 

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef ENABLE_QUIC
 
@@ -29,7 +29,7 @@
 #endif
 #include "urldata.h"
 #include "dynbuf.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 #include "vquic.h"
 
 #ifdef O_BINARY
@@ -46,7 +46,7 @@
  * create the file. Open file success is deemed by seeing if the returned fd
  * is != -1.
  */
-CURLcode Curl_qlogdir(struct Curl_easy *data,
+CARLcode Curl_qlogdir(struct Curl_easy *data,
                       unsigned char *scid,
                       size_t scidlen,
                       int *qlogfdp)
@@ -55,7 +55,7 @@ CURLcode Curl_qlogdir(struct Curl_easy *data,
   *qlogfdp = -1;
   if(qlog_dir) {
     struct dynbuf fname;
-    CURLcode result;
+    CARLcode result;
     unsigned int i;
     Curl_dyn_init(&fname, DYN_QLOG_NAME);
     result = Curl_dyn_add(&fname, qlog_dir);
@@ -80,6 +80,6 @@ CURLcode Curl_qlogdir(struct Curl_easy *data,
       return result;
   }
 
-  return CURLE_OK;
+  return CARLE_OK;
 }
 #endif

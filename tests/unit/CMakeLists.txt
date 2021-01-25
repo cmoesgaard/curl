@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 #
 ###########################################################################
 
-# TODO build a special libcurlu library for unittests.
+# TODO build a special libcarlu library for unittests.
 return()
 
 set(UT_SRC
@@ -49,13 +49,13 @@ set(UT_SRC
   unit1655.c
   )
 
-set(UT_COMMON_FILES ../libtest/first.c ../libtest/test.h curlcheck.h)
+set(UT_COMMON_FILES ../libtest/first.c ../libtest/test.h carlcheck.h)
 include_directories(
-  ${CURL_SOURCE_DIR}/lib          # To be able to reach "curl_setup_once.h"
-  ${CURL_SOURCE_DIR}/tests/libtest
-  ${CURL_SOURCE_DIR}/src
-  ${CURL_BINARY_DIR}/lib          # To be able to reach "curl_config.h"
-  ${CURL_BINARY_DIR}/include      # To be able to reach "curl/curl.h"
+  ${CARL_SOURCE_DIR}/lib          # To be able to reach "carl_setup_once.h"
+  ${CARL_SOURCE_DIR}/tests/libtest
+  ${CARL_SOURCE_DIR}/src
+  ${CARL_BINARY_DIR}/lib          # To be able to reach "carl_config.h"
+  ${CARL_BINARY_DIR}/include      # To be able to reach "carl/carl.h"
 )
 
 foreach(_testfile ${UT_SRC})
@@ -63,7 +63,7 @@ foreach(_testfile ${UT_SRC})
   get_filename_component(_testname ${_testfile} NAME_WE)
   add_executable(${_testname} EXCLUDE_FROM_ALL ${_testfile} ${UT_COMMON_FILES})
   #add_dependencies(testdeps ${_testname})
-  target_link_libraries(${_testname} libcurl ${CURL_LIBS})
+  target_link_libraries(${_testname} libcarl ${CARL_LIBS})
   set_target_properties(${_testname}
       PROPERTIES COMPILE_DEFINITIONS "UNITTESTS")
 endforeach()

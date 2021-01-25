@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,31 +20,31 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "vtls/vtls.h"
 #include "sendf.h"
 #include "rand.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
-static CURLcode randit(struct Curl_easy *data, unsigned int *rnd)
+static CARLcode randit(struct Curl_easy *data, unsigned int *rnd)
 {
   unsigned int r;
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   static unsigned int randseed;
   static bool seeded = FALSE;
 
-#ifdef CURLDEBUG
-  char *force_entropy = getenv("CURL_ENTROPY");
+#ifdef CARLDEBUG
+  char *force_entropy = getenv("CARL_ENTROPY");
   if(force_entropy) {
     if(!seeded) {
       unsigned int seed = 0;
@@ -58,13 +58,13 @@ static CURLcode randit(struct Curl_easy *data, unsigned int *rnd)
     else
       randseed++;
     *rnd = randseed;
-    return CURLE_OK;
+    return CARLE_OK;
   }
 #endif
 
   /* data may be NULL! */
   result = Curl_ssl_random(data, (unsigned char *)rnd, sizeof(*rnd));
-  if(result != CURLE_NOT_BUILT_IN)
+  if(result != CARLE_NOT_BUILT_IN)
     /* only if there is no random function in the TLS backend do the non crypto
        version, otherwise return result */
     return result;
@@ -86,7 +86,7 @@ static CURLcode randit(struct Curl_easy *data, unsigned int *rnd)
 #endif
 
   if(!seeded) {
-    struct curltime now = Curl_now();
+    struct carltime now = Curl_now();
     infof(data, "WARNING: Using weak random seed\n");
     randseed += (unsigned int)now.tv_usec + (unsigned int)now.tv_sec;
     randseed = randseed * 1103515245 + 12345;
@@ -98,14 +98,14 @@ static CURLcode randit(struct Curl_easy *data, unsigned int *rnd)
   /* Return an unsigned 32-bit pseudo-random number. */
   r = randseed = randseed * 1103515245 + 12345;
   *rnd = (r << 16) | ((r >> 16) & 0xFFFF);
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 /*
  * Curl_rand() stores 'num' number of random unsigned integers in the buffer
  * 'rndptr' points to.
  *
- * If libcurl is built without TLS support or with a TLS backend that lacks a
+ * If libcarl is built without TLS support or with a TLS backend that lacks a
  * proper random API (Gskit or mbedTLS), this function will use "weak" random.
  *
  * When built *with* TLS support and a backend that offers strong random, it
@@ -116,9 +116,9 @@ static CURLcode randit(struct Curl_easy *data, unsigned int *rnd)
  *
  */
 
-CURLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num)
+CARLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num)
 {
-  CURLcode result = CURLE_BAD_FUNCTION_ARGUMENT;
+  CARLcode result = CARLE_BAD_FUNCTION_ARGUMENT;
 
   DEBUGASSERT(num > 0);
 
@@ -147,10 +147,10 @@ CURLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num)
  * size.
  */
 
-CURLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
+CARLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
                        size_t num)
 {
-  CURLcode result = CURLE_BAD_FUNCTION_ARGUMENT;
+  CARLcode result = CARLE_BAD_FUNCTION_ARGUMENT;
   const char *hex = "0123456789abcdef";
   unsigned char buffer[128];
   unsigned char *bufp = buffer;
@@ -164,7 +164,7 @@ CURLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
 
   if((num/2 >= sizeof(buffer)) || !(num&1))
     /* make sure it fits in the local buffer and that it is an odd number! */
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
 
   num--; /* save one for zero termination */
 

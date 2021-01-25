@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 #
 ###########################################################################
 
-# This Perl package helps with path transforming when running curl tests on
+# This Perl package helps with path transforming when running carl tests on
 # Win32 platform with Msys or Cygwin.
 # Three main functions 'sys_native_abs_path', 'sys_native_path' and
 # 'build_sys_abs_path' autodetect format of given pathnames. Following formats

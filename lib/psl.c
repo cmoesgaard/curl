@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,9 +20,9 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #ifdef USE_LIBPSL
 
@@ -30,8 +30,8 @@
 #include "share.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 void Curl_psl_destroy(struct PslCache *pslcache)
@@ -46,7 +46,7 @@ void Curl_psl_destroy(struct PslCache *pslcache)
 
 static time_t now_seconds(void)
 {
-  struct curltime now = Curl_now();
+  struct carltime now = Curl_now();
 
   return now.tv_sec;
 }
@@ -60,14 +60,14 @@ const psl_ctx_t *Curl_psl_use(struct Curl_easy *easy)
   if(!pslcache)
     return NULL;
 
-  Curl_share_lock(easy, CURL_LOCK_DATA_PSL, CURL_LOCK_ACCESS_SHARED);
+  Curl_share_lock(easy, CARL_LOCK_DATA_PSL, CARL_LOCK_ACCESS_SHARED);
   now = now_seconds();
   if(!pslcache->psl || pslcache->expires <= now) {
     /* Let a chance to other threads to do the job: avoids deadlock. */
-    Curl_share_unlock(easy, CURL_LOCK_DATA_PSL);
+    Curl_share_unlock(easy, CARL_LOCK_DATA_PSL);
 
     /* Update cache: this needs an exclusive lock. */
-    Curl_share_lock(easy, CURL_LOCK_DATA_PSL, CURL_LOCK_ACCESS_SINGLE);
+    Curl_share_lock(easy, CARL_LOCK_DATA_PSL, CARL_LOCK_ACCESS_SINGLE);
 
     /* Recheck in case another thread did the job. */
     now = now_seconds();
@@ -94,18 +94,18 @@ const psl_ctx_t *Curl_psl_use(struct Curl_easy *easy)
         pslcache->expires = expires;
       }
     }
-    Curl_share_unlock(easy, CURL_LOCK_DATA_PSL);  /* Release exclusive lock. */
-    Curl_share_lock(easy, CURL_LOCK_DATA_PSL, CURL_LOCK_ACCESS_SHARED);
+    Curl_share_unlock(easy, CARL_LOCK_DATA_PSL);  /* Release exclusive lock. */
+    Curl_share_lock(easy, CARL_LOCK_DATA_PSL, CARL_LOCK_ACCESS_SHARED);
   }
   psl = pslcache->psl;
   if(!psl)
-    Curl_share_unlock(easy, CURL_LOCK_DATA_PSL);
+    Curl_share_unlock(easy, CARL_LOCK_DATA_PSL);
   return psl;
 }
 
 void Curl_psl_release(struct Curl_easy *easy)
 {
-  Curl_share_unlock(easy, CURL_LOCK_DATA_PSL);
+  Curl_share_unlock(easy, CARL_LOCK_DATA_PSL);
 }
 
 #endif /* USE_LIBPSL */

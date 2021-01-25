@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,13 +22,13 @@
 ###########################################################################
 
 # Experimental hooks are available to run tests remotely on machines that
-# are able to run curl but are unable to run the test harness.
+# are able to run carl but are unable to run the test harness.
 # The following sections need to be modified:
 #
 #  $HOSTIP, $HOST6IP - Set to the address of the host running the test suite
-#  $CLIENTIP, $CLIENT6IP - Set to the address of the host running curl
+#  $CLIENTIP, $CLIENT6IP - Set to the address of the host running carl
 #  runclient, runclientoutput - Modify to copy all the files in the log/
-#    directory to the system running curl, run the given command remotely
+#    directory to the system running carl, run the given command remotely
 #    and save the return code or returned stdout (respectively), then
 #    copy all the files from the remote system's log/ directory back to
 #    the host running the test suite.  This can be done a few ways, such
@@ -38,7 +38,7 @@
 # 'make && make test' needs to be done on both machines before making the
 # above changes and running runtests.pl manually.  In the shared NFS case,
 # the contents of the tests/server/ directory must be from the host
-# running the test suite, while the rest must be from the host running curl.
+# running the test suite, while the rest must be from the host running carl.
 #
 # Note that even with these changes a number of tests will still fail (mainly
 # to do with cookies, those that set environment variables, or those that
@@ -48,7 +48,7 @@
 #
 # Finally, to properly support -g and -n, checktestcmd needs to change
 # to check the remote system's PATH, and the places in the code where
-# the curl binary is read directly to determine its type also need to be
+# the carl binary is read directly to determine its type also need to be
 # fixed. As long as the -g option is never given, and the -n is always
 # given, this won't be a problem.
 
@@ -124,8 +124,8 @@ require "appveyor.pm";
 
 my $HOSTIP="127.0.0.1";   # address on which the test server listens
 my $HOST6IP="[::1]";      # address on which the test server listens
-my $CLIENTIP="127.0.0.1"; # address which curl uses for incoming connections
-my $CLIENT6IP="[::1]";    # address which curl uses for incoming connections
+my $CLIENTIP="127.0.0.1"; # address which carl uses for incoming connections
+my $CLIENT6IP="[::1]";    # address which carl uses for incoming connections
 
 my $noport="[not running]";
 
@@ -164,26 +164,26 @@ my $TELNETPORT=$noport;  # TELNET server port with negotiation
 my $HTTPUNIXPATH;        # HTTP server Unix domain socket path
 
 my $SSHSRVMD5 = "[uninitialized]"; # MD5 of ssh server public key
-my $VERSION;             # curl's reported version number
+my $VERSION;             # carl's reported version number
 
 my $srcdir = $ENV{'srcdir'} || '.';
-my $CURL="../src/curl".exe_ext('TOOL'); # what curl executable to run on the tests
-my $VCURL=$CURL;   # what curl binary to use to verify the servers with
-                   # VCURL is handy to set to the system one when the one you
+my $CARL="../src/carl".exe_ext('TOOL'); # what carl executable to run on the tests
+my $VCARL=$CARL;   # what carl binary to use to verify the servers with
+                   # VCARL is handy to set to the system one when the one you
                    # just built hangs or crashes and thus prevent verification
-my $DBGCURL=$CURL; #"../src/.libs/curl";  # alternative for debugging
+my $DBGCARL=$CARL; #"../src/.libs/carl";  # alternative for debugging
 my $LOGDIR="log";
 my $TESTDIR="$srcdir/data";
 my $LIBDIR="./libtest";
 my $UNITDIR="./unit";
 # TODO: change this to use server_inputfilename()
-my $SERVERIN="$LOGDIR/server.input"; # what curl sent the server
-my $SERVER2IN="$LOGDIR/server2.input"; # what curl sent the second server
-my $PROXYIN="$LOGDIR/proxy.input"; # what curl sent the proxy
-my $CURLLOG="commands.log"; # all command lines run
+my $SERVERIN="$LOGDIR/server.input"; # what carl sent the server
+my $SERVER2IN="$LOGDIR/server2.input"; # what carl sent the second server
+my $PROXYIN="$LOGDIR/proxy.input"; # what carl sent the proxy
+my $CARLLOG="commands.log"; # all command lines run
 my $FTPDCMD="$LOGDIR/ftpserver.cmd"; # copy server instructions here
 my $SERVERLOGS_LOCK="$LOGDIR/serverlogs.lock"; # server logs advisor read lock
-my $CURLCONFIG="../curl-config"; # curl-config from current build
+my $CARLCONFIG="../carl-config"; # carl-config from current build
 
 # Normally, all test cases should be run, but at times it is handy to
 # simply run a particular one:
@@ -201,7 +201,7 @@ my $perl="perl -I$srcdir";
 my $server_response_maxtime=13;
 
 my $debug_build=0;          # built debug enabled (--enable-debug)
-my $has_memory_tracking=0;  # built with memory tracking (--enable-curldebug)
+my $has_memory_tracking=0;  # built with memory tracking (--enable-carldebug)
 my $libtool;
 my $repeat = 0;
 
@@ -227,37 +227,37 @@ my $httptlssrv = find_httptlssrv();
 my $uname_release = `uname -r`;
 my $is_wsl = $uname_release =~ /Microsoft$/;
 
-my $has_ssl;        # set if libcurl is built with SSL support
-my $has_largefile;  # set if libcurl is built with large file support
-my $has_idn;        # set if libcurl is built with IDN support
+my $has_ssl;        # set if libcarl is built with SSL support
+my $has_largefile;  # set if libcarl is built with large file support
+my $has_idn;        # set if libcarl is built with IDN support
 my $http_ipv6;      # set if HTTP server has IPv6 support
 my $http_unix;      # set if HTTP server has Unix sockets support
 my $ftp_ipv6;       # set if FTP server has IPv6 support
 my $tftp_ipv6;      # set if TFTP server has IPv6 support
 my $gopher_ipv6;    # set if Gopher server has IPv6 support
-my $has_ipv6;       # set if libcurl is built with IPv6 support
-my $has_unix;       # set if libcurl is built with Unix sockets support
-my $has_libz;       # set if libcurl is built with libz support
-my $has_brotli;     # set if libcurl is built with brotli support
-my $has_zstd;       # set if libcurl is built with zstd support
+my $has_ipv6;       # set if libcarl is built with IPv6 support
+my $has_unix;       # set if libcarl is built with Unix sockets support
+my $has_libz;       # set if libcarl is built with libz support
+my $has_brotli;     # set if libcarl is built with brotli support
+my $has_zstd;       # set if libcarl is built with zstd support
 my $has_getrlimit;  # set if system has getrlimit()
-my $has_ntlm;       # set if libcurl is built with NTLM support
-my $has_ntlm_wb;    # set if libcurl is built with NTLM delegation to winbind
-my $has_sspi;       # set if libcurl is built with Windows SSPI
-my $has_gssapi;     # set if libcurl is built with a GSS-API library
-my $has_kerberos;   # set if libcurl is built with Kerberos support
-my $has_spnego;     # set if libcurl is built with SPNEGO support
-my $has_charconv;   # set if libcurl is built with CharConv support
-my $has_tls_srp;    # set if libcurl is built with TLS-SRP support
-my $has_metalink;   # set if curl is built with Metalink support
-my $has_http2;      # set if libcurl is built with HTTP2 support
-my $has_httpsproxy; # set if libcurl is built with HTTPS-proxy support
-my $has_crypto;     # set if libcurl is built with cryptographic support
+my $has_ntlm;       # set if libcarl is built with NTLM support
+my $has_ntlm_wb;    # set if libcarl is built with NTLM delegation to winbind
+my $has_sspi;       # set if libcarl is built with Windows SSPI
+my $has_gssapi;     # set if libcarl is built with a GSS-API library
+my $has_kerberos;   # set if libcarl is built with Kerberos support
+my $has_spnego;     # set if libcarl is built with SPNEGO support
+my $has_charconv;   # set if libcarl is built with CharConv support
+my $has_tls_srp;    # set if libcarl is built with TLS-SRP support
+my $has_metalink;   # set if carl is built with Metalink support
+my $has_http2;      # set if libcarl is built with HTTP2 support
+my $has_httpsproxy; # set if libcarl is built with HTTPS-proxy support
+my $has_crypto;     # set if libcarl is built with cryptographic support
 my $has_cares;      # set if built with c-ares
 my $has_threadedres;# set if built with threaded resolver
-my $has_psl;        # set if libcurl is built with PSL support
-my $has_altsvc;     # set if libcurl is built with alt-svc support
-my $has_hsts;       # set if libcurl is built with HSTS support
+my $has_psl;        # set if libcarl is built with PSL support
+my $has_altsvc;     # set if libcarl is built with alt-svc support
+my $has_hsts;       # set if libcarl is built with HSTS support
 my $has_ldpreload;  # set if built for systems supporting LD_PRELOAD
 my $has_multissl;   # set if build with MultiSSL support
 my $has_manual;     # set if built with built-in manual
@@ -335,7 +335,7 @@ my $gdbxwin;      # use windowed gdb when using gdb
 my $keepoutfiles; # keep stdout and stderr files after tests
 my $listonly;     # only list the tests
 my $postmortem;   # display detailed info about failed tests
-my $run_event_based; # run curl with --test-event to test the event API
+my $run_event_based; # run carl with --test-event to test the event API
 
 my %run;          # running server
 my %doesntrun;    # servers that don't work, identified by pidfile
@@ -377,11 +377,11 @@ if (!$USER) {
     }
 }
 
-# enable memory debugging if curl is compiled with it
-$ENV{'CURL_MEMDEBUG'} = $memdump;
-$ENV{'CURL_ENTROPY'}="12345678";
-$ENV{'CURL_FORCETIME'}=1; # for debug NTLM magic
-$ENV{'CURL_GLOBAL_INIT'}=1; # debug curl_global_init/cleanup use
+# enable memory debugging if carl is compiled with it
+$ENV{'CARL_MEMDEBUG'} = $memdump;
+$ENV{'CARL_ENTROPY'}="12345678";
+$ENV{'CARL_FORCETIME'}=1; # for debug NTLM magic
+$ENV{'CARL_GLOBAL_INIT'}=1; # debug carl_global_init/cleanup use
 $ENV{'HOME'}=$pwd;
 $ENV{'COLUMNS'}=79; # screen width!
 
@@ -412,7 +412,7 @@ foreach $protocol (('ftp', 'http', 'ftps', 'https', 'no', 'all')) {
 
 delete $ENV{'SSL_CERT_DIR'} if($ENV{'SSL_CERT_DIR'});
 delete $ENV{'SSL_CERT_PATH'} if($ENV{'SSL_CERT_PATH'});
-delete $ENV{'CURL_CA_BUNDLE'} if($ENV{'CURL_CA_BUNDLE'});
+delete $ENV{'CARL_CA_BUNDLE'} if($ENV{'CARL_CA_BUNDLE'});
 
 #######################################################################
 # Load serverpidfile and serverportfile hashes with file names for all
@@ -579,7 +579,7 @@ sub get_disttests {
 }
 
 #######################################################################
-# Check for a command in the PATH of the machine running curl.
+# Check for a command in the PATH of the machine running carl.
 #
 sub checktestcmd {
     my ($cmd)=@_;
@@ -595,7 +595,7 @@ sub runclient {
     print "CMD ($ret): $cmd\n" if($verbose && !$torture);
     return $ret;
 
-# This is one way to test curl on a remote machine
+# This is one way to test carl on a remote machine
 #    my $out = system("ssh $CLIENTIP cd \'$pwd\' \\; \'$cmd\'");
 #    sleep 2;    # time to allow the NFS server to be updated
 #    return $out;
@@ -608,7 +608,7 @@ sub runclientoutput {
     my ($cmd)=@_;
     return `$cmd`;
 
-# This is one way to test curl on a remote machine
+# This is one way to test carl on a remote machine
 #    my @out = `ssh $CLIENTIP cd \'$pwd\' \\; \'$cmd\'`;
 #    sleep 2;    # time to allow the NFS server to be updated
 #    return @out;
@@ -682,7 +682,7 @@ sub torture {
         }
 
         # make the memory allocation function number $limit return failure
-        $ENV{'CURL_MEMLIMIT'} = $limit;
+        $ENV{'CARL_MEMLIMIT'} = $limit;
 
         # remove memdump first to be sure we get a new nice and clean one
         unlink($memdump);
@@ -713,7 +713,7 @@ sub torture {
         #logmsg "$_ Returned " . ($ret >> 8) . "\n";
 
         # Now clear the variable again
-        delete $ENV{'CURL_MEMLIMIT'} if($ENV{'CURL_MEMLIMIT'});
+        delete $ENV{'CARL_MEMLIMIT'} if($ENV{'CARL_MEMLIMIT'});
 
         if(-r "core") {
             # there's core file present now!
@@ -876,7 +876,7 @@ sub verifyhttp {
     $flags .= "--insecure " if($proto eq 'https');
     $flags .= "\"$proto://$ip:$port/${bonus}verifiedserver\"";
 
-    my $cmd = "$VCURL $flags 2>$verifylog";
+    my $cmd = "$VCARL $flags 2>$verifylog";
 
     # verify if our/any server is running on this port
     logmsg "RUN: $cmd\n" if($verbose);
@@ -884,12 +884,12 @@ sub verifyhttp {
 
     $res >>= 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
     if($res && $verbose) {
-        logmsg "RUN: curl command returned $res\n";
+        logmsg "RUN: carl command returned $res\n";
         if(open(FILE, "<$verifylog")) {
             while(my $string = <FILE>) {
                 logmsg "RUN: $string" if($string !~ /^([ \t]*)$/);
@@ -911,7 +911,7 @@ sub verifyhttp {
         $pid = 0+$1;
     }
     elsif($res == 6) {
-        # curl: (6) Couldn't resolve host '::1'
+        # carl: (6) Couldn't resolve host '::1'
         logmsg "RUN: failed to resolve host ($proto://$ip:$port/verifiedserver)\n";
         return -1;
     }
@@ -950,7 +950,7 @@ sub verifyftp {
     $flags .= $extra;
     $flags .= "\"$proto://$ip:$port/verifiedserver\"";
 
-    my $cmd = "$VCURL $flags 2>$verifylog";
+    my $cmd = "$VCARL $flags 2>$verifylog";
 
     # check if this is our server running on this port:
     logmsg "RUN: $cmd\n" if($verbose);
@@ -958,7 +958,7 @@ sub verifyftp {
 
     my $res = $? >> 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
@@ -1013,7 +1013,7 @@ sub verifyrtsp {
     # currently verification is done using http
     $flags .= "\"http://$ip:$port/verifiedserver\"";
 
-    my $cmd = "$VCURL $flags 2>$verifylog";
+    my $cmd = "$VCARL $flags 2>$verifylog";
 
     # verify if our/any server is running on this port
     logmsg "RUN: $cmd\n" if($verbose);
@@ -1021,12 +1021,12 @@ sub verifyrtsp {
 
     $res >>= 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
     if($res && $verbose) {
-        logmsg "RUN: curl command returned $res\n";
+        logmsg "RUN: carl command returned $res\n";
         if(open(FILE, "<$verifylog")) {
             while(my $string = <FILE>) {
                 logmsg "RUN: $string" if($string !~ /^([ \t]*)$/);
@@ -1048,7 +1048,7 @@ sub verifyrtsp {
         $pid = 0+$1;
     }
     elsif($res == 6) {
-        # curl: (6) Couldn't resolve host '::1'
+        # carl: (6) Couldn't resolve host '::1'
         logmsg "RUN: failed to resolve host ($proto://$ip:$port/verifiedserver)\n";
         return -1;
     }
@@ -1153,7 +1153,7 @@ sub verifyhttptls {
     $flags .= "--tlspassword abc ";
     $flags .= "\"https://$ip:$port/verifiedserver\"";
 
-    my $cmd = "$VCURL $flags 2>$verifylog";
+    my $cmd = "$VCARL $flags 2>$verifylog";
 
     # verify if our/any server is running on this port
     logmsg "RUN: $cmd\n" if($verbose);
@@ -1161,12 +1161,12 @@ sub verifyhttptls {
 
     $res >>= 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
     if($res && $verbose) {
-        logmsg "RUN: curl command returned $res\n";
+        logmsg "RUN: carl command returned $res\n";
         if(open(FILE, "<$verifylog")) {
             while(my $string = <FILE>) {
                 logmsg "RUN: $string" if($string !~ /^([ \t]*)$/);
@@ -1199,7 +1199,7 @@ sub verifyhttptls {
         return $pid;
     }
     elsif($res == 6) {
-        # curl: (6) Couldn't resolve host '::1'
+        # carl: (6) Couldn't resolve host '::1'
         logmsg "RUN: failed to resolve host (https://$ip:$port/verifiedserver)\n";
         return -1;
     }
@@ -1256,11 +1256,11 @@ sub verifysmb {
     $flags .= "--silent ";
     $flags .= "--verbose ";
     $flags .= "--globoff ";
-    $flags .= "-u 'curltest:curltest' ";
+    $flags .= "-u 'carltest:carltest' ";
     $flags .= $extra;
     $flags .= "\"$proto://$ip:$port/SERVER/verifiedserver\"";
 
-    my $cmd = "$VCURL $flags 2>$verifylog";
+    my $cmd = "$VCARL $flags 2>$verifylog";
 
     # check if this is our server running on this port:
     logmsg "RUN: $cmd\n" if($verbose);
@@ -1268,7 +1268,7 @@ sub verifysmb {
 
     my $res = $? >> 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
@@ -1321,7 +1321,7 @@ sub verifytelnet {
     $flags .= $extra;
     $flags .= "\"$proto://$ip:$port\"";
 
-    my $cmd = "echo 'verifiedserver' | $VCURL $flags 2>$verifylog";
+    my $cmd = "echo 'verifiedserver' | $VCARL $flags 2>$verifylog";
 
     # check if this is our server running on this port:
     logmsg "RUN: $cmd\n" if($verbose);
@@ -1329,7 +1329,7 @@ sub verifytelnet {
 
     my $res = $? >> 8; # rotate the result
     if($res & 128) {
-        logmsg "RUN: curl command died with a coredump\n";
+        logmsg "RUN: carl command died with a coredump\n";
         return -1;
     }
 
@@ -2234,7 +2234,7 @@ sub runsshserver {
         return (0,0,0);
     }
 
-    my $hstpubmd5f = "curl_host_rsa_key.pub_md5";
+    my $hstpubmd5f = "carl_host_rsa_key.pub_md5";
     if(!open(PUBMD5FILE, "<", $hstpubmd5f) ||
        (read(PUBMD5FILE, $SSHSRVMD5, 32) != 32) ||
        !close(PUBMD5FILE) ||
@@ -2832,32 +2832,32 @@ sub setupfeatures {
 }
 
 #######################################################################
-# display information about curl and the host the test suite runs on
+# display information about carl and the host the test suite runs on
 #
 sub checksystem {
 
     unlink($memdump); # remove this if there was one left
 
     my $feat;
-    my $curl;
-    my $libcurl;
+    my $carl;
+    my $libcarl;
     my $versretval;
     my $versnoexec;
     my @version=();
     my @disabled;
     my $dis = "";
 
-    my $curlverout="$LOGDIR/curlverout.log";
-    my $curlvererr="$LOGDIR/curlvererr.log";
-    my $versioncmd="$CURL --version 1>$curlverout 2>$curlvererr";
+    my $carlverout="$LOGDIR/carlverout.log";
+    my $carlvererr="$LOGDIR/carlvererr.log";
+    my $versioncmd="$CARL --version 1>$carlverout 2>$carlvererr";
 
-    unlink($curlverout);
-    unlink($curlvererr);
+    unlink($carlverout);
+    unlink($carlvererr);
 
     $versretval = runclient($versioncmd);
     $versnoexec = $!;
 
-    open(VERSOUT, "<$curlverout");
+    open(VERSOUT, "<$carlverout");
     @version = <VERSOUT>;
     close(VERSOUT);
 
@@ -2874,72 +2874,72 @@ sub checksystem {
     for(@version) {
         chomp;
 
-        if($_ =~ /^curl ([^ ]*)/) {
-            $curl = $_;
+        if($_ =~ /^carl ([^ ]*)/) {
+            $carl = $_;
             $VERSION = $1;
-            $curl =~ s/^(.*)(libcurl.*)/$1/g;
+            $carl =~ s/^(.*)(libcarl.*)/$1/g;
 
-            $libcurl = $2;
-            if($curl =~ /linux|bsd|solaris/) {
+            $libcarl = $2;
+            if($carl =~ /linux|bsd|solaris/) {
                 $has_ldpreload = 1;
             }
-            if($curl =~ /win32|Windows|mingw(32|64)/) {
+            if($carl =~ /win32|Windows|mingw(32|64)/) {
                 # This is a Windows MinGW build or native build, we need to use
                 # Win32-style path.
                 $pwd = pathhelp::sys_native_current_path();
                 $has_textaware = 1;
                 $has_win32 = 1;
-                $has_mingw = 1 if ($curl =~ /-pc-mingw32/);
+                $has_mingw = 1 if ($carl =~ /-pc-mingw32/);
             }
-           if ($libcurl =~ /(winssl|schannel)/i) {
+           if ($libcarl =~ /(winssl|schannel)/i) {
                $has_schannel=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /openssl/i) {
+           elsif ($libcarl =~ /openssl/i) {
                $has_openssl=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /gnutls/i) {
+           elsif ($libcarl =~ /gnutls/i) {
                $has_gnutls=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /nss/i) {
+           elsif ($libcarl =~ /nss/i) {
                $has_nss=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /wolfssl/i) {
+           elsif ($libcarl =~ /wolfssl/i) {
                $has_wolfssl=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /securetransport/i) {
+           elsif ($libcarl =~ /securetransport/i) {
                $has_sectransp=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /BoringSSL/i) {
+           elsif ($libcarl =~ /BoringSSL/i) {
                $has_boringssl=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /libressl/i) {
+           elsif ($libcarl =~ /libressl/i) {
                $has_libressl=1;
                $has_sslpinning=1;
            }
-           elsif ($libcurl =~ /mbedTLS/i) {
+           elsif ($libcarl =~ /mbedTLS/i) {
                $has_mbedtls=1;
                $has_sslpinning=1;
            }
-           if ($libcurl =~ /ares/i) {
+           if ($libcarl =~ /ares/i) {
                $has_cares=1;
                $resolver="c-ares";
            }
-           if ($libcurl =~ /mesalink/i) {
+           if ($libcarl =~ /mesalink/i) {
                $has_mesalink=1;
            }
-           if ($libcurl =~ /Hyper/i) {
+           if ($libcarl =~ /Hyper/i) {
                $has_hyper=1;
            }
         }
         elsif($_ =~ /^Protocols: (.*)/i) {
-            # these are the protocols compiled in to this libcurl
+            # these are the protocols compiled in to this libcarl
             @protocols = split(' ', lc($1));
 
             # Generate a "proto-ipv6" version of each protocol to match the
@@ -2957,11 +2957,11 @@ sub checksystem {
         elsif($_ =~ /^Features: (.*)/i) {
             $feat = $1;
             if($feat =~ /TrackMemory/i) {
-                # built with memory tracking support (--enable-curldebug)
+                # built with memory tracking support (--enable-carldebug)
                 $has_memory_tracking = 1;
             }
             if($feat =~ /debug/i) {
-                # curl was built with --enable-debug
+                # carl was built with --enable-debug
                 $debug_build = 1;
             }
             if($feat =~ /SSL/i) {
@@ -3073,7 +3073,7 @@ sub checksystem {
         }
         #
         # Test harness currently uses a non-stunnel server in order to
-        # run HTTP TLS-SRP tests required when curl is built with https
+        # run HTTP TLS-SRP tests required when carl is built with https
         # protocol support and TLS-SRP feature enabled. For convenience
         # 'httptls' may be included in the test harness protocols array
         # to differentiate this from classic stunnel based 'https' test
@@ -3093,8 +3093,8 @@ sub checksystem {
             }
         }
     }
-    if(!$curl) {
-        logmsg "unable to get curl's version, further details are:\n";
+    if(!$carl) {
+        logmsg "unable to get carl's version, further details are:\n";
         logmsg "issued command: \n";
         logmsg "$versioncmd \n";
         if ($versretval == -1) {
@@ -3108,15 +3108,15 @@ sub checksystem {
         else {
             logmsg sprintf("command exited with value %d \n", $versretval >> 8);
         }
-        logmsg "contents of $curlverout: \n";
-        displaylogcontent("$curlverout");
-        logmsg "contents of $curlvererr: \n";
-        displaylogcontent("$curlvererr");
-        die "couldn't get curl's version";
+        logmsg "contents of $carlverout: \n";
+        displaylogcontent("$carlverout");
+        logmsg "contents of $carlvererr: \n";
+        displaylogcontent("$carlvererr");
+        die "couldn't get carl's version";
     }
 
-    if(-r "../lib/curl_config.h") {
-        open(CONF, "<../lib/curl_config.h");
+    if(-r "../lib/carl_config.h") {
+        open(CONF, "<../lib/carl_config.h");
         while(<CONF>) {
             if($_ =~ /^\#define HAVE_GETRLIMIT/) {
                 $has_getrlimit = 1;
@@ -3154,11 +3154,11 @@ sub checksystem {
     }
 
     if(!$has_memory_tracking && $torture) {
-        die "can't run torture tests since curl was built without ".
-            "TrackMemory feature (--enable-curldebug)";
+        die "can't run torture tests since carl was built without ".
+            "TrackMemory feature (--enable-carldebug)";
     }
 
-    open(M, "$CURL -M 2>&1|");
+    open(M, "$CARL -M 2>&1|");
     while(my $s = <M>) {
         if($s =~ /built-in manual was disabled at build-time/) {
             $has_manual = 0;
@@ -3169,7 +3169,7 @@ sub checksystem {
     }
     close(M);
 
-    $has_shared = `sh $CURLCONFIG --built-shared`;
+    $has_shared = `sh $CARLCONFIG --built-shared`;
     chomp $has_shared;
 
     my $hostname=join(' ', runclientoutput("hostname"));
@@ -3177,8 +3177,8 @@ sub checksystem {
     my $hostos=$^O;
 
     logmsg ("********* System characteristics ******** \n",
-            "* $curl\n",
-            "* $libcurl\n",
+            "* $carl\n",
+            "* $libcarl\n",
             "* Features: $feat\n",
             "* Disabled: $dis\n",
             "* Host: $hostname",
@@ -3277,7 +3277,7 @@ sub subVariables {
     $$thing =~ s/${prefix}HOSTIP/$HOSTIP/g;
 
     # misc
-    $$thing =~ s/${prefix}CURL/$CURL/g;
+    $$thing =~ s/${prefix}CARL/$CARL/g;
     $$thing =~ s/${prefix}PWD/$pwd/g;
     $$thing =~ s/${prefix}POSIX_PWD/$posix_pwd/g;
     $$thing =~ s/${prefix}VERSION/$VERSION/g;
@@ -3344,17 +3344,17 @@ my $prevupdate;
 sub subNewlines {
     my ($thing) = @_;
 
-    # When curl is built with Hyper, it gets all response headers delivered as
-    # name/value pairs and curl "invents" the newlines when it saves the
-    # headers. Therefore, curl will always save headers with CRLF newlines
+    # When carl is built with Hyper, it gets all response headers delivered as
+    # name/value pairs and carl "invents" the newlines when it saves the
+    # headers. Therefore, carl will always save headers with CRLF newlines
     # when built to use Hyper. By making sure we deliver all tests using CRLF
     # as well, all test comparisons will survive without knowing about this
     # little quirk.
 
     if(($$thing =~ /^HTTP\/(1.1|1.0|2) [1-5][^\x0d]*\z/) ||
        (($$thing =~ /^[a-z0-9_-]+: [^\x0d]*\z/i) &&
-        # skip curl error messages
-        ($$thing !~ /^curl: \(\d+\) /))) {
+        # skip carl error messages
+        ($$thing !~ /^carl: \(\d+\) /))) {
         # enforce CRLF newline
         $$thing =~ s/\x0a/\x0d\x0a/;
         $prevupdate = 1;
@@ -3463,7 +3463,7 @@ sub prepro {
 # Run a single specified test case
 #
 sub singletest {
-    my ($evbased, # 1 means switch on if possible (and "curl" is tested)
+    my ($evbased, # 1 means switch on if possible (and "carl" is tested)
                   # returns "not a test" if it can't be used for this test
         $testnum,
         $count,
@@ -3518,7 +3518,7 @@ sub singletest {
                 next;
             }
 
-            $why = "curl lacks $1 support";
+            $why = "carl lacks $1 support";
             last;
         }
     }
@@ -3538,7 +3538,7 @@ sub singletest {
                 next;
             }
 
-            $why = "curl has $1 support";
+            $why = "carl has $1 support";
             last;
         }
     }
@@ -3597,10 +3597,10 @@ sub singletest {
 
     # create test result in CI services
     if(azure_check_environment() && $AZURE_RUN_ID) {
-        $AZURE_RESULT_ID = azure_create_test_result($VCURL, $AZURE_RUN_ID, $testnum, $testname);
+        $AZURE_RESULT_ID = azure_create_test_result($VCARL, $AZURE_RUN_ID, $testnum, $testname);
     }
     elsif(appveyor_check_environment()) {
-        appveyor_create_test_result($VCURL, $testnum, $testname);
+        appveyor_create_test_result($VCARL, $testnum, $testname);
     }
 
     # remove test server commands file before servers are started/verified
@@ -3745,10 +3745,10 @@ sub singletest {
         }
     }
 
-    # this is the valid protocol blurb curl should generate
+    # this is the valid protocol blurb carl should generate
     my @protocol= getpart("verify", "protocol");
 
-    # this is the valid protocol blurb curl should generate to a proxy
+    # this is the valid protocol blurb carl should generate to a proxy
     my @proxyprot = getpart("verify", "proxy");
 
     # redirected stdout/stderr to these files
@@ -3772,7 +3772,7 @@ sub singletest {
     # if this section exists, it might be FTP server instructions:
     my @ftpservercmd = getpart("reply", "servercmd");
 
-    my $CURLOUT="$LOGDIR/curl$testnum.out"; # curl output if not stdout
+    my $CARLOUT="$LOGDIR/carl$testnum.out"; # carl output if not stdout
 
     # name of the test
     logmsg "[$testname]\n" if(!$short);
@@ -3848,7 +3848,7 @@ sub singletest {
         #We may slap on --output!
         if (!@validstdout ||
                 ($cmdhash{'option'} && $cmdhash{'option'} =~ /force-output/)) {
-            $out=" --output $CURLOUT ";
+            $out=" --output $CARLOUT ";
         }
     }
 
@@ -3887,7 +3887,7 @@ sub singletest {
         $disablevalgrind=1;
     }
     elsif(!$tool && !$keywords{"unittest"}) {
-        # run curl, add suitable command line options
+        # run carl, add suitable command line options
         my $inc="";
         if((!$cmdhash{'option'}) || ($cmdhash{'option'} !~ /no-include/)) {
             $inc = " --include";
@@ -3909,7 +3909,7 @@ sub singletest {
     }
     else {
         $cmdargs = " $cmd"; # $cmd is the command line for the test file
-        $CURLOUT = $STDOUT; # sends received data to stdout
+        $CARLOUT = $STDOUT; # sends received data to stdout
 
         # Default the tool to a unit test with the same name as the test spec
         if($keywords{"unittest"} && !$tool) {
@@ -3928,7 +3928,7 @@ sub singletest {
             timestampskippedevents($testnum);
             return -1;
         }
-        $DBGCURL=$CMDLINE;
+        $DBGCARL=$CMDLINE;
     }
 
     if($gdbthis) {
@@ -3960,7 +3960,7 @@ sub singletest {
     }
 
     if(!$tool) {
-        $CMDLINE="$CURL";
+        $CMDLINE="$CARL";
     }
 
     my $usevalgrind;
@@ -3985,7 +3985,7 @@ sub singletest {
         logmsg "$CMDLINE\n";
     }
 
-    open(CMDLOG, ">", "$LOGDIR/$CURLLOG");
+    open(CMDLOG, ">", "$LOGDIR/$CARLLOG");
     print CMDLOG "$CMDLINE\n";
     close(CMDLOG);
 
@@ -4010,11 +4010,11 @@ sub singletest {
     if ($torture) {
         $cmdres = torture($CMDLINE,
                           $testnum,
-                          "$gdb --directory $LIBDIR $DBGCURL -x $LOGDIR/gdbcmd");
+                          "$gdb --directory $LIBDIR $DBGCARL -x $LOGDIR/gdbcmd");
     }
     elsif($gdbthis) {
         my $GDBW = ($gdbxwin) ? "-w" : "";
-        runclient("$gdb --directory $LIBDIR $DBGCURL $GDBW -x $LOGDIR/gdbcmd");
+        runclient("$gdb --directory $LIBDIR $DBGCARL $GDBW -x $LOGDIR/gdbcmd");
         $cmdres=0; # makes it always continue after a debugged run
     }
     else {
@@ -4048,7 +4048,7 @@ sub singletest {
             open(GDBCMD, ">$LOGDIR/gdbcmd2");
             print GDBCMD "bt\n";
             close(GDBCMD);
-            runclient("$gdb --directory libtest -x $LOGDIR/gdbcmd2 -batch $DBGCURL core ");
+            runclient("$gdb --directory libtest -x $LOGDIR/gdbcmd2 -batch $DBGCARL core ");
      #       unlink("$LOGDIR/gdbcmd2");
         }
     }
@@ -4238,7 +4238,7 @@ sub singletest {
         # Verify the sent request
         my @out = loadarray($SERVERIN);
 
-        # what to cut off from the live protocol sent by curl
+        # what to cut off from the live protocol sent by carl
         my @strip = getpart("verify", "strip");
 
         my @protstrip=@protocol;
@@ -4273,7 +4273,7 @@ sub singletest {
         if((!$out[0] || ($out[0] eq "")) && $protstrip[0]) {
             logmsg "\n $testnum: protocol FAILED!\n".
                 " There was no content at all in the file $SERVERIN.\n".
-                " Server glitch? Total curl failure? Returned: $cmdres\n";
+                " Server glitch? Total carl failure? Returned: $cmdres\n";
             return $errorreturncode;
         }
 
@@ -4291,7 +4291,7 @@ sub singletest {
 
     if(!$replyattr{'nocheck'} && (@reply || $replyattr{'sendzero'})) {
         # verify the received data
-        my @out = loadarray($CURLOUT);
+        my @out = loadarray($CARLOUT);
         $res = compare($testnum, $testname, "data", \@out, \@reply);
         if ($res) {
             return $errorreturncode;
@@ -4330,7 +4330,7 @@ sub singletest {
         # Verify the sent proxy request
         my @out = loadarray($PROXYIN);
 
-        # what to cut off from the live protocol sent by curl, we use the
+        # what to cut off from the live protocol sent by carl, we use the
         # same rules as for <protocol>
         my @strip = getpart("verify", "strip");
 
@@ -4445,7 +4445,7 @@ sub singletest {
     else {
         if(!$short) {
             logmsg sprintf("\n%s returned $cmdres, when expecting %s\n",
-                           (!$tool)?"curl":$tool, $errorcode);
+                           (!$tool)?"carl":$tool, $errorcode);
         }
         logmsg " exit FAILED\n";
         # timestamp test result verification end
@@ -5107,10 +5107,10 @@ sub serverfortest {
             if(! grep /^\Q$server\E$/, @protocols) {
                 if(substr($server,0,5) ne "socks") {
                     if($tlsext) {
-                        return "curl lacks $tlsext support";
+                        return "carl lacks $tlsext support";
                     }
                     else {
-                        return "curl lacks $server server support";
+                        return "carl lacks $server server support";
                     }
                 }
             }
@@ -5277,18 +5277,18 @@ while(@ARGV) {
         $verbose=1;
     }
     elsif ($ARGV[0] eq "-c") {
-        # use this path to curl instead of default
-        $DBGCURL=$CURL="\"$ARGV[1]\"";
+        # use this path to carl instead of default
+        $DBGCARL=$CARL="\"$ARGV[1]\"";
         shift @ARGV;
     }
     elsif ($ARGV[0] eq "-vc") {
-        # use this path to a curl used to verify servers
+        # use this path to a carl used to verify servers
 
         # Particularly useful when you introduce a crashing bug somewhere in
         # the development version as then it won't be able to run any tests
         # since it can't verify the servers!
 
-        $VCURL="\"$ARGV[1]\"";
+        $VCARL="\"$ARGV[1]\"";
         shift @ARGV;
     }
     elsif ($ARGV[0] eq "-d") {
@@ -5397,7 +5397,7 @@ while(@ARGV) {
 Usage: runtests.pl [options] [test selection(s)]
   -a       continue even if a test fails
   -am      automake style output PASS/FAIL: [number] [name]
-  -c path  use this curl executable
+  -c path  use this carl executable
   -d       display server debug info
   -e       event-based execution
   -g       run the test case with gdb
@@ -5415,7 +5415,7 @@ Usage: runtests.pl [options] [test selection(s)]
   --shallow=[num] randomly makes the torture tests "thinner"
   -t[N]    torture (simulate function failures); N means fail Nth function
   -v       verbose output
-  -vc path use this curl only to verify the existing servers
+  -vc path use this carl only to verify the existing servers
   [num]    like "5 6 9" or " 5 to 22 " to run those tests only
   [!num]   like "!5 !6 !9" to disable those tests
   [~num]   like "~5 ~6 ~9" to ignore the result of those tests
@@ -5479,7 +5479,7 @@ if(!$randseed) {
         localtime(time);
     # seed of the month. December 2019 becomes 201912
     $randseed = ($year+1900)*100 + $mon+1;
-    open(C, "$CURL --version 2>/dev/null|");
+    open(C, "$CARL --version 2>/dev/null|");
     my @c = <C>;
     close(C);
     # use the first line of output and get the md5 out of it
@@ -5509,7 +5509,7 @@ if($valgrind) {
         if (($? >> 8)==0) {
             $valgrind_tool="--tool=memcheck";
         }
-        open(C, "<$CURL");
+        open(C, "<$CARL");
         my $l = <C>;
         if($l =~ /^\#\!/) {
             # A shell script. This is typically when built with libtool,
@@ -5532,8 +5532,8 @@ if($valgrind) {
 }
 
 if ($gdbthis) {
-    # open the executable curl and read the first 4 bytes of it
-    open(CHECK, "<$CURL");
+    # open the executable carl and read the first 4 bytes of it
+    open(CHECK, "<$CARL");
     my $c;
     sysread CHECK, $c, 4;
     close(CHECK);
@@ -5561,7 +5561,7 @@ get_disttests();
 init_serverpidfile_hash();
 
 #######################################################################
-# Output curl version and host info being tested
+# Output carl version and host info being tested
 #
 
 if(!$listonly) {
@@ -5748,8 +5748,8 @@ sub displaylogs {
         if(($log =~ /^upload\d+/) && ($log !~ /^upload$testnum/)) {
             next; # skip uploadNnn of other tests
         }
-        if(($log =~ /^curl\d+\.out/) && ($log !~ /^curl$testnum\.out/)) {
-            next; # skip curlNnn.out of other tests
+        if(($log =~ /^carl\d+\.out/) && ($log !~ /^carl$testnum\.out/)) {
+            next; # skip carlNnn.out of other tests
         }
         if(($log =~ /^test\d+\.txt/) && ($log !~ /^test$testnum\.txt/)) {
             next; # skip testNnn.txt of other tests
@@ -5780,7 +5780,7 @@ sub displaylogs {
 #
 
 if(azure_check_environment()) {
-    $AZURE_RUN_ID = azure_create_test_run($VCURL);
+    $AZURE_RUN_ID = azure_create_test_run($VCARL);
     logmsg "Azure Run ID: $AZURE_RUN_ID\n" if ($verbose);
 }
 
@@ -5808,11 +5808,11 @@ foreach $testnum (@at) {
 
     # update test result in CI services
     if(azure_check_environment() && $AZURE_RUN_ID && $AZURE_RESULT_ID) {
-        $AZURE_RESULT_ID = azure_update_test_result($VCURL, $AZURE_RUN_ID, $AZURE_RESULT_ID, $testnum, $error,
+        $AZURE_RESULT_ID = azure_update_test_result($VCARL, $AZURE_RUN_ID, $AZURE_RESULT_ID, $testnum, $error,
                                                     $timeprepini{$testnum}, $timevrfyend{$testnum});
     }
     elsif(appveyor_check_environment()) {
-        appveyor_update_test_result($VCURL, $testnum, $error, $timeprepini{$testnum}, $timevrfyend{$testnum});
+        appveyor_update_test_result($VCARL, $testnum, $error, $timeprepini{$testnum}, $timevrfyend{$testnum});
     }
 
     if($error < 0) {
@@ -5857,7 +5857,7 @@ my $sofar = time() - $start;
 #
 
 if(azure_check_environment() && $AZURE_RUN_ID) {
-    $AZURE_RUN_ID = azure_update_test_run($VCURL, $AZURE_RUN_ID);
+    $AZURE_RUN_ID = azure_update_test_run($VCARL, $AZURE_RUN_ID);
 }
 
 # Tests done, stop the servers

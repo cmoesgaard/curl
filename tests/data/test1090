@@ -60,12 +60,12 @@ http://%HOSTIP:%HTTPPORT/1090 -w "%{num_connects}\n%{num_redirects}\n%{size_down
 <protocol>
 GET /1090 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /10900001 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

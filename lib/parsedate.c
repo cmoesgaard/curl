@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -73,11 +73,11 @@
 
 */
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include <limits.h>
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "strcase.h"
 #include "warnless.h"
 #include "parsedate.h"
@@ -100,8 +100,8 @@ static int parsedate(const char *date, time_t *output);
 #define PARSEDATE_LATER  1
 #define PARSEDATE_SOONER 2
 
-#if !defined(CURL_DISABLE_PARSEDATE) || !defined(CURL_DISABLE_FTP) || \
-  !defined(CURL_DISABLE_FILE)
+#if !defined(CARL_DISABLE_PARSEDATE) || !defined(CARL_DISABLE_FTP) || \
+  !defined(CARL_DISABLE_FILE)
 /* These names are also used by FTP and FILE code */
 const char * const Curl_wkday[] =
 {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -110,7 +110,7 @@ const char * const Curl_month[]=
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 #endif
 
-#ifndef CURL_DISABLE_PARSEDATE
+#ifndef CARL_DISABLE_PARSEDATE
 static const char * const weekday[] =
 { "Monday", "Tuesday", "Wednesday", "Thursday",
   "Friday", "Saturday", "Sunday" };
@@ -393,7 +393,7 @@ static int parsedate(const char *date, time_t *output)
           return PARSEDATE_FAIL;
 #endif
 
-        val = curlx_sltosi(lval);
+        val = carlx_sltosi(lval);
 
         if((tzoff == -1) &&
            ((end - date) == 4) &&
@@ -536,7 +536,7 @@ static int parsedate(const char *date, time_t *output)
 }
 #endif
 
-time_t curl_getdate(const char *p, const time_t *now)
+time_t carl_getdate(const char *p, const time_t *now)
 {
   time_t parsed = -1;
   int rc = parsedate(p, &parsed);
@@ -552,7 +552,7 @@ time_t curl_getdate(const char *p, const time_t *now)
   return -1;
 }
 
-/* Curl_getdate_capped() differs from curl_getdate() in that this will return
+/* Curl_getdate_capped() differs from carl_getdate() in that this will return
    TIME_T_MAX in case the parsed time value was too big, instead of an
    error. */
 
@@ -582,7 +582,7 @@ time_t Curl_getdate_capped(const char *p)
  *
  */
 
-CURLcode Curl_gmtime(time_t intime, struct tm *store)
+CARLcode Curl_gmtime(time_t intime, struct tm *store)
 {
   const struct tm *tm;
 #ifdef HAVE_GMTIME_R
@@ -596,6 +596,6 @@ CURLcode Curl_gmtime(time_t intime, struct tm *store)
 #endif
 
   if(!tm)
-    return CURLE_BAD_FUNCTION_ARGUMENT;
-  return CURLE_OK;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
+  return CARLE_OK;
 }

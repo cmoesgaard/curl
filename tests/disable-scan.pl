@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -34,12 +34,12 @@ my %docs;
 
 # we may get the dir root pointed out
 my $root=$ARGV[0] || ".";
-my $DOCS="CURL-DISABLE.md";
+my $DOCS="CARL-DISABLE.md";
 
 sub scan_configure {
     open S, "<$root/configure.ac";
     while(<S>) {
-        if(/(CURL_DISABLE_[A-Z_]+)/g) {
+        if(/(CARL_DISABLE_[A-Z_]+)/g) {
             my ($sym)=($1);
             $disable{$sym} = 1;
         }
@@ -51,7 +51,7 @@ sub scan_file {
     my ($source)=@_;
     open F, "<$source";
     while(<F>) {
-        if(/(CURL_DISABLE_[A-Z_]+)/g) {
+        if(/(CARL_DISABLE_[A-Z_]+)/g) {
             my ($sym)=($1);
             $file{$sym} = $source;
         }
@@ -81,7 +81,7 @@ sub scan_docs {
     my $line = 0;
     while(<F>) {
         $line++;
-        if(/^## (CURL_DISABLE_[A-Z_]+)/g) {
+        if(/^## (CARL_DISABLE_[A-Z_]+)/g) {
             my ($sym)=($1);
             $docs{$sym} = $line;
         }

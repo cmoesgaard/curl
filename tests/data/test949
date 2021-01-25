@@ -41,7 +41,7 @@ smtp://%HOSTIP:%SMTPPORT/949 --mail-rcpt recipient@example.com --mail-from sende
 #
 # Verify data after the test has been "shot"
 <verify>
-# 67 - CURLE_LOGIN_DENIED
+# 67 - CARLE_LOGIN_DENIED
 <errorcode>
 67
 </errorcode>

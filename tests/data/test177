@@ -41,7 +41,7 @@ http://%HOSTIP:%HTTPPORT/177 -u auser:apasswd --digest -d "junkelijunk"
 <protocol>
 POST /177 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 0
 Content-Type: application/x-www-form-urlencoded

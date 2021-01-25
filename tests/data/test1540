@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLPAUSE_RECV
+CARLPAUSE_RECV
 chunked Transfer-Encoding
 Trailer:
 </keywords>

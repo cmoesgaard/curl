@@ -1,0 +1,84 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_NETRC 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_NETRC \- request that .netrc is used
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_NETRC, long level);
+.SH DESCRIPTION
+This parameter controls the preference \fIlevel\fP of libcarl between using
+user names and passwords from your \fI~/.netrc\fP file, relative to user names
+and passwords in the URL supplied with \fICARLOPT_URL(3)\fP. On Windows,
+libcarl will use the file as \fI%HOME%/_netrc\fP, but you can also tell
+libcarl a different file name to use with \fICARLOPT_NETRC_FILE(3)\fP.
+
+libcarl uses a user name (and supplied or prompted password) supplied with
+\fICARLOPT_USERPWD(3)\fP or \fICARLOPT_USERNAME(3)\fP in preference to any of
+the options controlled by this parameter.
+
+Only machine name, user name and password are taken into account (init macros
+and similar things aren't supported).
+
+libcarl does not verify that the file has the correct properties set (as the
+standard Unix ftp client does). It should only be readable by user.
+
+\fIlevel\fP should be set to one of the values described below.
+
+.IP CARL_NETRC_OPTIONAL
+The use of the \fI~/.netrc\fP file is optional, and information in the URL is
+to be preferred.  The file will be scanned for the host and user name (to find
+the password only) or for the host only, to find the first user name and
+password after that \fImachine\fP, which ever information is not specified.
+
+Undefined values of the option will have this effect.
+.IP CARL_NETRC_IGNORED
+The library will ignore the \fI~/.netrc\fP file.
+
+This is the default.
+.IP CARL_NETRC_REQUIRED
+The use of the \fI~/.netrc\fP file is required, and information in the URL is
+to be ignored.  The file will be scanned for the host and user name (to find
+the password only) or for the host only, to find the first user name and
+password after that \fImachine\fP, which ever information is not specified.
+.SH DEFAULT
+CARL_NETRC_IGNORED
+.SH PROTOCOLS
+Most
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  CARLcode ret;
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com/");
+  carl_easy_setopt(carl, CARLOPT_NETRC, CARL_NETRC_OPTIONAL);
+  ret = carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK
+.SH "SEE ALSO"
+.BR CARLOPT_USERPWD "(3), " CARLOPT_USERNAME "(3), " CARLOPT_NETRC_FILE "(3), "

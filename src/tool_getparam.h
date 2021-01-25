@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_GETPARAM_H
-#define HEADER_CURL_TOOL_GETPARAM_H
+#ifndef HEADER_CARL_TOOL_GETPARAM_H
+#define HEADER_CARL_TOOL_GETPARAM_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -36,8 +36,8 @@ typedef enum {
   PARAM_GOT_EXTRA_PARAMETER,
   PARAM_BAD_NUMERIC,
   PARAM_NEGATIVE_NUMERIC,
-  PARAM_LIBCURL_DOESNT_SUPPORT,
-  PARAM_LIBCURL_UNSUPPORTED_PROTOCOL,
+  PARAM_LIBCARL_DOESNT_SUPPORT,
+  PARAM_LIBCARL_UNSUPPORTED_PROTOCOL,
   PARAM_NO_MEM,
   PARAM_NEXT_OPERATION,
   PARAM_NO_PREFIX,
@@ -62,4 +62,4 @@ void parse_cert_parameter(const char *cert_parameter,
 ParameterError parse_args(struct GlobalConfig *config, int argc,
                           argv_item_t argv[]);
 
-#endif /* HEADER_CURL_TOOL_GETPARAM_H */
+#endif /* HEADER_CARL_TOOL_GETPARAM_H */

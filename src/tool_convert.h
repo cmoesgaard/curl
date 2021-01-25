@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CONVERT_H
-#define HEADER_CURL_TOOL_CONVERT_H
+#ifndef HEADER_CARL_TOOL_CONVERT_H
+#define HEADER_CARL_TOOL_CONVERT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,22 +23,22 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#ifdef CURL_DOES_CONVERSIONS
+#ifdef CARL_DOES_CONVERSIONS
 
 #ifdef HAVE_ICONV
 
-CURLcode convert_to_network(char *buffer, size_t length);
-CURLcode convert_from_network(char *buffer, size_t length);
+CARLcode convert_to_network(char *buffer, size_t length);
+CARLcode convert_from_network(char *buffer, size_t length);
 void convert_cleanup(void);
 
 #endif /* HAVE_ICONV */
 
-char convert_char(curl_infotype infotype, char this_char);
+char convert_char(carl_infotype infotype, char this_char);
 
-#endif /* CURL_DOES_CONVERSIONS */
+#endif /* CARL_DOES_CONVERSIONS */
 
-#if !defined(CURL_DOES_CONVERSIONS) || !defined(HAVE_ICONV)
+#if !defined(CARL_DOES_CONVERSIONS) || !defined(HAVE_ICONV)
 #define convert_cleanup() Curl_nop_stmt
 #endif
 
-#endif /* HEADER_CURL_TOOL_CONVERT_H */
+#endif /* HEADER_CARL_TOOL_CONVERT_H */

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_NONBLOCK_H
-#define HEADER_CURL_NONBLOCK_H
+#ifndef HEADER_CARL_NONBLOCK_H
+#define HEADER_CARL_NONBLOCK_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,9 +22,9 @@
  *
  ***************************************************************************/
 
-#include <curl/curl.h> /* for curl_socket_t */
+#include <carl/carl.h> /* for carl_socket_t */
 
-int curlx_nonblock(curl_socket_t sockfd,    /* operate on this */
+int carlx_nonblock(carl_socket_t sockfd,    /* operate on this */
                    int nonblock   /* TRUE or FALSE */);
 
-#endif /* HEADER_CURL_NONBLOCK_H */
+#endif /* HEADER_CARL_NONBLOCK_H */

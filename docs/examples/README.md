@@ -1,8 +1,8 @@
-# libcurl examples
+# libcarl examples
 
-This directory is for libcurl programming examples. They are meant to show
+This directory is for libcarl programming examples. They are meant to show
 some simple steps on how you can build your own application to take full
-advantage of libcurl.
+advantage of libcarl.
 
 If you end up with other small but still useful example sources, please mail
 them for submission in future packages and on the website.
@@ -14,15 +14,15 @@ examples. Just edit the file according to your system and requirements first.
 
 Most examples should build fine using a command line like this:
 
-    `curl-config --cc --cflags --libs` -o example example.c
+    `carl-config --cc --cflags --libs` -o example example.c
 
 Some compilers don't like having the arguments in this order but instead
 want you do reorganize them like:
 
-    `curl-config --cc` -o example example.c `curl-config --cflags --libs`
+    `carl-config --cc` -o example example.c `carl-config --cflags --libs`
 
-**Please** do not use the `curl.se` site as a test target for your
-libcurl applications/experiments. Even if some of the examples use that site
+**Please** do not use the `carl.se` site as a test target for your
+libcarl applications/experiments. Even if some of the examples use that site
 as a URL at some places, it doesn't mean that the URLs work or that we expect
 you to actually torture our website with your tests!  Thanks.
 

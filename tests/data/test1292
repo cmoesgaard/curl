@@ -40,7 +40,7 @@ Replaced internal headers with a blank one
 <protocol>
 GET /1292 HTTP/1.1
 Host:
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept:
 
 </protocol>

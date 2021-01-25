@@ -1,13 +1,13 @@
-# Building curl with Visual C++
+# Building carl with Visual C++
 
- This document describes how to compile, build and install curl and libcurl
+ This document describes how to compile, build and install carl and libcarl
  from sources using the Visual C++ build tool. To build with VC++, you will of
  course have to first install VC++. The minimum required version of VC is 6
  (part of Visual Studio 6). However using a more recent version is strongly
  recommended.
 
  VC++ is also part of the Windows Platform SDK. You do not have to install the
- full Visual Studio or Visual C++ if all you want is to build curl.
+ full Visual Studio or Visual C++ if all you want is to build carl.
 
  The latest Platform SDK can be downloaded freely from [Windows SDK and
  emulator
@@ -19,7 +19,7 @@
  them separately and copy them to the deps directory as shown below:
 
     somedirectory\
-     |_curl-src
+     |_carl-src
      | |_winbuild
      |
      |_deps
@@ -63,7 +63,7 @@ Open a Visual Studio Command prompt:
  Once you are in the console, go to the winbuild directory in the Curl
  sources:
 
-    cd curl-src\winbuild
+    cd carl-src\winbuild
 
  Then you can call `nmake /f Makefile.vc` with the desired options (see
  below). The builds will be in the top src directory, `builds\` directory, in
@@ -108,7 +108,7 @@ where `<options>` is one or many of:
 ## Static linking of Microsoft's C RunTime (CRT):
 
  If you are using mode=static nmake will create and link to the static build
- of libcurl but *not* the static CRT. If you must you can force nmake to link
+ of libcarl but *not* the static CRT. If you must you can force nmake to link
  in the static CRT by passing RTLIBCFG=static. Typically you shouldn't use
  that option, and nmake will default to the DLL CRT. RTLIBCFG is rarely used
  and therefore rarely tested. When passing RTLIBCFG for a configuration that
@@ -116,17 +116,17 @@ where `<options>` is one or many of:
  differently, you must destroy the build directory containing the
  configuration so that nmake can build it from scratch.
 
-## Building your own application with a static libcurl
+## Building your own application with a static libcarl
 
- When building an application that uses the static libcurl library on Windows,
- you must define CURL_STATICLIB. Otherwise the linker will look for dynamic
+ When building an application that uses the static libcarl library on Windows,
+ you must define CARL_STATICLIB. Otherwise the linker will look for dynamic
  import symbols.
 
 ## Legacy Windows and SSL
 
- When you build curl using the build files in this directory the default SSL
+ When you build carl using the build files in this directory the default SSL
  backend will be Schannel (Windows SSPI), the native SSL library that comes
  with the Windows OS. Schannel in Windows <= XP is not able to connect to
  servers that no longer support the legacy handshakes and algorithms used by
- those versions. If you will be using curl in one of those earlier versions of
+ those versions. If you will be using carl in one of those earlier versions of
  Windows you should choose another SSL backend like OpenSSL.

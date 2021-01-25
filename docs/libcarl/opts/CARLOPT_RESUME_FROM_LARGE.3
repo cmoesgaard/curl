@@ -1,0 +1,74 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_RESUME_FROM_LARGE 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_RESUME_FROM_LARGE \- set a point to resume transfer from
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_RESUME_FROM_LARGE,
+                          carl_off_t from);
+.SH DESCRIPTION
+Pass a carl_off_t as parameter. It contains the offset in number of bytes that
+you want the transfer to start from. Set this option to 0 to make the transfer
+start from the beginning (effectively disabling resume). For FTP, set this
+option to -1 to make the transfer start from the end of the target file
+(useful to continue an interrupted upload).
+
+When doing uploads with FTP, the resume position is where in the local/source
+file libcarl should try to resume the upload from and it will then append the
+source file to the remote target file.
+.SH DEFAULT
+0, not used
+.SH PROTOCOLS
+HTTP, FTP, SFTP, FILE
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_off_t resume_position = GET_IT_SOMEHOW;
+  carl_off_t file_size = GET_IT_SOMEHOW_AS_WELL;
+
+  carl_easy_setopt(carl, CARLOPT_URL, "ftp://example.com");
+
+  /* resuming upload at this position, possibly beyond 2GB */
+  carl_easy_setopt(carl, CARLOPT_RESUME_FROM_LARGE, resume_position);
+
+  /* ask for upload */
+  carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
+
+  /* set total data amount to expect */
+  carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE, file_size);
+
+  /* Perform the request */
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.11.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_RESUME_FROM "(3), " CARLOPT_RANGE "(3), "
+.BR CARLOPT_INFILESIZE_LARGE "(3), "

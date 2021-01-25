@@ -9,7 +9,7 @@
 .\" *
 .\" * This software is licensed as described in the file COPYING, which
 .\" * you should have received as part of this distribution. The terms
-.\" * are also available at https://curl.se/docs/copyright.html.
+.\" * are also available at https://carl.se/docs/copyright.html.
 .\" *
 .\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 .\" * copies of the Software, and permit persons to whom the Software is
@@ -26,8 +26,8 @@ runtests.pl \- run one or more test cases
 .SH SYNOPSIS
 .B runtests.pl [options] [tests]
 .SH DESCRIPTION
-\fIruntests.pl\fP runs one, several or all the existing test cases in curl's
-test suite. It is often called from the root Makefile of the curl package with
+\fIruntests.pl\fP runs one, several or all the existing test cases in carl's
+test suite. It is often called from the root Makefile of the carl package with
 \&'make test'.
 .SH "TESTS"
 Specify which test(s) to run by specifying test numbers or keywords.
@@ -55,18 +55,18 @@ Prefix a keyword with a tilde (~) to still run it, but ignore the results.
 .IP "-a"
 Continue running the rest of the test cases even if one test fails. By
 default, the test script stops as soon as an error is detected.
-.IP "-c <curl>"
-Provide a path to a custom curl binary to run the tests with. Default is the
-curl executable in the build tree.
+.IP "-c <carl>"
+Provide a path to a custom carl binary to run the tests with. Default is the
+carl executable in the build tree.
 .IP "-d"
 Enable protocol debug: have the servers display protocol output.
 .IP "-e"
-Run the test event-based (if possible). This will make runtests invoke curl
-with --test-event option. This option only works if both curl and libcurl were
+Run the test event-based (if possible). This will make runtests invoke carl
+with --test-event option. This option only works if both carl and libcarl were
 built debug-enabled.
 .IP "-g"
 Run the given test(s) with gdb. This is best used on a single test case and
-curl built --disable-shared. This then fires up gdb with command line set to
+carl built --disable-shared. This then fires up gdb with command line set to
 run the specified test case. Simply (set a break-point and) type 'run' to
 start.
 .IP "-h"
@@ -105,7 +105,7 @@ Shorter output. Speaks less than default.
 When using \fI--shallow\fP or \fI-R\rP that random certain aspects of the
 behavior, this option can set the initial seed. If not set, the random seed
 will be set based on the currently set local year and month and the first line
-of the "curl -V" output.
+of the "carl -V" output.
 .IP "--shallow=[num]"
 Used together with \fB-t\fP. This limits the number of tests to fail in
 torture mode to no more than 'num' per test case. If this reduces the amount,
@@ -123,14 +123,14 @@ through everyone, which is very handy when debugging and then often in
 combination with \fI-g\fP.
 .IP "-v"
 Enable verbose output. Speaks more than default.
-.IP "-vc <curl>"
-Provide a path to a custom curl binary to run when verifying that the servers
-running are indeed our test servers. Default is the curl executable in the
+.IP "-vc <carl>"
+Provide a path to a custom carl binary to run when verifying that the servers
+running are indeed our test servers. Default is the carl executable in the
 build tree.
 .SH "RUNNING TESTS"
 Many tests have conditions that must be met before the test case can run
-fine. They could depend on built-in features in libcurl or features present in
-the operating system or even in third-party libraries that curl may or may not
+fine. They could depend on built-in features in libcarl or features present in
+the operating system or even in third-party libraries that carl may or may not
 use.
 .P
 The test script checks most of these by itself to determine when it is

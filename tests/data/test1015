@@ -41,7 +41,7 @@ content to _?!#$'|<>
 <protocol nonewline="yes">
 POST /1015 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 133
 Content-Type: application/x-www-form-urlencoded

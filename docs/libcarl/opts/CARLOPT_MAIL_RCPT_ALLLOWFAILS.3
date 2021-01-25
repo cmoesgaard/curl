@@ -1,0 +1,71 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_MAIL_RCPT_ALLLOWFAILS 3 "16 Jan 2020" "libcarl 7.69.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_MAIL_RCPT_ALLLOWFAILS \- allow RCPT TO command to fail for some recipients
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_MAIL_RCPT_ALLLOWFAILS,
+                          long allow);
+.SH DESCRIPTION
+If \fIallow\fP is set to 1L, allow RCPT TO command to fail for some recipients.
+
+When sending data to multiple recipients, by default carl will abort SMTP
+conversation if at least one of the recipients causes RCPT TO command to
+return an error.
+
+The default behavior can be changed by setting \fIignore\fP to 1L which will
+make carl ignore errors and proceed with the remaining valid recipients.
+
+In case when all recipients cause RCPT TO command to fail, carl will abort SMTP
+conversation and return the error received from to the last RCPT TO command.
+.SH DEFAULT
+0
+.SH PROTOCOLS
+SMTP
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  struct carl_slist *list;
+
+  /* Adding one valid and one invalid email address */
+  list = carl_slist_append(NULL, "person@example.com");
+  list = carl_slist_append(list, "invalidemailaddress");
+
+  carl_easy_setopt(carl, CARLOPT_URL, "smtp://example.com/");
+  carl_easy_setopt(carl, CARLOPT_MAIL_RCPT_ALLLOWFAILS, 1L);
+
+  ret = carl_easy_perform(carl);
+  carl_slist_free_all(list);
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.69.0.
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_MAIL_FROM "(3), " CARLOPT_MAIL_RCPT "(3), "

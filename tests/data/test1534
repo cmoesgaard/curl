@@ -22,12 +22,12 @@ Content-Length: 0
 <server>
 http
 </server>
-# tool is what to use instead of 'curl'
+# tool is what to use instead of 'carl'
 <tool>
 lib1534
 </tool>
 <name>
-CURLINFO_FILETIME init and reset
+CARLINFO_FILETIME init and reset
 </name>
 <command>
 http://%HOSTIP:%HTTPPORT/1534

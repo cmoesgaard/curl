@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,22 +28,22 @@
 
 int test(char *URL)
 {
-  struct curl_slist *header = NULL;
-  curl_off_t retry;
-  CURL *curl = NULL;
+  struct carl_slist *header = NULL;
+  carl_off_t retry;
+  CARL *carl = NULL;
   int res = 0;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_URL, URL);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
-  res = curl_easy_getinfo(curl, CURLINFO_RETRY_AFTER, &retry);
+  res = carl_easy_getinfo(carl, CARLINFO_RETRY_AFTER, &retry);
   if(res)
     goto test_cleanup;
 
@@ -53,14 +53,14 @@ int test(char *URL)
   retry += time(NULL);
   retry /= 10000;
 #endif
-  printf("Retry-After: %" CURL_FORMAT_CURL_OFF_T "\n", retry);
+  printf("Retry-After: %" CARL_FORMAT_CARL_OFF_T "\n", retry);
 
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
-  curl_slist_free_all(header);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_slist_free_all(header);
+  carl_global_cleanup();
 
   return res;
 }

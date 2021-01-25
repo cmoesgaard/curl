@@ -1,0 +1,92 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_IOCTLFUNCTION 3 "16 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_IOCTLFUNCTION \- callback for I/O operations
+.SH SYNOPSIS
+.nf
+#include <carl/carl.h>
+
+typedef enum {
+  CARLIOE_OK,            /* I/O operation successful */
+  CARLIOE_UNKNOWNCMD,    /* command was unknown to callback */
+  CARLIOE_FAILRESTART,   /* failed to restart the read */
+  CARLIOE_LAST           /* never use */
+} carlioerr;
+
+typedef enum  {
+  CARLIOCMD_NOP,         /* no operation */
+  CARLIOCMD_RESTARTREAD, /* restart the read stream from start */
+  CARLIOCMD_LAST         /* never use */
+} carliocmd;
+
+carlioerr ioctl_callback(CARL *handle, int cmd, void *clientp);
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_IOCTLFUNCTION, ioctl_callback);
+.SH DESCRIPTION
+Pass a pointer to your callback function, which should match the prototype
+shown above.
+
+This callback function gets called by libcarl when something special
+I/O-related needs to be done that the library can't do by itself. For now,
+rewinding the read data stream is the only action it can request. The
+rewinding of the read data stream may be necessary when doing an HTTP PUT or
+POST with a multi-pass authentication method.
+
+The callback MUST return \fICARLIOE_UNKNOWNCMD\fP if the input \fIcmd\fP is
+not \fICARLIOCMD_RESTARTREAD\fP.
+
+The \fIclientp\fP argument to the callback is set with the
+\fICARLOPT_IOCTLDATA(3)\fP option.
+
+This option is deprecated! Do not use it. Use \fICARLOPT_SEEKFUNCTION(3)\fP
+instead to provide seeking! If \fICARLOPT_SEEKFUNCTION(3)\fP is set, this
+parameter will be ignored when seeking.
+.SH DEFAULT
+By default, this parameter is set to NULL. Not used.
+.SH PROTOCOLS
+Used with HTTP
+.SH EXAMPLE
+.nf
+static carlioerr ioctl_callback(CARL *handle, int cmd, void *clientp)
+{
+  struct data *io = (struct data *)clientp;
+  if(cmd == CARLIOCMD_RESTARTREAD) {
+    lseek(fd, 0, SEEK_SET);
+    current_offset = 0;
+    return CARLIOE_OK;
+  }
+  return CARLIOE_UNKNOWNCMD;
+}
+{
+  struct data ioctl_data;
+  carl_easy_setopt(carl, CARLOPT_IOCTLFUNCTION, ioctl_callback);
+  carl_easy_setopt(carl, CARLOPT_IOCTLDATA, &ioctl_data);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.12.3
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_IOCTLDATA "(3), " CARLOPT_SEEKFUNCTION "(3), "

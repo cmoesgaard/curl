@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HTTP_CHUNKS_H
-#define HEADER_CURL_HTTP_CHUNKS_H
+#ifndef HEADER_CARL_HTTP_CHUNKS_H
+#define HEADER_CARL_HTTP_CHUNKS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,9 +27,9 @@ struct connectdata;
 /*
  * The longest possible hexadecimal number we support in a chunked transfer.
  * Neither RFC2616 nor the later HTTP specs define a maximum chunk size.
- * For 64 bit curl_off_t we support 16 digits. For 32 bit, 8 digits.
+ * For 64 bit carl_off_t we support 16 digits. For 32 bit, 8 digits.
  */
-#define CHUNK_MAXNUM_LEN (SIZEOF_CURL_OFF_T * 2)
+#define CHUNK_MAXNUM_LEN (SIZEOF_CARL_OFF_T * 2)
 
 typedef enum {
   /* await and buffer all hexadecimal digits until we get one that isn't a
@@ -76,7 +76,7 @@ typedef enum {
   CHUNKE_BAD_CHUNK,
   CHUNKE_BAD_ENCODING,
   CHUNKE_OUT_OF_MEMORY,
-  CHUNKE_PASSTHRU_ERROR, /* Curl_httpchunk_read() returns a CURLcode to use */
+  CHUNKE_PASSTHRU_ERROR, /* Curl_httpchunk_read() returns a CARLcode to use */
   CHUNKE_LAST
 } CHUNKcode;
 
@@ -86,7 +86,7 @@ struct Curl_chunker {
   char hexbuffer[ CHUNK_MAXNUM_LEN + 1]; /* +1 for null-terminator */
   int hexindex;
   ChunkyState state;
-  curl_off_t datasize;
+  carl_off_t datasize;
   size_t dataleft; /* untouched data amount at the end of the last buffer */
 };
 
@@ -94,6 +94,6 @@ struct Curl_chunker {
 void Curl_httpchunk_init(struct Curl_easy *data);
 CHUNKcode Curl_httpchunk_read(struct Curl_easy *data, char *datap,
                               ssize_t length, ssize_t *wrote,
-                              CURLcode *passthru);
+                              CARLcode *passthru);
 
-#endif /* HEADER_CURL_HTTP_CHUNKS_H */
+#endif /* HEADER_CARL_HTTP_CHUNKS_H */

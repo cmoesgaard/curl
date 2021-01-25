@@ -20,7 +20,7 @@ ftp://bad%0auser:passwd@%HOSTIP:%FTPPORT/225%0a
 
 # Verify data after the test has been "shot"
 <verify>
-# 3 == CURLE_URL_MALFORMAT
+# 3 == CARLE_URL_MALFORMAT
 <errorcode>
 3
 </errorcode>

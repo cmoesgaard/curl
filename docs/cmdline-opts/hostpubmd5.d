@@ -6,5 +6,5 @@ Added: 7.17.1
 Category: sftp scp
 ---
 Pass a string containing 32 hexadecimal digits. The string should
-be the 128 bit MD5 checksum of the remote host's public key, curl will refuse
+be the 128 bit MD5 checksum of the remote host's public key, carl will refuse
 the connection with the host unless the md5sums match.

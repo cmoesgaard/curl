@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -37,7 +37,7 @@
 #include <nspr.h>
 #endif
 
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
 #  define MEMDEBUG_NODEFINES
 #  include "memdebug.h"
 #endif
@@ -83,32 +83,32 @@ struct timeval tv_test_start; /* for test timing */
 int unitfail; /* for unittests */
 #endif
 
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
 static void memory_tracking_init(void)
 {
   char *env;
-  /* if CURL_MEMDEBUG is set, this starts memory tracking message logging */
-  env = curl_getenv("CURL_MEMDEBUG");
+  /* if CARL_MEMDEBUG is set, this starts memory tracking message logging */
+  env = carl_getenv("CARL_MEMDEBUG");
   if(env) {
     /* use the value as file name */
-    char fname[CURL_MT_LOGFNAME_BUFSIZE];
-    if(strlen(env) >= CURL_MT_LOGFNAME_BUFSIZE)
-      env[CURL_MT_LOGFNAME_BUFSIZE-1] = '\0';
+    char fname[CARL_MT_LOGFNAME_BUFSIZE];
+    if(strlen(env) >= CARL_MT_LOGFNAME_BUFSIZE)
+      env[CARL_MT_LOGFNAME_BUFSIZE-1] = '\0';
     strcpy(fname, env);
-    curl_free(env);
-    curl_dbg_memdebug(fname);
-    /* this weird stuff here is to make curl_free() get called before
-       curl_dbg_memdebug() as otherwise memory tracking will log a free()
+    carl_free(env);
+    carl_dbg_memdebug(fname);
+    /* this weird stuff here is to make carl_free() get called before
+       carl_dbg_memdebug() as otherwise memory tracking will log a free()
        without an alloc! */
   }
-  /* if CURL_MEMLIMIT is set, this enables fail-on-alloc-number-N feature */
-  env = curl_getenv("CURL_MEMLIMIT");
+  /* if CARL_MEMLIMIT is set, this enables fail-on-alloc-number-N feature */
+  env = carl_getenv("CARL_MEMLIMIT");
   if(env) {
     char *endptr;
     long num = strtol(env, &endptr, 10);
     if((endptr != env) && (endptr == env + strlen(env)) && (num > 0))
-      curl_dbg_memlimit(num);
-    curl_free(env);
+      carl_dbg_memlimit(num);
+    carl_free(env);
   }
 }
 #else
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
   /*
    * Setup proper locale from environment. This is needed to enable locale-
    * specific behavior by the C library in order to test for undesired side
-   * effects that could cause in libcurl.
+   * effects that could cause in libcarl.
    */
 #ifdef HAVE_SETLOCALE
   setlocale(LC_ALL, "");

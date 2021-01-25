@@ -45,7 +45,7 @@ dummy data
 <protocol>
 POST /we/want/1315 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 797
 Content-Type: multipart/form-data; boundary=----------------------------9ef8d6205763

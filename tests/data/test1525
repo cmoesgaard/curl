@@ -6,7 +6,7 @@ HTTP GET
 HTTP CONNECT
 HTTP proxy
 proxytunnel
-CURLOPT_PROXYHEADER
+CARLOPT_PROXYHEADER
 </keywords>
 </info>
 
@@ -44,7 +44,7 @@ http-proxy
 lib1525
 </tool>
  <name>
-CURLOPT_PROXYHEADER is ignored CURLHEADER_UNIFIED
+CARLOPT_PROXYHEADER is ignored CARLHEADER_UNIFIED
  </name>
  <command>
  http://the.old.moo.1525:%HTTPPORT/1525 %HOSTIP:%PROXYPORT

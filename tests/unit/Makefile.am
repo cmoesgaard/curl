@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -26,9 +26,9 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_srcdir)/include is for libcurl's external include files
-# $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
-# $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "borrowed" files
+# $(top_srcdir)/include is for libcarl's external include files
+# $(top_builddir)/lib is for libcarl's generated lib/carl_config.h file
+# $(top_srcdir)/lib for libcarl's lib/carl_setup.h and other "borrowed" files
 # $(top_builddir)/ares is for in-tree c-ares's generated ares_build.h file
 # $(top_srcdir)/ares is for in-tree c-ares's external include files
 
@@ -50,16 +50,16 @@ endif
 
 EXTRA_DIST = Makefile.inc CMakeLists.txt README.md
 
-CFLAGS += @CURL_CFLAG_EXTRAS@
+CFLAGS += @CARL_CFLAG_EXTRAS@
 
 # Prevent LIBS from being used for all link targets
 LIBS = $(BLANK_AT_MAKETIME)
 
-LDADD = $(top_builddir)/src/libcurltool.la   \
-        $(top_builddir)/lib/libcurlu.la      \
-        @LDFLAGS@ @LIBCURL_LIBS@
+LDADD = $(top_builddir)/src/libcarltool.la   \
+        $(top_builddir)/lib/libcarlu.la      \
+        @LDFLAGS@ @LIBCARL_LIBS@
 
-AM_CPPFLAGS += -DCURL_STATICLIB -DUNITTESTS
+AM_CPPFLAGS += -DCARL_STATICLIB -DUNITTESTS
 
 # Makefile.inc provides neat definitions
 include Makefile.inc

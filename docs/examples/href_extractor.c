@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <htmlstreamparser.h>
 
 
@@ -53,7 +53,7 @@ static size_t write_callback(void *buffer, size_t size, size_t nmemb,
 int main(int argc, char *argv[])
 {
   char tag[1], attr[4], val[128];
-  CURL *curl;
+  CARL *carl;
   HTMLSTREAMPARSER *hsp;
 
   if(argc != 2) {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  curl = curl_easy_init();
+  carl = carl_easy_init();
 
   hsp = html_parser_init();
 
@@ -71,14 +71,14 @@ int main(int argc, char *argv[])
   html_parser_set_attr_buffer(hsp, attr, sizeof(attr));
   html_parser_set_val_buffer(hsp, val, sizeof(val)-1);
 
-  curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, hsp);
-  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+  carl_easy_setopt(carl, CARLOPT_URL, argv[1]);
+  carl_easy_setopt(carl, CARLOPT_WRITEFUNCTION, write_callback);
+  carl_easy_setopt(carl, CARLOPT_WRITEDATA, hsp);
+  carl_easy_setopt(carl, CARLOPT_FOLLOWLOCATION, 1L);
 
-  curl_easy_perform(curl);
+  carl_easy_perform(carl);
 
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   html_parser_cleanup(hsp);
 

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_cb_rea.h"
@@ -32,7 +32,7 @@
 #include "memdebug.h" /* keep this as LAST include */
 
 /*
-** callback for CURLOPT_READFUNCTION
+** callback for CARLOPT_READFUNCTION
 */
 
 size_t tool_read_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
@@ -45,7 +45,7 @@ size_t tool_read_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
     if(errno == EAGAIN) {
       errno = 0;
       in->config->readbusy = TRUE;
-      return CURL_READFUNC_PAUSE;
+      return CARL_READFUNC_PAUSE;
     }
     /* since size_t is unsigned we can't return negative values fine */
     rc = 0;
@@ -55,12 +55,12 @@ size_t tool_read_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
 }
 
 /*
-** callback for CURLOPT_XFERINFOFUNCTION used to unpause busy reads
+** callback for CARLOPT_XFERINFOFUNCTION used to unpause busy reads
 */
 
 int tool_readbusy_cb(void *clientp,
-                     curl_off_t dltotal, curl_off_t dlnow,
-                     curl_off_t ultotal, curl_off_t ulnow)
+                     carl_off_t dltotal, carl_off_t dlnow,
+                     carl_off_t ultotal, carl_off_t ulnow)
 {
   struct per_transfer *per = clientp;
   struct OperationConfig *config = per->config;
@@ -72,8 +72,8 @@ int tool_readbusy_cb(void *clientp,
 
   if(config->readbusy) {
     config->readbusy = FALSE;
-    curl_easy_pause(per->curl, CURLPAUSE_CONT);
+    carl_easy_pause(per->carl, CARLPAUSE_CONT);
   }
 
-  return per->noprogress? 0 : CURL_PROGRESSFUNC_CONTINUE;
+  return per->noprogress? 0 : CARL_PROGRESSFUNC_CONTINUE;
 }

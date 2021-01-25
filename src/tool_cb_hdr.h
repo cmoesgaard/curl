@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CB_HDR_H
-#define HEADER_CURL_TOOL_CB_HDR_H
+#ifndef HEADER_CARL_TOOL_CB_HDR_H
+#define HEADER_CARL_TOOL_CB_HDR_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,11 +24,11 @@
 #include "tool_setup.h"
 
 /*
- * curl operates using a single HdrCbData struct variable, a
+ * carl operates using a single HdrCbData struct variable, a
  * pointer to this is passed as userdata pointer to tool_header_cb.
  *
  * 'outs' member is a pointer to the OutStruct variable used to keep
- * track of information relative to curl's output writing.
+ * track of information relative to carl's output writing.
  *
  * 'heads' member is a pointer to the OutStruct variable used to keep
  * track of information relative to header response writing.
@@ -48,9 +48,9 @@ struct HdrCbData {
 };
 
 /*
-** callback for CURLOPT_HEADERFUNCTION
+** callback for CARLOPT_HEADERFUNCTION
 */
 
 size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata);
 
-#endif /* HEADER_CURL_TOOL_CB_HDR_H */
+#endif /* HEADER_CARL_TOOL_CB_HDR_H */

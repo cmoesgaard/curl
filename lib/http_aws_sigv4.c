@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://carl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,16 +20,16 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_CRYPTO_AUTH)
 
 #include "urldata.h"
 #include "strcase.h"
 #include "vauth/vauth.h"
 #include "vauth/digest.h"
 #include "http_aws_sigv4.h"
-#include "curl_sha256.h"
+#include "carl_sha256.h"
 #include "transfer.h"
 
 #include "strcase.h"
@@ -39,8 +39,8 @@
 #include <time.h>
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
+#include "carl_printf.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 #define HMAC_SHA256(k, kl, d, dl, o)                                    \
@@ -48,8 +48,8 @@
     if(Curl_hmacit(Curl_HMAC_SHA256, (unsigned char *)k,                \
                    (unsigned int)kl,                                    \
                    (unsigned char *)d,                                  \
-                   (unsigned int)dl, o) != CURLE_OK) {                  \
-      ret = CURLE_OUT_OF_MEMORY;                                        \
+                   (unsigned int)dl, o) != CARLE_OK) {                  \
+      ret = CARLE_OUT_OF_MEMORY;                                        \
       goto free_all;                                                    \
     }                                                                   \
   } while(0)
@@ -65,13 +65,13 @@ static void sha256_to_hex(char *dst, unsigned char *sha, size_t dst_l)
 
   DEBUGASSERT(dst_l >= 65);
   for(i = 0; i < 32; ++i) {
-    curl_msnprintf(dst + (i * 2), dst_l - (i * 2), "%02x", sha[i]);
+    carl_msnprintf(dst + (i * 2), dst_l - (i * 2), "%02x", sha[i]);
   }
 }
 
-CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
+CARLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 {
-  CURLcode ret = CURLE_OK;
+  CARLcode ret = CARLE_OK;
   char sk[FULL_SK_L] = {0};
   const char *customrequest = data->set.str[STRING_CUSTOMREQUEST];
   const char *hostname = data->state.up.hostname;
@@ -117,13 +117,13 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
   if(Curl_checkheaders(data, "Authorization")) {
     /* Authorization already present, Bailing out */
-    return CURLE_OK;
+    return CARLE_OK;
   }
 
   if(content_type) {
     content_type = strchr(content_type, ':');
     if(!content_type)
-      return CURLE_FAILED_INIT;
+      return CARLE_FAILED_INIT;
     content_type++;
     /* Skip whitespace now */
     while(*content_type == ' ' || *content_type == '\t')
@@ -138,7 +138,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     provider_l = tmp - provider;
     if(provider_l >= PROVIDER_MAX_L) {
       infof(data, "v4 signature argument string too long\n");
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      return CARLE_BAD_FUNCTION_ARGUMENT;
     }
     Curl_strntolower(low_provider0, provider, provider_l);
     Curl_strntoupper(up_provider, provider, provider_l);
@@ -147,7 +147,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     provider_l = strlen(provider);
     if(provider_l >= PROVIDER_MAX_L) {
       infof(data, "v4 signature argument string too long\n");
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      return CARLE_BAD_FUNCTION_ARGUMENT;
     }
     Curl_strntolower(low_provider, provider, provider_l);
     Curl_strntolower(mid_provider, provider, provider_l);
@@ -161,11 +161,11 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   }
   else {
     infof(data, "v4 signature argument string too long\n");
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    return CARLE_BAD_FUNCTION_ARGUMENT;
   }
 
 #ifdef DEBUGBUILD
-  force_timestamp = getenv("CURL_FORCETIME");
+  force_timestamp = getenv("CARL_FORCETIME");
   if(force_timestamp)
     rawtime = 0;
   else
@@ -173,25 +173,25 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     time(&rawtime);
 
   ret = Curl_gmtime(rawtime, &info);
-  if(ret != CURLE_OK) {
+  if(ret != CARLE_OK) {
     return ret;
   }
 
   if(!strftime(date_iso, sizeof(date_iso), "%Y%m%dT%H%M%SZ", &info)) {
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   memcpy(date, date_iso, sizeof(date));
   date[sizeof(date) - 1] = 0;
   api_type = strdup(hostname);
   if(!api_type) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
   tmp = strchr(api_type, '.');
   if(!tmp) {
-    ret = CURLE_URL_MALFORMAT;
+    ret = CARLE_URL_MALFORMAT;
     goto free_all;
   }
   *tmp = 0;
@@ -201,54 +201,54 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
   tmp = strchr(region, '.');
   if(!tmp) {
-    ret = CURLE_URL_MALFORMAT;
+    ret = CARLE_URL_MALFORMAT;
     goto free_all;
   }
   *tmp = 0;
 
   uri = data->state.up.path;
 
-  if(!curl_msnprintf(request_type, REQUEST_TYPE_L, "%s4_request",
+  if(!carl_msnprintf(request_type, REQUEST_TYPE_L, "%s4_request",
                      low_provider0)) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
-  cred_scope = curl_maprintf("%s/%s/%s/%s", date, region, api_type,
+  cred_scope = carl_maprintf("%s/%s/%s/%s", date, region, api_type,
                              request_type);
   if(!cred_scope) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
   if(content_type) {
-    canonical_hdr = curl_maprintf(
+    canonical_hdr = carl_maprintf(
       "content-type:%s\n"
       "host:%s\n"
       "x-%s-date:%s\n", content_type, hostname, low_provider, date_iso);
-    signed_headers = curl_maprintf("content-type;host;x-%s-date",
+    signed_headers = carl_maprintf("content-type;host;x-%s-date",
                                    low_provider);
   }
   else if(data->state.up.query) {
-    canonical_hdr = curl_maprintf(
+    canonical_hdr = carl_maprintf(
       "host:%s\n"
       "x-%s-date:%s\n", hostname, low_provider, date_iso);
-    signed_headers = curl_maprintf("host;x-%s-date", low_provider);
+    signed_headers = carl_maprintf("host;x-%s-date", low_provider);
   }
   else {
-    ret = CURLE_FAILED_INIT;
+    ret = CARLE_FAILED_INIT;
     goto free_all;
   }
 
   if(!canonical_hdr || !signed_headers) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
   Curl_sha256it(sha_d, (const unsigned char *)post_data, strlen(post_data));
   sha256_to_hex(sha_hex, sha_d, sizeof(sha_hex));
 
-  canonical_request = curl_maprintf(
+  canonical_request = carl_maprintf(
     "%s\n" /* Method */
     "%s\n" /* uri */
     "%s\n" /* querystring */
@@ -259,7 +259,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     data->state.up.query ? data->state.up.query : "",
     canonical_hdr, signed_headers, sha_hex);
   if(!canonical_request) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
@@ -270,15 +270,15 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   /* Google allow to use rsa key instead of HMAC, so this code might change
    * In the furure, but for now we support only HMAC version
    */
-  str_to_sign = curl_maprintf("%s4-HMAC-SHA256\n"
+  str_to_sign = carl_maprintf("%s4-HMAC-SHA256\n"
                               "%s\n%s\n%s",
                               up_provider, date_iso, cred_scope, sha_hex);
   if(!str_to_sign) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
-  curl_msnprintf(sk, sizeof(sk) - 1, "%s4%s", up_provider,
+  carl_msnprintf(sk, sizeof(sk) - 1, "%s4%s", up_provider,
                  data->set.str[STRING_PASSWORD]);
 
   HMAC_SHA256(sk, strlen(sk), date,
@@ -297,25 +297,25 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
   sha256_to_hex(sha_hex, tmp_sign0, sizeof(sha_hex));
 
-  auth = curl_maprintf("Authorization: %s4-HMAC-SHA256 Credential=%s/%s, "
+  auth = carl_maprintf("Authorization: %s4-HMAC-SHA256 Credential=%s/%s, "
                        "SignedHeaders=%s, Signature=%s",
                        up_provider, data->set.str[STRING_USERNAME], cred_scope,
                        signed_headers, sha_hex);
   if(!auth) {
-    ret = CURLE_OUT_OF_MEMORY;
+    ret = CARLE_OUT_OF_MEMORY;
     goto free_all;
   }
 
-  curl_msnprintf(date_str, sizeof(date_str), "X-%s-Date: %s",
+  carl_msnprintf(date_str, sizeof(date_str), "X-%s-Date: %s",
                  mid_provider, date_iso);
-  data->set.headers = curl_slist_append(data->set.headers, date_str);
+  data->set.headers = carl_slist_append(data->set.headers, date_str);
   if(!data->set.headers) {
-    ret = CURLE_FAILED_INIT;
+    ret = CARLE_FAILED_INIT;
     goto free_all;
   }
-  data->set.headers = curl_slist_append(data->set.headers, auth);
+  data->set.headers = carl_slist_append(data->set.headers, auth);
   if(!data->set.headers) {
-    ret = CURLE_FAILED_INIT;
+    ret = CARLE_FAILED_INIT;
     goto free_all;
   }
   data->state.authhost.done = 1;
@@ -331,4 +331,4 @@ free_all:
   return ret;
 }
 
-#endif /* !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH) */
+#endif /* !defined(CARL_DISABLE_HTTP) && !defined(CARL_DISABLE_CRYPTO_AUTH) */

@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -99,24 +99,24 @@ LIB_CFILES =         \
   connect.c          \
   content_encoding.c \
   cookie.c           \
-  curl_addrinfo.c    \
-  curl_ctype.c       \
-  curl_des.c         \
-  curl_endian.c      \
-  curl_fnmatch.c     \
-  curl_get_line.c    \
-  curl_gethostname.c \
-  curl_gssapi.c      \
-  curl_memrchr.c     \
-  curl_multibyte.c   \
-  curl_ntlm_core.c   \
-  curl_ntlm_wb.c     \
-  curl_path.c        \
-  curl_range.c       \
-  curl_rtmp.c        \
-  curl_sasl.c        \
-  curl_sspi.c        \
-  curl_threads.c     \
+  carl_addrinfo.c    \
+  carl_ctype.c       \
+  carl_des.c         \
+  carl_endian.c      \
+  carl_fnmatch.c     \
+  carl_get_line.c    \
+  carl_gethostname.c \
+  carl_gssapi.c      \
+  carl_memrchr.c     \
+  carl_multibyte.c   \
+  carl_ntlm_core.c   \
+  carl_ntlm_wb.c     \
+  carl_path.c        \
+  carl_range.c       \
+  carl_rtmp.c        \
+  carl_sasl.c        \
+  carl_sspi.c        \
+  carl_threads.c     \
   dict.c             \
   doh.c              \
   dotdot.c           \
@@ -219,36 +219,36 @@ LIB_HFILES =         \
   connect.h          \
   content_encoding.h \
   cookie.h           \
-  curl_addrinfo.h    \
-  curl_base64.h      \
-  curl_ctype.h       \
-  curl_des.h         \
-  curl_endian.h      \
-  curl_fnmatch.h     \
-  curl_get_line.h    \
-  curl_gethostname.h \
-  curl_gssapi.h      \
-  curl_hmac.h        \
-  curl_krb5.h        \
-  curl_ldap.h        \
-  curl_md4.h         \
-  curl_md5.h         \
-  curl_memory.h      \
-  curl_memrchr.h     \
-  curl_multibyte.h   \
-  curl_ntlm_core.h   \
-  curl_ntlm_wb.h     \
-  curl_path.h        \
-  curl_printf.h      \
-  curl_range.h       \
-  curl_rtmp.h        \
-  curl_sasl.h        \
-  curl_setup.h       \
-  curl_setup_once.h  \
-  curl_sha256.h      \
-  curl_sspi.h        \
-  curl_threads.h     \
-  curlx.h            \
+  carl_addrinfo.h    \
+  carl_base64.h      \
+  carl_ctype.h       \
+  carl_des.h         \
+  carl_endian.h      \
+  carl_fnmatch.h     \
+  carl_get_line.h    \
+  carl_gethostname.h \
+  carl_gssapi.h      \
+  carl_hmac.h        \
+  carl_krb5.h        \
+  carl_ldap.h        \
+  carl_md4.h         \
+  carl_md5.h         \
+  carl_memory.h      \
+  carl_memrchr.h     \
+  carl_multibyte.h   \
+  carl_ntlm_core.h   \
+  carl_ntlm_wb.h     \
+  carl_path.h        \
+  carl_printf.h      \
+  carl_range.h       \
+  carl_rtmp.h        \
+  carl_sasl.h        \
+  carl_setup.h       \
+  carl_setup_once.h  \
+  carl_sha256.h      \
+  carl_sspi.h        \
+  carl_threads.h     \
+  carlx.h            \
   dict.h             \
   doh.h              \
   dotdot.h           \
@@ -329,7 +329,7 @@ LIB_HFILES =         \
   wildcard.h         \
   x509asn1.h
 
-LIB_RCFILES = libcurl.rc
+LIB_RCFILES = libcarl.rc
 
 CSOURCES = $(LIB_CFILES) $(LIB_VAUTH_CFILES) $(LIB_VTLS_CFILES) \
   $(LIB_VQUIC_CFILES) $(LIB_VSSH_CFILES)

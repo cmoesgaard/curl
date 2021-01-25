@@ -42,7 +42,7 @@ HTTPS with 8 secs timeout
 <protocol>
 GET /want/303 HTTP/1.1
 Host: %HOSTIP:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

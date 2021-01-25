@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_PARAMHLP_H
-#define HEADER_CURL_TOOL_PARAMHLP_H
+#ifndef HEADER_CARL_TOOL_PARAMHLP_H
+#define HEADER_CARL_TOOL_PARAMHLP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -41,11 +41,11 @@ long proto2num(struct OperationConfig *config, long *val, const char *str);
 
 int check_protocol(const char *str);
 
-ParameterError str2offset(curl_off_t *val, const char *str);
+ParameterError str2offset(carl_off_t *val, const char *str);
 
-CURLcode get_args(struct OperationConfig *config, const size_t i);
+CARLcode get_args(struct OperationConfig *config, const size_t i);
 
-ParameterError add2list(struct curl_slist **list, const char *ptr);
+ParameterError add2list(struct carl_slist **list, const char *ptr);
 
 int ftpfilemethod(struct OperationConfig *config, const char *str);
 
@@ -55,4 +55,4 @@ long delegation(struct OperationConfig *config, const char *str);
 
 ParameterError str2tls_max(long *val, const char *str);
 
-#endif /* HEADER_CURL_TOOL_PARAMHLP_H */
+#endif /* HEADER_CARL_TOOL_PARAMHLP_H */

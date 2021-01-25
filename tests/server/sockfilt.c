@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -99,10 +99,10 @@
 #include <netdb.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
-/* make the curlx header define all printf() functions to use the curlx_*
+#define ENABLE_CARLX_PRINTF
+/* make the carlx header define all printf() functions to use the carlx_*
    versions instead */
-#include "curlx.h" /* from the private lib dir */
+#include "carlx.h" /* from the private lib dir */
 #include "getpart.h"
 #include "inet_pton.h"
 #include "util.h"
@@ -165,10 +165,10 @@ static ssize_t read_wincon(int fd, void *buf, size_t count)
   }
 
   if(GetConsoleMode(handle, &mode)) {
-    success = ReadConsole(handle, buf, curlx_uztoul(count), &rcount, NULL);
+    success = ReadConsole(handle, buf, carlx_uztoul(count), &rcount, NULL);
   }
   else {
-    success = ReadFile(handle, buf, curlx_uztoul(count), &rcount, NULL);
+    success = ReadFile(handle, buf, carlx_uztoul(count), &rcount, NULL);
   }
   if(success) {
     return rcount;
@@ -200,10 +200,10 @@ static ssize_t write_wincon(int fd, const void *buf, size_t count)
   }
 
   if(GetConsoleMode(handle, &mode)) {
-    success = WriteConsole(handle, buf, curlx_uztoul(count), &wcount, NULL);
+    success = WriteConsole(handle, buf, carlx_uztoul(count), &wcount, NULL);
   }
   else {
-    success = WriteFile(handle, buf, curlx_uztoul(count), &wcount, NULL);
+    success = WriteFile(handle, buf, carlx_uztoul(count), &wcount, NULL);
   }
   if(success) {
     return wcount;
@@ -614,7 +614,7 @@ static HANDLE select_ws_wait(HANDLE handle, HANDLE signal,
 struct select_ws_data {
   int fd;                /* provided file descriptor  (indexed by nfd) */
   long wsastate;         /* internal pre-select state (indexed by nfd) */
-  curl_socket_t wsasock; /* internal socket handle    (indexed by nws) */
+  carl_socket_t wsasock; /* internal socket handle    (indexed by nws) */
   WSAEVENT wsaevent;     /* internal select event     (indexed by nws) */
   HANDLE signal;         /* internal thread signal    (indexed by nth) */
   HANDLE thread;         /* internal thread handle    (indexed by nth) */
@@ -627,7 +627,7 @@ static int select_ws(int nfds, fd_set *readfds, fd_set *writefds,
   fd_set readsock, writesock, exceptsock;
   struct select_ws_data *data;
   WSANETWORKEVENTS wsaevents;
-  curl_socket_t wsasock;
+  carl_socket_t wsasock;
   int error, ret, fd;
   WSAEVENT wsaevent;
 
@@ -690,7 +690,7 @@ static int select_ws(int nfds, fd_set *readfds, fd_set *writefds,
   nth = 0; /* number of internal waiting threads */
   nws = 0; /* number of handled WINSOCK sockets */
   for(fd = 0; fd < nfds; fd++) {
-    wsasock = curlx_sitosk(fd);
+    wsasock = carlx_sitosk(fd);
     wsaevents.lNetworkEvents = 0;
     handles[nfd] = 0;
 
@@ -806,7 +806,7 @@ static int select_ws(int nfds, fd_set *readfds, fd_set *writefds,
   for(i = 0; i < nfd; i++) {
     fd = data[i].fd;
     handle = handles[i];
-    wsasock = curlx_sitosk(fd);
+    wsasock = carlx_sitosk(fd);
 
     /* check if the current internal handle was triggered */
     if(wait != WAIT_FAILED && (wait - WAIT_OBJECT_0) <= i &&
@@ -893,20 +893,20 @@ static int select_ws(int nfds, fd_set *readfds, fd_set *writefds,
 #endif  /* USE_WINSOCK */
 
 /*
-  sockfdp is a pointer to an established stream or CURL_SOCKET_BAD
+  sockfdp is a pointer to an established stream or CARL_SOCKET_BAD
 
-  if sockfd is CURL_SOCKET_BAD, listendfd is a listening socket we must
+  if sockfd is CARL_SOCKET_BAD, listendfd is a listening socket we must
   accept()
 */
-static bool juggle(curl_socket_t *sockfdp,
-                   curl_socket_t listenfd,
+static bool juggle(carl_socket_t *sockfdp,
+                   carl_socket_t listenfd,
                    enum sockmode *mode)
 {
   struct timeval timeout;
   fd_set fds_read;
   fd_set fds_write;
   fd_set fds_err;
-  curl_socket_t sockfd = CURL_SOCKET_BAD;
+  carl_socket_t sockfd = CARL_SOCKET_BAD;
   int maxfd = -99;
   ssize_t rc;
   int error = 0;
@@ -937,7 +937,7 @@ static bool juggle(curl_socket_t *sockfdp,
   FD_ZERO(&fds_write);
   FD_ZERO(&fds_err);
 
-  FD_SET((curl_socket_t)fileno(stdin), &fds_read);
+  FD_SET((carl_socket_t)fileno(stdin), &fds_read);
 
   switch(*mode) {
 
@@ -953,7 +953,7 @@ static bool juggle(curl_socket_t *sockfdp,
   case PASSIVE_CONNECT:
 
     sockfd = *sockfdp;
-    if(CURL_SOCKET_BAD == sockfd) {
+    if(CARL_SOCKET_BAD == sockfd) {
       /* eeek, we are supposedly connected and then this cannot be -1 ! */
       logmsg("socket is -1! on %s:%d", __FILE__, __LINE__);
       maxfd = 0; /* stdin */
@@ -968,8 +968,8 @@ static bool juggle(curl_socket_t *sockfdp,
   case ACTIVE:
 
     sockfd = *sockfdp;
-    /* sockfd turns CURL_SOCKET_BAD when our connection has been closed */
-    if(CURL_SOCKET_BAD != sockfd) {
+    /* sockfd turns CARL_SOCKET_BAD when our connection has been closed */
+    if(CARL_SOCKET_BAD != sockfd) {
       FD_SET(sockfd, &fds_read);
       maxfd = (int)sockfd;
     }
@@ -983,7 +983,7 @@ static bool juggle(curl_socket_t *sockfdp,
 
     logmsg("disconnected, no socket to read on");
     maxfd = 0;
-    sockfd = CURL_SOCKET_BAD;
+    sockfd = CARL_SOCKET_BAD;
     break;
 
   } /* switch(*mode) */
@@ -1097,10 +1097,10 @@ static bool juggle(curl_socket_t *sockfdp,
       /* disconnect! */
       if(!write_stdout("DISC\n", 5))
         return FALSE;
-      if(sockfd != CURL_SOCKET_BAD) {
+      if(sockfd != CARL_SOCKET_BAD) {
         logmsg("====> Client forcibly disconnected");
         sclose(sockfd);
-        *sockfdp = CURL_SOCKET_BAD;
+        *sockfdp = CARL_SOCKET_BAD;
         if(*mode == PASSIVE_CONNECT)
           *mode = PASSIVE_LISTEN;
         else
@@ -1113,13 +1113,13 @@ static bool juggle(curl_socket_t *sockfdp,
   }
 
 
-  if((sockfd != CURL_SOCKET_BAD) && (FD_ISSET(sockfd, &fds_read)) ) {
+  if((sockfd != CARL_SOCKET_BAD) && (FD_ISSET(sockfd, &fds_read)) ) {
     ssize_t nread_socket;
     if(*mode == PASSIVE_LISTEN) {
       /* there's no stream set up yet, this is an indication that there's a
          client connecting. */
-      curl_socket_t newfd = accept(sockfd, NULL, NULL);
-      if(CURL_SOCKET_BAD == newfd) {
+      carl_socket_t newfd = accept(sockfd, NULL, NULL);
+      if(CARL_SOCKET_BAD == newfd) {
         error = SOCKERRNO;
         logmsg("accept(%d, NULL, NULL) failed with error: (%d) %s",
                sockfd, error, strerror(error));
@@ -1153,7 +1153,7 @@ static bool juggle(curl_socket_t *sockfdp,
       if(!write_stdout("DISC\n", 5))
         return FALSE;
       sclose(sockfd);
-      *sockfdp = CURL_SOCKET_BAD;
+      *sockfdp = CARL_SOCKET_BAD;
       if(*mode == PASSIVE_CONNECT)
         *mode = PASSIVE_LISTEN;
       else
@@ -1165,7 +1165,7 @@ static bool juggle(curl_socket_t *sockfdp,
   return TRUE;
 }
 
-static curl_socket_t sockdaemon(curl_socket_t sock,
+static carl_socket_t sockdaemon(carl_socket_t sock,
                                 unsigned short *listenport)
 {
   /* passive daemon style */
@@ -1195,12 +1195,12 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
           logmsg("wait_ms() failed with error: (%d) %s",
                  error, strerror(error));
           sclose(sock);
-          return CURL_SOCKET_BAD;
+          return CARL_SOCKET_BAD;
         }
         if(got_exit_signal) {
           logmsg("signalled to die, exiting...");
           sclose(sock);
-          return CURL_SOCKET_BAD;
+          return CARL_SOCKET_BAD;
         }
         totdelay += delay;
         delay *= 2; /* double the sleep for next attempt */
@@ -1240,13 +1240,13 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
     logmsg("Error binding socket on port %hu: (%d) %s",
            *listenport, error, strerror(error));
     sclose(sock);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   if(!*listenport) {
     /* The system was supposed to choose a port number, figure out which
        port we actually got and update the listener port value with it. */
-    curl_socklen_t la_size;
+    carl_socklen_t la_size;
     srvr_sockaddr_union_t localaddr;
 #ifdef ENABLE_IPV6
     if(!use_ipv6)
@@ -1262,7 +1262,7 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
       logmsg("getsockname() failed with error: (%d) %s",
              error, strerror(error));
       sclose(sock);
-      return CURL_SOCKET_BAD;
+      return CARL_SOCKET_BAD;
     }
     switch(localaddr.sa.sa_family) {
     case AF_INET:
@@ -1283,7 +1283,7 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
       logmsg("proper network library linkage. This might not be the only");
       logmsg("reason, but double check it before anything else.");
       sclose(sock);
-      return CURL_SOCKET_BAD;
+      return CARL_SOCKET_BAD;
     }
   }
 
@@ -1300,7 +1300,7 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
     logmsg("listen(%d, 5) failed with error: (%d) %s",
            sock, error, strerror(error));
     sclose(sock);
-    return CURL_SOCKET_BAD;
+    return CARL_SOCKET_BAD;
   }
 
   return sock;
@@ -1310,8 +1310,8 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
 int main(int argc, char *argv[])
 {
   srvr_sockaddr_union_t me;
-  curl_socket_t sock = CURL_SOCKET_BAD;
-  curl_socket_t msgsock = CURL_SOCKET_BAD;
+  carl_socket_t sock = CARL_SOCKET_BAD;
+  carl_socket_t msgsock = CARL_SOCKET_BAD;
   int wrotepidfile = 0;
   const char *pidname = ".sockfilt.pid";
   const char *portfile = NULL; /* none by default */
@@ -1376,7 +1376,7 @@ int main(int argc, char *argv[])
       if(argc>arg) {
         char *endptr;
         unsigned long ulnum = strtoul(argv[arg], &endptr, 10);
-        port = curlx_ultous(ulnum);
+        port = carlx_ultous(ulnum);
         arg++;
       }
     }
@@ -1393,7 +1393,7 @@ int main(int argc, char *argv[])
                   argv[arg]);
           return 0;
         }
-        connectport = curlx_ultous(ulnum);
+        connectport = carlx_ultous(ulnum);
         arg++;
       }
     }
@@ -1441,7 +1441,7 @@ int main(int argc, char *argv[])
     sock = socket(AF_INET6, SOCK_STREAM, 0);
 #endif
 
-  if(CURL_SOCKET_BAD == sock) {
+  if(CARL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
            error, strerror(error));
@@ -1490,11 +1490,11 @@ int main(int argc, char *argv[])
   else {
     /* passive daemon style */
     sock = sockdaemon(sock, &port);
-    if(CURL_SOCKET_BAD == sock) {
+    if(CARL_SOCKET_BAD == sock) {
       write_stdout("FAIL\n", 5);
       goto sockfilt_cleanup;
     }
-    msgsock = CURL_SOCKET_BAD; /* no stream socket yet */
+    msgsock = CARL_SOCKET_BAD; /* no stream socket yet */
   }
 
   logmsg("Running %s version", ipv_inuse);
@@ -1525,10 +1525,10 @@ int main(int argc, char *argv[])
 
 sockfilt_cleanup:
 
-  if((msgsock != sock) && (msgsock != CURL_SOCKET_BAD))
+  if((msgsock != sock) && (msgsock != CARL_SOCKET_BAD))
     sclose(msgsock);
 
-  if(sock != CURL_SOCKET_BAD)
+  if(sock != CARL_SOCKET_BAD)
     sclose(sock);
 
   if(wrotepidfile)

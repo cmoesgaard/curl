@@ -4,7 +4,7 @@ Added: 7.41.0
 Help: Verify the status of the server certificate
 Category: tls
 ---
-Tells curl to verify the status of the server certificate by using the
+Tells carl to verify the status of the server certificate by using the
 Certificate Status Request (aka. OCSP stapling) TLS extension.
 
 If this option is enabled and the server sends an invalid (e.g. expired)

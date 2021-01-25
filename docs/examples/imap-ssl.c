@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,29 +26,29 @@
  */
 
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-/* This is a simple example showing how to fetch mail using libcurl's IMAP
+/* This is a simple example showing how to fetch mail using libcarl's IMAP
  * capabilities. It builds on the imap-fetch.c example adding transport
  * security to protect the authentication details from being snooped.
  *
- * Note that this example requires libcurl 7.30.0 or above.
+ * Note that this example requires libcarl 7.30.0 or above.
  */
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
 
-  curl = curl_easy_init();
-  if(curl) {
+  carl = carl_easy_init();
+  if(carl) {
     /* Set username and password */
-    curl_easy_setopt(curl, CURLOPT_USERNAME, "user");
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, "secret");
+    carl_easy_setopt(carl, CARLOPT_USERNAME, "user");
+    carl_easy_setopt(carl, CARLOPT_PASSWORD, "secret");
 
     /* This will fetch message 1 from the user's inbox. Note the use of
     * imaps:// rather than imap:// to request a SSL based connection. */
-    curl_easy_setopt(curl, CURLOPT_URL,
+    carl_easy_setopt(carl, CARLOPT_URL,
                      "imaps://imap.example.com/INBOX/;UID=1");
 
     /* If you want to connect to a site who isn't using a certificate that is
@@ -57,35 +57,35 @@ int main(void)
      * A LOT LESS SECURE.
      *
      * If you have a CA cert for the server stored someplace else than in the
-     * default bundle, then the CURLOPT_CAPATH option might come handy for
+     * default bundle, then the CARLOPT_CAPATH option might come handy for
      * you. */
 #ifdef SKIP_PEER_VERIFICATION
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    carl_easy_setopt(carl, CARLOPT_SSL_VERIFYPEER, 0L);
 #endif
 
     /* If the site you're connecting to uses a different host name that what
      * they have mentioned in their server certificate's commonName (or
-     * subjectAltName) fields, libcurl will refuse to connect. You can skip
+     * subjectAltName) fields, libcarl will refuse to connect. You can skip
      * this check, but this will make the connection less secure. */
 #ifdef SKIP_HOSTNAME_VERIFICATION
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    carl_easy_setopt(carl, CARLOPT_SSL_VERIFYHOST, 0L);
 #endif
 
     /* Since the traffic will be encrypted, it is very useful to turn on debug
-     * information within libcurl to see what is happening during the
+     * information within libcarl to see what is happening during the
      * transfer */
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
     /* Perform the fetch */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
 
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* Always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
 
   return (int)res;

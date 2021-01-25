@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
 
 /* struct containing data of a thread */
 struct Tdata {
-  CURLSH *share;
+  CARLSH *share;
   char *url;
 };
 
@@ -36,8 +36,8 @@ struct userdata {
 };
 
 /* lock callback */
-static void my_lock(CURL *handle, curl_lock_data data,
-                    curl_lock_access laccess, void *useptr)
+static void my_lock(CARL *handle, carl_lock_data data,
+                    carl_lock_access laccess, void *useptr)
 {
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
@@ -46,16 +46,16 @@ static void my_lock(CURL *handle, curl_lock_data data,
   (void)laccess;
 
   switch(data) {
-    case CURL_LOCK_DATA_SHARE:
+    case CARL_LOCK_DATA_SHARE:
       what = "share";
       break;
-    case CURL_LOCK_DATA_DNS:
+    case CARL_LOCK_DATA_DNS:
       what = "dns";
       break;
-    case CURL_LOCK_DATA_COOKIE:
+    case CARL_LOCK_DATA_COOKIE:
       what = "cookie";
       break;
-    case CURL_LOCK_DATA_SSL_SESSION:
+    case CARL_LOCK_DATA_SSL_SESSION:
       what = "ssl_session";
       break;
     default:
@@ -67,22 +67,22 @@ static void my_lock(CURL *handle, curl_lock_data data,
 }
 
 /* unlock callback */
-static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
+static void my_unlock(CARL *handle, carl_lock_data data, void *useptr)
 {
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
   (void)handle;
   switch(data) {
-    case CURL_LOCK_DATA_SHARE:
+    case CARL_LOCK_DATA_SHARE:
       what = "share";
       break;
-    case CURL_LOCK_DATA_DNS:
+    case CARL_LOCK_DATA_DNS:
       what = "dns";
       break;
-    case CURL_LOCK_DATA_COOKIE:
+    case CARL_LOCK_DATA_COOKIE:
       what = "cookie";
       break;
-    case CURL_LOCK_DATA_SSL_SESSION:
+    case CARL_LOCK_DATA_SSL_SESSION:
       what = "ssl_session";
       break;
     default:
@@ -96,32 +96,32 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
 /* the dummy thread function */
 static void *fire(void *ptr)
 {
-  CURLcode code;
+  CARLcode code;
   struct Tdata *tdata = (struct Tdata*)ptr;
-  CURL *curl;
+  CARL *carl;
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
     return NULL;
   }
 
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(curl, CURLOPT_VERBOSE,    1L);
-  curl_easy_setopt(curl, CURLOPT_URL,        tdata->url);
-  printf("CURLOPT_SHARE\n");
-  curl_easy_setopt(curl, CURLOPT_SHARE, tdata->share);
+  carl_easy_setopt(carl, CARLOPT_SSL_VERIFYPEER, 0L);
+  carl_easy_setopt(carl, CARLOPT_VERBOSE,    1L);
+  carl_easy_setopt(carl, CARLOPT_URL,        tdata->url);
+  printf("CARLOPT_SHARE\n");
+  carl_easy_setopt(carl, CARLOPT_SHARE, tdata->share);
 
   printf("PERFORM\n");
-  code = curl_easy_perform(curl);
-  if(code != CURLE_OK) {
+  code = carl_easy_perform(carl);
+  if(code != CARLE_OK) {
     int i = 0;
-    fprintf(stderr, "perform url '%s' repeat %d failed, curlcode %d\n",
+    fprintf(stderr, "perform url '%s' repeat %d failed, carlcode %d\n",
             tdata->url, i, (int)code);
   }
 
   printf("CLEANUP\n");
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   return NULL;
 }
@@ -130,11 +130,11 @@ static void *fire(void *ptr)
 int test(char *URL)
 {
   int res;
-  CURLSHcode scode = CURLSHE_OK;
+  CARLSHcode scode = CARLSHE_OK;
   char *url;
   struct Tdata tdata;
-  CURL *curl;
-  CURLSH *share;
+  CARL *carl;
+  CARLSH *share;
   int i;
   struct userdata user;
 
@@ -142,42 +142,42 @@ int test(char *URL)
   user.counter = 0;
 
   printf("GLOBAL_INIT\n");
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* prepare share */
   printf("SHARE_INIT\n");
-  share = curl_share_init();
+  share = carl_share_init();
   if(!share) {
-    fprintf(stderr, "curl_share_init() failed\n");
-    curl_global_cleanup();
+    fprintf(stderr, "carl_share_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  if(CURLSHE_OK == scode) {
-    printf("CURLSHOPT_LOCKFUNC\n");
-    scode = curl_share_setopt(share, CURLSHOPT_LOCKFUNC, my_lock);
+  if(CARLSHE_OK == scode) {
+    printf("CARLSHOPT_LOCKFUNC\n");
+    scode = carl_share_setopt(share, CARLSHOPT_LOCKFUNC, my_lock);
   }
-  if(CURLSHE_OK == scode) {
-    printf("CURLSHOPT_UNLOCKFUNC\n");
-    scode = curl_share_setopt(share, CURLSHOPT_UNLOCKFUNC, my_unlock);
+  if(CARLSHE_OK == scode) {
+    printf("CARLSHOPT_UNLOCKFUNC\n");
+    scode = carl_share_setopt(share, CARLSHOPT_UNLOCKFUNC, my_unlock);
   }
-  if(CURLSHE_OK == scode) {
-    printf("CURLSHOPT_USERDATA\n");
-    scode = curl_share_setopt(share, CURLSHOPT_USERDATA, &user);
+  if(CARLSHE_OK == scode) {
+    printf("CARLSHOPT_USERDATA\n");
+    scode = carl_share_setopt(share, CARLSHOPT_USERDATA, &user);
   }
-  if(CURLSHE_OK == scode) {
-    printf("CURL_LOCK_DATA_SSL_SESSION\n");
-    scode = curl_share_setopt(share, CURLSHOPT_SHARE,
-                              CURL_LOCK_DATA_SSL_SESSION);
+  if(CARLSHE_OK == scode) {
+    printf("CARL_LOCK_DATA_SSL_SESSION\n");
+    scode = carl_share_setopt(share, CARLSHOPT_SHARE,
+                              CARL_LOCK_DATA_SSL_SESSION);
   }
 
-  if(CURLSHE_OK != scode) {
-    fprintf(stderr, "curl_share_setopt() failed\n");
-    curl_share_cleanup(share);
-    curl_global_cleanup();
+  if(CARLSHE_OK != scode) {
+    fprintf(stderr, "carl_share_setopt() failed\n");
+    carl_share_cleanup(share);
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
@@ -199,27 +199,27 @@ int test(char *URL)
 
   /* fetch a another one */
   printf("*** run %d\n", i);
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_share_cleanup(share);
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_share_cleanup(share);
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   url = URL;
-  test_setopt(curl, CURLOPT_URL, url);
-  printf("CURLOPT_SHARE\n");
-  test_setopt(curl, CURLOPT_SHARE, share);
+  test_setopt(carl, CARLOPT_URL, url);
+  printf("CARLOPT_SHARE\n");
+  test_setopt(carl, CARLOPT_SHARE, share);
 
   printf("PERFORM\n");
-  curl_easy_perform(curl);
+  carl_easy_perform(carl);
 
   /* try to free share, expect to fail because share is in use*/
   printf("try SHARE_CLEANUP...\n");
-  scode = curl_share_cleanup(share);
-  if(scode == CURLSHE_OK) {
-    fprintf(stderr, "curl_share_cleanup succeed but error expected\n");
+  scode = carl_share_cleanup(share);
+  if(scode == CARLSHE_OK) {
+    fprintf(stderr, "carl_share_cleanup succeed but error expected\n");
     share = NULL;
   }
   else {
@@ -230,17 +230,17 @@ test_cleanup:
 
   /* clean up last handle */
   printf("CLEANUP\n");
-  curl_easy_cleanup(curl);
+  carl_easy_cleanup(carl);
 
   /* free share */
   printf("SHARE_CLEANUP\n");
-  scode = curl_share_cleanup(share);
-  if(scode != CURLSHE_OK)
-    fprintf(stderr, "curl_share_cleanup failed, code errno %d\n",
+  scode = carl_share_cleanup(share);
+  if(scode != CARLSHE_OK)
+    fprintf(stderr, "carl_share_cleanup failed, code errno %d\n",
             (int)scode);
 
   printf("GLOBAL_CLEANUP\n");
-  curl_global_cleanup();
+  carl_global_cleanup();
 
   return res;
 }

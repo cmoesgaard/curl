@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,22 +23,22 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #if defined(HAVE_GSSAPI) && defined(USE_KERBEROS5)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 #include "vauth/vauth.h"
-#include "curl_sasl.h"
+#include "carl_sasl.h"
 #include "urldata.h"
-#include "curl_base64.h"
-#include "curl_gssapi.h"
+#include "carl_base64.h"
+#include "carl_gssapi.h"
 #include "sendf.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -77,9 +77,9 @@ bool Curl_auth_is_gssapi_supported(void)
  *                        holding the result will be stored upon completion.
  * outlen      [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
                                               const char *userp,
                                               const char *passwdp,
                                               const char *service,
@@ -89,7 +89,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
                                               struct kerberos5data *krb5,
                                               char **outptr, size_t *outlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t chlglen = 0;
   unsigned char *chlg = NULL;
   OM_uint32 major_status;
@@ -106,7 +106,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
     /* Generate our SPN */
     char *spn = Curl_auth_build_spn(service, NULL, host);
     if(!spn)
-      return CURLE_OUT_OF_MEMORY;
+      return CARLE_OUT_OF_MEMORY;
 
     /* Populate the SPN structure */
     spn_token.value = spn;
@@ -121,7 +121,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
 
       free(spn);
 
-      return CURLE_AUTH_ERROR;
+      return CARLE_AUTH_ERROR;
     }
 
     free(spn);
@@ -139,7 +139,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
     if(!chlg) {
       infof(data, "GSSAPI handshake failure (empty challenge message)\n");
 
-      return CURLE_BAD_CONTENT_ENCODING;
+      return CARLE_BAD_CONTENT_ENCODING;
     }
 
     /* Setup the challenge "input" security buffer */
@@ -168,7 +168,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
     Curl_gss_log_error(data, "gss_init_sec_context() failed: ",
                        major_status, minor_status);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   if(output_token.value && output_token.length) {
@@ -181,7 +181,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
   else if(mutual_auth) {
     *outptr = strdup("");
     if(!*outptr)
-      result = CURLE_OUT_OF_MEMORY;
+      result = CARLE_OUT_OF_MEMORY;
   }
 
   return result;
@@ -202,15 +202,15 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
                                                   const char *chlg64,
                                                   struct kerberos5data *krb5,
                                                   char **outptr,
                                                   size_t *outlen)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   size_t chlglen = 0;
   size_t messagelen = 0;
   unsigned char *chlg = NULL;
@@ -239,7 +239,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
   if(!chlg) {
     infof(data, "GSSAPI handshake failure (empty security message)\n");
 
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   /* Get the fully qualified username back from the context */
@@ -252,7 +252,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
 
     free(chlg);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   /* Convert the username from internal format to a displayable token */
@@ -264,7 +264,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
 
     free(chlg);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   /* Setup the challenge "input" security buffer */
@@ -281,7 +281,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
     gss_release_buffer(&unused_status, &username_token);
     free(chlg);
 
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   /* Not 4 octets long so fail as per RFC4752 Section 3.1 */
@@ -291,7 +291,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
     gss_release_buffer(&unused_status, &username_token);
     free(chlg);
 
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   /* Copy the data out and free the challenge as it is not required anymore */
@@ -306,7 +306,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
 
     gss_release_buffer(&unused_status, &username_token);
 
-    return CURLE_BAD_CONTENT_ENCODING;
+    return CARLE_BAD_CONTENT_ENCODING;
   }
 
   /* Extract the maximum message size the server can receive */
@@ -324,7 +324,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
   if(!message) {
     gss_release_buffer(&unused_status, &username_token);
 
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* Populate the message with the security layer, client supported receive
@@ -355,7 +355,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
 
     free(message);
 
-    return CURLE_AUTH_ERROR;
+    return CARLE_AUTH_ERROR;
   }
 
   /* Base64 encode the response */

@@ -20,10 +20,10 @@ Content-Type: text/1
 #
 # Client-side
 <client>
-<file1 name="log/.curlrc">
+<file1 name="log/.carlrc">
 --next
 header = "a: a"
-data = "curlrc read"
+data = "carlrc read"
 </file1>
 <server>
 http
@@ -32,7 +32,7 @@ http
 XDG_CONFIG_HOME=%PWD/log
 </setenv>
 <name>
-Verify XDG_CONFIG_HOME use to find .curlrc
+Verify XDG_CONFIG_HOME use to find .carlrc
 </name>
 <command>
 %HOSTIP:%HTTPPORT/433
@@ -45,13 +45,13 @@ Verify XDG_CONFIG_HOME use to find .curlrc
 <protocol nonewline="yes">
 POST /433 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 a: a
 Content-Length: 11
 Content-Type: application/x-www-form-urlencoded
 
-curlrc read
+carlrc read
 </protocol>
 </verify>
 </testcase>

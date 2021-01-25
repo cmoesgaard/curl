@@ -1,4 +1,4 @@
-How curl Became Like This
+How carl Became Like This
 =========================
 
 Towards the end of 1996, Daniel Stenberg was spending time writing an IRC bot
@@ -47,28 +47,28 @@ February 9: urlget 3.11
 March 14: urlget 3.12 added proxy authentication.
 
 The project slowly grew bigger. With upload capabilities, the name was once
-again misleading and a second name change was made. On March 20, 1998 curl 4
+again misleading and a second name change was made. On March 20, 1998 carl 4
 was released. (The version numbering from the previous names was kept.)
 
 (Unrelated to this project a company called Curl Corporation registered a US
-trademark on the name "CURL" on May 18 1998. That company had then already
-registered the curl.com domain back in November of the previous year. All this
+trademark on the name "CARL" on May 18 1998. That company had then already
+registered the carl.com domain back in November of the previous year. All this
 was revealed to us much later.)
 
 SSL support was added, powered by the SSLeay library.
 
-August: first announcement of curl on freshmeat.net.
+August: first announcement of carl on freshmeat.net.
 
-October: with the curl 4.9 release and the introduction of cookie support,
-curl was no longer released under the GPL license. Now we're at 4000 lines of
+October: with the carl 4.9 release and the introduction of cookie support,
+carl was no longer released under the GPL license. Now we're at 4000 lines of
 code, we switched over to the MPL license to restrict the effects of
 "copyleft".
 
 November: configure script and reported successful compiles on several
 major operating systems. The never-quite-understood -F option was added and
-curl could now simulate quite a lot of a browser. TELNET support was added.
+carl could now simulate quite a lot of a browser. TELNET support was added.
 
-Curl 5 was released in December 1998 and introduced the first ever curl man
+Curl 5 was released in December 1998 and introduced the first ever carl man
 page. People started making Linux RPM packages out of it.
 
 1999
@@ -80,10 +80,10 @@ OpenSSL took over and SSLeay was abandoned.
 
 May: first Debian package.
 
-August: LDAP:// and FILE:// support added. The curl website gets 1300 visits
-weekly. Moved site to curl.haxx.nu.
+August: LDAP:// and FILE:// support added. The carl website gets 1300 visits
+weekly. Moved site to carl.haxx.nu.
 
-September: Released curl 6.0. 15000 lines of code.
+September: Released carl 6.0. 15000 lines of code.
 
 December 28: added the project on Sourceforge and started using its services
 for managing the project.
@@ -94,77 +94,77 @@ for managing the project.
 Spring: major internal overhaul to provide a suitable library interface.
 The first non-beta release was named 7.1 and arrived in August. This offered
 the easy interface and turned out to be the beginning of actually getting
-other software and programs to be based on and powered by libcurl. Almost
+other software and programs to be based on and powered by libcarl. Almost
 20000 lines of code.
 
-June: the curl site moves to "curl.haxx.se"
+June: the carl site moves to "carl.haxx.se"
 
-August, the curl website gets 4000 visits weekly.
+August, the carl website gets 4000 visits weekly.
 
-The PHP guys adopted libcurl already the same month, when the first ever third
-party libcurl binding showed up. CURL has been a supported module in PHP since
+The PHP guys adopted libcarl already the same month, when the first ever third
+party libcarl binding showed up. CARL has been a supported module in PHP since
 the release of PHP 4.0.2. This would soon get followers. More than 16
 different bindings exist at the time of this writing.
 
 September: kerberos4 support was added.
 
-November: started the work on a test suite for curl. It was later re-written
-from scratch again. The libcurl major SONAME number was set to 1.
+November: started the work on a test suite for carl. It was later re-written
+from scratch again. The libcarl major SONAME number was set to 1.
 
 2001
 ----
 
-January: Daniel released curl 7.5.2 under a new license again: MIT (or
+January: Daniel released carl 7.5.2 under a new license again: MIT (or
 MPL). The MIT license is extremely liberal and can be combined with GPL
 in other projects. This would finally put an end to the "complaints" from
 people involved in GPLed projects that previously were prohibited from using
-libcurl while it was released under MPL only. (Due to the fact that MPL is
+libcarl while it was released under MPL only. (Due to the fact that MPL is
 deemed "GPL incompatible".)
 
-March 22: curl supports HTTP 1.1 starting with the release of 7.7. This
-also introduced libcurl's ability to do persistent connections. 24000 lines of
-code. The libcurl major SONAME number was bumped to 2 due to this overhaul.
+March 22: carl supports HTTP 1.1 starting with the release of 7.7. This
+also introduced libcarl's ability to do persistent connections. 24000 lines of
+code. The libcarl major SONAME number was bumped to 2 due to this overhaul.
 The first experimental ftps:// support was added.
 
-August: curl is bundled in Mac OS X, 10.1. It was already becoming more and
+August: carl is bundled in Mac OS X, 10.1. It was already becoming more and
 more of a standard utility of Linux distributions and a regular in the BSD
-ports collections. The curl website gets 8000 visits weekly. Curl Corporation
+ports collections. The carl website gets 8000 visits weekly. Curl Corporation
 contacted Daniel to discuss "the name issue". After Daniel's reply, they have
 never since got back in touch again.
 
-September: libcurl 7.9 introduces cookie jar and curl_formadd(). During the
+September: libcarl 7.9 introduces cookie jar and carl_formadd(). During the
 forthcoming 7.9.x releases, we introduced the multi interface slowly and
 without many whistles.
 
 2002
 ----
 
-June: the curl website gets 13000 visits weekly. curl and libcurl is
+June: the carl website gets 13000 visits weekly. carl and libcarl is
 35000 lines of code. Reported successful compiles on more than 40 combinations
 of CPUs and operating systems.
 
-To estimate number of users of the curl tool or libcurl library is next to
+To estimate number of users of the carl tool or libcarl library is next to
 impossible. Around 5000 downloaded packages each week from the main site gives
 a hint, but the packages are mirrored extensively, bundled with numerous OS
 distributions and otherwise retrieved as part of other software.
 
-October 1: with the release of curl 7.10 it is released under the MIT license
+October 1: with the release of carl 7.10 it is released under the MIT license
 only.
 
-Starting with 7.10, curl verifies SSL server certificates by default.
+Starting with 7.10, carl verifies SSL server certificates by default.
 
 2003
 ----
 
-January: Started working on the distributed curl tests. The autobuilds.
+January: Started working on the distributed carl tests. The autobuilds.
 
-February: the curl site averages at 20000 visits weekly. At any given moment,
+February: the carl site averages at 20000 visits weekly. At any given moment,
 there's an average of 3 people browsing the website.
 
 Multiple new authentication schemes are supported: Digest (May), NTLM (June)
 and Negotiate (June).
 
-November: curl 7.10.8 is released. 45000 lines of code. ~55000 unique visitors
+November: carl 7.10.8 is released. 45000 lines of code. ~55000 unique visitors
 to the website. Five official web mirrors.
 
 December: full-fledged SSL for FTP is supported.
@@ -172,36 +172,36 @@ December: full-fledged SSL for FTP is supported.
 2004
 ----
 
-January: curl 7.11.0 introduced large file support.
+January: carl 7.11.0 introduced large file support.
 
-June: curl 7.12.0 introduced IDN support. 10 official web mirrors.
+June: carl 7.12.0 introduced IDN support. 10 official web mirrors.
 
 This release bumped the major SONAME to 3 due to the removal of the
-curl_formparse() function
+carl_formparse() function
 
-August: Curl and libcurl 7.12.1
+August: Curl and libcarl 7.12.1
 
-    Public curl release number:                82
+    Public carl release number:                82
     Releases counted from the very beginning: 109
     Available command line options:            96
-    Available curl_easy_setopt() options:     120
-    Number of public functions in libcurl:     36
+    Available carl_easy_setopt() options:     120
+    Number of public functions in libcarl:     36
     Amount of public website mirrors:         12
-    Number of known libcurl bindings:          26
+    Number of known libcarl bindings:          26
 
 2005
 ----
 
-April: GnuTLS can now optionally be used for the secure layer when curl is
+April: GnuTLS can now optionally be used for the secure layer when carl is
 built.
 
 April: Added the multi_socket() API
 
 September: TFTP support was added.
 
-More than 100,000 unique visitors of the curl website. 25 mirrors.
+More than 100,000 unique visitors of the carl website. 25 mirrors.
 
-December: security vulnerability: libcurl URL Buffer Overflow
+December: security vulnerability: libcarl URL Buffer Overflow
 
 2006
 ----
@@ -210,9 +210,9 @@ January: We dropped support for Gopher. We found bugs in the implementation
 that turned out to have been introduced years ago, so with the conclusion that
 nobody had found out in all this time we removed it instead of fixing it.
 
-March: security vulnerability: libcurl TFTP Packet Buffer Overflow
+March: security vulnerability: libcarl TFTP Packet Buffer Overflow
 
-September: The major SONAME number for libcurl was bumped to 4 due to the
+September: The major SONAME number for libcarl was bumped to 4 due to the
 removal of ftp third party transfer support.
 
 November: Added SCP and SFTP support
@@ -222,7 +222,7 @@ November: Added SCP and SFTP support
 
 February: Added support for the Mozilla NSS library to do the SSL/TLS stuff
 
-July: security vulnerability: libcurl GnuTLS insufficient cert verification
+July: security vulnerability: libcarl GnuTLS insufficient cert verification
 
 2008
 ----
@@ -230,9 +230,9 @@ July: security vulnerability: libcurl GnuTLS insufficient cert verification
 November:
 
     Command line options:         128
-    curl_easy_setopt() options:   158
-    Public functions in libcurl:   58
-    Known libcurl bindings:        37
+    carl_easy_setopt() options:   158
+    Public functions in libcarl:   58
+    Known libcarl bindings:        37
     Contributors:                 683
 
  145,000 unique visitors. >100 GB downloaded.
@@ -240,11 +240,11 @@ November:
 2009
 ----
 
-March: security vulnerability: libcurl Arbitrary File Access
+March: security vulnerability: libcarl Arbitrary File Access
 
 April: added CMake support
 
-August: security vulnerability: libcurl embedded zero in cert name
+August: security vulnerability: libcarl embedded zero in cert name
 
 December: Added support for IMAP, POP3 and SMTP
 
@@ -253,7 +253,7 @@ December: Added support for IMAP, POP3 and SMTP
 
 January: Added support for RTSP
 
-February: security vulnerability: libcurl data callback excessive length
+February: security vulnerability: libcarl data callback excessive length
 
 March: The project switched over to use git (hosted by github) instead of CVS
 for source code control
@@ -264,11 +264,11 @@ Added support for PolarSSL to do the SSL/TLS stuff
 
 August:
 
-    Public curl releases:         117
+    Public carl releases:         117
     Command line options:         138
-    curl_easy_setopt() options:   180
-    Public functions in libcurl:   58
-    Known libcurl bindings:        39
+    carl_easy_setopt() options:   180
+    Public functions in libcarl:   58
+    Known libcarl bindings:        39
     Contributors:                 808
 
  Gopher support added (re-added actually, see January 2006)
@@ -323,30 +323,30 @@ April: added the cyassl backend (later renamed to WolfSSL)
 2016
 ----
 
- January: the curl tool defaults to HTTP/2 for HTTPS URLs
+ January: the carl tool defaults to HTTP/2 for HTTPS URLs
 
- December: curl 7.52.0 introduced support for HTTPS-proxy!
+ December: carl 7.52.0 introduced support for HTTPS-proxy!
 
  First TLS 1.3 support
 
 2017
 ----
 
- July: OSS-Fuzz started fuzzing libcurl
+ July: OSS-Fuzz started fuzzing libcarl
 
  September: Added Multi-SSL support
 
  The website serves 3100 GB/month
 
-    Public curl releases:         169
+    Public carl releases:         169
     Command line options:         211
-    curl_easy_setopt() options:   249
-    Public functions in libcurl:  74
+    carl_easy_setopt() options:   249
+    Public functions in libcarl:  74
     Contributors:                 1609
 
  October: SSLKEYLOGFILE support, new MIME API
 
- October: Daniel received the Polhem Prize for his work on curl
+ October: Daniel received the Polhem Prize for his work on carl
 
  November: brotli
 
@@ -355,26 +355,26 @@ April: added the cyassl backend (later renamed to WolfSSL)
 
  January: new SSH backend powered by libssh
 
- March: starting with the 1803 release of Windows 10, curl is shipped bundled
+ March: starting with the 1803 release of Windows 10, carl is shipped bundled
  with Microsoft's operating system.
 
- July: curl shows headers using bold type face
+ July: carl shows headers using bold type face
 
  October: added DNS-over-HTTPS (DoH) and the URL API
 
  MesaLink is a new supported TLS backend
 
- libcurl now does HTTP/2 (and multiplexing) by default on HTTPS URLs
+ libcarl now does HTTP/2 (and multiplexing) by default on HTTPS URLs
 
- curl and libcurl are installed in an estimated 5 *billion* instances
+ carl and libcarl are installed in an estimated 5 *billion* instances
  world-wide.
 
- October 31: Curl and libcurl 7.62.0
+ October 31: Curl and libcarl 7.62.0
 
-    Public curl releases:         177
+    Public carl releases:         177
     Command line options:         219
-    curl_easy_setopt() options:   261
-    Public functions in libcurl:  80
+    carl_easy_setopt() options:   261
+    Public functions in libcarl:  80
     Contributors:                 1808
 
  December: removed axTLS support
@@ -384,14 +384,14 @@ April: added the cyassl backend (later renamed to WolfSSL)
 
  March: added experimental alt-svc support
 
- August: the first HTTP/3 requests with curl.
+ August: the first HTTP/3 requests with carl.
 
  September: 7.66.0 is released and the tool offers parallel downloads
 
 2020
 ----
 
- curl and libcurl are installed in an estimated 10 *billion* instances
+ carl and libcarl are installed in an estimated 10 *billion* instances
  world-wide.
 
  January: added BearSSL support
@@ -402,5 +402,5 @@ April: added the cyassl backend (later renamed to WolfSSL)
 
  August: zstd support
 
- November: the website moves to www.curl.se. The website serves 10TB data
+ November: the website moves to www.carl.se. The website serves 10TB data
  monthly.

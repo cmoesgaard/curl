@@ -62,12 +62,12 @@ http://%HOSTIP:%HTTPPORT/want/this/1031 -L
 <protocol>
 GET /want/this/1031 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /want/this/1031?coolsite=yes/10310002.txt HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

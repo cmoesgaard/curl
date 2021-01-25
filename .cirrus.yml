@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -20,7 +20,7 @@
 #
 ###########################################################################
 # Cirrus CI configuration
-# https://cirrus-ci.com/github/curl/curl
+# https://cirrus-ci.com/github/carl/carl
 
 task:
   name: FreeBSD
@@ -43,7 +43,7 @@ task:
         Python?3.7*) pkg install -y py37-impacket ;;
         Python?2.7*) pkg install -y py27-impacket ;;
       esac
-    - pkg delete -y curl
+    - pkg delete -y carl
   configure_script:
     - ./buildconf
     - case `uname -r` in

@@ -1,0 +1,91 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_USERPWD 3 "17 Jun 2014" "libcarl 7.37.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_USERPWD \- user name and password to use in authentication
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_USERPWD, char *userpwd);
+.SH DESCRIPTION
+Pass a char * as parameter, pointing to a null-terminated login details string
+for the connection. The format of which is: [user name]:[password].
+
+When using Kerberos V5 authentication with a Windows based server, you should
+specify the user name part with the domain name in order for the server to
+successfully obtain a Kerberos Ticket. If you don't then the initial part of
+the authentication handshake may fail.
+
+When using NTLM, the user name can be specified simply as the user name
+without the domain name should the server be part of a single domain and
+forest.
+
+To specify the domain name use either Down-Level Logon Name or UPN (User
+Principal Name) formats. For example, EXAMPLE\\user and user@example.com
+respectively.
+
+Some HTTP servers (on Windows) support inclusion of the domain for Basic
+authentication as well.
+
+When using HTTP and \fICARLOPT_FOLLOWLOCATION(3)\fP, libcarl might perform
+several requests to possibly different hosts. libcarl will only send this user
+and password information to hosts using the initial host name (unless
+\fICARLOPT_UNRESTRICTED_AUTH(3)\fP is set), so if libcarl follows locations to
+other hosts it will not send the user and password to those. This is enforced
+to prevent accidental information leakage.
+
+Use \fICARLOPT_HTTPAUTH(3)\fP to specify the authentication method for HTTP
+based connections or \fICARLOPT_LOGIN_OPTIONS(3)\fP to control IMAP, POP3 and
+SMTP options.
+
+The user and password strings are not URL decoded, so there's no way to send
+in a user name containing a colon using this option. Use
+\fICARLOPT_USERNAME(3)\fP for that, or include it in the URL.
+
+The application does not have to keep the string around after setting this
+option.
+.SH DEFAULT
+NULL
+.SH PROTOCOLS
+Most
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com/foo.bin");
+
+  carl_easy_setopt(carl, CARLOPT_USERPWD, "clark:kent");
+
+  ret = carl_easy_perform(carl);
+
+  carl_easy_cleanup(carl);
+}
+.fi
+.SH AVAILABILITY
+Always
+.SH RETURN VALUE
+Returns CARLE_OK on success or
+CARLE_OUT_OF_MEMORY if there was insufficient heap space.
+.SH "SEE ALSO"
+.BR CARLOPT_USERNAME "(3), " CARLOPT_PASSWORD "(3), "
+.BR CARLOPT_PROXYUSERPWD "(3), "

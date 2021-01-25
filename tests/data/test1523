@@ -1,7 +1,7 @@
 <testcase>
 <info>
 <keywords>
-CURLINFO_LOW_SPEED_LIMIT
+CARLINFO_LOW_SPEED_LIMIT
 </keywords>
 </info>
 
@@ -31,7 +31,7 @@ lib1523
 </tool>
 
 <name>
-CURLINFO_LOW_SPEED_LIMIT
+CARLINFO_LOW_SPEED_LIMIT
 </name>
 
 <command>

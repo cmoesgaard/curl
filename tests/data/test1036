@@ -33,7 +33,7 @@ FTP download resume from end of file
  <command>
 ftp://%HOSTIP:%FTPPORT/1036 -C -
 </command>
-<file name="log/curl1036.out">
+<file name="log/carl1036.out">
 This is the start!!
 </file>
 </client>
@@ -52,7 +52,7 @@ REST 20
 RETR 1036
 QUIT
 </protocol>
-<file name="log/curl1036.out">
+<file name="log/carl1036.out">
 This is the start!!
 expected to be a file without the first part
 but we emulate that

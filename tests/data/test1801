@@ -52,14 +52,14 @@ http://%HOSTIP:%HTTPPORT/1801 --http2
 <protocol>
 GET /1801 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Connection: Upgrade, HTTP2-Settings
 Upgrade: %H2CVER
 HTTP2-Settings: AAMAAABkAARAAAAAAAIAAAAA
 
 </protocol>
-# CURLE_HTTP2: Send failure: Broken pipe
+# CARLE_HTTP2: Send failure: Broken pipe
 <errorcode>
 16
 </errorcode>

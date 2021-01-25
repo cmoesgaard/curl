@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -27,10 +27,10 @@
 # order of least-to-most-dependent.  Some libraries depend on others
 # to link correctly.
 macro(check_library_exists_concat LIBRARY SYMBOL VARIABLE)
-  check_library_exists("${LIBRARY};${CURL_LIBS}" ${SYMBOL} "${CMAKE_LIBRARY_PATH}"
+  check_library_exists("${LIBRARY};${CARL_LIBS}" ${SYMBOL} "${CMAKE_LIBRARY_PATH}"
     ${VARIABLE})
   if(${VARIABLE})
-    set(CURL_LIBS ${LIBRARY} ${CURL_LIBS})
+    set(CARL_LIBS ${LIBRARY} ${CARL_LIBS})
   endif()
 endmacro()
 
@@ -39,47 +39,47 @@ endmacro()
 # possibly dependent header files.  Some headers depend on others to be
 # compiled correctly.
 macro(check_include_file_concat FILE VARIABLE)
-  check_include_files("${CURL_INCLUDES};${FILE}" ${VARIABLE})
+  check_include_files("${CARL_INCLUDES};${FILE}" ${VARIABLE})
   if(${VARIABLE})
-    set(CURL_INCLUDES ${CURL_INCLUDES} ${FILE})
-    set(CURL_TEST_DEFINES "${CURL_TEST_DEFINES} -D${VARIABLE}")
+    set(CARL_INCLUDES ${CARL_INCLUDES} ${FILE})
+    set(CARL_TEST_DEFINES "${CARL_TEST_DEFINES} -D${VARIABLE}")
   endif()
 endmacro()
 
-# For other curl specific tests, use this macro.
-macro(curl_internal_test CURL_TEST)
-  if(NOT DEFINED "${CURL_TEST}")
+# For other carl specific tests, use this macro.
+macro(carl_internal_test CARL_TEST)
+  if(NOT DEFINED "${CARL_TEST}")
     set(MACRO_CHECK_FUNCTION_DEFINITIONS
-      "-D${CURL_TEST} ${CURL_TEST_DEFINES} ${CMAKE_REQUIRED_FLAGS}")
+      "-D${CARL_TEST} ${CARL_TEST_DEFINES} ${CMAKE_REQUIRED_FLAGS}")
     if(CMAKE_REQUIRED_LIBRARIES)
-      set(CURL_TEST_ADD_LIBRARIES
+      set(CARL_TEST_ADD_LIBRARIES
         "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
     endif()
 
-    message(STATUS "Performing Curl Test ${CURL_TEST}")
-    try_compile(${CURL_TEST}
+    message(STATUS "Performing Curl Test ${CARL_TEST}")
+    try_compile(${CARL_TEST}
       ${CMAKE_BINARY_DIR}
       ${CMAKE_CURRENT_SOURCE_DIR}/CMake/CurlTests.c
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
-      "${CURL_TEST_ADD_LIBRARIES}"
+      "${CARL_TEST_ADD_LIBRARIES}"
       OUTPUT_VARIABLE OUTPUT)
-    if(${CURL_TEST})
-      set(${CURL_TEST} 1 CACHE INTERNAL "Curl test ${FUNCTION}")
-      message(STATUS "Performing Curl Test ${CURL_TEST} - Success")
+    if(${CARL_TEST})
+      set(${CARL_TEST} 1 CACHE INTERNAL "Curl test ${FUNCTION}")
+      message(STATUS "Performing Curl Test ${CARL_TEST} - Success")
       file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
-        "Performing Curl Test ${CURL_TEST} passed with the following output:\n"
+        "Performing Curl Test ${CARL_TEST} passed with the following output:\n"
         "${OUTPUT}\n")
     else()
-      message(STATUS "Performing Curl Test ${CURL_TEST} - Failed")
-      set(${CURL_TEST} "" CACHE INTERNAL "Curl test ${FUNCTION}")
+      message(STATUS "Performing Curl Test ${CARL_TEST} - Failed")
+      set(${CARL_TEST} "" CACHE INTERNAL "Curl test ${FUNCTION}")
       file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
-        "Performing Curl Test ${CURL_TEST} failed with the following output:\n"
+        "Performing Curl Test ${CARL_TEST} failed with the following output:\n"
         "${OUTPUT}\n")
     endif()
   endif()
 endmacro()
 
-macro(curl_nroff_check)
+macro(carl_nroff_check)
   find_program(NROFF NAMES gnroff nroff)
   if(NROFF)
     # Need a way to write to stdin, this will do
@@ -109,12 +109,12 @@ macro(curl_nroff_check)
 endmacro()
 
 macro(optional_dependency DEPENDENCY)
-  set(CURL_${DEPENDENCY} AUTO CACHE STRING "Build curl with ${DEPENDENCY} support (AUTO, ON or OFF)")
-  set_property(CACHE CURL_${DEPENDENCY} PROPERTY STRINGS AUTO ON OFF)
+  set(CARL_${DEPENDENCY} AUTO CACHE STRING "Build carl with ${DEPENDENCY} support (AUTO, ON or OFF)")
+  set_property(CACHE CARL_${DEPENDENCY} PROPERTY STRINGS AUTO ON OFF)
 
-  if(CURL_${DEPENDENCY} STREQUAL AUTO)
+  if(CARL_${DEPENDENCY} STREQUAL AUTO)
     find_package(${DEPENDENCY})
-  elseif(CURL_${DEPENDENCY})
+  elseif(CARL_${DEPENDENCY})
     find_package(${DEPENDENCY} REQUIRED)
   endif()
 endmacro()

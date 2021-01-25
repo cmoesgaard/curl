@@ -39,11 +39,11 @@ http://%HOSTIP:%HTTPPORT/we/want/our/1261 -w '%{redirect_url}\n' --location --ma
 <protocol>
 GET /we/want/our/1261 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>
-# CURLE_TOO_MANY_REDIRECTS
+# CARLE_TOO_MANY_REDIRECTS
 <errorcode>
 47
 </errorcode>

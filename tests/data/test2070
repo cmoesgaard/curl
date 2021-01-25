@@ -35,7 +35,7 @@ Ignore certificate revocation "best effort" strategy
  </name>
   <setenv>
 # This test is pointless if we're not using the schannel backend
-CURL_SSL_BACKEND=schannel
+CARL_SSL_BACKEND=schannel
  </setenv>
  <command>
 --cacert %SRCDIR/certs/EdelCurlRoot-ca.crt --ssl-revoke-best-effort https://localhost:%HTTPSPORT/2070
@@ -52,7 +52,7 @@ perl -e "print 'Test requires default test server host' if ( '%HOSTIP' ne '127.0
 <protocol>
 GET /2070 HTTP/1.1
 Host: localhost:%HTTPSPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

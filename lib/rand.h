@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_RAND_H
-#define HEADER_CURL_RAND_H
+#ifndef HEADER_CARL_RAND_H
+#define HEADER_CARL_RAND_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
  * Curl_rand() stores 'num' number of random unsigned characters in the buffer
  * 'rnd' points to.
  *
- * If libcurl is built without TLS support or with a TLS backend that lacks a
+ * If libcarl is built without TLS support or with a TLS backend that lacks a
  * proper random API (Gskit or mbedTLS), this function will use "weak" random.
  *
  * When built *with* TLS support and a backend that offers strong random, it
@@ -36,14 +36,14 @@
  * easy handle!
  *
  */
-CURLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num);
+CARLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num);
 
 /*
  * Curl_rand_hex() fills the 'rnd' buffer with a given 'num' size with random
  * hexadecimal digits PLUS a zero terminating byte. It must be an odd number
  * size.
  */
-CURLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
+CARLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
                        size_t num);
 
-#endif /* HEADER_CURL_RAND_H */
+#endif /* HEADER_CARL_RAND_H */

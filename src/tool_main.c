@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -36,9 +36,9 @@
 #include <plarenas.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_convert.h"
@@ -60,7 +60,7 @@
 #ifdef __VMS
 /*
  * vms_show is a global variable, used in main() as parameter for
- * function vms_special_exit() to allow proper curl tool exiting.
+ * function vms_special_exit() to allow proper carl tool exiting.
  * Its value may be set in other tool_*.c source files thanks to
  * forward declaration present in tool_vms.h
  */
@@ -82,7 +82,7 @@ int _CRT_glob = 0;
 /*
  * Ensure that file descriptors 0, 1 and 2 (stdin, stdout, stderr) are
  * open before starting to run.  Otherwise, the first three network
- * sockets opened by curl could be used for input sources, downloaded data
+ * sockets opened by carl could be used for input sources, downloaded data
  * or error logs as they will effectively be stdin, stdout and/or stderr.
  */
 static void main_checkfds(void)
@@ -103,32 +103,32 @@ static void main_checkfds(void)
 #endif
 }
 
-#ifdef CURLDEBUG
+#ifdef CARLDEBUG
 static void memory_tracking_init(void)
 {
   char *env;
-  /* if CURL_MEMDEBUG is set, this starts memory tracking message logging */
-  env = curlx_getenv("CURL_MEMDEBUG");
+  /* if CARL_MEMDEBUG is set, this starts memory tracking message logging */
+  env = carlx_getenv("CARL_MEMDEBUG");
   if(env) {
     /* use the value as file name */
-    char fname[CURL_MT_LOGFNAME_BUFSIZE];
-    if(strlen(env) >= CURL_MT_LOGFNAME_BUFSIZE)
-      env[CURL_MT_LOGFNAME_BUFSIZE-1] = '\0';
+    char fname[CARL_MT_LOGFNAME_BUFSIZE];
+    if(strlen(env) >= CARL_MT_LOGFNAME_BUFSIZE)
+      env[CARL_MT_LOGFNAME_BUFSIZE-1] = '\0';
     strcpy(fname, env);
-    curl_free(env);
-    curl_dbg_memdebug(fname);
-    /* this weird stuff here is to make curl_free() get called before
-       curl_gdb_memdebug() as otherwise memory tracking will log a free()
+    carl_free(env);
+    carl_dbg_memdebug(fname);
+    /* this weird stuff here is to make carl_free() get called before
+       carl_gdb_memdebug() as otherwise memory tracking will log a free()
        without an alloc! */
   }
-  /* if CURL_MEMLIMIT is set, this enables fail-on-alloc-number-N feature */
-  env = curlx_getenv("CURL_MEMLIMIT");
+  /* if CARL_MEMLIMIT is set, this enables fail-on-alloc-number-N feature */
+  env = carlx_getenv("CARL_MEMLIMIT");
   if(env) {
     char *endptr;
     long num = strtol(env, &endptr, 10);
     if((endptr != env) && (endptr == env + strlen(env)) && (num > 0))
-      curl_dbg_memlimit(num);
-    curl_free(env);
+      carl_dbg_memlimit(num);
+    carl_free(env);
   }
 }
 #else
@@ -137,12 +137,12 @@ static void memory_tracking_init(void)
 
 /*
  * This is the main global constructor for the app. Call this before
- * _any_ libcurl usage. If this fails, *NO* libcurl functions may be
+ * _any_ libcarl usage. If this fails, *NO* libcarl functions may be
  * used, or havoc may be the result.
  */
-static CURLcode main_init(struct GlobalConfig *config)
+static CARLcode main_init(struct GlobalConfig *config)
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
 
 #if defined(__DJGPP__) || defined(__GO32__)
   /* stop stat() wasting time */
@@ -158,11 +158,11 @@ static CURLcode main_init(struct GlobalConfig *config)
   /* Allocate the initial operate config */
   config->first = config->last = malloc(sizeof(struct OperationConfig));
   if(config->first) {
-    /* Perform the libcurl initialization */
-    result = curl_global_init(CURL_GLOBAL_DEFAULT);
+    /* Perform the libcarl initialization */
+    result = carl_global_init(CARL_GLOBAL_DEFAULT);
     if(!result) {
-      /* Get information about libcurl */
-      result = get_libcurl_info();
+      /* Get information about libcarl */
+      result = get_libcarl_info();
 
       if(!result) {
         /* Initialise the config */
@@ -170,18 +170,18 @@ static CURLcode main_init(struct GlobalConfig *config)
         config->first->global = config;
       }
       else {
-        errorf(config, "error retrieving curl library information\n");
+        errorf(config, "error retrieving carl library information\n");
         free(config->first);
       }
     }
     else {
-      errorf(config, "error initializing curl library\n");
+      errorf(config, "error initializing carl library\n");
       free(config->first);
     }
   }
   else {
-    errorf(config, "error initializing curl\n");
-    result = CURLE_FAILED_INIT;
+    errorf(config, "error initializing carl\n");
+    result = CARLE_FAILED_INIT;
   }
 
   return result;
@@ -199,18 +199,18 @@ static void free_globalconfig(struct GlobalConfig *config)
     fclose(config->trace_stream);
   config->trace_stream = NULL;
 
-  Curl_safefree(config->libcurl);
+  Curl_safefree(config->libcarl);
 }
 
 /*
  * This is the main global destructor for the app. Call this after
- * _all_ libcurl usage is done.
+ * _all_ libcarl usage is done.
  */
 static void main_free(struct GlobalConfig *config)
 {
   /* Cleanup the easy handle */
   /* Main cleanup */
-  curl_global_cleanup();
+  carl_global_cleanup();
   convert_cleanup();
   metalink_cleanup();
 #ifdef USE_NSS
@@ -230,7 +230,7 @@ static void main_free(struct GlobalConfig *config)
 }
 
 /*
-** curl tool main function.
+** carl tool main function.
 */
 #ifdef _UNICODE
 int wmain(int argc, wchar_t *argv[])
@@ -238,7 +238,7 @@ int wmain(int argc, wchar_t *argv[])
 int main(int argc, char *argv[])
 #endif
 {
-  CURLcode result = CURLE_OK;
+  CARLcode result = CARLE_OK;
   struct GlobalConfig global;
   memset(&global, 0, sizeof(global));
 
@@ -246,16 +246,16 @@ int main(int argc, char *argv[])
   /* Undocumented diagnostic option to list the full paths of all loaded
      modules. This is purposely pre-init. */
   if(argc == 2 && !_tcscmp(argv[1], _T("--dump-module-paths"))) {
-    struct curl_slist *item, *head = GetLoadedModulePaths();
+    struct carl_slist *item, *head = GetLoadedModulePaths();
     for(item = head; item; item = item->next)
       printf("%s\n", item->data);
-    curl_slist_free_all(head);
+    carl_slist_free_all(head);
     return head ? 0 : 1;
   }
   /* win32_init must be called before other init routines. */
   result = win32_init();
   if(result) {
-    fprintf(stderr, "curl: (%d) Windows-specific init failed.\n", result);
+    fprintf(stderr, "carl: (%d) Windows-specific init failed.\n", result);
     return result;
   }
 #endif
@@ -269,11 +269,11 @@ int main(int argc, char *argv[])
   /* Initialize memory tracking */
   memory_tracking_init();
 
-  /* Initialize the curl library - do not call any libcurl functions before
+  /* Initialize the carl library - do not call any libcarl functions before
      this point */
   result = main_init(&global);
   if(!result) {
-    /* Start our curl operation */
+    /* Start our carl operation */
     result = operate(&global, argc, argv);
 
     /* Perform the main cleanup */

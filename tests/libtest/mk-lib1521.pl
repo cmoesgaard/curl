@@ -10,7 +10,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -22,7 +22,7 @@
 ###########################################################################
 
 # Usage:
-#   perl mk-lib1521.pl < ../../include/curl/curl.h > lib1521.c
+#   perl mk-lib1521.pl < ../../include/carl/carl.h > lib1521.c
 
 # minimum and maximum long signed values
 my $minlong = "LONG_MIN";
@@ -42,7 +42,7 @@ print <<HEADER
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -64,23 +64,23 @@ struct data {
 
 #define LO $minlong
 #define HI $maxlong
-#define OFF_LO (curl_off_t) LO
-#define OFF_HI (curl_off_t) $maxulong
-#define OFF_NO (curl_off_t) 0
+#define OFF_LO (carl_off_t) LO
+#define OFF_HI (carl_off_t) $maxulong
+#define OFF_NO (carl_off_t) 0
 
 /* Unexpected error.
-    CURLE_NOT_BUILT_IN   - means disabled at build
-    CURLE_UNKNOWN_OPTION - means no such option (anymore?)
-    CURLE_SSL_ENGINE_NOTFOUND - set unknown ssl engine
-    CURLE_UNSUPPORTED_PROTOCOL - set bad HTTP version
-    CURLE_BAD_FUNCTION_ARGUMENT - unsupported value
+    CARLE_NOT_BUILT_IN   - means disabled at build
+    CARLE_UNKNOWN_OPTION - means no such option (anymore?)
+    CARLE_SSL_ENGINE_NOTFOUND - set unknown ssl engine
+    CARLE_UNSUPPORTED_PROTOCOL - set bad HTTP version
+    CARLE_BAD_FUNCTION_ARGUMENT - unsupported value
    */
 #define UNEX(x) ((x) && \\
-                 ((x) != CURLE_NOT_BUILT_IN) && \\
-                 ((x) != CURLE_UNKNOWN_OPTION) && \\
-                 ((x) != CURLE_SSL_ENGINE_NOTFOUND) && \\
-                 ((x) != CURLE_UNSUPPORTED_PROTOCOL) && \\
-                 ((x) != CURLE_BAD_FUNCTION_ARGUMENT) )
+                 ((x) != CARLE_NOT_BUILT_IN) && \\
+                 ((x) != CARLE_UNKNOWN_OPTION) && \\
+                 ((x) != CARLE_SSL_ENGINE_NOTFOUND) && \\
+                 ((x) != CARLE_UNSUPPORTED_PROTOCOL) && \\
+                 ((x) != CARLE_BAD_FUNCTION_ARGUMENT) )
 
 static size_t writecb(char *buffer, size_t size, size_t nitems,
                       void *outstream)
@@ -104,71 +104,71 @@ static size_t readcb(char *buffer,
   return 0;
 }
 
-static int err(const char *name, CURLcode val, int lineno)
+static int err(const char *name, CARLcode val, int lineno)
 {
-  printf("CURLOPT_%s returned %d, \\"%s\\" on line %d\\n",
-         name, val, curl_easy_strerror(val), lineno);
+  printf("CARLOPT_%s returned %d, \\"%s\\" on line %d\\n",
+         name, val, carl_easy_strerror(val), lineno);
   return (int)val;
 }
 
-static int geterr(const char *name, CURLcode val, int lineno)
+static int geterr(const char *name, CARLcode val, int lineno)
 {
-  printf("CURLINFO_%s returned %d, \\"%s\\" on line %d\\n",
-         name, val, curl_easy_strerror(val), lineno);
+  printf("CARLINFO_%s returned %d, \\"%s\\" on line %d\\n",
+         name, val, carl_easy_strerror(val), lineno);
   return (int)val;
 }
 
-static curl_progress_callback progresscb;
-static curl_write_callback headercb;
-static curl_debug_callback debugcb;
-static curl_trailer_callback trailercb;
-static curl_ssl_ctx_callback ssl_ctx_cb;
-static curl_ioctl_callback ioctlcb;
-static curl_sockopt_callback sockoptcb;
-static curl_opensocket_callback opensocketcb;
-static curl_seek_callback seekcb;
-static curl_sshkeycallback ssh_keycb;
-static curl_chunk_bgn_callback chunk_bgn_cb;
-static curl_chunk_end_callback chunk_end_cb;
-static curl_fnmatch_callback fnmatch_cb;
-static curl_closesocket_callback closesocketcb;
-static curl_xferinfo_callback xferinfocb;
-static curl_hstsread_callback hstsreadcb;
-static curl_hstswrite_callback hstswritecb;
-static curl_resolver_start_callback resolver_start_cb;
+static carl_progress_callback progresscb;
+static carl_write_callback headercb;
+static carl_debug_callback debugcb;
+static carl_trailer_callback trailercb;
+static carl_ssl_ctx_callback ssl_ctx_cb;
+static carl_ioctl_callback ioctlcb;
+static carl_sockopt_callback sockoptcb;
+static carl_opensocket_callback opensocketcb;
+static carl_seek_callback seekcb;
+static carl_sshkeycallback ssh_keycb;
+static carl_chunk_bgn_callback chunk_bgn_cb;
+static carl_chunk_end_callback chunk_end_cb;
+static carl_fnmatch_callback fnmatch_cb;
+static carl_closesocket_callback closesocketcb;
+static carl_xferinfo_callback xferinfocb;
+static carl_hstsread_callback hstsreadcb;
+static carl_hstswrite_callback hstswritecb;
+static carl_resolver_start_callback resolver_start_cb;
 
 int test(char *URL)
 {
-  CURL *curl = NULL;
-  CURL *dep = NULL;
-  CURLSH *share = NULL;
-  char errorbuffer[CURL_ERROR_SIZE];
+  CARL *carl = NULL;
+  CARL *dep = NULL;
+  CARLSH *share = NULL;
+  char errorbuffer[CARL_ERROR_SIZE];
   void *conv_from_network_cb = NULL;
   void *conv_to_network_cb = NULL;
   void *conv_from_utf8_cb = NULL;
   void *interleavecb = NULL;
   char *stringpointerextra = (char *)"moooo";
-  struct curl_slist *slist = NULL;
-  struct curl_httppost *httppost = NULL;
-  curl_mime *mimepost = NULL;
+  struct carl_slist *slist = NULL;
+  struct carl_httppost *httppost = NULL;
+  carl_mime *mimepost = NULL;
   FILE *stream = stderr;
   struct data object;
   char *charp;
   long val;
-  curl_off_t oval;
+  carl_off_t oval;
   double dval;
-  curl_socket_t sockfd;
-  struct curl_certinfo *certinfo;
-  struct curl_tlssessioninfo *tlssession;
-  struct curl_blob blob = { (void *)"silly", 5, 0};
-  CURLcode res = CURLE_OK;
+  carl_socket_t sockfd;
+  struct carl_certinfo *certinfo;
+  struct carl_tlssessioninfo *tlssession;
+  struct carl_blob blob = { (void *)"silly", 5, 0};
+  CARLcode res = CARLE_OK;
   (void)URL; /* not used */
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
   easy_init(dep);
-  easy_init(curl);
-  share = curl_share_init();
+  easy_init(carl);
+  share = carl_share_init();
   if(!share) {
-    res = CURLE_OUT_OF_MEMORY;
+    res = CARLE_OUT_OF_MEMORY;
     goto test_cleanup;
   }
 
@@ -176,47 +176,47 @@ HEADER
     ;
 
 while(<STDIN>) {
-    if($_ =~ /^  CURLOPT\(([^ ]*), ([^ ]*), (\d*)\)/) {
+    if($_ =~ /^  CARLOPT\(([^ ]*), ([^ ]*), (\d*)\)/) {
         my ($name, $type, $val)=($1, $2, $3);
         my $w="  ";
-        my $pref = "${w}res = curl_easy_setopt(curl, $name,";
+        my $pref = "${w}res = carl_easy_setopt(carl, $name,";
         my $i = ' ' x (length($w) + 23);
         my $check = "  if(UNEX(res)) {\n    err(\"$name\", res, __LINE__);\n    goto test_cleanup;\n  }\n";
-        if($type eq "CURLOPTTYPE_STRINGPOINT") {
+        if($type eq "CARLOPTTYPE_STRINGPOINT") {
             print "${pref} \"string\");\n$check";
             print "${pref} NULL);\n$check";
         }
-        elsif(($type eq "CURLOPTTYPE_LONG") ||
-              ($type eq "CURLOPTTYPE_VALUES")) {
+        elsif(($type eq "CARLOPTTYPE_LONG") ||
+              ($type eq "CARLOPTTYPE_VALUES")) {
             print "${pref} 0L);\n$check";
             print "${pref} 22L);\n$check";
             print "${pref} LO);\n$check";
             print "${pref} HI);\n$check";
         }
-        elsif(($type eq "CURLOPTTYPE_OBJECTPOINT") ||
-              ($type eq "CURLOPTTYPE_CBPOINT")) {
+        elsif(($type eq "CARLOPTTYPE_OBJECTPOINT") ||
+              ($type eq "CARLOPTTYPE_CBPOINT")) {
             if($name =~ /DEPENDS/) {
               print "${pref} dep);\n$check";
             }
             elsif($name =~ "SHARE") {
               print "${pref} share);\n$check";
             }
-            elsif($name eq "CURLOPT_ERRORBUFFER") {
+            elsif($name eq "CARLOPT_ERRORBUFFER") {
               print "${pref} errorbuffer);\n$check";
             }
-            elsif(($name eq "CURLOPT_POSTFIELDS") ||
-                  ($name eq "CURLOPT_COPYPOSTFIELDS")) {
+            elsif(($name eq "CARLOPT_POSTFIELDS") ||
+                  ($name eq "CARLOPT_COPYPOSTFIELDS")) {
                 # set size to zero to avoid it being "illegal"
-                print "  (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0);\n";
+                print "  (void)carl_easy_setopt(carl, CARLOPT_POSTFIELDSIZE, 0);\n";
                 print "${pref} stringpointerextra);\n$check";
             }
-            elsif($name eq "CURLOPT_HTTPPOST") {
+            elsif($name eq "CARLOPT_HTTPPOST") {
               print "${pref} httppost);\n$check";
             }
-            elsif($name eq "CURLOPT_MIMEPOST") {
+            elsif($name eq "CARLOPT_MIMEPOST") {
               print "${pref} mimepost);\n$check";
             }
-            elsif($name eq "CURLOPT_STDERR") {
+            elsif($name eq "CARLOPT_STDERR") {
               print "${pref} stream);\n$check";
             }
             else {
@@ -224,13 +224,13 @@ while(<STDIN>) {
             }
             print "${pref} NULL);\n$check";
         }
-        elsif($type eq "CURLOPTTYPE_SLISTPOINT") {
+        elsif($type eq "CARLOPTTYPE_SLISTPOINT") {
             print "${pref} slist);\n$check";
         }
-        elsif($type eq "CURLOPTTYPE_FUNCTIONPOINT") {
+        elsif($type eq "CARLOPTTYPE_FUNCTIONPOINT") {
             if($name =~ /([^ ]*)FUNCTION/) {
                 my $l=lc($1);
-                $l =~ s/^curlopt_//;
+                $l =~ s/^carlopt_//;
                 print "${pref}\n$i${l}cb);\n$check";
             }
             else {
@@ -238,13 +238,13 @@ while(<STDIN>) {
             }
             print "${pref} NULL);\n$check";
         }
-        elsif($type eq "CURLOPTTYPE_OFF_T") {
-            # play conservative to work with 32bit curl_off_t
+        elsif($type eq "CARLOPTTYPE_OFF_T") {
+            # play conservative to work with 32bit carl_off_t
             print "${pref} OFF_NO);\n$check";
             print "${pref} OFF_HI);\n$check";
             print "${pref} OFF_LO);\n$check";
         }
-        elsif($type eq "CURLOPTTYPE_BLOB") {
+        elsif($type eq "CARLOPTTYPE_BLOB") {
             print "${pref} &blob);\n$check";
         }
         else {
@@ -252,13 +252,13 @@ while(<STDIN>) {
             exit 22; # exit to make this noticed!
         }
     }
-    elsif($_ =~ /^  CURLINFO_NONE/) {
+    elsif($_ =~ /^  CARLINFO_NONE/) {
        $infomode = 1;
     }
     elsif($infomode &&
-          ($_ =~ /^  CURLINFO_([^ ]*) *= *CURLINFO_([^ ]*)/)) {
+          ($_ =~ /^  CARLINFO_([^ ]*) *= *CARLINFO_([^ ]*)/)) {
        my ($info, $type)=($1, $2);
-       my $c = "  res = curl_easy_getinfo(curl, CURLINFO_$info,";
+       my $c = "  res = carl_easy_getinfo(carl, CARLINFO_$info,";
        my $check = "  if(UNEX(res)) {\n    geterr(\"$info\", res, __LINE__);\n    goto test_cleanup;\n  }\n";
        if($type eq "STRING") {
          print "$c &charp);\n$check";
@@ -274,7 +274,7 @@ while(<STDIN>) {
        }
        elsif($type eq "SLIST") {
          print "$c &slist);\n$check";
-         print "  if(slist)\n    curl_slist_free_all(slist);\n";
+         print "  if(slist)\n    carl_slist_free_all(slist);\n";
        }
        elsif($type eq "SOCKET") {
          print "$c &sockfd);\n$check";
@@ -299,13 +299,13 @@ while(<STDIN>) {
 
 
 print <<FOOTER
-  curl_easy_setopt(curl, (CURLoption)1, 0);
-  res = CURLE_OK;
+  carl_easy_setopt(carl, (CARLoption)1, 0);
+  res = CARLE_OK;
 test_cleanup:
-  curl_easy_cleanup(curl);
-  curl_easy_cleanup(dep);
-  curl_share_cleanup(share);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_easy_cleanup(dep);
+  carl_share_cleanup(share);
+  carl_global_cleanup();
 
   return (int)res;
 }

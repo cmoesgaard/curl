@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -35,33 +35,33 @@
  *
  * The test case originated for verifying CONNECT_ONLY option shall not
  * block after protocol connect is done, but it returns the message
- * with function curl_multi_info_read().
+ * with function carl_multi_info_read().
  */
 
 int test(char *URL)
 {
-  CURL *easy = NULL;
-  CURLM *multi = NULL;
+  CARL *easy = NULL;
+  CARLM *multi = NULL;
   int res = 0;
   int running;
   int msgs_left;
-  CURLMsg *msg;
+  CARLMsg *msg;
 
   start_test_timing();
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   easy_init(easy);
 
   multi_init(multi);
 
   /* go verbose */
-  easy_setopt(easy, CURLOPT_VERBOSE, 1L);
+  easy_setopt(easy, CARLOPT_VERBOSE, 1L);
 
   /* specify target */
-  easy_setopt(easy, CURLOPT_URL, URL);
+  easy_setopt(easy, CARLOPT_URL, URL);
 
-  easy_setopt(easy, CURLOPT_CONNECT_ONLY, 1L);
+  easy_setopt(easy, CARLOPT_CONNECT_ONLY, 1L);
 
   multi_add_handle(multi, easy);
 
@@ -108,7 +108,7 @@ int test(char *URL)
     abort_on_test_timeout();
   }
 
-  msg = curl_multi_info_read(multi, &msgs_left);
+  msg = carl_multi_info_read(multi, &msgs_left);
   if(msg)
     res = msg->data.result;
 
@@ -118,9 +118,9 @@ test_cleanup:
 
   /* undocumented cleanup sequence - type UA */
 
-  curl_multi_cleanup(multi);
-  curl_easy_cleanup(easy);
-  curl_global_cleanup();
+  carl_multi_cleanup(multi);
+  carl_easy_cleanup(easy);
+  carl_global_cleanup();
 
   return res;
 }

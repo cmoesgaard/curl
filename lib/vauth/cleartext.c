@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,24 +23,24 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "carl_setup.h"
 
-#if !defined(CURL_DISABLE_IMAP) || !defined(CURL_DISABLE_SMTP) ||       \
-  !defined(CURL_DISABLE_POP3)
+#if !defined(CARL_DISABLE_IMAP) || !defined(CARL_DISABLE_SMTP) ||       \
+  !defined(CARL_DISABLE_POP3)
 
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include "urldata.h"
 
 #include "vauth/vauth.h"
-#include "curl_base64.h"
-#include "curl_md5.h"
+#include "carl_base64.h"
+#include "carl_md5.h"
 #include "warnless.h"
 #include "strtok.h"
 #include "sendf.h"
-#include "curl_printf.h"
+#include "carl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
+#include "carl_memory.h"
 #include "memdebug.h"
 
 /*
@@ -59,15 +59,15 @@
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_plain_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_plain_message(struct Curl_easy *data,
                                         const char *authzid,
                                         const char *authcid,
                                         const char *passwd,
                                         char **outptr, size_t *outlen)
 {
-  CURLcode result;
+  CARLcode result;
   char *plainauth;
   size_t zlen;
   size_t clen;
@@ -83,12 +83,12 @@ CURLcode Curl_auth_create_plain_message(struct Curl_easy *data,
   /* Compute binary message length. Check for overflows. */
   if((zlen > SIZE_T_MAX/4) || (clen > SIZE_T_MAX/4) ||
      (plen > (SIZE_T_MAX/2 - 2)))
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   plainlen = zlen + clen + plen + 2;
 
   plainauth = malloc(plainlen);
   if(!plainauth)
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
 
   /* Calculate the reply */
   if(zlen != 0)
@@ -119,9 +119,9 @@ CURLcode Curl_auth_create_plain_message(struct Curl_easy *data,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_login_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_login_message(struct Curl_easy *data,
                                         const char *valuep, char **outptr,
                                         size_t *outlen)
 {
@@ -132,11 +132,11 @@ CURLcode Curl_auth_create_login_message(struct Curl_easy *data,
     *outptr = strdup("=");
     if(*outptr) {
       *outlen = (size_t) 1;
-      return CURLE_OK;
+      return CARLE_OK;
     }
 
     *outlen = 0;
-    return CURLE_OUT_OF_MEMORY;
+    return CARLE_OUT_OF_MEMORY;
   }
 
   /* Base64 encode the value */
@@ -157,9 +157,9 @@ CURLcode Curl_auth_create_login_message(struct Curl_easy *data,
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
  *
- * Returns CURLE_OK on success.
+ * Returns CARLE_OK on success.
  */
-CURLcode Curl_auth_create_external_message(struct Curl_easy *data,
+CARLcode Curl_auth_create_external_message(struct Curl_easy *data,
                                            const char *user, char **outptr,
                                            size_t *outlen)
 {

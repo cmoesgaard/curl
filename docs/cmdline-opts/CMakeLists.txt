@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-set(MANPAGE "${CURL_BINARY_DIR}/docs/curl.1")
+set(MANPAGE "${CARL_BINARY_DIR}/docs/carl.1")
 
 # Load DPAGES and OTHERPAGES from shared file
 transform_makefile_inc("Makefile.inc" "${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake")
@@ -30,4 +30,4 @@ add_custom_command(OUTPUT "${MANPAGE}"
   DEPENDS ${DPAGES} ${OTHERPAGES}
   VERBATIM
 )
-add_custom_target(generate-curl.1 DEPENDS "${MANPAGE}")
+add_custom_target(generate-carl.1 DEPENDS "${MANPAGE}")

@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,9 +25,9 @@
 #include <sys/ioctl.h>
 #endif
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_cb_prg.h"
@@ -109,46 +109,46 @@ static void fly(struct ProgressData *bar, bool moved)
 }
 
 /*
-** callback for CURLOPT_XFERINFOFUNCTION
+** callback for CARLOPT_XFERINFOFUNCTION
 */
 
 #define MAX_BARLENGTH 256
 
-#if (SIZEOF_CURL_OFF_T == 4)
-#  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFF)
+#if (SIZEOF_CARL_OFF_T == 4)
+#  define CARL_OFF_T_MAX CARL_OFF_T_C(0x7FFFFFFF)
 #else
-   /* assume CURL_SIZEOF_CURL_OFF_T == 8 */
-#  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
+   /* assume CARL_SIZEOF_CARL_OFF_T == 8 */
+#  define CARL_OFF_T_MAX CARL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
 #endif
 
 int tool_progress_cb(void *clientp,
-                     curl_off_t dltotal, curl_off_t dlnow,
-                     curl_off_t ultotal, curl_off_t ulnow)
+                     carl_off_t dltotal, carl_off_t dlnow,
+                     carl_off_t ultotal, carl_off_t ulnow)
 {
-  /* The original progress-bar source code was written for curl by Lars Aas,
+  /* The original progress-bar source code was written for carl by Lars Aas,
      and this new edition inherits some of his concepts. */
 
   struct timeval now = tvnow();
   struct per_transfer *per = clientp;
   struct OperationConfig *config = per->config;
   struct ProgressData *bar = &per->progressbar;
-  curl_off_t total;
-  curl_off_t point;
+  carl_off_t total;
+  carl_off_t point;
 
   /* Calculate expected transfer size. initial_size can be less than zero
      when indicating that we are expecting to get the filesize from the
      remote */
   if(bar->initial_size < 0 ||
-     ((CURL_OFF_T_MAX - bar->initial_size) < (dltotal + ultotal)))
-    total = CURL_OFF_T_MAX;
+     ((CARL_OFF_T_MAX - bar->initial_size) < (dltotal + ultotal)))
+    total = CARL_OFF_T_MAX;
   else
     total = dltotal + ultotal + bar->initial_size;
 
   /* Calculate the current progress. initial_size can be less than zero when
      indicating that we are expecting to get the filesize from the remote */
   if(bar->initial_size < 0 ||
-     ((CURL_OFF_T_MAX - bar->initial_size) < (dlnow + ulnow)))
-    point = CURL_OFF_T_MAX;
+     ((CARL_OFF_T_MAX - bar->initial_size) < (dlnow + ulnow)))
+    point = CARL_OFF_T_MAX;
   else
     point = dlnow + ulnow + bar->initial_size;
 
@@ -203,7 +203,7 @@ int tool_progress_cb(void *clientp,
 
   if(config->readbusy) {
     config->readbusy = FALSE;
-    curl_easy_pause(per->curl, CURLPAUSE_CONT);
+    carl_easy_pause(per->carl, CARLPAUSE_CONT);
   }
 
   return 0;
@@ -221,14 +221,14 @@ void progressbarinit(struct ProgressData *bar,
   if(config->use_resume)
     bar->initial_size = config->resume_from;
 
-  colp = curlx_getenv("COLUMNS");
+  colp = carlx_getenv("COLUMNS");
   if(colp) {
     char *endptr;
     long num = strtol(colp, &endptr, 10);
     if((endptr != colp) && (endptr == colp + strlen(colp)) && (num > 20) &&
        (num < 10000))
       bar->width = (int)num;
-    curl_free(colp);
+    carl_free(colp);
   }
 
   if(!bar->width) {

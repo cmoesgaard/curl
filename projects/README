@@ -1,24 +1,24 @@
 Building via IDE Project Files
 ==============================
 
-   This document describes how to compile, build and install curl and libcurl
+   This document describes how to compile, build and install carl and libcarl
    from sources using an IDE based development tool such as Visual Studio.
 
    Project files are currently available for Visual C++ v6.0 to v15.0. The
    following directory structure has been used to cater for this:
 
    somedirectory\
-    |_curl
+    |_carl
       |_projects
         |_<platform>
           |_<ide>
             |_lib
             |_src
 
-   This structure allows for side-by-side compilation of curl on the same
+   This structure allows for side-by-side compilation of carl on the same
    machine using different versions of a given compiler (for example VC8, VC9
    and VC10) and allows for your own application or product to be compiled
-   against those variants of libcurl for example.
+   against those variants of libcarl for example.
 
    Note: Typically this side-by-side compilation is generally only required
    when a library is being compiled against dynamic runtime libraries.
@@ -32,10 +32,10 @@ Dependencies
 
    To support compilation of these libraries using different versions of
    compilers, the following directory structure has been used for both the
-   output of curl and libcurl as well as these dependencies.
+   output of carl and libcarl as well as these dependencies.
 
    somedirectory\
-    |_curl
+    |_carl
     | |_ build
     |    |_<architecture>
     |      |_<ide>
@@ -82,21 +82,21 @@ Building with Visual C++
    Once you have VC++ installed you should launch the application and open one
    of the solution or workspace files.
 
-   Whilst files are provided for both libcurl and the curl command line tool as
+   Whilst files are provided for both libcarl and the carl command line tool as
    well as a configuration that includes both, it is recommend that you use the
    all-in-one configuration.
 
 Running DLL based configurations
 ================================
 
-   If you are a developer and plan to run the curl tool from Visual Studio (eg
+   If you are a developer and plan to run the carl tool from Visual Studio (eg
    you are debugging) with any third-party libraries (such as OpenSSL, wolfSSL
    or LibSSH2) then you will need to add the search path of these DLLs to the
    configuration's PATH environment. To do that:
 
-    * Open the 'curl-all.sln' or 'curl.sln' solutions
+    * Open the 'carl-all.sln' or 'carl.sln' solutions
 
-    * Right-click on the 'curl' project and select Properties
+    * Right-click on the 'carl' project and select Properties
 
     * Navigate to 'Configuration Properties > Debugging > Environment'
 
@@ -155,5 +155,5 @@ Legacy Windows and SSL
    SSL library in Windows which forms part of Windows SSPI. However, Schannel
    in Windows <= XP is unable to connect to servers that no longer support the
    legacy handshakes and algorithms used by those versions. If you will be
-   using curl in one of those earlier versions of Windows you should choose
+   using carl in one of those earlier versions of Windows you should choose
    another SSL backend such as OpenSSL.

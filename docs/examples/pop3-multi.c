@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,13 +27,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
-/* This is a simple example showing how to retrieve mail using libcurl's POP3
+/* This is a simple example showing how to retrieve mail using libcarl's POP3
  * capabilities. It builds on the pop3-retr.c example to demonstrate how to use
- * libcurl's multi interface.
+ * libcarl's multi interface.
  *
- * Note that this example requires libcurl 7.20.0 or above.
+ * Note that this example requires libcarl 7.20.0 or above.
  */
 
 #define MULTI_PERFORM_HANG_TIMEOUT 60 * 1000
@@ -57,36 +57,36 @@ static long tvdiff(struct timeval newer, struct timeval older)
 
 int main(void)
 {
-  CURL *curl;
-  CURLM *mcurl;
+  CARL *carl;
+  CARLM *mcarl;
   int still_running = 1;
   struct timeval mp_start;
 
-  curl_global_init(CURL_GLOBAL_DEFAULT);
+  carl_global_init(CARL_GLOBAL_DEFAULT);
 
-  curl = curl_easy_init();
-  if(!curl)
+  carl = carl_easy_init();
+  if(!carl)
     return 1;
 
-  mcurl = curl_multi_init();
-  if(!mcurl)
+  mcarl = carl_multi_init();
+  if(!mcarl)
     return 2;
 
   /* Set username and password */
-  curl_easy_setopt(curl, CURLOPT_USERNAME, "user");
-  curl_easy_setopt(curl, CURLOPT_PASSWORD, "secret");
+  carl_easy_setopt(carl, CARLOPT_USERNAME, "user");
+  carl_easy_setopt(carl, CARLOPT_PASSWORD, "secret");
 
   /* This will retrieve message 1 from the user's mailbox */
-  curl_easy_setopt(curl, CURLOPT_URL, "pop3://pop.example.com/1");
+  carl_easy_setopt(carl, CARLOPT_URL, "pop3://pop.example.com/1");
 
   /* Tell the multi stack about our easy handle */
-  curl_multi_add_handle(mcurl, curl);
+  carl_multi_add_handle(mcarl, carl);
 
   /* Record the start time which we can use later */
   mp_start = tvnow();
 
   /* We start some action by calling perform right away */
-  curl_multi_perform(mcurl, &still_running);
+  carl_multi_perform(mcarl, &still_running);
 
   while(still_running) {
     struct timeval timeout;
@@ -95,9 +95,9 @@ int main(void)
     fd_set fdexcep;
     int maxfd = -1;
     int rc;
-    CURLMcode mc; /* curl_multi_fdset() return code */
+    CARLMcode mc; /* carl_multi_fdset() return code */
 
-    long curl_timeo = -1;
+    long carl_timeo = -1;
 
     /* Initialise the file descriptors */
     FD_ZERO(&fdread);
@@ -108,20 +108,20 @@ int main(void)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    curl_multi_timeout(mcurl, &curl_timeo);
-    if(curl_timeo >= 0) {
-      timeout.tv_sec = curl_timeo / 1000;
+    carl_multi_timeout(mcarl, &carl_timeo);
+    if(carl_timeo >= 0) {
+      timeout.tv_sec = carl_timeo / 1000;
       if(timeout.tv_sec > 1)
         timeout.tv_sec = 1;
       else
-        timeout.tv_usec = (curl_timeo % 1000) * 1000;
+        timeout.tv_usec = (carl_timeo % 1000) * 1000;
     }
 
     /* get file descriptors from the transfers */
-    mc = curl_multi_fdset(mcurl, &fdread, &fdwrite, &fdexcep, &maxfd);
+    mc = carl_multi_fdset(mcarl, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    if(mc != CURLM_OK) {
-      fprintf(stderr, "curl_multi_fdset() failed, code %d.\n", mc);
+    if(mc != CARLM_OK) {
+      fprintf(stderr, "carl_multi_fdset() failed, code %d.\n", mc);
       break;
     }
 
@@ -129,7 +129,7 @@ int main(void)
        select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
        no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
        to sleep 100ms, which is the minimum suggested value in the
-       curl_multi_fdset() doc. */
+       carl_multi_fdset() doc. */
 
     if(maxfd == -1) {
 #ifdef _WIN32
@@ -158,16 +158,16 @@ int main(void)
       break;
     case 0:   /* timeout */
     default:  /* action */
-      curl_multi_perform(mcurl, &still_running);
+      carl_multi_perform(mcarl, &still_running);
       break;
     }
   }
 
   /* Always cleanup */
-  curl_multi_remove_handle(mcurl, curl);
-  curl_multi_cleanup(mcurl);
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_multi_remove_handle(mcarl, carl);
+  carl_multi_cleanup(mcarl);
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return 0;
 }

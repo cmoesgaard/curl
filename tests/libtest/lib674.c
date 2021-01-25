@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -31,51 +31,51 @@
 
 int test(char *URL)
 {
-  CURL *handle = NULL;
-  CURL *handle2;
-  CURLcode res = 0;
-  CURLU *urlp = NULL;
-  CURLUcode uc = 0;
+  CARL *handle = NULL;
+  CARL *handle2;
+  CARLcode res = 0;
+  CARLU *urlp = NULL;
+  CARLUcode uc = 0;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
   easy_init(handle);
 
-  urlp = curl_url();
+  urlp = carl_url();
 
   if(!urlp) {
     fprintf(stderr, "problem init URL api.");
     goto test_cleanup;
   }
 
-  uc = curl_url_set(urlp, CURLUPART_URL, URL, 0);
+  uc = carl_url_set(urlp, CARLUPART_URL, URL, 0);
   if(uc) {
-    fprintf(stderr, "problem setting CURLUPART_URL.");
+    fprintf(stderr, "problem setting CARLUPART_URL.");
     goto test_cleanup;
   }
 
   /* demonstrate override behavior */
 
 
-  easy_setopt(handle, CURLOPT_CURLU, urlp);
-  easy_setopt(handle, CURLOPT_VERBOSE, 1L);
+  easy_setopt(handle, CARLOPT_CARLU, urlp);
+  easy_setopt(handle, CARLOPT_VERBOSE, 1L);
 
-  res = curl_easy_perform(handle);
+  res = carl_easy_perform(handle);
 
   if(res) {
-    fprintf(stderr, "%s:%d curl_easy_perform() failed with code %d (%s)\n",
-            __FILE__, __LINE__, res, curl_easy_strerror(res));
+    fprintf(stderr, "%s:%d carl_easy_perform() failed with code %d (%s)\n",
+            __FILE__, __LINE__, res, carl_easy_strerror(res));
     goto test_cleanup;
   }
 
-  handle2 = curl_easy_duphandle(handle);
-  res = curl_easy_perform(handle2);
-  curl_easy_cleanup(handle2);
+  handle2 = carl_easy_duphandle(handle);
+  res = carl_easy_perform(handle2);
+  carl_easy_cleanup(handle2);
 
 test_cleanup:
 
-  curl_url_cleanup(urlp);
-  curl_easy_cleanup(handle);
-  curl_global_cleanup();
+  carl_url_cleanup(urlp);
+  carl_easy_cleanup(handle);
+  carl_global_cleanup();
 
   return res;
 }

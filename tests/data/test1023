@@ -1,7 +1,7 @@
 <testcase>
 <info>
 <keywords>
-curl-config
+carl-config
 </keywords>
 </info>
 
@@ -17,13 +17,13 @@ curl-config
 none
 </server>
  <name>
-Compare curl --version with curl-config --vernum
+Compare carl --version with carl-config --vernum
  </name>
  <command>
 --version
 </command>
 <postcheck>
-%SRCDIR/libtest/test1022.pl ../curl-config log/stdout1023 vernum
+%SRCDIR/libtest/test1022.pl ../carl-config log/stdout1023 vernum
 </postcheck>
 </client>
 

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TOOL_CB_WRT_H
-#define HEADER_CURL_TOOL_CB_WRT_H
+#ifndef HEADER_CARL_TOOL_CB_WRT_H
+#define HEADER_CARL_TOOL_CB_WRT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,7 +24,7 @@
 #include "tool_setup.h"
 
 /*
-** callback for CURLOPT_WRITEFUNCTION
+** callback for CARLOPT_WRITEFUNCTION
 */
 
 size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata);
@@ -33,4 +33,4 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata);
 bool tool_create_output_file(struct OutStruct *outs,
                              struct OperationConfig *config);
 
-#endif /* HEADER_CURL_TOOL_CB_WRT_H */
+#endif /* HEADER_CARL_TOOL_CB_WRT_H */

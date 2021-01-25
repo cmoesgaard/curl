@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #include "sethostname.h"
 
@@ -29,7 +29,7 @@
 
 int gethostname(char *name, GETHOSTNAME_TYPE_ARG2 namelen)
 {
-  const char *force_hostname = getenv("CURL_GETHOSTNAME");
+  const char *force_hostname = getenv("CARL_GETHOSTNAME");
   if(force_hostname) {
     strncpy(name, force_hostname, namelen);
     name[namelen-1] = '\0';

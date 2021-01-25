@@ -25,7 +25,7 @@ file://localhost%FILE_PWD/log/test1445.dir/plainfile.txt --remote-time
 </command>
 <postcheck>
 perl %SRCDIR/libtest/test613.pl postprocess %PWD/log/test1445.dir && \
-perl -e 'exit((stat("log/curl1445.out"))[9] != 946728000)'
+perl -e 'exit((stat("log/carl1445.out"))[9] != 946728000)'
 </postcheck>
 </client>
 

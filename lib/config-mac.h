@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_MAC_H
-#define HEADER_CURL_CONFIG_MAC_H
+#ifndef HEADER_CARL_CONFIG_MAC_H
+#define HEADER_CARL_CONFIG_MAC_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
 /* =================================================================== */
 /*                Hand crafted config file for Mac OS 9                */
 /* =================================================================== */
-/*  On Mac OS X you must run configure to generate curl_config.h file  */
+/*  On Mac OS X you must run configure to generate carl_config.h file  */
 /* =================================================================== */
 
 #define OS "mac"
@@ -73,7 +73,7 @@
 #  define USE_OPENSSL           1
 #endif
 
-#define CURL_DISABLE_LDAP       1
+#define CARL_DISABLE_LDAP       1
 
 #define HAVE_RAND_STATUS        1
 #define HAVE_RAND_EGD           1
@@ -122,4 +122,4 @@
 #define HAVE_EXTRA_STRICMP_H 1
 #define HAVE_EXTRA_STRDUP_H  1
 
-#endif /* HEADER_CURL_CONFIG_MAC_H */
+#endif /* HEADER_CARL_CONFIG_MAC_H */

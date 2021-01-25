@@ -34,7 +34,7 @@ http://%HOSTIP:%HTTPPORT/want/334
 <protocol>
 GET /want/334 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

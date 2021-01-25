@@ -7,7 +7,7 @@ Category: auth http
 Enables Negotiate (SPNEGO) authentication.
 
 This option requires a library built with GSS-API or SSPI support. Use
---version to see if your curl supports GSS-API/SSPI or SPNEGO.
+--version to see if your carl supports GSS-API/SSPI or SPNEGO.
 
 When using this option, you must also provide a fake --user option to activate
 the authentication code properly. Sending a '-u :' is enough as the user name

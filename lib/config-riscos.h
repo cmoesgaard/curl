@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CONFIG_RISCOS_H
-#define HEADER_CURL_CONFIG_RISCOS_H
+#ifndef HEADER_CARL_CONFIG_RISCOS_H
+#define HEADER_CARL_CONFIG_RISCOS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -415,7 +415,7 @@
 #define HAVE_IOCTL_FIONBIO
 
 /* to disable LDAP */
-#define CURL_DISABLE_LDAP
+#define CARL_DISABLE_LDAP
 
 /* Define if you have the getnameinfo function. */
 #define HAVE_GETNAMEINFO 1
@@ -501,4 +501,4 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV ssize_t
 
-#endif /* HEADER_CURL_CONFIG_RISCOS_H */
+#endif /* HEADER_CARL_CONFIG_RISCOS_H */

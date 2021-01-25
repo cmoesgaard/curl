@@ -6,7 +6,7 @@
 
                 Things that could be nice to do in the future
 
- Things to do in project curl. Please tell us what you think, contribute and
+ Things to do in project carl. Please tell us what you think, contribute and
  send us patches that improve things!
 
  Be aware that these are things that we could do, or have once been considered
@@ -16,7 +16,7 @@
 
  All bugs documented in the KNOWN_BUGS document are subject for fixing!
 
- 1. libcurl
+ 1. libcarl
  1.1 TFO support on Windows
  1.2 Consult %APPDATA% also for .netrc
  1.3 struct lifreq
@@ -24,19 +24,19 @@
  1.5 get rid of PATH_MAX
  1.6 native IDN support on macOS
  1.7 Support HTTP/2 for HTTP(S) proxies
- 1.8 CURLOPT_RESOLVE for any port number
+ 1.8 CARLOPT_RESOLVE for any port number
  1.9 Cache negative name resolves
  1.10 auto-detect proxy
  1.11 minimize dependencies with dynamically loaded modules
  1.12 updated DNS server while running
- 1.13 c-ares and CURLOPT_OPENSOCKETFUNCTION
- 1.14 Typesafe curl_easy_setopt()
+ 1.13 c-ares and CARLOPT_OPENSOCKETFUNCTION
+ 1.14 Typesafe carl_easy_setopt()
  1.15 Monitor connections in the connection pool
  1.16 Try to URL encode given URL
  1.17 Add support for IRIs
  1.18 try next proxy if one doesn't work
  1.20 SRV and URI DNS records
- 1.22 CURLINFO_PAUSE_STATE
+ 1.22 CARLINFO_PAUSE_STATE
  1.23 Offer API to flush the connection pool
  1.24 TCP Fast Open for windows
  1.25 Expose tried IP addresses that failed
@@ -45,10 +45,10 @@
  1.29 Upgrade to websockets
  1.30 config file parsing
 
- 2. libcurl - multi interface
+ 2. libcarl - multi interface
  2.1 More non-blocking
  2.2 Better support for same name resolves
- 2.3 Non-blocking curl_multi_remove_handle()
+ 2.3 Non-blocking carl_multi_remove_handle()
  2.4 Split connect and authentication process
  2.5 Edge-triggered sockets should work
  2.6 multi upkeep
@@ -82,7 +82,7 @@
 
  7. SMTP
  7.2 Enhanced capability support
- 7.3 Add CURLOPT_MAIL_CLIENT option
+ 7.3 Add CARLOPT_MAIL_CLIENT option
 
  8. POP3
  8.2 Enhanced capability support
@@ -92,7 +92,7 @@
 
  10. LDAP
  10.1 SASL based authentication mechanisms
- 10.2 CURLOPT_SSL_CTX_FUNCTION for LDAPS
+ 10.2 CARLOPT_SSL_CTX_FUNCTION for LDAPS
  10.3 Paged searches on LDAP server
 
  11. SMB
@@ -138,7 +138,7 @@
  17.1 Multiplexing
  17.2 Handle growing SFTP files
  17.3 Support better than MD5 hostkey hash
- 17.4 Support CURLOPT_PREQUOTE
+ 17.4 Support CARLOPT_PREQUOTE
  17.5 SSH over HTTPS proxy with more backends
 
  18. Command line tool
@@ -151,7 +151,7 @@
  18.7 at least N milliseconds between requests
  18.8 Consider convenience options for JSON and XML?
  18.9 Choose the name of file in braces for complex URLs
- 18.10 improve how curl works in a windows console window
+ 18.10 improve how carl works in a windows console window
  18.11 Windows: set attribute 'archive' for completed downloads
  18.12 keep running, read instructions from pipe/socket
  18.13 Ratelimit or wait between serial requests
@@ -172,7 +172,7 @@
  19.1 roffit
  19.2 Enable PIE and RELRO by default
  19.3 Don't use GNU libtool on OpenBSD
- 19.4 Package curl for Windows in a signed installer
+ 19.4 Package carl for Windows in a signed installer
 
  20. Test suite
  20.1 SSL tunnel
@@ -188,33 +188,33 @@
  21. Next SONAME bump
  21.1 http-style HEAD output for FTP
  21.2 combine error codes
- 21.3 extend CURLOPT_SOCKOPTFUNCTION prototype
+ 21.3 extend CARLOPT_SOCKOPTFUNCTION prototype
 
  22. Next major release
  22.1 cleanup return codes
  22.2 remove obsolete defines
  22.3 size_t
  22.4 remove several functions
- 22.5 remove CURLOPT_FAILONERROR
- 22.7 remove progress meter from libcurl
- 22.8 remove 'curl_httppost' from public
+ 22.5 remove CARLOPT_FAILONERROR
+ 22.7 remove progress meter from libcarl
+ 22.8 remove 'carl_httppost' from public
 
 ==============================================================================
 
-1. libcurl
+1. libcarl
 
 1.1 TFO support on Windows
 
  TCP Fast Open is supported on several platforms but not on Windows. Work on
  this was once started but never finished.
 
- See https://github.com/curl/curl/pull/3378
+ See https://github.com/carl/carl/pull/3378
 
 1.2 Consult %APPDATA% also for .netrc
 
  %APPDATA%\.netrc is not considered when running on Windows. Shouldn't it?
 
- See https://github.com/curl/curl/issues/4016
+ See https://github.com/carl/carl/issues/4016
 
 1.3 struct lifreq
 
@@ -227,7 +227,7 @@
  The share interface could benefit from allowing the alt-svc cache to be
  possible to share between easy handles.
 
- See https://github.com/curl/curl/issues/4476
+ See https://github.com/carl/carl/issues/4476
 
 1.5 get rid of PATH_MAX
 
@@ -243,24 +243,24 @@
  On recent macOS versions, the getaddrinfo() function itself has built-in IDN
  support. By setting the AI_CANONNAME flag, the function will return the
  encoded name in the ai_canonname struct field in the returned information.
- This could be used by curl on macOS when built without a separate IDN library
+ This could be used by carl on macOS when built without a separate IDN library
  and an IDN host name is used in a URL.
 
- See initial work in https://github.com/curl/curl/pull/5371
+ See initial work in https://github.com/carl/carl/pull/5371
 
 1.7 Support HTTP/2 for HTTP(S) proxies
 
  Support for doing HTTP/2 to HTTP and HTTPS proxies is still missing.
 
- See https://github.com/curl/curl/issues/3570
+ See https://github.com/carl/carl/issues/3570
 
-1.8 CURLOPT_RESOLVE for any port number
+1.8 CARLOPT_RESOLVE for any port number
 
  This option allows applications to set a replacement IP address for a given
  host + port pair. Consider making support for providing a replacement address
  for the host name on all port numbers.
 
- See https://github.com/curl/curl/issues/1264
+ See https://github.com/carl/carl/issues/1264
 
 1.9 Cache negative name resolves
 
@@ -269,12 +269,12 @@
 
 1.10 auto-detect proxy
 
- libcurl could be made to detect the system proxy setup automatically and use
+ libcarl could be made to detect the system proxy setup automatically and use
  that. On Windows, macOS and Linux desktops for example.
 
  The pull-request to use libproxy for this was deferred due to doubts on the
  reliability of the dependency and how to use it:
- https://github.com/curl/curl/pull/977
+ https://github.com/carl/carl/pull/977
 
  libdetectproxy is a (C++) library for detecting the proxy on Windows
  https://github.com/paulharris/libdetectproxy
@@ -285,75 +285,75 @@
  would be the ones that link to 3rd party libs. That would allow us to avoid
  having to load ALL dependencies since only the necessary ones for this
  app/invoke/used protocols would be necessary to load.  See
- https://github.com/curl/curl/issues/349
+ https://github.com/carl/carl/issues/349
 
 1.12 updated DNS server while running
 
- If /etc/resolv.conf gets updated while a program using libcurl is running, it
+ If /etc/resolv.conf gets updated while a program using libcarl is running, it
  is may cause name resolves to fail unless res_init() is called. We should
  consider calling res_init() + retry once unconditionally on all name resolve
  failures to mitigate against this. Firefox works like that. Note that Windows
  doesn't have res_init() or an alternative.
 
- https://github.com/curl/curl/issues/2251
+ https://github.com/carl/carl/issues/2251
 
-1.13 c-ares and CURLOPT_OPENSOCKETFUNCTION
+1.13 c-ares and CARLOPT_OPENSOCKETFUNCTION
 
- curl will create most sockets via the CURLOPT_OPENSOCKETFUNCTION callback and
- close them with the CURLOPT_CLOSESOCKETFUNCTION callback. However, c-ares
+ carl will create most sockets via the CARLOPT_OPENSOCKETFUNCTION callback and
+ close them with the CARLOPT_CLOSESOCKETFUNCTION callback. However, c-ares
  does not use those functions and instead opens and closes the sockets
- itself. This means that when curl passes the c-ares socket to the
- CURLMOPT_SOCKETFUNCTION it isn't owned by the application like other sockets.
+ itself. This means that when carl passes the c-ares socket to the
+ CARLMOPT_SOCKETFUNCTION it isn't owned by the application like other sockets.
 
- See https://github.com/curl/curl/issues/2734
+ See https://github.com/carl/carl/issues/2734
 
-1.14 Typesafe curl_easy_setopt()
+1.14 Typesafe carl_easy_setopt()
 
- One of the most common problems in libcurl using applications is the lack of
- type checks for curl_easy_setopt() which happens because it accepts varargs
+ One of the most common problems in libcarl using applications is the lack of
+ type checks for carl_easy_setopt() which happens because it accepts varargs
  and thus can take any type.
 
  One possible solution to this is to introduce a few different versions of the
  setopt version for the different kinds of data you can set.
 
-  curl_easy_set_num() - sets a long value
+  carl_easy_set_num() - sets a long value
 
-  curl_easy_set_large() - sets a curl_off_t value
+  carl_easy_set_large() - sets a carl_off_t value
 
-  curl_easy_set_ptr() - sets a pointer
+  carl_easy_set_ptr() - sets a pointer
 
-  curl_easy_set_cb() - sets a callback PLUS its callback data
+  carl_easy_set_cb() - sets a callback PLUS its callback data
 
 1.15 Monitor connections in the connection pool
 
- libcurl's connection cache or pool holds a number of open connections for the
+ libcarl's connection cache or pool holds a number of open connections for the
  purpose of possible subsequent connection reuse. It may contain a few up to a
- significant amount of connections. Currently, libcurl leaves all connections
+ significant amount of connections. Currently, libcarl leaves all connections
  as they are and first when a connection is iterated over for matching or
  reuse purpose it is verified that it is still alive.
 
  Those connections may get closed by the server side for idleness or they may
  get a HTTP/2 ping from the peer to verify that they're still alive. By adding
- monitoring of the connections while in the pool, libcurl can detect dead
+ monitoring of the connections while in the pool, libcarl can detect dead
  connections (and close them) better and earlier, and it can handle HTTP/2
  pings to keep such ones alive even when not actively doing transfers on them.
 
 1.16 Try to URL encode given URL
 
- Given a URL that for example contains spaces, libcurl could have an option
+ Given a URL that for example contains spaces, libcarl could have an option
  that would try somewhat harder than it does now and convert spaces to %20 and
  perhaps URL encoded byte values over 128 etc (basically do what the redirect
  following code already does).
 
- https://github.com/curl/curl/issues/514
+ https://github.com/carl/carl/issues/514
 
 1.17 Add support for IRIs
 
  IRIs (RFC 3987) allow localized, non-ascii, names in the URL. To properly
- support this, curl/libcurl would need to translate/encode the given input
+ support this, carl/libcarl would need to translate/encode the given input
  from the input string encoding into percent encoded output "over the wire".
 
- To make that work smoothly for curl users even on Windows, curl would
+ To make that work smoothly for carl users even on Windows, carl would
  probably need to be able to convert from several input encodings.
 
 1.18 try next proxy if one doesn't work
@@ -363,17 +363,17 @@
  exhausted. Browsers support this feature at least when they specify proxies
  using PACs.
 
- https://github.com/curl/curl/issues/896
+ https://github.com/carl/carl/issues/896
 
 1.20 SRV and URI DNS records
 
- Offer support for resolving SRV and URI DNS records for libcurl to know which
+ Offer support for resolving SRV and URI DNS records for libcarl to know which
  server to connect to for various protocols (including HTTP!).
 
-1.22 CURLINFO_PAUSE_STATE
+1.22 CARLINFO_PAUSE_STATE
 
  Return information about the transfer's current pause state, in both
- directions. https://github.com/curl/curl/issues/2588
+ directions. https://github.com/carl/carl/issues/2588
 
 1.23 Offer API to flush the connection pool
 
@@ -383,22 +383,22 @@
 
 1.24 TCP Fast Open for windows
 
- libcurl supports the CURLOPT_TCP_FASTOPEN option since 7.49.0 for Linux and
+ libcarl supports the CARLOPT_TCP_FASTOPEN option since 7.49.0 for Linux and
  Mac OS. Windows supports TCP Fast Open starting with Windows 10, version 1607
  and we should add support for it.
 
 1.25 Expose tried IP addresses that failed
 
- When libcurl fails to connect to a host, it should be able to offer the
+ When libcarl fails to connect to a host, it should be able to offer the
  application the list of IP addresses that were used in the attempt.
 
- https://github.com/curl/curl/issues/2126
+ https://github.com/carl/carl/issues/2126
 
 1.27 hardcode the "localhost" addresses
 
  There's this new spec getting adopted that says "localhost" should always and
  unconditionally be a local address and not get resolved by a DNS server. A
- fine way for curl to fix this would be to simply hard-code the response to
+ fine way for carl to fix this would be to simply hard-code the response to
  127.0.0.1 and/or ::1 (depending on what IP versions that are requested). This
  is what the browsers probably will do with this hostname.
 
@@ -412,25 +412,25 @@
  descriptor to be automatically (and atomically) closed when any of the
  exec-family functions succeed. Should probably be set by default?
 
- https://github.com/curl/curl/issues/2252
+ https://github.com/carl/carl/issues/2252
 
 1.29 Upgrade to websockets
 
- libcurl could offer a smoother path to get to a websocket connection.
- See https://github.com/curl/curl/issues/3523
+ libcarl could offer a smoother path to get to a websocket connection.
+ See https://github.com/carl/carl/issues/3523
 
  Michael Kaufmann suggestion here:
- https://curl.se/video/curlup-2017/2017-03-19_05_Michael_Kaufmann_Websocket_support_for_curl.mp4
+ https://carl.se/video/carlup-2017/2017-03-19_05_Michael_Kaufmann_Websocket_support_for_carl.mp4
 
 1.30 config file parsing
 
  Consider providing an API, possibly in a separate companion library, for
- parsing a config file like curl's -K/--config option to allow applications to
- get the same ability to read curl options from files.
+ parsing a config file like carl's -K/--config option to allow applications to
+ get the same ability to read carl options from files.
 
- See https://github.com/curl/curl/issues/3698
+ See https://github.com/carl/carl/issues/3698
 
-2. libcurl - multi interface
+2. libcarl - multi interface
 
 2.1 More non-blocking
 
@@ -440,7 +440,7 @@
  - Name resolves on non-windows unless c-ares or the threaded resolver is used.
 
  - The threaded resolver may block on cleanup:
- https://github.com/curl/curl/issues/4852
+ https://github.com/carl/carl/issues/4852
 
  - file:// transfers
 
@@ -451,7 +451,7 @@
  - The "DONE" operation (post transfer protocol-specific actions) for the
  protocols SFTP, SMTP, FTP. Fixing multi_done() for this is a worthy task.
 
- - curl_multi_remove_handle for any of the above. See section 2.3.
+ - carl_multi_remove_handle for any of the above. See section 2.3.
 
 2.2 Better support for same name resolves
 
@@ -461,7 +461,7 @@
  especially needed when adding many simultaneous handles using the same host
  name when the DNS resolver can get flooded.
 
-2.3 Non-blocking curl_multi_remove_handle()
+2.3 Non-blocking carl_multi_remove_handle()
 
  The multi interface has a few API calls that assume a blocking behavior, like
  add_handle() and remove_handle() which limits what we can do internally. The
@@ -484,37 +484,37 @@
 
 2.6 multi upkeep
 
- In libcurl 7.62.0 we introduced curl_easy_upkeep. It unfortunately only works
+ In libcarl 7.62.0 we introduced carl_easy_upkeep. It unfortunately only works
  on easy handles. We should introduces a version of that for the multi handle,
  and also consider doing "upkeep" automatically on connections in the
  connection pool when the multi handle is in used.
 
- See https://github.com/curl/curl/issues/3199
+ See https://github.com/carl/carl/issues/3199
 
 2.7 Virtual external sockets
 
- libcurl performs operations on the given file descriptor that presumes it is
+ libcarl performs operations on the given file descriptor that presumes it is
  a socket and an application cannot replace them at the moment. Allowing an
  application to fully replace those would allow a larger degree of freedom and
  flexibility.
 
- See https://github.com/curl/curl/issues/5835
+ See https://github.com/carl/carl/issues/5835
 
 2.8 dynamically decide to use socketpair
 
- For users who don't use curl_multi_wait() or don't care for
- curl_multi_wakeup(), we could introduce a way to make libcurl NOT
+ For users who don't use carl_multi_wait() or don't care for
+ carl_multi_wakeup(), we could introduce a way to make libcarl NOT
  create a socketpair in the multi handle.
 
- See https://github.com/curl/curl/issues/4829
+ See https://github.com/carl/carl/issues/4829
 
 3. Documentation
 
 3.2 Provide cmake config-file
 
  A config-file package is a set of files provided by us to allow applications
- to write cmake scripts to find and use libcurl easier. See
- https://github.com/curl/curl/issues/885
+ to write cmake scripts to find and use libcarl easier. See
+ https://github.com/carl/carl/issues/885
 
 4. FTP
 
@@ -528,9 +528,9 @@
 4.2 Alter passive/active on failure and retry
 
  When trying to connect passively to a server which only supports active
- connections, libcurl returns CURLE_FTP_WEIRD_PASV_REPLY and closes the
+ connections, libcarl returns CARLE_FTP_WEIRD_PASV_REPLY and closes the
  connection. There could be a way to fallback to an active connection (and
- vice versa). https://curl.se/bug/feature.cgi?id=1754793
+ vice versa). https://carl.se/bug/feature.cgi?id=1754793
 
 4.3 Earlier bad letter detection
 
@@ -560,28 +560,28 @@
 
  Some servers respond with and some other FTP client implementations can
  ignore private (RFC 1918 style) IP addresses when received in PASV responses.
- To consider for libcurl as well. See https://github.com/curl/curl/issues/1455
+ To consider for libcarl as well. See https://github.com/carl/carl/issues/1455
 
 5. HTTP
 
 5.1 Better persistency for HTTP 1.0
 
  "Better" support for persistent connections over HTTP 1.0
- https://curl.se/bug/feature.cgi?id=1089001
+ https://carl.se/bug/feature.cgi?id=1089001
 
 5.2 Set custom client ip when using haproxy protocol
 
  This would allow testing servers with different client ip addresses (without
  using x-forward-for header).
 
- https://github.com/curl/curl/issues/5125
+ https://github.com/carl/carl/issues/5125
 
 5.3 Rearrange request header order
 
  Server implementors often make an effort to detect browser and to reject
  clients it can detect to not match. One of the last details we cannot yet
- control in libcurl's HTTP requests, which also can be exploited to detect
- that libcurl is in fact used even when it tries to impersonate a browser, is
+ control in libcarl's HTTP requests, which also can be exploited to detect
+ that libcarl is in fact used even when it tries to impersonate a browser, is
  the order of the request headers. I propose that we introduce a new option in
  which you give headers a value, and then when the HTTP request is built it
  sorts the headers based on that number. We could then have internally created
@@ -590,12 +590,12 @@
 
 5.4 Allow SAN names in HTTP/2 server push
 
- curl only allows HTTP/2 push promise if the provided :authority header value
+ carl only allows HTTP/2 push promise if the provided :authority header value
  exactly matches the host name given in the URL. It could be extended to allow
  any name that would match the Subject Alternative Names in the server's TLS
  certificate.
 
- See https://github.com/curl/curl/pull/3581
+ See https://github.com/carl/carl/pull/3581
 
 5.5 auth= in URLs
 
@@ -611,11 +611,11 @@
 
 5.6 alt-svc should fallback if alt-svc doesn't work
 
- The alt-svc: header provides a set of alternative services for curl to use
+ The alt-svc: header provides a set of alternative services for carl to use
  instead of the original. If the first attempted one fails, it should try the
  next etc and if all alternatives fail go back to the original.
 
- See https://github.com/curl/curl/issues/4908
+ See https://github.com/carl/carl/issues/4908
 
 6. TELNET
 
@@ -640,32 +640,32 @@
 
 7.2 Enhanced capability support
 
- Add the ability, for an application that uses libcurl, to obtain the list of
+ Add the ability, for an application that uses libcarl, to obtain the list of
  capabilities returned from the EHLO command.
 
-7.3 Add CURLOPT_MAIL_CLIENT option
+7.3 Add CARLOPT_MAIL_CLIENT option
 
  Rather than use the URL to specify the mail client string to present in the
- HELO and EHLO commands, libcurl should support a new CURLOPT specifically for
+ HELO and EHLO commands, libcarl should support a new CARLOPT specifically for
  specifying this data as the URL is non-standard and to be honest a bit of a
  hack ;-)
 
  Please see the following thread for more information:
- https://curl.se/mail/lib-2012-05/0178.html
+ https://carl.se/mail/lib-2012-05/0178.html
 
 
 8. POP3
 
 8.2 Enhanced capability support
 
- Add the ability, for an application that uses libcurl, to obtain the list of
+ Add the ability, for an application that uses libcarl, to obtain the list of
  capabilities returned from the CAPA command.
 
 9. IMAP
 
 9.1 Enhanced capability support
 
- Add the ability, for an application that uses libcurl, to obtain the list of
+ Add the ability, for an application that uses libcarl, to obtain the list of
  capabilities returned from the CAPABILITY command.
 
 10. LDAP
@@ -678,16 +678,16 @@
  be possible to use ldap_bind_s() instead specifying the security context
  information ourselves.
 
-10.2 CURLOPT_SSL_CTX_FUNCTION for LDAPS
+10.2 CARLOPT_SSL_CTX_FUNCTION for LDAPS
 
- CURLOPT_SSL_CTX_FUNCTION works perfectly for HTTPS and email protocols, but
+ CARLOPT_SSL_CTX_FUNCTION works perfectly for HTTPS and email protocols, but
  it has no effect for LDAPS connections.
 
- https://github.com/curl/curl/issues/4108
+ https://github.com/carl/carl/issues/4108
 
 10.3 Paged searches on LDAP server
 
- https://github.com/curl/curl/issues/4452
+ https://github.com/carl/carl/issues/4452
 
 11. SMB
 
@@ -728,11 +728,11 @@
  keys (PSKs). These pre-shared keys are symmetric keys shared in advance among
  the communicating parties.
 
- https://github.com/curl/curl/issues/5081
+ https://github.com/carl/carl/issues/5081
 
 13.2 Provide mutex locking API
 
- Provide a libcurl API for setting mutex callbacks in the underlying SSL
+ Provide a libcarl API for setting mutex callbacks in the underlying SSL
  library, so that the same application code can use mutex-locking
  independently of OpenSSL or GnutTLS being used.
 
@@ -741,8 +741,8 @@
  You can specify the private and public keys for SSH/SSL as file paths. Some
  programs want to avoid using files and instead just pass them as in-memory
  data blobs. There's probably a challenge to make this work across the
- plethora of different TLS and SSH backends that curl supports.
- https://github.com/curl/curl/issues/2310
+ plethora of different TLS and SSH backends that carl supports.
+ https://github.com/carl/carl/issues/2310
 
 13.4 Cache/share OpenSSL contexts
 
@@ -752,17 +752,17 @@
  sure we don't create and kill a new SSL "context" for every request, but
  instead make one for every connection and re-use that SSL context in the same
  style connections are re-used. It will make us use slightly more memory but
- it will libcurl do less creations and deletions of SSL contexts.
+ it will libcarl do less creations and deletions of SSL contexts.
 
  Technically, the "caching" is probably best implemented by getting added to
  the share interface so that easy handles who want to and can reuse the
  context specify that by sharing with the right properties set.
 
- https://github.com/curl/curl/issues/1110
+ https://github.com/carl/carl/issues/1110
 
 13.5 Export session ids
 
- Add an interface to libcurl that enables "session IDs" to get
+ Add an interface to libcarl that enables "session IDs" to get
  exported/imported. Cris Bailiff said: "OpenSSL has functions which can
  serialise the current SSL state to a buffer of your choice, and recover/reset
  the state from such a buffer at a later date - this is used by mod_ssl for
@@ -771,7 +771,7 @@
 13.6 Provide callback for cert verification
 
  OpenSSL supports a callback for customised verification of the peer
- certificate, but this doesn't seem to be exposed in the libcurl APIs. Could
+ certificate, but this doesn't seem to be exposed in the libcarl APIs. Could
  it be? There's so much that could be done if it were!
 
 13.7 improve configure --with-ssl
@@ -786,9 +786,9 @@
  https://www.rfc-editor.org/rfc/rfc6698.txt
 
  An initial patch was posted by Suresh Krishnaswamy on March 7th 2013
- (https://curl.se/mail/lib-2013-03/0075.html) but it was a too simple
+ (https://carl.se/mail/lib-2013-03/0075.html) but it was a too simple
  approach. See Daniel's comments:
- https://curl.se/mail/lib-2013-03/0103.html . libunbound may be the
+ https://carl.se/mail/lib-2013-03/0103.html . libunbound may be the
  correct library to base this development on.
 
  Björn Stenberg wrote a separate initial take on DANE that was never
@@ -797,10 +797,10 @@
 13.9 TLS record padding
 
  TLS (1.3) offers optional record padding and OpenSSL provides an API for it.
- I could make sense for libcurl to offer this ability to applications to make
+ I could make sense for libcarl to offer this ability to applications to make
  traffic patterns harder to figure out by network traffic observers.
 
- See https://github.com/curl/curl/issues/5398
+ See https://github.com/carl/carl/issues/5398
 
 13.10 Support Authority Information Access certificate extension (AIA)
 
@@ -811,17 +811,17 @@
  Since AIA is about downloading certs on demand to complete a TLS handshake,
  it is probably a bit tricky to get done right.
 
- See https://github.com/curl/curl/issues/2793
+ See https://github.com/carl/carl/issues/2793
 
 13.11 Support intermediate & root pinning for PINNEDPUBLICKEY
 
- CURLOPT_PINNEDPUBLICKEY does not consider the hashes of intermediate & root
+ CARLOPT_PINNEDPUBLICKEY does not consider the hashes of intermediate & root
  certificates when comparing the pinned keys. Therefore it is not compatible
  with "HTTP Public Key Pinning" as there also intermediate and root
  certificates can be pinned. This is very useful as it prevents webadmins from
  "locking themselves out of their servers".
 
- Adding this feature would make curls pinning 100% compatible to HPKP and
+ Adding this feature would make carls pinning 100% compatible to HPKP and
  allow more flexible pinning.
 
 13.12 Support HSTS
@@ -839,7 +839,7 @@
  RFC 8740 explains how using HTTP/2 must forbid the use of TLS 1.3
  post-handshake authentication. We should make sure to live up to that.
 
- See https://github.com/curl/curl/issues/5396
+ See https://github.com/carl/carl/issues/5396
 
 13.14 Support the clienthello extension
 
@@ -849,7 +849,7 @@
  extension adds padding to avoid that size range.
 
  https://tools.ietf.org/html/rfc7685
- https://github.com/curl/curl/issues/2299
+ https://github.com/carl/carl/issues/2299
 
 14. GnuTLS
 
@@ -885,16 +885,16 @@
  change. An option should be added that can be used to disable the default
  Schannel auto-send behavior.
 
- https://github.com/curl/curl/issues/2262
+ https://github.com/carl/carl/issues/2262
 
 15.4 Add option to allow abrupt server closure
 
- libcurl w/schannel will error without a known termination point from the
+ libcarl w/schannel will error without a known termination point from the
  server (such as length of transfer, or SSL "close notify" alert) to prevent
  against a truncation attack. Really old servers may neglect to send any
  termination point. An option could be added to ignore such abrupt closures.
 
- https://github.com/curl/curl/issues/4427
+ https://github.com/carl/carl/issues/4427
 
 16. SASL
 
@@ -919,35 +919,35 @@
 
 17.1 Multiplexing
 
- SSH is a perfectly fine multiplexed protocols which would allow libcurl to do
+ SSH is a perfectly fine multiplexed protocols which would allow libcarl to do
  multiple parallel transfers from the same host using the same connection,
- much in the same spirit as HTTP/2 does. libcurl however does not take
+ much in the same spirit as HTTP/2 does. libcarl however does not take
  advantage of that ability but will instead always create a new connection for
  new transfers even if an existing connection already exists to the host.
 
- To fix this, libcurl would have to detect an existing connection and "attach"
+ To fix this, libcarl would have to detect an existing connection and "attach"
  the new transfer to the existing one.
 
 17.2 Handle growing SFTP files
 
- The SFTP code in libcurl checks the file size *before* a transfer starts and
+ The SFTP code in libcarl checks the file size *before* a transfer starts and
  then proceeds to transfer exactly that amount of data. If the remote file
- grows while the transfer is in progress libcurl won't notice and will not
- adapt. The OpenSSH SFTP command line tool does and libcurl could also just
+ grows while the transfer is in progress libcarl won't notice and will not
+ adapt. The OpenSSH SFTP command line tool does and libcarl could also just
  attempt to download more to see if there is more to get...
 
- https://github.com/curl/curl/issues/4344
+ https://github.com/carl/carl/issues/4344
 
 17.3 Support better than MD5 hostkey hash
 
- libcurl offers the CURLOPT_SSH_HOST_PUBLIC_KEY_MD5 option for verifying the
+ libcarl offers the CARLOPT_SSH_HOST_PUBLIC_KEY_MD5 option for verifying the
  server's key. MD5 is generally being deprecated so we should implement
  support for stronger hashing algorithms. libssh2 itself is what provides this
  underlying functionality and it supports at least SHA-1 as an alternative.
  SHA-1 is also being deprecated these days so we should consider working with
  libssh2 to instead offer support for SHA-256 or similar.
 
-17.4 Support CURLOPT_PREQUOTE
+17.4 Support CARLOPT_PREQUOTE
 
  The two other QUOTE options are supported for SFTP, but this was left out for
  unknown reasons!
@@ -955,7 +955,7 @@
 17.5 SSH over HTTPS proxy with more backends
 
  The SSH based protocols SFTP and SCP didn't work over HTTPS proxy at
- all until PR https://github.com/curl/curl/pull/6021 brought the
+ all until PR https://github.com/carl/carl/pull/6021 brought the
  functionality with the libssh2 backend. Presumably, this support
  can/could be added for the other backends as well.
 
@@ -963,8 +963,8 @@
 
 18.1 sync
 
- "curl --sync http://example.com/feed[1-100].rss" or
- "curl --sync http://example.net/{index,calendar,history}.html"
+ "carl --sync http://example.com/feed[1-100].rss" or
+ "carl --sync http://example.net/{index,calendar,history}.html"
 
  Downloads a range or set of URLs using the remote name, but only if the
  remote file is newer than the local file. A Last-Modified HTTP date header
@@ -972,12 +972,12 @@
 
 18.2 glob posts
 
- Globbing support for -d and -F, as in 'curl -d "name=foo[0-9]" URL'.
+ Globbing support for -d and -F, as in 'carl -d "name=foo[0-9]" URL'.
  This is easily scripted though.
 
 18.3 prevent file overwriting
 
- Add an option that prevents curl from overwriting existing local files. When
+ Add an option that prevents carl from overwriting existing local files. When
  used, and there already is an existing file with the target file name
  (either -O or -o), a number should be appended (and increased if already
  existing). So that index.html becomes first index.html.1 and then
@@ -985,39 +985,39 @@
 
 18.4 --proxycommand
 
- Allow the user to make curl run a command and use its stdio to make requests
+ Allow the user to make carl run a command and use its stdio to make requests
  and not do any network connection by itself. Example:
 
-   curl --proxycommand 'ssh pi@raspberrypi.local -W 10.1.1.75 80' \
+   carl --proxycommand 'ssh pi@raspberrypi.local -W 10.1.1.75 80' \
         http://some/otherwise/unavailable/service.php
 
- See https://github.com/curl/curl/issues/4941
+ See https://github.com/carl/carl/issues/4941
 
 18.5 UTF-8 filenames in Content-Disposition
 
  RFC 6266 documents how UTF-8 names can be passed to a client in the
- Content-Disposition header, and curl does not support this.
+ Content-Disposition header, and carl does not support this.
 
- https://github.com/curl/curl/issues/1888
+ https://github.com/carl/carl/issues/1888
 
 18.6 Option to make -Z merge lined based outputs on stdout
 
  When a user requests multiple lined based files using -Z and sends them to
- stdout, curl will not "merge" and send complete lines fine but may very well
+ stdout, carl will not "merge" and send complete lines fine but may very well
  send partial lines from several sources.
 
- https://github.com/curl/curl/issues/5175
+ https://github.com/carl/carl/issues/5175
 
 18.7 at least N milliseconds between requests
 
- Allow curl command lines issue a lot of request against services that limit
+ Allow carl command lines issue a lot of request against services that limit
  users to no more than N requests/second or similar. Could be implemented with
  an option asking that at least a certain time has elapsed since the previous
  request before the next one will be performed. Example:
 
-    $ curl "https://example.com/api?input=[1-1000]" -d yadayada --after 500
+    $ carl "https://example.com/api?input=[1-1000]" -d yadayada --after 500
 
- See https://github.com/curl/curl/issues/3920
+ See https://github.com/carl/carl/issues/3920
 
 18.8 Consider convenience options for JSON and XML?
 
@@ -1031,25 +1031,25 @@
  Maybe plain `--xml` and ` --json` are a bit too brief and generic. Maybe
  `--http-json` etc?
 
- See https://github.com/curl/curl/issues/5203
+ See https://github.com/carl/carl/issues/5203
 
 18.9 Choose the name of file in braces for complex URLs
 
  When using braces to download a list of URLs and you use complicated names
- in the list of alternatives, it could be handy to allow curl to use other
+ in the list of alternatives, it could be handy to allow carl to use other
  names when saving.
 
  Consider a way to offer that. Possibly like
  {partURL1:name1,partURL2:name2,partURL3:name3} where the name following the
  colon is the output name.
 
- See https://github.com/curl/curl/issues/221
+ See https://github.com/carl/carl/issues/221
 
-18.10 improve how curl works in a windows console window
+18.10 improve how carl works in a windows console window
 
- If you pull the scrollbar when transferring with curl in a Windows console
+ If you pull the scrollbar when transferring with carl in a Windows console
  window, the transfer is interrupted and can get disconnected. This can
- probably be improved. See https://github.com/curl/curl/issues/322
+ probably be improved. See https://github.com/carl/carl/issues/322
 
 18.11 Windows: set attribute 'archive' for completed downloads
 
@@ -1060,54 +1060,54 @@
  opened by a different process. Only after a download has been completed it's
  sensible to include it in any integer snapshot or backup of the system.
 
- See https://github.com/curl/curl/issues/3354
+ See https://github.com/carl/carl/issues/3354
 
 18.12 keep running, read instructions from pipe/socket
 
- Provide an option that makes curl not exit after the last URL (or even work
+ Provide an option that makes carl not exit after the last URL (or even work
  without a given URL), and then make it read instructions passed on a pipe or
- over a socket to make further instructions so that a second subsequent curl
+ over a socket to make further instructions so that a second subsequent carl
  invoke can talk to the still running instance and ask for transfers to get
  done, and thus maintain its connection pool, DNS cache and more.
 
 18.13 Ratelimit or wait between serial requests
 
- Consider a command line option that can make curl do multiple serial requests
+ Consider a command line option that can make carl do multiple serial requests
  slow, potentially with a (random) wait between transfers. There's also a
  proposed set of standard HTTP headers to let servers let the client adapt to
  its rate limits:
  https://www.ietf.org/id/draft-polli-ratelimit-headers-02.html
 
- See https://github.com/curl/curl/issues/5406
+ See https://github.com/carl/carl/issues/5406
 
 18.14 --dry-run
 
- A command line option that makes curl show exactly what it would do and send
+ A command line option that makes carl show exactly what it would do and send
  if it would run for real.
 
- See https://github.com/curl/curl/issues/5426
+ See https://github.com/carl/carl/issues/5426
 
 18.15 --retry should resume
 
- When --retry is used and curl actually retries transfer, it should use the
+ When --retry is used and carl actually retries transfer, it should use the
  already transferred data and do a resumed transfer for the rest (when
  possible) so that it doesn't have to transfer the same data again that was
  already transferred before the retry.
 
- See https://github.com/curl/curl/issues/1084
+ See https://github.com/carl/carl/issues/1084
 
 18.16 send only part of --data
 
  When the user only wants to send a small piece of the data provided with
  --data or --data-binary, like when that data is a huge file, consider a way
- to specify that curl should only send a piece of that. One suggested syntax
+ to specify that carl should only send a piece of that. One suggested syntax
  would be: "--data-binary @largefile.zip!1073741823-2147483647".
 
- See https://github.com/curl/curl/issues/1200
+ See https://github.com/carl/carl/issues/1200
 
 18.17 consider file name from the redirected URL with -O ?
 
- When a user gives a URL and uses -O, and curl follows a redirect to a new
+ When a user gives a URL and uses -O, and carl follows a redirect to a new
  URL, the file name is not extracted and used from the newly redirected-to URL
  even if the new URL may have a much more sensible file name.
 
@@ -1119,10 +1119,10 @@
 
  This is extra tricky if the original URL has no file name part at all since
  then the current code path will error out with an error message, and we can't
- *know* already at that point if curl will be redirected to a URL that has a
+ *know* already at that point if carl will be redirected to a URL that has a
  file name...
 
- See https://github.com/curl/curl/issues/1241
+ See https://github.com/carl/carl/issues/1241
 
 18.18 retry on network is unreachable
 
@@ -1134,32 +1134,32 @@
  this more configurable than to add a new option for every new error people
  want to retry for?
 
- https://github.com/curl/curl/issues/1603
+ https://github.com/carl/carl/issues/1603
 
 18.19 expand ~/ in config files
 
- For example .curlrc could benefit from being able to do this.
+ For example .carlrc could benefit from being able to do this.
 
- See https://github.com/curl/curl/issues/2317
+ See https://github.com/carl/carl/issues/2317
 
 18.20 host name sections in config files
 
  config files would be more powerful if they could set different
  configurations depending on used URLs, host name or possibly origin. Then a
- default .curlrc could a specific user-agent only when doing requests against
+ default .carlrc could a specific user-agent only when doing requests against
  a certain site.
 
 18.21 retry on the redirected-to URL
 
- When curl is told to --retry a failed transfer and follows redirects, it
+ When carl is told to --retry a failed transfer and follows redirects, it
  might get a HTTP 429 response from the redirected-to URL and not the original
- one, which then could make curl decide to rather retry the transfer on that
+ one, which then could make carl decide to rather retry the transfer on that
  URL only instead of the original operation to the original URL.
 
  Perhaps extra emphasized if the original transfer is a large POST that
  redirects to a separate GET, and that GET is what gets the 529
 
- See https://github.com/curl/curl/issues/5462
+ See https://github.com/carl/carl/issues/5462
 
 18.22 --fail-with-body
 
@@ -1171,10 +1171,10 @@
 
 18.23 Set the modification date on an uploaded file
 
- For SFTP and possibly FTP, curl could offer an option to set the
+ For SFTP and possibly FTP, carl could offer an option to set the
  modification time for the uploaded file.
 
- See https://github.com/curl/curl/issues/5768
+ See https://github.com/carl/carl/issues/5768
 
 18.24 Use multiple parallel transfers for a single download
 
@@ -1183,7 +1183,7 @@
  result.
 
  An ideal implementation would not use a specified number of parallel
- transfers, but curl could:
+ transfers, but carl could:
  - First start getting the full file as transfer A
  - If after N seconds have passed and the transfer is expected to continue for
    M seconds or more, add a new transfer (B) that asks for the second half of
@@ -1195,15 +1195,15 @@
  transfer A remain the single one. N and M could be set to some sensible
  defaults.
 
- See https://github.com/curl/curl/issues/5774
+ See https://github.com/carl/carl/issues/5774
 
 18.25 Prevent terminal injection when writing to terminal
 
- curl could offer an option to make escape sequence either non-functional or
+ carl could offer an option to make escape sequence either non-functional or
  avoid cursor moves or similar to reduce the risk of a user getting tricked by
  clever tricks.
 
- See https://github.com/curl/curl/issues/6150
+ See https://github.com/carl/carl/issues/6150
 
 
 19. Build
@@ -1215,7 +1215,7 @@
 
 19.2 Enable PIE and RELRO by default
 
- Especially when having programs that execute curl via the command line, PIE
+ Especially when having programs that execute carl via the command line, PIE
  renders the exploitation of memory corruption vulnerabilities a lot more
  difficult. This can be attributed to the additional information leaks being
  required to conduct a successful attack. RELRO, on the other hand, masks
@@ -1223,21 +1223,21 @@
  of techniques that come in handy when attackers are able to arbitrarily
  overwrite memory. A few tests showed that enabling these features had close
  to no impact, neither on the performance nor on the general functionality of
- curl.
+ carl.
 
 19.3 Don't use GNU libtool on OpenBSD
- When compiling curl on OpenBSD with "--enable-debug" it will give linking
+ When compiling carl on OpenBSD with "--enable-debug" it will give linking
  errors when you use GNU libtool. This can be fixed by using the libtool
  provided by OpenBSD itself. However for this the user always needs to invoke
  make with "LIBTOOL=/usr/bin/libtool". It would be nice if the script could
  have some magic to detect if this system is an OpenBSD host and then use the
  OpenBSD libtool instead.
 
- See https://github.com/curl/curl/issues/5862
+ See https://github.com/carl/carl/issues/5862
 
-19.4 Package curl for Windows in a signed installer
+19.4 Package carl for Windows in a signed installer
 
- See https://github.com/curl/curl/issues/5424
+ See https://github.com/carl/carl/issues/5424
 
 20. Test suite
 
@@ -1282,7 +1282,7 @@
  https://github.com/abarth/http-state/tree/master/tests
 
  It'd be really awesome if someone would write a script/setup that would run
- curl with that test suite and detect deviances. Ideally, that would even be
+ carl with that test suite and detect deviances. Ideally, that would even be
  incorporated into our regular test suite.
 
 20.7 Support LD_PRELOAD on macOS
@@ -1298,7 +1298,7 @@
  It would help us find issues to fix and help us document where our parser
  differs from the WHATWG URL spec parsers.
 
- See https://github.com/curl/curl/issues/4477
+ See https://github.com/carl/carl/issues/4477
 
 20.9 Use "random" ports for the test servers
 
@@ -1315,35 +1315,35 @@
 
 21.1 http-style HEAD output for FTP
 
- #undef CURL_FTP_HTTPSTYLE_HEAD in lib/ftp.c to remove the HTTP-style headers
+ #undef CARL_FTP_HTTPSTYLE_HEAD in lib/ftp.c to remove the HTTP-style headers
  from being output in NOBODY requests over FTP
 
 21.2 combine error codes
 
  Combine some of the error codes to remove duplicates.  The original
  numbering should not be changed, and the old identifiers would be
- macroed to the new ones in an CURL_NO_OLDIES section to help with
+ macroed to the new ones in an CARL_NO_OLDIES section to help with
  backward compatibility.
 
  Candidates for removal and their replacements:
 
-    CURLE_FILE_COULDNT_READ_FILE => CURLE_REMOTE_FILE_NOT_FOUND
+    CARLE_FILE_COULDNT_READ_FILE => CARLE_REMOTE_FILE_NOT_FOUND
 
-    CURLE_FTP_COULDNT_RETR_FILE => CURLE_REMOTE_FILE_NOT_FOUND
+    CARLE_FTP_COULDNT_RETR_FILE => CARLE_REMOTE_FILE_NOT_FOUND
 
-    CURLE_FTP_COULDNT_USE_REST => CURLE_RANGE_ERROR
+    CARLE_FTP_COULDNT_USE_REST => CARLE_RANGE_ERROR
 
-    CURLE_FUNCTION_NOT_FOUND => CURLE_FAILED_INIT
+    CARLE_FUNCTION_NOT_FOUND => CARLE_FAILED_INIT
 
-    CURLE_LDAP_INVALID_URL => CURLE_URL_MALFORMAT
+    CARLE_LDAP_INVALID_URL => CARLE_URL_MALFORMAT
 
-    CURLE_TFTP_NOSUCHUSER => CURLE_TFTP_ILLEGAL
+    CARLE_TFTP_NOSUCHUSER => CARLE_TFTP_ILLEGAL
 
-    CURLE_TFTP_NOTFOUND => CURLE_REMOTE_FILE_NOT_FOUND
+    CARLE_TFTP_NOTFOUND => CARLE_REMOTE_FILE_NOT_FOUND
 
-    CURLE_TFTP_PERM => CURLE_REMOTE_ACCESS_DENIED
+    CARLE_TFTP_PERM => CARLE_REMOTE_ACCESS_DENIED
 
-21.3 extend CURLOPT_SOCKOPTFUNCTION prototype
+21.3 extend CARLOPT_SOCKOPTFUNCTION prototype
 
  The current prototype only provides 'purpose' that tells what the
  connection/socket is for, but not any protocol or similar. It makes it hard
@@ -1354,12 +1354,12 @@
 
 22.1 cleanup return codes
 
- curl_easy_cleanup() returns void, but curl_multi_cleanup() returns a
- CURLMcode. These should be changed to be the same.
+ carl_easy_cleanup() returns void, but carl_multi_cleanup() returns a
+ CARLMcode. These should be changed to be the same.
 
 22.2 remove obsolete defines
 
- remove obsolete defines from curl/curl.h
+ remove obsolete defines from carl/carl.h
 
 22.3 size_t
 
@@ -1369,41 +1369,41 @@
 
  remove the following functions from the public API:
 
- curl_getenv
+ carl_getenv
 
- curl_mprintf (and variations)
+ carl_mprintf (and variations)
 
- curl_strequal
+ carl_strequal
 
- curl_strnequal
+ carl_strnequal
 
- They will instead become curlx_ - alternatives. That makes the curl app
+ They will instead become carlx_ - alternatives. That makes the carl app
  still capable of using them, by building with them from source.
 
  These functions have no purpose anymore:
 
- curl_multi_socket
+ carl_multi_socket
 
- curl_multi_socket_all
+ carl_multi_socket_all
 
-22.5 remove CURLOPT_FAILONERROR
+22.5 remove CARLOPT_FAILONERROR
 
- Remove support for CURLOPT_FAILONERROR, it has gotten too kludgy and weird
+ Remove support for CARLOPT_FAILONERROR, it has gotten too kludgy and weird
  internally. Let the app judge success or not for itself.
 
-22.7 remove progress meter from libcurl
+22.7 remove progress meter from libcarl
 
  The internally provided progress meter output doesn't belong in the library.
- Basically no application wants it (apart from curl) but instead applications
+ Basically no application wants it (apart from carl) but instead applications
  can and should do their own progress meters using the progress callback.
 
  The progress callback should then be bumped as well to get proper 64bit
  variable types passed to it instead of doubles so that big files work
  correctly.
 
-22.8 remove 'curl_httppost' from public
+22.8 remove 'carl_httppost' from public
 
- curl_formadd() was made to fill in a public struct, but the fact that the
+ carl_formadd() was made to fill in a public struct, but the fact that the
  struct is public is never really used by application for their own advantage
  but instead often restricts how the form functions can or can't be modified.
 

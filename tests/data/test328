@@ -47,7 +47,7 @@ http://%HOSTIP:%HTTPPORT/hello/328 --compressed
 <protocol>
 GET /hello/328 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

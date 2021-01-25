@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 
 /*
  * This example shows a HTTP PUT operation. PUTs a file given as a command
@@ -41,16 +41,16 @@
 static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t retcode;
-  curl_off_t nread;
+  carl_off_t nread;
 
   /* in real-world cases, this would probably get this data differently
      as this fread() stuff is exactly what the library already would do
      by default internally */
   retcode = fread(ptr, size, nmemb, stream);
 
-  nread = (curl_off_t)retcode;
+  nread = (carl_off_t)retcode;
 
-  fprintf(stderr, "*** We read %" CURL_FORMAT_CURL_OFF_T
+  fprintf(stderr, "*** We read %" CARL_FORMAT_CARL_OFF_T
           " bytes from file\n", nread);
 
   return retcode;
@@ -58,8 +58,8 @@ static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 
 int main(int argc, char **argv)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   FILE * hd_src;
   struct stat file_info;
 
@@ -81,41 +81,41 @@ int main(int argc, char **argv)
   hd_src = fopen(file, "rb");
 
   /* In windows, this will init the winsock stuff */
-  curl_global_init(CURL_GLOBAL_ALL);
+  carl_global_init(CARL_GLOBAL_ALL);
 
-  /* get a curl handle */
-  curl = curl_easy_init();
-  if(curl) {
+  /* get a carl handle */
+  carl = carl_easy_init();
+  if(carl) {
     /* we want to use our own read function */
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+    carl_easy_setopt(carl, CARLOPT_READFUNCTION, read_callback);
 
     /* enable uploading (implies PUT over HTTP) */
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
 
     /* specify target URL, and note that this URL should include a file
        name, not only a directory */
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    carl_easy_setopt(carl, CARLOPT_URL, url);
 
     /* now specify which file to upload */
-    curl_easy_setopt(curl, CURLOPT_READDATA, hd_src);
+    carl_easy_setopt(carl, CARLOPT_READDATA, hd_src);
 
     /* provide the size of the upload, we specicially typecast the value
-       to curl_off_t since we must be sure to use the correct data size */
-    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,
-                     (curl_off_t)file_info.st_size);
+       to carl_off_t since we must be sure to use the correct data size */
+    carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE,
+                     (carl_off_t)file_info.st_size);
 
     /* Now run off and do what you've been told! */
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK)
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   fclose(hd_src); /* close the local file */
 
-  curl_global_cleanup();
+  carl_global_cleanup();
   return 0;
 }

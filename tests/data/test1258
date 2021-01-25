@@ -39,12 +39,12 @@ http://%HOSTIP:%HTTPPORT/we/want/1258 http://%HOSTIP:%HTTPPORT/we/want?hoge=fuga
 <protocol>
 GET /we/want/1258 HTTP/1.1
 Host: localhost
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /we/want?hoge=fuga HTTP/1.1
 Host: localhost
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Cookie: I-am=here
 

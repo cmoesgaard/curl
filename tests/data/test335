@@ -76,14 +76,14 @@ http://digest:alot@data.from.server.requiring.digest.hohoho.com/335 --proxy http
 <protocol>
 GET http://data.from.server.requiring.digest.hohoho.com/335 HTTP/1.1
 Host: data.from.server.requiring.digest.hohoho.com
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 
 GET http://data.from.server.requiring.digest.hohoho.com/335 HTTP/1.1
 Host: data.from.server.requiring.digest.hohoho.com
 Proxy-Authorization: Digest username="foo", realm="weirdorealm", nonce="12345", uri="/335", response="f61609cd8f5bb205ef4e169b2c5626cb"
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 
@@ -91,7 +91,7 @@ GET http://data.from.server.requiring.digest.hohoho.com/335 HTTP/1.1
 Host: data.from.server.requiring.digest.hohoho.com
 Proxy-Authorization: Digest username="foo", realm="weirdorealm", nonce="12345", uri="/335", response="f61609cd8f5bb205ef4e169b2c5626cb"
 Authorization: Digest username="digest", realm="realmweirdo", nonce="123456", uri="/335", response="08a2e2e684047f4219a38ddc189ac00c"
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

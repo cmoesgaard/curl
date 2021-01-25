@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,9 +23,9 @@
 
 #include "strcase.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_doswin.h"
@@ -50,7 +50,7 @@ static char *parse_filename(const char *ptr, size_t len);
 #endif
 
 /*
-** callback for CURLOPT_HEADERFUNCTION
+** callback for CARLOPT_HEADERFUNCTION
 */
 
 size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -66,9 +66,9 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
   long protocol = 0;
 
   /*
-   * Once that libcurl has called back tool_header_cb() the returned value
+   * Once that libcarl has called back tool_header_cb() the returned value
    * is checked against the amount that was intended to be written, if
-   * it does not match then it fails with CURLE_WRITE_ERROR. So at this
+   * it does not match then it fails with CARLE_WRITE_ERROR. So at this
    * point returning a value different from sz*nmemb indicates failure.
    */
   size_t failure = (size && nmemb) ? 0 : 1;
@@ -77,7 +77,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
     return failure;
 
 #ifdef DEBUGBUILD
-  if(size * nmemb > (size_t)CURL_MAX_HTTP_HEADER) {
+  if(size * nmemb > (size_t)CARL_MAX_HTTP_HEADER) {
     warnf(per->config->global, "Header data exceeds single call write "
           "limit!\n");
     return failure;
@@ -85,7 +85,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 #endif
 
   /*
-   * Write header data when curl option --dump-header (-D) is given.
+   * Write header data when carl option --dump-header (-D) is given.
    */
 
   if(per->config->headerfile && heads->stream) {
@@ -101,7 +101,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
    */
   if(per->config->etag_save_file && etag_save->stream) {
     /* match only header that start with etag (case insensitive) */
-    if(curl_strnequal(str, "etag:", 5)) {
+    if(carl_strnequal(str, "etag:", 5)) {
       const char *etag_h = &str[5];
       const char *eot = end - 1;
       if(*eot == '\n') {
@@ -123,15 +123,15 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 
   /*
    * This callback sets the filename where output shall be written when
-   * curl options --remote-name (-O) and --remote-header-name (-J) have
+   * carl options --remote-name (-O) and --remote-header-name (-J) have
    * been simultaneously given and additionally server returns an HTTP
    * Content-Disposition header specifying a filename property.
    */
 
-  curl_easy_getinfo(per->curl, CURLINFO_PROTOCOL, &protocol);
+  carl_easy_getinfo(per->carl, CARLINFO_PROTOCOL, &protocol);
   if(hdrcbdata->honor_cd_filename &&
      (cb > 20) && checkprefix("Content-disposition:", str) &&
-     (protocol & (CURLPROTO_HTTPS|CURLPROTO_HTTP))) {
+     (protocol & (CARLPROTO_HTTPS|CARLPROTO_HTTP))) {
     const char *p = str + 20;
 
     /* look for the 'filename=' parameter
@@ -192,7 +192,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
   }
   if(hdrcbdata->config->show_headers &&
     (protocol &
-     (CURLPROTO_HTTP|CURLPROTO_HTTPS|CURLPROTO_RTSP|CURLPROTO_FILE))) {
+     (CARLPROTO_HTTP|CARLPROTO_HTTPS|CARLPROTO_RTSP|CARLPROTO_FILE))) {
     /* bold headers only for selected protocols */
     char *value = NULL;
 
@@ -290,21 +290,21 @@ static char *parse_filename(const char *ptr, size_t len)
 #endif /* MSDOS || WIN32 */
 
   /* in case we built debug enabled, we allow an environment variable
-   * named CURL_TESTDIR to prefix the given file name to put it into a
+   * named CARL_TESTDIR to prefix the given file name to put it into a
    * specific directory
    */
 #ifdef DEBUGBUILD
   {
-    char *tdir = curlx_getenv("CURL_TESTDIR");
+    char *tdir = carlx_getenv("CARL_TESTDIR");
     if(tdir) {
       char buffer[512]; /* suitably large */
       msnprintf(buffer, sizeof(buffer), "%s/%s", tdir, copy);
       Curl_safefree(copy);
-      copy = strdup(buffer); /* clone the buffer, we don't use the libcurl
+      copy = strdup(buffer); /* clone the buffer, we don't use the libcarl
                                 aprintf() or similar since we want to use the
                                 same memory code as the "real" parse_filename
                                 function */
-      curl_free(tdir);
+      carl_free(tdir);
     }
   }
 #endif

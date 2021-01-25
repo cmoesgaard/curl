@@ -39,7 +39,7 @@ http://%HOSTIP:%HTTPPORT/we/want/our/1029 -w '%{redirect_url} %{url} %{exitcode}
 <protocol>
 GET /we/want/our/1029 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

@@ -1,0 +1,100 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2019, 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_PROXY_SSLVERSION 3 "16 Nov 2016" "libcarl 7.52.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_PROXY_SSLVERSION \- set preferred proxy TLS/SSL version
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_PROXY_SSLVERSION, long version);
+.SH DESCRIPTION
+Pass a long as parameter to control which version of SSL/TLS to attempt to use
+when connecting to an HTTPS proxy.
+
+Use one of the available defines for this purpose. The available options are:
+.RS
+.IP CARL_SSLVERSION_DEFAULT
+The default action. This will attempt to figure out the remote SSL protocol
+version.
+.IP CARL_SSLVERSION_TLSv1
+TLSv1.x
+.IP CARL_SSLVERSION_TLSv1_0
+TLSv1.0
+.IP CARL_SSLVERSION_TLSv1_1
+TLSv1.1
+.IP CARL_SSLVERSION_TLSv1_2
+TLSv1.2
+.IP CARL_SSLVERSION_TLSv1_3
+TLSv1.3
+.RE
+The maximum TLS version can be set by using \fIone\fP of the
+CARL_SSLVERSION_MAX_ macros below. It is also possible to OR \fIone\fP of the
+CARL_SSLVERSION_ macros with \fIone\fP of the CARL_SSLVERSION_MAX_ macros.
+The MAX macros are not supported for WolfSSL.
+.RS
+.IP CARL_SSLVERSION_MAX_DEFAULT
+The flag defines the maximum supported TLS version as TLSv1.2, or the default
+value from the SSL library.
+(Added in 7.54.0)
+.IP CARL_SSLVERSION_MAX_TLSv1_0
+The flag defines maximum supported TLS version as TLSv1.0.
+(Added in 7.54.0)
+.IP CARL_SSLVERSION_MAX_TLSv1_1
+The flag defines maximum supported TLS version as TLSv1.1.
+(Added in 7.54.0)
+.IP CARL_SSLVERSION_MAX_TLSv1_2
+The flag defines maximum supported TLS version as TLSv1.2.
+(Added in 7.54.0)
+.IP CARL_SSLVERSION_MAX_TLSv1_3
+The flag defines maximum supported TLS version as TLSv1.3.
+(Added in 7.54.0)
+.RE
+
+In versions of carl prior to 7.54 the CARL_SSLVERSION_TLS options were
+documented to allow \fIonly\fP the specified TLS version, but behavior was
+inconsistent depending on the TLS library.
+
+.SH DEFAULT
+CARL_SSLVERSION_DEFAULT
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* ask libcarl to use TLS version 1.0 or later */
+  carl_easy_setopt(carl, CARLOPT_SSLVERSION, CARL_SSLVERSION_TLSv1);
+
+  /* Perform the request */
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.52.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, and CARLE_UNKNOWN_OPTION if not.
+.SH "SEE ALSO"
+.BR CARLOPT_USE_SSL "(3), " CARLOPT_HTTP_VERSION "(3), "
+.BR CARLOPT_IPRESOLVE "(3) " CARLOPT_SSLVERSION "(3), "

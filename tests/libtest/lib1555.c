@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,7 +27,7 @@
 
 #include "memdebug.h"
 
-static CURL *curl;
+static CARL *carl;
 
 static int progressCallback(void *arg,
                             double dltotal,
@@ -35,7 +35,7 @@ static int progressCallback(void *arg,
                             double ultotal,
                             double ulnow)
 {
-  CURLcode res = 0;
+  CARLcode res = 0;
   char buffer[256];
   size_t n = 0;
   (void)arg;
@@ -43,10 +43,10 @@ static int progressCallback(void *arg,
   (void)dlnow;
   (void)ultotal;
   (void)ulnow;
-  res = curl_easy_recv(curl, buffer, 256, &n);
-  printf("curl_easy_recv returned %d\n", res);
-  res = curl_easy_send(curl, buffer, n, &n);
-  printf("curl_easy_send returned %d\n", res);
+  res = carl_easy_recv(carl, buffer, 256, &n);
+  printf("carl_easy_recv returned %d\n", res);
+  res = carl_easy_send(carl, buffer, n, &n);
+  printf("carl_easy_send returned %d\n", res);
 
   return 1;
 }
@@ -55,25 +55,25 @@ int test(char *URL)
 {
   int res = 0;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_TIMEOUT, (long)7);
-  easy_setopt(curl, CURLOPT_NOSIGNAL, (long)1);
-  easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progressCallback);
-  easy_setopt(curl, CURLOPT_PROGRESSDATA, NULL);
-  easy_setopt(curl, CURLOPT_NOPROGRESS, (long)0);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_TIMEOUT, (long)7);
+  easy_setopt(carl, CARLOPT_NOSIGNAL, (long)1);
+  easy_setopt(carl, CARLOPT_PROGRESSFUNCTION, progressCallback);
+  easy_setopt(carl, CARLOPT_PROGRESSDATA, NULL);
+  easy_setopt(carl, CARLOPT_NOPROGRESS, (long)0);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   /* undocumented cleanup sequence - type UA */
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return res;
 }

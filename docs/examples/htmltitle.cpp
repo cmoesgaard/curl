@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,14 +27,14 @@
 
  GNU C++ compile command line suggestion (edit paths accordingly):
 
- g++ -Wall -I/opt/curl/include -I/opt/libxml/include/libxml2 htmltitle.cpp \
- -o htmltitle -L/opt/curl/lib -L/opt/libxml/lib -lcurl -lxml2
+ g++ -Wall -I/opt/carl/include -I/opt/libxml/include/libxml2 htmltitle.cpp \
+ -o htmltitle -L/opt/carl/lib -L/opt/libxml/lib -lcarl -lxml2
 */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <string>
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <libxml/HTMLparser.h>
 
 //
@@ -60,13 +60,13 @@ struct Context
 };
 
 //
-//  libcurl variables for error strings and returned data
+//  libcarl variables for error strings and returned data
 
-static char errorBuffer[CURL_ERROR_SIZE];
+static char errorBuffer[CARL_ERROR_SIZE];
 static std::string buffer;
 
 //
-//  libcurl write callback function
+//  libcarl write callback function
 //
 
 static int writer(char *data, size_t size, size_t nmemb,
@@ -81,46 +81,46 @@ static int writer(char *data, size_t size, size_t nmemb,
 }
 
 //
-//  libcurl connection initialization
+//  libcarl connection initialization
 //
 
-static bool init(CURL *&conn, char *url)
+static bool init(CARL *&conn, char *url)
 {
-  CURLcode code;
+  CARLcode code;
 
-  conn = curl_easy_init();
+  conn = carl_easy_init();
 
   if(conn == NULL) {
-    fprintf(stderr, "Failed to create CURL connection\n");
+    fprintf(stderr, "Failed to create CARL connection\n");
     exit(EXIT_FAILURE);
   }
 
-  code = curl_easy_setopt(conn, CURLOPT_ERRORBUFFER, errorBuffer);
-  if(code != CURLE_OK) {
+  code = carl_easy_setopt(conn, CARLOPT_ERRORBUFFER, errorBuffer);
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to set error buffer [%d]\n", code);
     return false;
   }
 
-  code = curl_easy_setopt(conn, CURLOPT_URL, url);
-  if(code != CURLE_OK) {
+  code = carl_easy_setopt(conn, CARLOPT_URL, url);
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to set URL [%s]\n", errorBuffer);
     return false;
   }
 
-  code = curl_easy_setopt(conn, CURLOPT_FOLLOWLOCATION, 1L);
-  if(code != CURLE_OK) {
+  code = carl_easy_setopt(conn, CARLOPT_FOLLOWLOCATION, 1L);
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to set redirect option [%s]\n", errorBuffer);
     return false;
   }
 
-  code = curl_easy_setopt(conn, CURLOPT_WRITEFUNCTION, writer);
-  if(code != CURLE_OK) {
+  code = carl_easy_setopt(conn, CARLOPT_WRITEFUNCTION, writer);
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to set writer [%s]\n", errorBuffer);
     return false;
   }
 
-  code = curl_easy_setopt(conn, CURLOPT_WRITEDATA, &buffer);
-  if(code != CURLE_OK) {
+  code = carl_easy_setopt(conn, CARLOPT_WRITEDATA, &buffer);
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to set write data [%s]\n", errorBuffer);
     return false;
   }
@@ -254,8 +254,8 @@ static void parseHtml(const std::string &html,
 
 int main(int argc, char *argv[])
 {
-  CURL *conn = NULL;
-  CURLcode code;
+  CARL *conn = NULL;
+  CARLcode code;
   std::string title;
 
   // Ensure one argument is given
@@ -265,9 +265,9 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  curl_global_init(CURL_GLOBAL_DEFAULT);
+  carl_global_init(CARL_GLOBAL_DEFAULT);
 
-  // Initialize CURL connection
+  // Initialize CARL connection
 
   if(!init(conn, argv[1])) {
     fprintf(stderr, "Connection initializion failed\n");
@@ -276,10 +276,10 @@ int main(int argc, char *argv[])
 
   // Retrieve content for the URL
 
-  code = curl_easy_perform(conn);
-  curl_easy_cleanup(conn);
+  code = carl_easy_perform(conn);
+  carl_easy_cleanup(conn);
 
-  if(code != CURLE_OK) {
+  if(code != CARLE_OK) {
     fprintf(stderr, "Failed to get '%s' [%s]\n", argv[1], errorBuffer);
     exit(EXIT_FAILURE);
   }

@@ -3,7 +3,7 @@
 <keywords>
 HTTP
 HTTP GET
-CURLOPT_CURLU
+CARLOPT_CARLU
 proxy
 </keywords>
 </info>
@@ -31,7 +31,7 @@ http
 lib659
 </tool>
 <name>
-CURLOPT_CURLU without the path set - over proxy
+CARLOPT_CARLU without the path set - over proxy
  </name>
  <command>
 http://%HOSTIP:%HTTPPORT

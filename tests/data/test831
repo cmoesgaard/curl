@@ -36,7 +36,7 @@ IMAP NTLM graceful cancellation
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -44,14 +44,14 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 'imap://%HOSTIP:%IMAPPORT/831/;MAILINDEX=1' -u testuser:testpass
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 
 #
 # Verify data after the test has been "shot"
 <verify>
-# 67 - CURLE_LOGIN_DENIED
+# 67 - CARLE_LOGIN_DENIED
 <errorcode>
 67
 </errorcode>

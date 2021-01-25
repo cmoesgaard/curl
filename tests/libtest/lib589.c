@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,48 +25,48 @@
 
 int test(char *URL)
 {
-  CURL *curl;
-  CURLcode res = CURLE_OK;
+  CARL *carl;
+  CARLcode res = CARLE_OK;
 
-  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-    fprintf(stderr, "curl_global_init() failed\n");
+  if(carl_global_init(CARL_GLOBAL_ALL) != CARLE_OK) {
+    fprintf(stderr, "carl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl = curl_easy_init();
-  if(!curl) {
-    fprintf(stderr, "curl_easy_init() failed\n");
-    curl_global_cleanup();
+  carl = carl_easy_init();
+  if(!carl) {
+    fprintf(stderr, "carl_easy_init() failed\n");
+    carl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* First set the URL that is about to receive our POST. */
-  test_setopt(curl, CURLOPT_URL, URL);
-  test_setopt(curl, CURLOPT_VERBOSE, 1L); /* show verbose for debug */
-  test_setopt(curl, CURLOPT_HEADER, 1L); /* include header */
+  test_setopt(carl, CARLOPT_URL, URL);
+  test_setopt(carl, CARLOPT_VERBOSE, 1L); /* show verbose for debug */
+  test_setopt(carl, CARLOPT_HEADER, 1L); /* include header */
 
 #ifdef LIB584
   {
-    curl_mime *mime = curl_mime_init(curl);
-    curl_mimepart *part = curl_mime_addpart(mime);
-    curl_mime_name(part, "fake");
-    curl_mime_data(part, "party", 5);
-    test_setopt(curl, CURLOPT_MIMEPOST, mime);
-    res = curl_easy_perform(curl);
-    curl_mime_free(mime);
+    carl_mime *mime = carl_mime_init(carl);
+    carl_mimepart *part = carl_mime_addpart(mime);
+    carl_mime_name(part, "fake");
+    carl_mime_data(part, "party", 5);
+    test_setopt(carl, CARLOPT_MIMEPOST, mime);
+    res = carl_easy_perform(carl);
+    carl_mime_free(mime);
   }
 #endif
 
-  test_setopt(curl, CURLOPT_MIMEPOST, NULL);
+  test_setopt(carl, CARLOPT_MIMEPOST, NULL);
 
   /* Now, we should be making a zero byte POST request */
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
 
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
 
   return (int)res;
 }

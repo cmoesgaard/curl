@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,24 +19,24 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "carlcheck.h"
 
 #include "urldata.h"
 #include "altsvc.h"
 
-static CURLcode
+static CARLcode
 unit_setup(void)
 {
-  return CURLE_OK;
+  return CARLE_OK;
 }
 
 static void
 unit_stop(void)
 {
-  curl_global_cleanup();
+  carl_global_cleanup();
 }
 
-#if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_ALTSVC)
+#if defined(CARL_DISABLE_HTTP) || defined(CARL_DISABLE_ALTSVC)
 UNITTEST_START
 {
   return 0; /* nothing to do when HTTP or alt-svc is disabled */
@@ -46,8 +46,8 @@ UNITTEST_STOP
 UNITTEST_START
 {
   char outname[256];
-  CURL *curl;
-  CURLcode result;
+  CARL *carl;
+  CARLcode result;
   struct altsvcinfo *asi = Curl_altsvc_init();
   if(!asi)
     return 1;
@@ -56,14 +56,14 @@ UNITTEST_START
     Curl_altsvc_cleanup(&asi);
     return result;
   }
-  curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if(!curl)
+  carl_global_init(CARL_GLOBAL_ALL);
+  carl = carl_easy_init();
+  if(!carl)
     goto fail;
   fail_unless(asi->list.size == 4, "wrong number of entries");
   msnprintf(outname, sizeof(outname), "%s-out", arg);
 
-  result = Curl_altsvc_parse(curl, asi, "h2=\"example.com:8080\"\r\n",
+  result = Curl_altsvc_parse(carl, asi, "h2=\"example.com:8080\"\r\n",
                              ALPN_h1, "example.org", 8080);
   if(result) {
     fprintf(stderr, "Curl_altsvc_parse() failed!\n");
@@ -71,7 +71,7 @@ UNITTEST_START
   }
   fail_unless(asi->list.size == 5, "wrong number of entries");
 
-  result = Curl_altsvc_parse(curl, asi, "h3=\":8080\"\r\n",
+  result = Curl_altsvc_parse(carl, asi, "h3=\":8080\"\r\n",
                              ALPN_h1, "2.example.org", 8080);
   if(result) {
     fprintf(stderr, "Curl_altsvc_parse(2) failed!\n");
@@ -79,7 +79,7 @@ UNITTEST_START
   }
   fail_unless(asi->list.size == 6, "wrong number of entries");
 
-  result = Curl_altsvc_parse(curl, asi,
+  result = Curl_altsvc_parse(carl, asi,
                              "h2=\"example.com:8080\", h3=\"yesyes.com\"\r\n",
                              ALPN_h1, "3.example.org", 8080);
   if(result) {
@@ -89,7 +89,7 @@ UNITTEST_START
   /* that one should make two entries */
   fail_unless(asi->list.size == 8, "wrong number of entries");
 
-  result = Curl_altsvc_parse(curl, asi,
+  result = Curl_altsvc_parse(carl, asi,
                              "h2=\"example.com:443\"; ma = 120;\r\n",
                              ALPN_h2, "example.org", 80);
   if(result) {
@@ -99,7 +99,7 @@ UNITTEST_START
   fail_unless(asi->list.size == 9, "wrong number of entries");
 
   /* quoted 'ma' value */
-  result = Curl_altsvc_parse(curl, asi,
+  result = Curl_altsvc_parse(carl, asi,
                              "h2=\"example.net:443\"; ma=\"180\";\r\n",
                              ALPN_h2, "example.net", 80);
   if(result) {
@@ -109,9 +109,9 @@ UNITTEST_START
   fail_unless(asi->list.size == 10, "wrong number of entries");
 
   result =
-    Curl_altsvc_parse(curl, asi,
+    Curl_altsvc_parse(carl, asi,
                       "h2=\":443\", h3=\":443\"; ma = 120; persist = 1\r\n",
-                      ALPN_h1, "curl.se", 80);
+                      ALPN_h1, "carl.se", 80);
   if(result) {
     fprintf(stderr, "Curl_altsvc_parse(5) failed!\n");
     unitfail++;
@@ -119,21 +119,21 @@ UNITTEST_START
   fail_unless(asi->list.size == 12, "wrong number of entries");
 
   /* clear that one again and decrease the counter */
-  result = Curl_altsvc_parse(curl, asi, "clear;\r\n",
-                             ALPN_h1, "curl.se", 80);
+  result = Curl_altsvc_parse(carl, asi, "clear;\r\n",
+                             ALPN_h1, "carl.se", 80);
   if(result) {
     fprintf(stderr, "Curl_altsvc_parse(6) failed!\n");
     unitfail++;
   }
   fail_unless(asi->list.size == 10, "wrong number of entries");
 
-  Curl_altsvc_save(curl, asi, outname);
+  Curl_altsvc_save(carl, asi, outname);
 
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_global_cleanup();
   fail:
   Curl_altsvc_cleanup(&asi);
-  curl_global_cleanup();
+  carl_global_cleanup();
   return unitfail;
 }
 UNITTEST_STOP

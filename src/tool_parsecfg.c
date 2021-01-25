@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,9 +21,9 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 
 #include "tool_cfgable.h"
 #include "tool_getparam.h"
@@ -42,7 +42,7 @@
 static const char *unslashquote(const char *line, char *param);
 
 #define MAX_CONFIG_LINE_LENGTH (100*1024)
-static bool my_get_line(FILE *fp, struct curlx_dynbuf *, bool *error);
+static bool my_get_line(FILE *fp, struct carlx_dynbuf *, bool *error);
 
 #ifdef WIN32
 static FILE *execpath(const char *filename)
@@ -83,12 +83,12 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   char *pathalloc = NULL;
 
   if(!filename || !*filename) {
-    /* NULL or no file name attempts to load .curlrc from the homedir! */
+    /* NULL or no file name attempts to load .carlrc from the homedir! */
 
-    char *home = homedir(".curlrc");
+    char *home = homedir(".carlrc");
 #ifndef WIN32
     if(home) {
-      pathalloc = curl_maprintf("%s%s.curlrc", home, DIR_CHAR);
+      pathalloc = carl_maprintf("%s%s.carlrc", home, DIR_CHAR);
       if(!pathalloc) {
         free(home);
         return 1; /* out of memory */
@@ -101,15 +101,15 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       char prefix = '.';
       do {
         /* if it was allocated in a previous attempt */
-        curl_free(pathalloc);
-        /* check for .curlrc then _curlrc in the home dir */
-        pathalloc = curl_maprintf("%s%s%ccurlrc", home, DIR_CHAR, prefix);
+        carl_free(pathalloc);
+        /* check for .carlrc then _carlrc in the home dir */
+        pathalloc = carl_maprintf("%s%s%ccarlrc", home, DIR_CHAR, prefix);
         if(!pathalloc) {
           free(home);
           return 1; /* out of memory */
         }
 
-        /* Check if the file exists - if not, try _curlrc */
+        /* Check if the file exists - if not, try _carlrc */
         file = fopen(pathalloc, FOPEN_READTEXT);
         if(file) {
           filename = pathalloc;
@@ -119,10 +119,10 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       } while(++i < 2);
     }
     if(!filename) {
-      /* check for .curlrc then _curlrc in the dir of the executable */
-      file = execpath(".curlrc");
+      /* check for .carlrc then _carlrc in the dir of the executable */
+      file = execpath(".carlrc");
       if(!file)
-        file = execpath("_curlrc");
+        file = execpath("_carlrc");
     }
 #endif
 
@@ -142,15 +142,15 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
     char *param;
     int lineno = 0;
     bool dashed_option;
-    struct curlx_dynbuf buf;
+    struct carlx_dynbuf buf;
     bool fileerror;
-    curlx_dyn_init(&buf, MAX_CONFIG_LINE_LENGTH);
+    carlx_dyn_init(&buf, MAX_CONFIG_LINE_LENGTH);
 
     while(my_get_line(file, &buf, &fileerror)) {
       int res;
       bool alloced_param = FALSE;
       lineno++;
-      line = curlx_dyn_ptr(&buf);
+      line = carlx_dyn_ptr(&buf);
       if(!line) {
         rc = 1; /* out of memory */
         break;
@@ -167,7 +167,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       case '\n':
       case '*':
       case '\0':
-        curlx_dyn_reset(&buf);
+        carlx_dyn_reset(&buf);
         continue;
       }
 
@@ -288,9 +288,9 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       if(alloced_param)
         Curl_safefree(param);
 
-      curlx_dyn_reset(&buf);
+      carlx_dyn_reset(&buf);
     }
-    curlx_dyn_free(&buf);
+    carlx_dyn_free(&buf);
     if(file != stdin)
       fclose(file);
     if(fileerror)
@@ -299,7 +299,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   else
     rc = 1; /* couldn't open the file */
 
-  curl_free(pathalloc);
+  carl_free(pathalloc);
   return rc;
 }
 
@@ -347,7 +347,7 @@ static const char *unslashquote(const char *line, char *param)
 /*
  * Reads a line from the given file, ensuring is NUL terminated.
  */
-static bool my_get_line(FILE *fp, struct curlx_dynbuf *db,
+static bool my_get_line(FILE *fp, struct carlx_dynbuf *db,
                         bool *error)
 {
   char buf[4096];
@@ -357,8 +357,8 @@ static bool my_get_line(FILE *fp, struct curlx_dynbuf *db,
        occurs while no characters have been read. */
     if(!fgets(buf, sizeof(buf), fp))
       /* only if there's data in the line, return TRUE */
-      return curlx_dyn_len(db) ? TRUE : FALSE;
-    if(curlx_dyn_add(db, buf)) {
+      return carlx_dyn_len(db) ? TRUE : FALSE;
+    if(carlx_dyn_add(db, buf)) {
       *error = TRUE; /* error */
       return FALSE; /* stop reading */
     }

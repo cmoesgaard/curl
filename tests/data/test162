@@ -48,7 +48,7 @@ http://%HOSTIP:%HTTPPORT/162 --proxy http://%HOSTIP:%HTTPPORT --proxy-user foo:b
 GET http://%HOSTIP:%HTTPPORT/162 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 

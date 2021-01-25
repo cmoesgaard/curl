@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,16 +24,16 @@
  * </DESC>
  */
 #include <stdio.h>
-#include <curl/curl.h>
+#include <carl/carl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 int main(void)
 {
-  CURL *curl;
-  CURLcode res;
+  CARL *carl;
+  CARLcode res;
   struct stat file_info;
-  curl_off_t speed_upload, total_time;
+  carl_off_t speed_upload, total_time;
   FILE *fd;
 
   fd = fopen("debugit", "rb"); /* open file to upload */
@@ -44,45 +44,45 @@ int main(void)
   if(fstat(fileno(fd), &file_info) != 0)
     return 1; /* can't continue */
 
-  curl = curl_easy_init();
-  if(curl) {
+  carl = carl_easy_init();
+  if(carl) {
     /* upload to this place */
-    curl_easy_setopt(curl, CURLOPT_URL,
-                     "file:///home/dast/src/curl/debug/new");
+    carl_easy_setopt(carl, CARLOPT_URL,
+                     "file:///home/dast/src/carl/debug/new");
 
     /* tell it to "upload" to the URL */
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    carl_easy_setopt(carl, CARLOPT_UPLOAD, 1L);
 
     /* set where to read from (on Windows you need to use READFUNCTION too) */
-    curl_easy_setopt(curl, CURLOPT_READDATA, fd);
+    carl_easy_setopt(carl, CARLOPT_READDATA, fd);
 
     /* and give the size of the upload (optional) */
-    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,
-                     (curl_off_t)file_info.st_size);
+    carl_easy_setopt(carl, CARLOPT_INFILESIZE_LARGE,
+                     (carl_off_t)file_info.st_size);
 
     /* enable verbose for easier tracing */
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    carl_easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-    res = curl_easy_perform(curl);
+    res = carl_easy_perform(carl);
     /* Check for errors */
-    if(res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
-              curl_easy_strerror(res));
+    if(res != CARLE_OK) {
+      fprintf(stderr, "carl_easy_perform() failed: %s\n",
+              carl_easy_strerror(res));
 
     }
     else {
       /* now extract transfer info */
-      curl_easy_getinfo(curl, CURLINFO_SPEED_UPLOAD_T, &speed_upload);
-      curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME_T, &total_time);
+      carl_easy_getinfo(carl, CARLINFO_SPEED_UPLOAD_T, &speed_upload);
+      carl_easy_getinfo(carl, CARLINFO_TOTAL_TIME_T, &total_time);
 
-      fprintf(stderr, "Speed: %" CURL_FORMAT_CURL_OFF_T " bytes/sec during %"
-              CURL_FORMAT_CURL_OFF_T ".%06ld seconds\n",
+      fprintf(stderr, "Speed: %" CARL_FORMAT_CARL_OFF_T " bytes/sec during %"
+              CARL_FORMAT_CARL_OFF_T ".%06ld seconds\n",
               speed_upload,
               (total_time / 1000000), (long)(total_time % 1000000));
 
     }
     /* always cleanup */
-    curl_easy_cleanup(curl);
+    carl_easy_cleanup(carl);
   }
   fclose(fd);
   return 0;

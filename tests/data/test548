@@ -82,11 +82,11 @@ debug
 proxy
 </features>
  <name>
-HTTP proxy auth NTLM with POST data from CURLOPT_POSTFIELDS
+HTTP proxy auth NTLM with POST data from CARLOPT_POSTFIELDS
  </name>
  <setenv>
 # we force our own host name, in order to make the test machine independent
-CURL_GETHOSTNAME=curlhost
+CARL_GETHOSTNAME=carlhost
 # we try to use the LD_PRELOAD hack, if not a debug build
 LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
  </setenv>
@@ -94,7 +94,7 @@ LD_PRELOAD=%PWD/libtest/.libs/libhostname.so
 http://test.remote.example.com/path/548 http://%HOSTIP:%HTTPPORT testuser:testpass
 </command>
 <precheck>
-chkhostname curlhost
+chkhostname carlhost
 </precheck>
 </client>
 

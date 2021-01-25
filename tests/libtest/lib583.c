@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,7 +21,7 @@
  ***************************************************************************/
 /*
  * This test case is based on the sample code provided by Saqib Ali
- * https://curl.se/mail/lib-2011-03/0066.html
+ * https://carl.se/mail/lib-2011-03/0066.html
  */
 
 #include "test.h"
@@ -33,55 +33,55 @@
 int test(char *URL)
 {
   int stillRunning;
-  CURLM *multiHandle = NULL;
-  CURL *curl = NULL;
-  CURLcode res = CURLE_OK;
-  CURLMcode mres;
+  CARLM *multiHandle = NULL;
+  CARL *carl = NULL;
+  CARLcode res = CARLE_OK;
+  CARLMcode mres;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
   multi_init(multiHandle);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_USERPWD, libtest_arg2);
-  easy_setopt(curl, CURLOPT_SSH_PUBLIC_KEYFILE, "curl_client_key.pub");
-  easy_setopt(curl, CURLOPT_SSH_PRIVATE_KEYFILE, "curl_client_key");
+  easy_setopt(carl, CARLOPT_USERPWD, libtest_arg2);
+  easy_setopt(carl, CARLOPT_SSH_PUBLIC_KEYFILE, "carl_client_key.pub");
+  easy_setopt(carl, CARLOPT_SSH_PRIVATE_KEYFILE, "carl_client_key");
 
-  easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-  easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+  easy_setopt(carl, CARLOPT_UPLOAD, 1L);
+  easy_setopt(carl, CARLOPT_VERBOSE, 1L);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_INFILESIZE, (long)5);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_INFILESIZE, (long)5);
 
-  multi_add_handle(multiHandle, curl);
+  multi_add_handle(multiHandle, carl);
 
   /* this tests if removing an easy handle immediately after multi
      perform has been called succeeds or not. */
 
-  fprintf(stderr, "curl_multi_perform()...\n");
+  fprintf(stderr, "carl_multi_perform()...\n");
 
   multi_perform(multiHandle, &stillRunning);
 
-  fprintf(stderr, "curl_multi_perform() succeeded\n");
+  fprintf(stderr, "carl_multi_perform() succeeded\n");
 
-  fprintf(stderr, "curl_multi_remove_handle()...\n");
-  mres = curl_multi_remove_handle(multiHandle, curl);
+  fprintf(stderr, "carl_multi_remove_handle()...\n");
+  mres = carl_multi_remove_handle(multiHandle, carl);
   if(mres) {
-    fprintf(stderr, "curl_multi_remove_handle() failed, "
+    fprintf(stderr, "carl_multi_remove_handle() failed, "
             "with code %d\n", (int)mres);
     res = TEST_ERR_MULTI;
   }
   else
-    fprintf(stderr, "curl_multi_remove_handle() succeeded\n");
+    fprintf(stderr, "carl_multi_remove_handle() succeeded\n");
 
 test_cleanup:
 
   /* undocumented cleanup sequence - type UB */
 
-  curl_easy_cleanup(curl);
-  curl_multi_cleanup(multiHandle);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_multi_cleanup(multiHandle);
+  carl_global_cleanup();
 
   return (int)res;
 }

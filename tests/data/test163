@@ -27,7 +27,7 @@ http
 HTTP multipart formpost with contents from a file
  </name>
  <command>
-http://%HOSTIP:%HTTPPORT/we/want/163 -F "name=<log/field163" -F tool=curl
+http://%HOSTIP:%HTTPPORT/we/want/163 -F "name=<log/field163" -F tool=carl
 </command>
 # We create this file before the command is invoked!
 <file name="log/field163">
@@ -51,7 +51,7 @@ yes please
 <protocol>
 POST /we/want/163 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 304
 Content-Type: multipart/form-data; boundary=----------------------------c2d1767eb6ac
@@ -72,7 +72,7 @@ yes please
 ------------------------------c2d1767eb6ac
 Content-Disposition: form-data; name="tool"
 
-curl
+carl
 ------------------------------c2d1767eb6ac--
 </protocol>
 </verify>

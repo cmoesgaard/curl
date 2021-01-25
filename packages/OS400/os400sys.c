@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,8 +23,8 @@
 
 /* OS/400 additional support. */
 
-#include <curl/curl.h>
-#include "config-os400.h"  /* Not curl_setup.h: we only need some defines. */
+#include <carl/carl.h>
+#include "config-os400.h"  /* Not carl_setup.h: we only need some defines. */
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -51,7 +51,7 @@
 #include <gssapi.h>
 #endif
 
-#ifndef CURL_DISABLE_LDAP
+#ifndef CARL_DISABLE_LDAP
 #include <ldap.h>
 #endif
 
@@ -63,7 +63,7 @@
 /**
 *** QADRT OS/400 ASCII runtime defines only the most used procedures, but a
 *** lot of them are not supported. This module implements ASCII wrappers for
-*** those that are used by libcurl, but not defined by QADRT.
+*** those that are used by libcarl, but not defined by QADRT.
 **/
 
 #pragma convert(0)                              /* Restore EBCDIC. */
@@ -253,9 +253,9 @@ set_thread_string(localkey_t key, const char *s)
 
 
 int
-Curl_getnameinfo_a(const struct sockaddr *sa, curl_socklen_t salen,
-                   char *nodename, curl_socklen_t nodenamelen,
-                   char *servname, curl_socklen_t servnamelen,
+Curl_getnameinfo_a(const struct sockaddr *sa, carl_socklen_t salen,
+                   char *nodename, carl_socklen_t nodenamelen,
+                   char *servname, carl_socklen_t servnamelen,
                    int flags)
 {
   char *enodename = NULL;
@@ -877,7 +877,7 @@ Curl_gss_delete_sec_context_a(OM_uint32 *minor_status,
 
 #endif /* HAVE_GSSAPI */
 
-#ifndef CURL_DISABLE_LDAP
+#ifndef CARL_DISABLE_LDAP
 
 /* ASCII wrappers for the LDAP procedures. */
 
@@ -1154,7 +1154,7 @@ Curl_ldap_next_attribute_a(void *ld,
   return cp;
 }
 
-#endif /* CURL_DISABLE_LDAP */
+#endif /* CARL_DISABLE_LDAP */
 
 static int
 sockaddr2ebcdic(struct sockaddr_storage *dstaddr,

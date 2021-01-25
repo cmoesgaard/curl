@@ -68,13 +68,13 @@ http://%HOSTIP:%HTTPPORT/65 -u testuser:test2pass --digest
 <protocol>
 GET /65 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 GET /65 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Authorization: Digest username="testuser", realm="testrealm", nonce="2053604145", uri="/65", response="66d68d3251f1839576ba7c766cf9205b"
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

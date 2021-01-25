@@ -40,7 +40,7 @@ http://%HOSTIP:%HTTPPORT/1223 -w 'IP %{remote_ip} and PORT %{remote_port}\n'
 <protocol>
 GET /1223 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

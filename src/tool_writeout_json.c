@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -21,21 +21,21 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#define ENABLE_CURLX_PRINTF
+#define ENABLE_CARLX_PRINTF
 
 /* use our own printf() functions */
-#include "curlx.h"
+#include "carlx.h"
 #include "tool_cfgable.h"
 #include "tool_writeout_json.h"
 #include "tool_writeout.h"
 
 
 static const char *http_version[] = {
-  "0",   /* CURL_HTTP_VERSION_NONE */
-  "1",   /* CURL_HTTP_VERSION_1_0 */
-  "1.1", /* CURL_HTTP_VERSION_1_1 */
-  "2",   /* CURL_HTTP_VERSION_2 */
-  "3"    /* CURL_HTTP_VERSION_3 */
+  "0",   /* CARL_HTTP_VERSION_NONE */
+  "1",   /* CARL_HTTP_VERSION_1_0 */
+  "1.1", /* CARL_HTTP_VERSION_1_1 */
+  "2",   /* CARL_HTTP_VERSION_2 */
+  "3"    /* CARL_HTTP_VERSION_3 */
 };
 
 static void jsonEscape(FILE *stream, const char *in)
@@ -78,23 +78,23 @@ static void jsonEscape(FILE *stream, const char *in)
   }
 }
 
-static int writeTime(FILE *str, CURL *curl, const char *key, CURLINFO ci)
+static int writeTime(FILE *str, CARL *carl, const char *key, CARLINFO ci)
 {
-  curl_off_t val = 0;
-  if(CURLE_OK == curl_easy_getinfo(curl, ci, &val)) {
-    curl_off_t s = val / 1000000l;
-    curl_off_t ms = val % 1000000l;
-    fprintf(str, "\"%s\":%" CURL_FORMAT_CURL_OFF_T
-            ".%06" CURL_FORMAT_CURL_OFF_T, key, s, ms);
+  carl_off_t val = 0;
+  if(CARLE_OK == carl_easy_getinfo(carl, ci, &val)) {
+    carl_off_t s = val / 1000000l;
+    carl_off_t ms = val % 1000000l;
+    fprintf(str, "\"%s\":%" CARL_FORMAT_CARL_OFF_T
+            ".%06" CARL_FORMAT_CARL_OFF_T, key, s, ms);
     return 1;
   }
   return 0;
 }
 
-static int writeString(FILE *str, CURL *curl, const char *key, CURLINFO ci)
+static int writeString(FILE *str, CARL *carl, const char *key, CARLINFO ci)
 {
   char *valp = NULL;
-  if((CURLE_OK == curl_easy_getinfo(curl, ci, &valp)) && valp) {
+  if((CARLE_OK == carl_easy_getinfo(carl, ci, &valp)) && valp) {
     fprintf(str, "\"%s\":\"", key);
     jsonEscape(str, valp);
     fprintf(str, "\"");
@@ -103,7 +103,7 @@ static int writeString(FILE *str, CURL *curl, const char *key, CURLINFO ci)
   return 0;
 }
 
-static int writeLong(FILE *str, CURL *curl, const char *key, CURLINFO ci,
+static int writeLong(FILE *str, CARL *carl, const char *key, CARLINFO ci,
                      struct per_transfer *per, const struct writeoutvar *wovar)
 {
   if(wovar->id == VAR_NUM_HEADERS) {
@@ -112,7 +112,7 @@ static int writeLong(FILE *str, CURL *curl, const char *key, CURLINFO ci,
   }
   else {
     long val = 0;
-    if(CURLE_OK == curl_easy_getinfo(curl, ci, &val)) {
+    if(CARLE_OK == carl_easy_getinfo(carl, ci, &val)) {
       fprintf(str, "\"%s\":%ld", key, val);
       return 1;
     }
@@ -120,11 +120,11 @@ static int writeLong(FILE *str, CURL *curl, const char *key, CURLINFO ci,
   return 0;
 }
 
-static int writeOffset(FILE *str, CURL *curl, const char *key, CURLINFO ci)
+static int writeOffset(FILE *str, CARL *carl, const char *key, CARLINFO ci)
 {
-  curl_off_t val = 0;
-  if(CURLE_OK == curl_easy_getinfo(curl, ci, &val)) {
-    fprintf(str, "\"%s\":%" CURL_FORMAT_CURL_OFF_T, key, val);
+  carl_off_t val = 0;
+  if(CARLE_OK == carl_easy_getinfo(carl, ci, &val)) {
+    fprintf(str, "\"%s\":%" CARL_FORMAT_CARL_OFF_T, key, val);
     return 1;
   }
   return 0;
@@ -143,10 +143,10 @@ static int writeFilename(FILE *str, const char *key, const char *filename)
   return 1;
 }
 
-static int writeVersion(FILE *str, CURL *curl, const char *key, CURLINFO ci)
+static int writeVersion(FILE *str, CARL *carl, const char *key, CARLINFO ci)
 {
   long version = 0;
-  if(CURLE_OK == curl_easy_getinfo(curl, ci, &version) &&
+  if(CARLE_OK == carl_easy_getinfo(carl, ci, &version) &&
      (version >= 0) &&
      (version < (long)(sizeof(http_version)/sizeof(char *)))) {
     fprintf(str, "\"%s\":\"%s\"", key, http_version[version]);
@@ -155,7 +155,7 @@ static int writeVersion(FILE *str, CURL *curl, const char *key, CURLINFO ci)
   return 0;
 }
 
-void ourWriteOutJSON(const struct writeoutvar mappings[], CURL *curl,
+void ourWriteOutJSON(const struct writeoutvar mappings[], CARL *carl,
                      struct per_transfer *per, FILE *stream)
 {
   int i;
@@ -164,7 +164,7 @@ void ourWriteOutJSON(const struct writeoutvar mappings[], CURL *curl,
   for(i = 0; mappings[i].name != NULL; i++) {
     const struct writeoutvar *wovar = &mappings[i];
     const char *name = mappings[i].name;
-    CURLINFO cinfo = mappings[i].cinfo;
+    CARLINFO cinfo = mappings[i].cinfo;
     int ok = 0;
 
     if(mappings[i].is_ctrl == 1) {
@@ -173,22 +173,22 @@ void ourWriteOutJSON(const struct writeoutvar mappings[], CURL *curl,
 
     switch(mappings[i].jsontype) {
     case JSON_STRING:
-      ok = writeString(stream, curl, name, cinfo);
+      ok = writeString(stream, carl, name, cinfo);
       break;
     case JSON_LONG:
-      ok = writeLong(stream, curl, name, cinfo, per, wovar);
+      ok = writeLong(stream, carl, name, cinfo, per, wovar);
       break;
     case JSON_OFFSET:
-      ok = writeOffset(stream, curl, name, cinfo);
+      ok = writeOffset(stream, carl, name, cinfo);
       break;
     case JSON_TIME:
-      ok = writeTime(stream, curl, name, cinfo);
+      ok = writeTime(stream, carl, name, cinfo);
       break;
     case JSON_FILENAME:
       ok = writeFilename(stream, name, per->outs.filename);
       break;
     case JSON_VERSION:
-      ok = writeVersion(stream, curl, name, cinfo);
+      ok = writeVersion(stream, carl, name, cinfo);
       break;
     default:
       break;
@@ -199,5 +199,5 @@ void ourWriteOutJSON(const struct writeoutvar mappings[], CURL *curl,
     }
   }
 
-  fprintf(stream, "\"curl_version\":\"%s\"}", curl_version());
+  fprintf(stream, "\"carl_version\":\"%s\"}", carl_version());
 }

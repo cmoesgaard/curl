@@ -60,7 +60,7 @@ HTTP GET with resume from end of file
  <command>
 http://%HOSTIP:%HTTPPORT/1043 -C -
 </command>
-<file name="log/curl1043.out">
+<file name="log/carl1043.out">
 012345678
 012345678
 012345678
@@ -74,7 +74,7 @@ http://%HOSTIP:%HTTPPORT/1043 -C -
 GET /1043 HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 Range: bytes=40-
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 
 </protocol>

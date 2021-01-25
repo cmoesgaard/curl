@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -51,16 +51,16 @@ check_c_source_compiles("${_source_epilogue}
 int main(void) {
     recv(0, 0, 0, 0);
     return 0;
-}" curl_cv_recv)
-if(curl_cv_recv)
-  if(NOT DEFINED curl_cv_func_recv_args OR curl_cv_func_recv_args STREQUAL "unknown")
+}" carl_cv_recv)
+if(carl_cv_recv)
+  if(NOT DEFINED carl_cv_func_recv_args OR carl_cv_func_recv_args STREQUAL "unknown")
     foreach(recv_retv "int" "ssize_t" )
       foreach(recv_arg1 "SOCKET" "int" )
         foreach(recv_arg2 "char *" "void *" )
           foreach(recv_arg3 "int" "size_t" "socklen_t" "unsigned int")
             foreach(recv_arg4 "int" "unsigned int")
-              if(NOT curl_cv_func_recv_done)
-                unset(curl_cv_func_recv_test CACHE)
+              if(NOT carl_cv_func_recv_done)
+                unset(carl_cv_func_recv_test CACHE)
                 check_c_source_compiles("
                   ${_source_epilogue}
                   #ifdef WINSOCK_API_LINKAGE
@@ -77,11 +77,11 @@ if(curl_cv_recv)
                     (void) res;
                     return 0;
                   }"
-                  curl_cv_func_recv_test)
+                  carl_cv_func_recv_test)
                 message(STATUS
                   "Tested: ${recv_retv} recv(${recv_arg1}, ${recv_arg2}, ${recv_arg3}, ${recv_arg4})")
-                if(curl_cv_func_recv_test)
-                  set(curl_cv_func_recv_args
+                if(carl_cv_func_recv_test)
+                  set(carl_cv_func_recv_args
                     "${recv_arg1},${recv_arg2},${recv_arg3},${recv_arg4},${recv_retv}")
                   set(RECV_TYPE_ARG1 "${recv_arg1}")
                   set(RECV_TYPE_ARG2 "${recv_arg2}")
@@ -89,7 +89,7 @@ if(curl_cv_recv)
                   set(RECV_TYPE_ARG4 "${recv_arg4}")
                   set(RECV_TYPE_RETV "${recv_retv}")
                   set(HAVE_RECV 1)
-                  set(curl_cv_func_recv_done 1)
+                  set(carl_cv_func_recv_done 1)
                 endif()
               endif()
             endforeach()
@@ -98,36 +98,36 @@ if(curl_cv_recv)
       endforeach()
     endforeach()
   else()
-    string(REGEX REPLACE "^([^,]*),[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG1 "${curl_cv_func_recv_args}")
-    string(REGEX REPLACE "^[^,]*,([^,]*),[^,]*,[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG2 "${curl_cv_func_recv_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,([^,]*),[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG3 "${curl_cv_func_recv_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,([^,]*),[^,]*$" "\\1" RECV_TYPE_ARG4 "${curl_cv_func_recv_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,([^,]*)$" "\\1" RECV_TYPE_RETV "${curl_cv_func_recv_args}")
+    string(REGEX REPLACE "^([^,]*),[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG1 "${carl_cv_func_recv_args}")
+    string(REGEX REPLACE "^[^,]*,([^,]*),[^,]*,[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG2 "${carl_cv_func_recv_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,([^,]*),[^,]*,[^,]*$" "\\1" RECV_TYPE_ARG3 "${carl_cv_func_recv_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,([^,]*),[^,]*$" "\\1" RECV_TYPE_ARG4 "${carl_cv_func_recv_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,([^,]*)$" "\\1" RECV_TYPE_RETV "${carl_cv_func_recv_args}")
   endif()
 
-  if(curl_cv_func_recv_args STREQUAL "unknown")
+  if(carl_cv_func_recv_args STREQUAL "unknown")
     message(FATAL_ERROR "Cannot find proper types to use for recv args")
   endif()
 else()
   message(FATAL_ERROR "Unable to link function recv")
 endif()
-set(curl_cv_func_recv_args "${curl_cv_func_recv_args}" CACHE INTERNAL "Arguments for recv")
+set(carl_cv_func_recv_args "${carl_cv_func_recv_args}" CACHE INTERNAL "Arguments for recv")
 set(HAVE_RECV 1)
 
 check_c_source_compiles("${_source_epilogue}
 int main(void) {
     send(0, 0, 0, 0);
     return 0;
-}" curl_cv_send)
-if(curl_cv_send)
-  if(NOT DEFINED curl_cv_func_send_args OR "${curl_cv_func_send_args}" STREQUAL "unknown")
+}" carl_cv_send)
+if(carl_cv_send)
+  if(NOT DEFINED carl_cv_func_send_args OR "${carl_cv_func_send_args}" STREQUAL "unknown")
     foreach(send_retv "int" "ssize_t" )
       foreach(send_arg1 "SOCKET" "int" "ssize_t" )
         foreach(send_arg2 "const char *" "const void *" "void *" "char *")
           foreach(send_arg3 "int" "size_t" "socklen_t" "unsigned int")
             foreach(send_arg4 "int" "unsigned int")
-              if(NOT curl_cv_func_send_done)
-                unset(curl_cv_func_send_test CACHE)
+              if(NOT carl_cv_func_send_done)
+                unset(carl_cv_func_send_test CACHE)
                 check_c_source_compiles("
                   ${_source_epilogue}
                   #ifdef WINSOCK_API_LINKAGE
@@ -144,13 +144,13 @@ if(curl_cv_send)
                     (void) res;
                     return 0;
                   }"
-                  curl_cv_func_send_test)
+                  carl_cv_func_send_test)
                 message(STATUS
                   "Tested: ${send_retv} send(${send_arg1}, ${send_arg2}, ${send_arg3}, ${send_arg4})")
-                if(curl_cv_func_send_test)
+                if(carl_cv_func_send_test)
                   string(REGEX REPLACE "(const) .*" "\\1" send_qual_arg2 "${send_arg2}")
                   string(REGEX REPLACE "const (.*)" "\\1" send_arg2 "${send_arg2}")
-                  set(curl_cv_func_send_args
+                  set(carl_cv_func_send_args
                     "${send_arg1},${send_arg2},${send_arg3},${send_arg4},${send_retv},${send_qual_arg2}")
                   set(SEND_TYPE_ARG1 "${send_arg1}")
                   set(SEND_TYPE_ARG2 "${send_arg2}")
@@ -158,7 +158,7 @@ if(curl_cv_send)
                   set(SEND_TYPE_ARG4 "${send_arg4}")
                   set(SEND_TYPE_RETV "${send_retv}")
                   set(HAVE_SEND 1)
-                  set(curl_cv_func_send_done 1)
+                  set(carl_cv_func_send_done 1)
                 endif()
               endif()
             endforeach()
@@ -167,22 +167,22 @@ if(curl_cv_send)
       endforeach()
     endforeach()
   else()
-    string(REGEX REPLACE "^([^,]*),[^,]*,[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG1 "${curl_cv_func_send_args}")
-    string(REGEX REPLACE "^[^,]*,([^,]*),[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG2 "${curl_cv_func_send_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,([^,]*),[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG3 "${curl_cv_func_send_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,([^,]*),[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG4 "${curl_cv_func_send_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,([^,]*),[^,]*$" "\\1" SEND_TYPE_RETV "${curl_cv_func_send_args}")
-    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,([^,]*)$" "\\1" SEND_QUAL_ARG2 "${curl_cv_func_send_args}")
+    string(REGEX REPLACE "^([^,]*),[^,]*,[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG1 "${carl_cv_func_send_args}")
+    string(REGEX REPLACE "^[^,]*,([^,]*),[^,]*,[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG2 "${carl_cv_func_send_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,([^,]*),[^,]*,[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG3 "${carl_cv_func_send_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,([^,]*),[^,]*,[^,]*$" "\\1" SEND_TYPE_ARG4 "${carl_cv_func_send_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,([^,]*),[^,]*$" "\\1" SEND_TYPE_RETV "${carl_cv_func_send_args}")
+    string(REGEX REPLACE "^[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,([^,]*)$" "\\1" SEND_QUAL_ARG2 "${carl_cv_func_send_args}")
   endif()
 
-  if("${curl_cv_func_send_args}" STREQUAL "unknown")
+  if("${carl_cv_func_send_args}" STREQUAL "unknown")
     message(FATAL_ERROR "Cannot find proper types to use for send args")
   endif()
   set(SEND_QUAL_ARG2 "const")
 else()
   message(FATAL_ERROR "Unable to link function send")
 endif()
-set(curl_cv_func_send_args "${curl_cv_func_send_args}" CACHE INTERNAL "Arguments for send")
+set(carl_cv_func_send_args "${carl_cv_func_send_args}" CACHE INTERNAL "Arguments for send")
 set(HAVE_SEND 1)
 
 check_c_source_compiles("${_source_epilogue}

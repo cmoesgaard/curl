@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-/* This is the 'proxyauth.c' test app posted by Shmulik Regev on the libcurl
+/* This is the 'proxyauth.c' test app posted by Shmulik Regev on the libcarl
  * mailing list on 10 Jul 2007, converted to a test case.
  *
  * argv1 = URL
@@ -44,10 +44,10 @@
 
 #define NUM_HANDLES 2
 
-static CURL *eh[NUM_HANDLES];
+static CARL *eh[NUM_HANDLES];
 
-static int init(int num, CURLM *cm, const char *url, const char *userpwd,
-                struct curl_slist *headers)
+static int init(int num, CARLM *cm, const char *url, const char *userpwd,
+                struct carl_slist *headers)
 {
   int res = 0;
 
@@ -55,31 +55,31 @@ static int init(int num, CURLM *cm, const char *url, const char *userpwd,
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_URL, url);
+  res_easy_setopt(eh[num], CARLOPT_URL, url);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_PROXY, PROXY);
+  res_easy_setopt(eh[num], CARLOPT_PROXY, PROXY);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_PROXYUSERPWD, userpwd);
+  res_easy_setopt(eh[num], CARLOPT_PROXYUSERPWD, userpwd);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_PROXYAUTH, (long)CURLAUTH_ANY);
+  res_easy_setopt(eh[num], CARLOPT_PROXYAUTH, (long)CARLAUTH_ANY);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_VERBOSE, 1L);
+  res_easy_setopt(eh[num], CARLOPT_VERBOSE, 1L);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_HEADER, 1L);
+  res_easy_setopt(eh[num], CARLOPT_HEADER, 1L);
   if(res)
     goto init_failed;
 
-  res_easy_setopt(eh[num], CURLOPT_HTTPHEADER, headers); /* custom Host: */
+  res_easy_setopt(eh[num], CARLOPT_HTTPHEADER, headers); /* custom Host: */
   if(res)
     goto init_failed;
 
@@ -91,16 +91,16 @@ static int init(int num, CURLM *cm, const char *url, const char *userpwd,
 
 init_failed:
 
-  curl_easy_cleanup(eh[num]);
+  carl_easy_cleanup(eh[num]);
   eh[num] = NULL;
 
   return res; /* failure */
 }
 
-static int loop(int num, CURLM *cm, const char *url, const char *userpwd,
-                struct curl_slist *headers)
+static int loop(int num, CARLM *cm, const char *url, const char *userpwd,
+                struct carl_slist *headers)
 {
-  CURLMsg *msg;
+  CARLMsg *msg;
   long L;
   int Q, U = -1;
   fd_set R, W, E;
@@ -155,14 +155,14 @@ static int loop(int num, CURLM *cm, const char *url, const char *userpwd,
         return res;
     }
 
-    while((msg = curl_multi_info_read(cm, &Q)) != NULL) {
-      if(msg->msg == CURLMSG_DONE) {
+    while((msg = carl_multi_info_read(cm, &Q)) != NULL) {
+      if(msg->msg == CARLMSG_DONE) {
         int i;
-        CURL *e = msg->easy_handle;
+        CARL *e = msg->easy_handle;
         fprintf(stderr, "R: %d - %s\n", (int)msg->data.result,
-                curl_easy_strerror(msg->data.result));
-        curl_multi_remove_handle(cm, e);
-        curl_easy_cleanup(e);
+                carl_easy_strerror(msg->data.result));
+        carl_multi_remove_handle(cm, e);
+        carl_easy_cleanup(e);
         for(i = 0; i < NUM_HANDLES; i++) {
           if(eh[i] == e) {
             eh[i] = NULL;
@@ -171,7 +171,7 @@ static int loop(int num, CURLM *cm, const char *url, const char *userpwd,
         }
       }
       else
-        fprintf(stderr, "E: CURLMsg (%d)\n", (int)msg->msg);
+        fprintf(stderr, "E: CARLMsg (%d)\n", (int)msg->msg);
     }
 
     res_test_timedout();
@@ -184,8 +184,8 @@ static int loop(int num, CURLM *cm, const char *url, const char *userpwd,
 
 int test(char *URL)
 {
-  CURLM *cm = NULL;
-  struct curl_slist *headers = NULL;
+  CARLM *cm = NULL;
+  struct carl_slist *headers = NULL;
   char buffer[246]; /* naively fixed-size */
   int res = 0;
   int i;
@@ -201,22 +201,22 @@ int test(char *URL)
   msnprintf(buffer, sizeof(buffer), "Host: %s", HOST);
 
   /* now add a custom Host: header */
-  headers = curl_slist_append(headers, buffer);
+  headers = carl_slist_append(headers, buffer);
   if(!headers) {
-    fprintf(stderr, "curl_slist_append() failed\n");
+    fprintf(stderr, "carl_slist_append() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
-  res_global_init(CURL_GLOBAL_ALL);
+  res_global_init(CARL_GLOBAL_ALL);
   if(res) {
-    curl_slist_free_all(headers);
+    carl_slist_free_all(headers);
     return res;
   }
 
   res_multi_init(cm);
   if(res) {
-    curl_global_cleanup();
-    curl_slist_free_all(headers);
+    carl_global_cleanup();
+    carl_slist_free_all(headers);
     return res;
   }
 
@@ -233,14 +233,14 @@ test_cleanup:
   /* proper cleanup sequence - type PB */
 
   for(i = 0; i < NUM_HANDLES; i++) {
-    curl_multi_remove_handle(cm, eh[i]);
-    curl_easy_cleanup(eh[i]);
+    carl_multi_remove_handle(cm, eh[i]);
+    carl_easy_cleanup(eh[i]);
   }
 
-  curl_multi_cleanup(cm);
-  curl_global_cleanup();
+  carl_multi_cleanup(cm);
+  carl_global_cleanup();
 
-  curl_slist_free_all(headers);
+  carl_slist_free_all(headers);
 
   return res;
 }

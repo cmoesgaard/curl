@@ -7,6 +7,6 @@ Added: 7.33.0
 Requires: c-ares
 Category: dns
 ---
-Tell curl to send outgoing DNS requests through <interface>. This option is a
+Tell carl to send outgoing DNS requests through <interface>. This option is a
 counterpart to --interface (which does not affect DNS). The supplied string
 must be an interface name (not an address).

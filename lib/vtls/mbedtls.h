@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MBEDTLS_H
-#define HEADER_CURL_MBEDTLS_H
+#ifndef HEADER_CARL_MBEDTLS_H
+#define HEADER_CARL_MBEDTLS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -12,7 +12,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -22,11 +22,11 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "carl_setup.h"
 
 #ifdef USE_MBEDTLS
 
 extern const struct Curl_ssl Curl_ssl_mbedtls;
 
 #endif /* USE_MBEDTLS */
-#endif /* HEADER_CURL_MBEDTLS_H */
+#endif /* HEADER_CARL_MBEDTLS_H */

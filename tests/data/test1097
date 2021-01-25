@@ -63,12 +63,12 @@ http://test.a.galaxy.far.far.away.1097:%HTTPPORT/1097 --proxy http://%HOSTIP:%HT
 CONNECT test.a.galaxy.far.far.away.1097:%HTTPPORT HTTP/1.1
 Host: test.a.galaxy.far.far.away.1097:%HTTPPORT
 Proxy-Authorization: NTLM TlRMTVNTUAABAAAABoIIAAAAAAAAAAAAAAAAAAAAAAA=
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Proxy-Connection: Keep-Alive
 
 POST /1097 HTTP/1.1
 Host: test.a.galaxy.far.far.away.1097:%HTTPPORT
-User-Agent: curl/%VERSION
+User-Agent: carl/%VERSION
 Accept: */*
 Content-Length: 11
 Content-Type: application/x-www-form-urlencoded

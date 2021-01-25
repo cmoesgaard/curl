@@ -4,8 +4,8 @@
                             | (__| |_| |  _ <| |___
                              \___|\___/|_| \_\_____|
 
- This document lists all command line options present in curl, together with
- exact information about the first curl version that supports it. The options
+ This document lists all command line options present in carl, together with
+ exact information about the first carl version that supports it. The options
  are sorted alphabetically on the long name.
 
  Long (short)                        Introduced
@@ -99,7 +99,7 @@
 --key                                7.9.3
 --key-type                           7.9.3
 --krb                                7.3
---libcurl                            7.16.1
+--libcarl                            7.16.1
 --limit-rate                         7.10
 --list-only (-l)                     4.0
 --local-port                         7.15.2

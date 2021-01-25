@@ -1,0 +1,63 @@
+.\" **************************************************************************
+.\" *                                  _   _ ____  _
+.\" *  Project                     ___| | | |  _ \| |
+.\" *                             / __| | | | |_) | |
+.\" *                            | (__| |_| |  _ <| |___
+.\" *                             \___|\___/|_| \_\_____|
+.\" *
+.\" * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" *
+.\" * This software is licensed as described in the file COPYING, which
+.\" * you should have received as part of this distribution. The terms
+.\" * are also available at https://carl.se/docs/copyright.html.
+.\" *
+.\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+.\" * copies of the Software, and permit persons to whom the Software is
+.\" * furnished to do so, under the terms of the COPYING file.
+.\" *
+.\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+.\" * KIND, either express or implied.
+.\" *
+.\" **************************************************************************
+.\"
+.TH CARLOPT_SOCKS5_AUTH 3 "27 April 2017" "libcarl 7.55.0" "carl_easy_setopt options"
+.SH NAME
+CARLOPT_SOCKS5_AUTH \- set allowed methods for SOCKS5 proxy authentication
+.SH SYNOPSIS
+#include <carl/carl.h>
+
+CARLcode carl_easy_setopt(CARL *handle, CARLOPT_SOCKS5_AUTH, long bitmask);
+.SH DESCRIPTION
+Pass a long as parameter, which is set to a bitmask, to tell libcarl which
+authentication method(s) are allowed for SOCKS5 proxy authentication.  The only
+supported flags are \fICARLAUTH_BASIC\fP, which allows username/password
+authentication, \fICARLAUTH_GSSAPI\fP, which allows GSS-API authentication, and
+\fICARLAUTH_NONE\fP, which allows no authentication.  Set the actual user name
+and password with the \fICARLOPT_PROXYUSERPWD(3)\fP option.
+.SH DEFAULT
+CARLAUTH_BASIC|CARLAUTH_GSSAPI
+.SH PROTOCOLS
+All
+.SH EXAMPLE
+.nf
+CARL *carl = carl_easy_init();
+if(carl) {
+  carl_easy_setopt(carl, CARLOPT_URL, "https://example.com");
+
+  /* request to use a SOCKS5 proxy */
+  carl_easy_setopt(carl, CARLOPT_PROXY, "socks5://user:pass@myproxy.com");
+
+  /* enable username/password authentication only */
+  carl_easy_setopt(carl, CARLOPT_SOCKS5_AUTH, CARLAUTH_BASIC);
+
+  /* Perform the request */
+  carl_easy_perform(carl);
+}
+.fi
+.SH AVAILABILITY
+Added in 7.55.0
+.SH RETURN VALUE
+Returns CARLE_OK if the option is supported, CARLE_UNKNOWN_OPTION if not, or
+CARLE_NOT_BUILT_IN if the bitmask contains unsupported flags.
+.SH "SEE ALSO"
+.BR CARLOPT_PROXY "(3), " CARLOPT_PROXYTYPE "(3)"

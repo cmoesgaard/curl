@@ -4,7 +4,7 @@
 HTTP
 HTTP GET
 multi
-CURLOPT_RESOLVE
+CARLOPT_RESOLVE
 </keywords>
 </info>
 
@@ -35,7 +35,7 @@ http
 lib1502
 </tool>
  <name>
-HTTP multi with CURLOPT_RESOLVE, cleanup sequence UA
+HTTP multi with CARLOPT_RESOLVE, cleanup sequence UA
  </name>
  <command>
 http://google.com:%HTTPPORT/1502 %HTTPPORT %HOSTIP

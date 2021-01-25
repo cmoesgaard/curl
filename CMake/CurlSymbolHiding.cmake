@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.se/docs/copyright.html.
+# are also available at https://carl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -21,10 +21,10 @@
 ###########################################################################
 include(CheckCSourceCompiles)
 
-option(CURL_HIDDEN_SYMBOLS "Set to ON to hide libcurl internal symbols (=hide all symbols that aren't officially external)." ON)
-mark_as_advanced(CURL_HIDDEN_SYMBOLS)
+option(CARL_HIDDEN_SYMBOLS "Set to ON to hide libcarl internal symbols (=hide all symbols that aren't officially external)." ON)
+mark_as_advanced(CARL_HIDDEN_SYMBOLS)
 
-if(CURL_HIDDEN_SYMBOLS)
+if(CARL_HIDDEN_SYMBOLS)
   set(SUPPORTS_SYMBOL_HIDING FALSE)
 
   if(CMAKE_C_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
@@ -59,18 +59,18 @@ if(CURL_HIDDEN_SYMBOLS)
     set(SUPPORTS_SYMBOL_HIDING TRUE)
   endif()
 
-  set(HIDES_CURL_PRIVATE_SYMBOLS ${SUPPORTS_SYMBOL_HIDING})
+  set(HIDES_CARL_PRIVATE_SYMBOLS ${SUPPORTS_SYMBOL_HIDING})
 elseif(MSVC)
   if(NOT CMAKE_VERSION VERSION_LESS 3.7)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE) #present since 3.4.3 but broken
-    set(HIDES_CURL_PRIVATE_SYMBOLS FALSE)
+    set(HIDES_CARL_PRIVATE_SYMBOLS FALSE)
   else()
-    message(WARNING "Hiding private symbols regardless CURL_HIDDEN_SYMBOLS being disabled.")
-    set(HIDES_CURL_PRIVATE_SYMBOLS TRUE)
+    message(WARNING "Hiding private symbols regardless CARL_HIDDEN_SYMBOLS being disabled.")
+    set(HIDES_CARL_PRIVATE_SYMBOLS TRUE)
   endif()
 else()
-  set(HIDES_CURL_PRIVATE_SYMBOLS FALSE)
+  set(HIDES_CARL_PRIVATE_SYMBOLS FALSE)
 endif()
 
-set(CURL_CFLAG_SYMBOLS_HIDE ${_CFLAG_SYMBOLS_HIDE})
-set(CURL_EXTERN_SYMBOL ${_SYMBOL_EXTERN})
+set(CARL_CFLAG_SYMBOLS_HIDE ${_CFLAG_SYMBOLS_HIDE})
+set(CARL_EXTERN_SYMBOL ${_SYMBOL_EXTERN})

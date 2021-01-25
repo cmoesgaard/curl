@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.se/docs/copyright.html.
+ * are also available at https://carl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,29 +28,29 @@
 
 int test(char *URL)
 {
-  struct curl_slist *header = NULL;
+  struct carl_slist *header = NULL;
   long unmet;
-  CURL *curl = NULL;
+  CARL *carl = NULL;
   int res = 0;
 
-  global_init(CURL_GLOBAL_ALL);
+  global_init(CARL_GLOBAL_ALL);
 
-  easy_init(curl);
+  easy_init(carl);
 
-  easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_TIMECONDITION, (long)CURL_TIMECOND_IFMODSINCE);
+  easy_setopt(carl, CARLOPT_URL, URL);
+  easy_setopt(carl, CARLOPT_TIMECONDITION, (long)CARL_TIMECOND_IFMODSINCE);
   /* Some TIMEVALUE; it doesn't matter. */
-  easy_setopt(curl, CURLOPT_TIMEVALUE, 1566210680L);
+  easy_setopt(carl, CARLOPT_TIMEVALUE, 1566210680L);
 
-  header = curl_slist_append(NULL, "If-Modified-Since:");
+  header = carl_slist_append(NULL, "If-Modified-Since:");
   if(!header) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
 
-  easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+  easy_setopt(carl, CARLOPT_HTTPHEADER, header);
 
-  res = curl_easy_perform(curl);
+  res = carl_easy_perform(carl);
   if(res)
     goto test_cleanup;
 
@@ -59,7 +59,7 @@ int test(char *URL)
    * The server returns 304, which means the condition is "unmet".
    */
 
-  res = curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &unmet);
+  res = carl_easy_getinfo(carl, CARLINFO_CONDITION_UNMET, &unmet);
   if(res)
     goto test_cleanup;
 
@@ -71,9 +71,9 @@ int test(char *URL)
 test_cleanup:
 
   /* always cleanup */
-  curl_easy_cleanup(curl);
-  curl_slist_free_all(header);
-  curl_global_cleanup();
+  carl_easy_cleanup(carl);
+  carl_slist_free_all(header);
+  carl_global_cleanup();
 
   return res;
 }

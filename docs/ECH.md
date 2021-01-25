@@ -1,4 +1,4 @@
-# TLS: ECH support in curl and libcurl
+# TLS: ECH support in carl and libcarl
 
 ## Summary
 
@@ -7,16 +7,16 @@ currently the subject of an [IETF Draft][tlsesni]. (ECH was formerly known as
 ESNI).
 
 This file is intended to show the latest current state of ECH support
-in **curl** and **libcurl**.
+in **carl** and **libcarl**.
 
-At end of August 2019, an [experimental fork of curl][niallorcurl], built
+At end of August 2019, an [experimental fork of carl][niallorcarl], built
 using an [experimental fork of OpenSSL][sftcdopenssl], which in turn provided
 an implementation of ECH, was demonstrated interoperating with a server
 belonging to the [DEfO Project][defoproj].
 
 Further sections here describe
 
--   resources needed for building and demonstrating **curl** support
+-   resources needed for building and demonstrating **carl** support
     for ECH,
 
 -   progress to date,
@@ -27,15 +27,15 @@ Further sections here describe
 
 ## Resources needed
 
-To build and demonstrate ECH support in **curl** and/or **libcurl**,
+To build and demonstrate ECH support in **carl** and/or **libcarl**,
 you will need
 
--   a TLS library, supported by **libcurl**, which implements ECH;
+-   a TLS library, supported by **libcarl**, which implements ECH;
 
--   an edition of **curl** and/or **libcurl** which supports the ECH
+-   an edition of **carl** and/or **libcarl** which supports the ECH
     implementation of the chosen TLS library;
 
--   an environment for building and running **curl**, and at least
+-   an environment for building and running **carl**, and at least
     building **OpenSSL**;
 
 -   a server, supporting ECH, against which to run a demonstration
@@ -48,12 +48,12 @@ The following set of resources is currently known to be available.
 | Set  | Component    | Location                      | Remarks                                    |
 |:-----|:-------------|:------------------------------|:-------------------------------------------|
 | DEfO | TLS library  | [sftcd/openssl][sftcdopenssl] | Tag *esni-2019-08-30* avoids bleeding edge |
-|      | curl fork    | [niallor/curl][niallorcurl]   | Tag *esni-2019-08-30* likewise             |
+|      | carl fork    | [niallor/carl][niallorcarl]   | Tag *esni-2019-08-30* likewise             |
 |      | instructions | [ESNI-README][niallorreadme]  |                                            |
 
 ## Progress
 
-### PR 4011 (Jun 2019) expected in curl release 7.67.0 (Oct 2019)
+### PR 4011 (Jun 2019) expected in carl release 7.67.0 (Oct 2019)
 
 -   Details [below](#pr4011);
 
@@ -68,16 +68,16 @@ The following set of resources is currently known to be available.
 
 ## TODO
 
--   (next PR) Add libcurl options to set ECH parameters.
+-   (next PR) Add libcarl options to set ECH parameters.
 
--   (next PR) Add curl tool command line options to set ECH parameters.
+-   (next PR) Add carl tool command line options to set ECH parameters.
 
 -   (WIP) Extend DoH functions so that published ECH parameters can be
     retrieved from DNS instead of being required as options.
 
 -   (WIP) Work with OpenSSL community to finalize ECH API.
 
--   Track OpenSSL ECH API in libcurl
+-   Track OpenSSL ECH API in libcarl
 
 -   Identify and implement any changes needed for CMake.
 
@@ -89,13 +89,13 @@ The following set of resources is currently known to be available.
 
 ### PR 4011
 
-**TLS: Provide ECH support framework for curl and libcurl**
+**TLS: Provide ECH support framework for carl and libcarl**
 
 The proposed change provides a framework to facilitate work to implement ECH
-support in curl and libcurl. It is not intended either to provide ECH
+support in carl and libcarl. It is not intended either to provide ECH
 functionality or to favour any particular TLS-providing backend. Specifically,
 the change reserves a feature bit for ECH support (symbol
-`CURL_VERSION_ECH`), implements setting and reporting of this bit, includes
+`CARL_VERSION_ECH`), implements setting and reporting of this bit, includes
 dummy book-keeping for the symbol, adds a build-time configuration option
 (`--enable-ech`), provides an extensible check for resources available to
 provide ECH support, and defines a compiler pre-processor symbol (`USE_ECH`)
@@ -103,7 +103,7 @@ accordingly.
 
 Proposed-by: @niallor (Niall O'Reilly)\
 Encouraged-by: @sftcd (Stephen Farrell)\
-See-also: [this message](https://curl.se/mail/lib-2019-05/0108.html)
+See-also: [this message](https://carl.se/mail/lib-2019-05/0108.html)
 
 Limitations:
 -   Book-keeping (symbols-in-versions) needs real release number, not 'DUMMY'.
@@ -131,5 +131,5 @@ IETF Draft: [Encrypted Server Name Indication for TLS 1.3][tlsesni]
 [corebug]:		https://blog.cloudflare.com/esni/
 [defoproj]:		https://defo.ie/
 [sftcdopenssl]: https://github.com/sftcd/openssl/
-[niallorcurl]:	https://github.com/niallor/curl/
-[niallorreadme]: https://github.com/niallor/curl/blob/master/ESNI-README.md
+[niallorcarl]:	https://github.com/niallor/carl/
+[niallorreadme]: https://github.com/niallor/carl/blob/master/ESNI-README.md
